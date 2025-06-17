@@ -11,12 +11,19 @@ use regex::{Captures, Regex, RegexSet};
 use phf::{phf_map, phf_set};
 use crate::speech::{BRAILLE_RULES, SpeechRulesWithContext, braille_replace_chars, make_quoted_string};
 use crate::canonicalize::get_parent;
+use std::borrow::Cow;
 use std::ops::Range;
 
 static UEB_PREFIXES: phf::Set<char> = phf_set! {
     '⠼', '⠈', '⠘', '⠸', '⠐', '⠨', '⠰', '⠠',
 };
 
+/// Returns the braille *char* at the given position in the braille string.
+fn braille_at(braille: &str, index: usize) -> char {
+    // braille is always 3 bytes per char
+    return braille[index..index+3].chars().next().unwrap();
+
+}
 
 /// braille the MathML
 /// If 'nav_node_id' is not an empty string, then the element with that id will have dots 7 & 8 turned on as per the pref
@@ -74,13 +81,13 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
             return (braille, 0, end/3);
         };
 
-        let end = end.unwrap() + 3;         // always exists if start exists ('end' is exclusive)
-        // debug!("braille highlight: start/end={}/{}; braille={}", start.unwrap()/3, end/3, braille);
-        // let is_nemeth_baseline_hack_check = end < braille.len() && braille[end..end+3].chars().next().unwrap() == '⣐';
-        // if is_nemeth_baseline_hack_check {
-        //     end += end + 3;
-        // }
-        let start = highlight_first_indicator(&mut braille, braille_code, start.unwrap(), end);
+        let start = start.unwrap();
+        let mut end = end.unwrap() + 3;         // always exists if start exists ('end' is exclusive)
+        debug!("braille highlight: start/end={}/{}; braille={}", start/3, end/3, braille);
+        let mut start = highlight_first_indicator(&mut braille, braille_code, start, end);
+        if let Some(new_range) = expand_highlight(&mut braille, braille_code, start, end) {
+            (start, end) = new_range
+        }
 
         if start == end {
             return (braille, start/3, end/3);
@@ -102,7 +109,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
         /// Return the byte index of the first place to highlight
         fn highlight_first_indicator(braille: &mut String, braille_code: &str, start_index: usize, end_index: usize) -> usize {
             // chars in the braille block range use 3 bytes -- we can use that to optimize the code some
-            let first_ch = unhighlight(braille[start_index..start_index+3].chars().next().unwrap());
+            let first_ch = unhighlight(braille_at(braille, start_index));
 
             // need to highlight (optional) capital/number, language, and style (max 2 chars) also in that (rev) order
             let mut prefix_ch_index = std::cmp::max(0, start_index as isize - 5*3) as usize;
@@ -123,19 +130,49 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
                 // remove old highlight as long as we don't wipe out the end highlight
                 if start_index < end_index {
                     let old_first_char_bytes = start_index..start_index+3;
-                    let replacement_str = unhighlight(braille[old_first_char_bytes.clone()].chars().next().unwrap()).to_string();
+                    let replacement_str = unhighlight(braille_at(braille, start_index)).to_string();
                     braille.replace_range(old_first_char_bytes, &replacement_str);
                 }
 
                 // add new highlight
                 let new_first_char_bytes = i_byte_start..i_byte_start+3;
-                let replacement_str = highlight(braille[new_first_char_bytes.clone()].chars().next().unwrap()).to_string();
+                let replacement_str = highlight(braille_at(braille, i_byte_start)).to_string();
                 braille.replace_range(new_first_char_bytes, &replacement_str);
             }
 
             return i_byte_start;
         }
 
+        /// Return the byte indexes of the first and last place to highlight
+        /// Currently, this only does something for CMU braille
+        fn expand_highlight(braille: &mut String, braille_code: &str, start_index: usize, end_index: usize) -> Option<(usize, usize)> {
+            // For CMU, we want to expand mrows to include the opening and closing grouping indicators if they exist
+            if start_index == 0 || end_index == braille.len() || braille_code != "CMU" {
+                return None;
+            }
+
+            let first_ch = unhighlight(braille_at(braille, start_index));
+            let last_ch = unhighlight(braille_at(braille, end_index-3));
+            // We need to be careful not to expand the selection if we are already on a grouping indicator
+            if first_ch == '⠢' && last_ch == '⠔'{
+                return None;
+            }
+            let preceding_ch = braille_at(braille, start_index-3);
+            if preceding_ch != '⠢' {
+                return None;
+            }
+
+            let following_ch = braille_at(braille, end_index);
+            if following_ch != '⠔' {
+                return None;
+            }
+
+            let preceding_ch = highlight(preceding_ch);
+            braille.replace_range(start_index-3..start_index+3, format!("{}{}", preceding_ch, first_ch).as_str());
+            let following_ch = highlight(following_ch);
+            braille.replace_range(end_index-3..end_index+3, format!("{}{}", last_ch, following_ch).as_str());
+            return Some( (start_index-3, end_index + 3) );
+        }
     }
 
     /// Given a position in a Nemeth string, what is the position character that starts it (e.g, the prev char for capital letter)
@@ -214,7 +251,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
 //   they would need to be unshifted for the external world
 fn is_highlighted(ch: char) -> bool {
     let ch_as_u32 = ch as u32;
-    return (0x28C0..0x28FF).contains(&ch_as_u32);           // 0x28C0..0x28FF all have dots 7 & 8 on
+    return (0x28C0..0x28FF).contains(&ch_as_u32) || ch == '𝑏';           // 0x28C0..0x28FF all have dots 7 & 8 on
 }
 
 fn highlight(ch: char) -> char {
@@ -295,24 +332,43 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
         let (braille, char_start, char_end) = braille_mathml(mathml, node_id)?;
         let mut status = None;
         // debug!("find_navigation_node ({}, id={}): highlight=[{}, {});  target={}", name(node), node_id, char_start, char_end, target_position);
-        if is_leaf(node) && char_start == 0 && char_end == braille.len()/3 {
-            // nothing highlighted -- probably invisible char not represented in braille -- continue looking to the right
-            status = Some(SearchStatus::LookRight);
-        } else if target_position < char_start {
-            // debug!("  return due to target_position {} < start {}", target_position, start);
-            status = Some(SearchStatus::LookLeft);
-        } else if target_position >= char_end {
-            // debug!("  return due to target_position {} >= end {}", target_position, char_end);
-            status = Some(SearchStatus::LookRight);
-        } else if is_leaf(node) {
-            // at this point, char_start <= target_position && target_position < char_end
-            // FIX: need to handle multi-char leaves and set the offset (char_start) appropriately
-            return Ok( SearchState {
-                status: SearchStatus::Found,
-                node,
-                highlight_start: 0,
-                highlight_end: 0,
-            } );
+        if is_leaf(node) {
+            if char_start == 0 && char_end == braille.len()/3 {
+                // nothing highlighted -- probably invisible char not represented in braille -- continue looking to the right
+                // debug!("  return due invisible char (?)' ");
+                status = Some(SearchStatus::LookRight);
+            } else if char_start <= target_position && target_position < char_end {
+                // FIX: need to handle multi-char leaves and set the offset (char_start) appropriately
+                // debug!("  return due to target_position inside leaf: {} <= {} < {}", char_start, target_position, char_end);
+                return Ok( SearchState {
+                    status: SearchStatus::Found,
+                    node,
+                    highlight_start: target_position - char_start,
+                    highlight_end: 0,
+                });
+            } else if name(node) == "mo" {
+                // if there is whitespace before or after the operator, consider the operator to be a match
+                if (char_start > 0 && target_position == char_start - 1 && 
+                    braille_at(&braille, 3*(char_start - 1)) == '⠀' && is_operator_that_adds_whitespace(node)) ||
+                   (3*char_end < braille.len() && target_position == char_end &&
+                    braille_at(&braille, 3*char_end) == '⠀' && is_operator_that_adds_whitespace(node)) {
+                    return Ok( SearchState {
+                        status: SearchStatus::Found,
+                        node,
+                        highlight_start: 0,
+                        highlight_end: 0,
+                    } );
+                }
+            }
+        }
+        if status.is_none() {
+            if target_position < char_start {
+                // debug!("  return due to target_position {} < start {}", target_position, char_start);
+                status = Some(SearchStatus::LookLeft);
+            } else if target_position >= char_end {
+                // debug!("  return due to target_position {} >= end {}", target_position, char_end);
+                status = Some(SearchStatus::LookRight);
+            }
         }
         if let Some(status) = status {
             return Ok( SearchState {
@@ -331,8 +387,10 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
         while i_left_child < i_right_child {
             let i_guess_child = guess_fn(i_left_child, i_right_child, call_start, target_position);
             let status = find_navigation_node(mathml, as_element(children[i_guess_child]), target_position)?;
-            // debug!("  in {} loop: status: {}, child: left/guess/right {}/{}/{}; highlight=[{}, {})", 
-            //         name(node), status.status, i_left_child, i_guess_child, i_right_child, status.highlight_start, status.highlight_end);
+            // debug!("  in {} loop: status: {}, child: left/guess/right {}/({},{})/{}; highlight=[{}, {})", 
+            //         name(node), status.status,
+            //         i_left_child, i_guess_child, name(as_element(children[i_guess_child])),i_right_child,
+            //         status.highlight_start, status.highlight_end);
             match status.status {
                 SearchStatus::Found => {
                     return Ok(status);
@@ -352,7 +410,7 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
                     return Ok(status);  // look up a level
                 },
                 SearchStatus::LookLeft => {
-                    i_right_child = if i_guess_child == 0 {0} else {i_guess_child-1};
+                    i_right_child = if i_guess_child == 0 {0} else {i_guess_child};         // exclusive
                     call_start = status.highlight_start-1;
                     guess_fn = Box::new(|i_left, i_right, start, target| guess_child_node_rtl(&children, i_left, i_right, start, target));
                 },
@@ -363,19 +421,9 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
                 },
             }
         }
-        // debug!("Didn't find node {} in children: left/right={}/{};  target_position={}", name(node), i_left_child, i_right_child, target_position);
+        // debug!("Didn't child in node {}: left/right={}/{};  target_position={}", name(node), i_left_child, i_right_child, target_position);
 
         // if we get here, we didn't find it in the children
-        if i_left_child < children.len() {
-            if let Some(child) = shift_whitespace_to_operator(&braille, target_position, as_element(children[i_left_child])) {
-                return Ok( SearchState {
-                    status: SearchStatus::Found,
-                    node: child,
-                    highlight_start: 0,
-                    highlight_end: 0,
-                } );
-            }
-        }
         // debug!("..end of loop: look in parent of {} has start/end={}/{}", name(node), char_start, char_end);
         return Ok( SearchState{
             status: if char_start <= target_position && target_position <= char_end {SearchStatus::Found} else {SearchStatus::LookInParent},
@@ -385,33 +433,16 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
         } );
     }
 
-    /// Select an adjacent operator if we are on whitespace (preference given to comparison operators)
-    /// 'nearby_node' is the node that is past the target (because i_left> i_right)
-    fn shift_whitespace_to_operator<'a>(braille: &str, target: usize, nearby_node: Element<'a>) -> Option<Element<'a>> {
+    fn is_operator_that_adds_whitespace(node: Element) -> bool {
         use crate::definitions::BRAILLE_DEFINITIONS;
-        let braille_char = braille[3*target..3*target+3].chars().next().unwrap();
-        // debug!("shift_whitespace_to_operator: braille_char={}, target={}, node=\n{}", braille_char, target, mml_to_string(nearby_node));
-        if braille_char != '⠀' {    // braille blank char
-            return None;
-        }
+        if PreferenceManager::get().borrow().pref_to_string("UseSpacesAroundAllOperators") == "true" {
+            return true;
+        } 
 
         return BRAILLE_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             let comparison_operators = definitions.get_hashset("ComparisonOperators").unwrap();
-            if name(nearby_node) == "mo" && comparison_operators.contains(as_text(nearby_node)) {
-                // debug!("  found comparison operator to the right of space: {}", as_text(nearby_node));
-                return Some(nearby_node);
-            }
-            let preceding_siblings = nearby_node.preceding_siblings();
-            if !preceding_siblings.is_empty() && name(as_element(preceding_siblings[0])) == "mo" {
-                // look to the left for a comparison operator
-                let child = as_element(preceding_siblings[0]);
-                if name(child) == "mo" && comparison_operators.contains(as_text(child)) {
-                    // debug!("  found comparison operator to the left of space: {}", as_text(child));
-                    return Some(child);
-                }
-            }
-            return None;
+            return comparison_operators.contains(as_text(node));
         });        
     }
 
@@ -670,8 +701,10 @@ fn nemeth_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
 
     // strip level indicators
     // checks for punctuation char, so needs to before punctuation is stripped.
-    
-    let result = REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT.replace_all(&result, "$1");
+    // if '𝑏' is removed, then the highlight needs to be shifted to the left in some cases
+//   debug!("Punct  : \"{}\"", &result);
+    let mut result = result;
+    let result = remove_baseline_before_space_or_punctuation(&mut result);
 //   debug!("Punct  : \"{}\"", &result);
     let result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "$1");
 //   debug!("Bseline: \"{}\"", &result);
@@ -709,6 +742,36 @@ fn nemeth_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
    
     return result.to_string();
 
+    fn remove_baseline_before_space_or_punctuation<'a>(braille: &'a mut Cow<'a, str>) -> Cow<'a, str> {
+        // If the baseline highlight is at the end of the string and it is going to be deleted by the regex,
+        //   then we need to shift the highlight to the left if what is to it's left is not whitespace (which should never be a highlight end)
+        // This only happens when BrailleNavHighlight == "EndPoints".
+        let highlight_style = PreferenceManager::get().borrow().pref_to_string("BrailleNavHighlight");
+        if highlight_style == "EndPoints" {
+            if let Some(last_highlighted) = braille.rfind(is_highlighted) {
+                if braille[last_highlighted..].starts_with('𝑏') {
+                    let i_after_baseline = last_highlighted + '𝑏'.len_utf8();
+                    if i_after_baseline == braille.len() || braille[i_after_baseline..].starts_with(&['W', 'w', ',', 'P']) {
+                        // shift the highlight to the left after doing just the replacement (if any) that the regex below does
+                        let mut bytes_deleted = 0;
+                        let mut char_to_highlight = "".to_string();   // illegal value
+                        for ch in braille[..last_highlighted].chars().rev() {
+                            if (0x2800..0x28FF).contains(&(ch as u32)) {
+                                char_to_highlight = highlight(ch).to_string();
+                                break;
+                            } else {
+                                bytes_deleted += ch.len_utf8();
+                            }
+                        }
+                        braille.to_mut().replace_range(last_highlighted-bytes_deleted..last_highlighted+'𝑏'.len_utf8(),
+                                                        &char_to_highlight);
+                    }
+                }
+            }
+        }
+        return REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT.replace_all(braille, "$1");
+
+    }
 }
 
 // Typeface: S: sans-serif, B: bold, T: script/blackboard, I: italic, R: Roman
@@ -3108,20 +3171,20 @@ mod tests {
             debug!("Time taken: {}ms", instant.elapsed().as_millis());
             assert_eq!(answers[i], id, "\nUEB test ith position={}", i);
         }
-
         set_preference("BrailleCode".to_string(), "CMU".to_string()).unwrap();
-        // let braille = get_braille("".to_string())?;
-        // let answers= &[2, 3, 4, 7, 8, 9, 9, 9, 10, 10,   10, 13, 12, 14, 14, 15, 17, 17, 19, 19,   21, 10, 4, 4, 4, 23, 23, 25, 25, 4,];
-        // let answers = answers.map(|num| format!("id-{}", num));
-        // debug!("\n\n*** Testing CMU ***");
-        // for i in 0..braille.chars().count() {
-        //     debug!("\n===  i={}  ===", i);
-        //     let instant = Instant::now();
-        //     let (id, _offset) = crate::interface::get_navigation_node_from_braille_position(i)?;
-        //     N_PROBES.with(|n| {debug!("test {:2} #probes = {}", i, n.borrow())});
-        //     debug!("Time taken: {}ms", instant.elapsed().as_millis());
-        //     assert_eq!(answers[i], id, "\nCMU test ith position={}", i);
-        // }
+        let braille = get_braille("".to_string())?;
+        let answers= &[2, 3, 5, 7, 8, 9, 9, 9, 10, 10,   11, 13, 12, 14, 14, 15, 17, 17, 19, 19,   21, 11, 5, 4, 22, 23, 23, 25, 25, 22,];
+        let answers = answers.map(|num| format!("id-{}", num));
+        debug!("\n\n*** Testing CMU ***");
+        debug!("Braille: {}", braille);
+        for i in 0..braille.chars().count() {
+            debug!("\n===  i={}  ===", i);
+            let instant = Instant::now();
+            let (id, _offset) = crate::interface::get_navigation_node_from_braille_position(i)?;
+            N_PROBES.with(|n| {debug!("test {:2} #probes = {}", i, n.borrow())});
+            debug!("Time taken: {}ms", instant.elapsed().as_millis());
+            assert_eq!(answers[i], id, "\nCMU test ith position={}", i);
+        }
         return Ok( () );
     }
     
