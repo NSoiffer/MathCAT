@@ -11,14 +11,18 @@ env:
 
 jobs:
   build:
-
+    name: Build and Test
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Build
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
-    - name: Run Clippy/Lint
+
+  clippy:
+    name: Run Clippy/Lint
+    runs-on: ubuntu-latest
+    steps:
+    - name: clippy
       run: cargo clippy
