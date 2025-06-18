@@ -83,7 +83,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
 
         let start = start.unwrap();
         let mut end = end.unwrap() + 3;         // always exists if start exists ('end' is exclusive)
-        debug!("braille highlight: start/end={}/{}; braille={}", start/3, end/3, braille);
+        // debug!("braille highlight: start/end={}/{}; braille={}", start/3, end/3, braille);
         let mut start = highlight_first_indicator(&mut braille, braille_code, start, end);
         if let Some(new_range) = expand_highlight(&mut braille, braille_code, start, end) {
             (start, end) = new_range
@@ -752,14 +752,14 @@ fn nemeth_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
                     let i_after_baseline = last_highlighted + '𝑏'.len_utf8();
                     if i_after_baseline == braille.len() || braille[i_after_baseline..].starts_with(&['W', 'w', ',', 'P']) {
                         // shift the highlight to the left after doing just the replacement (if any) that the regex below does
+                        // the shift runs until a non blank braille char is found
                         let mut bytes_deleted = 0;
                         let mut char_to_highlight = "".to_string();   // illegal value
                         for ch in braille[..last_highlighted].chars().rev() {
-                            if (0x2800..0x28FF).contains(&(ch as u32)) {
+                            bytes_deleted += ch.len_utf8();
+                            if (0x2801..0x28FF).contains(&(ch as u32)) {
                                 char_to_highlight = highlight(ch).to_string();
                                 break;
-                            } else {
-                                bytes_deleted += ch.len_utf8();
                             }
                         }
                         braille.to_mut().replace_range(last_highlighted-bytes_deleted..last_highlighted+'𝑏'.len_utf8(),
