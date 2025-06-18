@@ -700,14 +700,13 @@ fn nemeth_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
 //   debug!("A PUNCT: \"{}\"", &result);
 
     // strip level indicators
+    // check first to remove level indicators before baseline, then potentially remove the baseline
+    let mut result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "$1");
+//   debug!("Punct  : \"{}\"", &result);
     // checks for punctuation char, so needs to before punctuation is stripped.
     // if '𝑏' is removed, then the highlight needs to be shifted to the left in some cases
-//   debug!("Punct  : \"{}\"", &result);
-    let mut result = result;
     let result = remove_baseline_before_space_or_punctuation(&mut result);
-//   debug!("Punct  : \"{}\"", &result);
-    let result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "$1");
-//   debug!("Bseline: \"{}\"", &result);
+//   debug!("Removed: \"{}\"", &result);
 
     let result = NO_SPACE_AFTER_COMMA.replace_all(&result, "⠠P⠴");
 
