@@ -462,7 +462,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: [T: "exp"]      # phrase('exp' means exponential function)
-      else: [T: "eksponentialfunksjonen"]      # phrase('exponential' function)
+      else: [T: "eksponensialfunksjonen"]      # phrase('exponential' function)  #Norwegian: Spelled wrong for correct pronunciation
 
 # NORWEGIAN: Added this rule from English version, but removed test for Verbosity.    
 - name: covariance

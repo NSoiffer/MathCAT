@@ -268,13 +268,12 @@
   - "    self::m:square-root or self::m:msqrt or self::m:root or self::m:mroot or"
   - "    (self::m:msub or self::m:msubsup or"
   - "    ((self::m:msup or self::m:power) and not(IsNode(*[1], 'leaf') and *[2][self::m:mn and (.=2 or '.=3')]))) and " # followed by msup, etc.
-  - "       (*[1][self::m:mrow[IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')] or "
-  - "            self::m:matrix or self::m:determinant] or" # base has parens
-  - "        not(IsNode(*[2], 'simple')) or "
-  - "        (self::m:msubsup and not(IsNode(*[3], 'simple')))"
-  - "    )"
-  - "  ]"
-  # other possibility is the preceding element has parens (but not the following)
+  - "     (*[1][self::m:mrow[IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')] or "
+  - "           self::m:matrix or self::m:determinant] or" # base has parens
+  - "      not(IsNode(*[2], 'simple')) or "
+  - "      (self::m:msubsup and not(IsNode(*[3], 'simple')))"
+  - "     )"
+  - "  ]"  # other possibility is the preceding element has parens (but not the following)
   - " or "
   - "  preceding-sibling::*[1]["
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens

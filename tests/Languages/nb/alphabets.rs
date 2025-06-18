@@ -10,7 +10,7 @@ fn special_alphabet_chars() {
   let expr = "<math> <mi>ℍ</mi><mo>,</mo><mi>ℿ</mi></math>";
   test("nb", "SimpleSpeak", expr, "dobbeltstreket stor h, komma, dobbeltstreket stor pi");
   let expr = "<math> <mi>ℐ</mi><mo>,</mo><mi>ℳ</mi></math>";
-  test("nb", "SimpleSpeak", expr, "skriftstil stor i komma, skriftstil stor m");
+  test("nb", "SimpleSpeak", expr, "script font stor i, komma, script font stor m");
 }
 
 #[test]
@@ -92,27 +92,27 @@ fn double_struck() {
 #[test]
 fn script() {
     let expr = "<math> <mi>𝒜</mi><mo>,</mo><mi>𝒵</mi></math>";
-    test("nb", "SimpleSpeak", expr, "skriftstil stor a komma, skriftstil stor z");
+    test("nb", "SimpleSpeak", expr, "script font stor a, komma, script font stor z");
     let expr = "<math> <mi>𝒶</mi><mo>,</mo><mi>𝓏</mi></math>";
-    test("nb", "SimpleSpeak", expr, "skriftstil a komma, skriftstil z");
+    test("nb", "SimpleSpeak", expr, "script font a komma, script font z");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("nb", "SimpleSpeak", expr, "skriftstil stor a komma, skriftstil stor z");
+    test("nb", "SimpleSpeak", expr, "script font stor a, komma, script font stor z");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("nb", "SimpleSpeak", expr, "skriftstil a komma, skriftstil z");
+    test("nb", "SimpleSpeak", expr, "script font a komma, script font z");
 }
 
 #[test]
 fn bold_script() {
     let expr = "<math> <mi>𝓐</mi><mo>,</mo><mi>𝓩</mi></math>";
-    test("nb", "SimpleSpeak", expr, "skriftstil fet stor a, komma, skriftstil fet stor z");
+    test("nb", "SimpleSpeak", expr, "script font fet stor a, komma, script font fet stor z");
     let expr = "<math> <mi>𝓪</mi><mo>,</mo><mi>𝔃</mi></math>";
-    test("nb", "SimpleSpeak", expr, "skriftstil fet a komma, skriftstil fet z");
+    test("nb", "SimpleSpeak", expr, "script font fet a komma, script font fet z");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("nb", "SimpleSpeak", expr, "skriftstil fet stor a, komma, skriftstil fet stor z");
+    test("nb", "SimpleSpeak", expr, "script font fet stor a, komma, script font fet stor z");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("nb", "SimpleSpeak", expr, "skriftstil fet a komma, skriftstil fet z");
+    test("nb", "SimpleSpeak", expr, "script font fet a komma, script font fet z");
 }
 
 #[test]

@@ -85,7 +85,7 @@ fn trig_power_other() {
 #[test]
 fn simple_log() {
     let expr = "<math> <mrow>  <mi>log</mi><mi>x</mi></mrow> </math>";
-    test("nb", "ClearSpeak", expr, "log x");
+    test("nb", "ClearSpeak", expr, "log av x");
 }
 
 #[test]
@@ -109,7 +109,7 @@ fn normal_log_with_base() {
 #[test]
 fn simple_ln() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
-    test("nb", "ClearSpeak", expr, "l n x");
+    test("nb", "ClearSpeak", expr, "l n av x");
 }
 
 #[test]
@@ -123,7 +123,7 @@ fn normal_ln() {
 fn simple_natural_log() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
     test_ClearSpeak("nb", "ClearSpeak_Log", "LnAsNaturalLog",expr,
-        "den naturlige logaritmen x");
+        "den naturlige logaritmen av x");
 }
 
     

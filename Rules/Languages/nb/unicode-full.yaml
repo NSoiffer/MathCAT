@@ -164,7 +164,7 @@
  - "̒": [T: "med rotert komma"]       #  0x312    (en: 'turned comma above embellishment', google translation)
  - "̓": [T: "med komma"]               #  0x313    (en: 'comma above embellishment', google translation)
  - "̔": [T: "med omvendt komma"]        #  0x314    (en: 'reversed comma above embellishment', google translation)
- - "̕": [T: "med et høyrejustert komma"]         #  0x315    (en: 'comma above right embellishment', google translation)
+ - "̕": [T: "med høyrestilt komma"]         #  0x315    (en: 'comma above right embellishment', google translation)
  - "̖": [T: "lav grav aksent"]    #  0x316    (en: 'grave accent below embellishment', google translation)
  - "̗": [T: "lav akutt aksent"]        #  0x317    (en: 'acute accent below embellishment', google translation)
  - "̘": [T: "lavt venstre dreiekors"]       #  0x318    (en: 'left tack below embellishment', google translation)
@@ -184,7 +184,7 @@
  - "̦": [T: "lavt komma"]              #  0x326    (en: 'comma below embellishment', google translation)
  - "̧": [T: "lav cédille"]                 #  0x327    (en: 'cedilla embellishment', google: 'cedilla -utsmyckning')
  - "̨": [T: "lav kvist"]                                #  0x328    (en: 'ogonek embellishment', google translation)
- - "̩": [T: "lav vertikal linje"]     #  0x329    (en: 'vertical line below embellishment', google translation)
+ - "̩": [T: "lav vertikal strek"]     #  0x329    (en: 'vertical line below embellishment', google translation)
  - "̪": [T: "lav bro"]                #  0x32a    (en: 'bridge below embellishment', google translation)
  - "̫": [T: "lav omvendt dobbel bue"]    #  0x32b    (en: 'inverted double arch below embellishment', google translation)
  - "̬": [T: "lav hake"]              #  0x32c    (en: 'caron below embellishment', google translation)
@@ -193,7 +193,7 @@
  - "̯": [T: "lav omvendt breve"]    #  0x32f    (en: 'inverted breve below embellishment', google translation)
  - "̰": [T: "lav tilde"]            #  0x330    (en: 'tilde below embellishment', google: 'tilde under utsmyckning')
  - "̱": [T: "lav makron"]           #  0x331    (en: 'macron below embellishment', google: 'macron under utsmyckning')
- - "̲": [T: "lav linje"]               #  0x332    (en: 'low line embellishment', google: 'låg linje utsmyckning')
+ - "̲": [T: "lav strek"]               #  0x332    (en: 'low line embellishment', google: 'låg linje utsmyckning')
  - "̳": [T: "lav dobbeltstrek"]         #  0x333    (en: 'double low line embellishment', google translation)
  #------------------------------------------
  #Overstruck diacritics OK
@@ -481,16 +481,16 @@
     - T: "script font"                                 #     (en: 'script')
     - spell: "translate('.', 'ℐℒ℘ℬℰℱℳ', 'ILPBEFM')"
 
- - "ℓ": [T: "skrifttype l"]                             #  0x2113    (en: 'script l')
+ - "ℓ": [T: "script font l"]                             #  0x2113    (en: 'script l')
  - "℔": [T: "pund"]                           #  0x2114    (en: 'pounds', google: 'pund')
  - "№": [T: "numero"]                        #  0x2116    (en: 'number')
  - "℥": [T: "ounce"]                           #  0x2125    (en: 'ounces')
  - "Ω": [T: "ohm"]                                  #  0x2126    (en: 'ohms')
  - "℧": [T: "mho"]                           #  0x2127    (en: 'mhos')
- - "℩": [T: "rotert jota"]                         #  0x2129    (en: 'turned iota', google: 'vände iota')
+ - "℩": [T: "rotert iota"]                         #  0x2129    (en: 'turned iota', google: 'vände iota')
  - "K": [T: "grader kelvin"]                        #  0x212a    (en: 'kelvin')
  - "Å": [T: "ångstrøm"]                            #  0x212b
- - "ℯ": [T: "skrifttype e"]                             #  0x212f    (en: 'script e')
+ - "ℯ": [T: "script font e"]                             #  0x212f    (en: 'script e')
 
    # coalesced some chars that use cap letters
  - "Ⅎ℺⅁⅂⅃⅄":                                        #  0x2132, 0x213a, 0x2141, 0x2142, 0x2143, 0x2144
@@ -504,7 +504,7 @@
         else: [T: "rotert sans-serif"]                       #     (en: 'turned sans-serif', google: 'vände sans-serif')
     - spell: "translate('.', 'Ⅎ℺⅁⅂⅃⅄', 'FQGLLY')"
 
- - "ℴ": [T: "skrifttype o"]                             #  0x2134    (en: 'script o')
+ - "ℴ": [T: "script font o"]                             #  0x2134    (en: 'script o')
  - "ℵ": [T: "alef"]                                 #  0x2135    (en: 'first transfinite cardinal')
  - "ℶ": [T: "bet"]                                  #  0x2136    (en: 'second transfinite cardinal')
  - "ℷ": [T: "gimel"]                                #  0x2137    (en: 'third transfinite cardinal')
@@ -1133,7 +1133,7 @@
  - "⊘": [T: "divisjon i sirkel"]                         #  0x2298    (en: 'circled slash')
  - "⊙": [T: "direkte produkt"]                           #  0x2299    (en: 'circled dot operator')                   
  - "⊚": [T: "ring-operator i sirkel"]                          #  0x229a    (en: 'circled ring')
- - "⊛": [T: "asteriskoperator i sirkel"]                      #  0x229b    (en: 'circled asterisk')
+ - "⊛": [T: "asterisk-operator i sirkel"]                      #  0x229b    (en: 'circled asterisk')
  - "⊜": [T: "likhetstegn i sirkel"]                        #  0x229c    (en: 'circled equals')
  - "⊝": [T: "tankestrek i sirkel"]                          #  0x229d    (en: 'circled dash')  
  - "⊞": [T: "plusstegn i kvadrat"]                          #  0x229e    (en: 'squared plus')
@@ -1200,7 +1200,7 @@
  # SWEDISH: misspelled to fix pronunciation
  - "⋂": [T: "snitt"]                                #  0x22c2    (en: 'intersection')
  - "⋃": [T: "union"]                                #  0x22c3
- - "⋄": [T: "diamantoperatør"]                     #  0x22c4
+ - "⋄": [T: "diamant-operatør"]                     #  0x22c4
  - "⋅":                                             #  0x22c5
     - test: 
         if: "@data-chem-formula-op"
@@ -1711,7 +1711,7 @@
  - "⟠": [T: "rombe delt med horisontal strek"]    #  0x27e0    (en: 'lozenge divided by horizontal rule')
  - "⟡": [T: "hvit konkav-sidet diamant"]              #  0x27e1    (en: 'white concave sided diamond')
  - "⟢": [T: "hvit konkav-sidet diamant med strek til venstre"]    #  0x27e2    (en: 'white concave sided diamond with leftwards tick')
- - "⟣": [T: "hvit konkavsidet diamant med strek til høyre"]    #  0x27e3    (en: 'white concave sided diamond with rightwards tick')
+ - "⟣": [T: "hvit konkav-sidet diamant med strek til høyre"]    #  0x27e3    (en: 'white concave sided diamond with rightwards tick')
  - "⟤": [T: "hvitt kvadrat med strek til venstre"]    #  0x27e4    (en: 'white square with leftwards tick')
  - "⟥": [T: "hvitt kvadrat med strek til høyre"]      #  0x27e5    (en: 'white square with rightwards tick')
  - "⟦": [T: "hvit venstre hakeparentes"]          #  0x27e6    (en: 'left white square bracket')
@@ -1726,8 +1726,8 @@
  - "⟯": [T: "avflatet venstreparentes"]              #  0x27ef    (en: 'right flattened parenthesis')
  #--------------------------------------------------------------------------------------------------
  # Supplemental arrows-A OK
- - "⟰": [T: "kvadrupelstreket oppoverpil"]             #  0x27f0    (en: 'upwards quadruple arrow', google: 'uppåt fyrdubbla pilen')
- - "⟱": [T: "kvadrupelstreket nedoverpil"]             #  0x27f1    (en: 'downwards quadruple arrow', google: 'nedåt fyrdubbla pilen')
+ - "⟰": [T: "kvadrupel-streket oppoverpil"]             #  0x27f0    (en: 'upwards quadruple arrow', google: 'uppåt fyrdubbla pilen')
+ - "⟱": [T: "kvadrupel-streket nedoverpil"]             #  0x27f1    (en: 'downwards quadruple arrow', google: 'nedåt fyrdubbla pilen')
  - "⟲": [T: "åpen sirkelpil mot klokken"]      #  0x27f2    (en: 'anticlockwise gapped circle arrow', google: 'antikvis gappad cirkelpil')
  - "⟳": [T: "åpen sirkelpil med klokken"]      #  0x27f3    (en: 'clockwise gapped circle arrow', google: 'medurs gappad cirkelpil')
  - "⟴": [T: "høyrepil med pluss i sirkel"]           #  0x27f4    (en: 'right arrow with circled plus', google: 'höger-pil med circled plus')
@@ -2363,8 +2363,8 @@
  - "⸉": [T: "venstre transposisjonsparentes"]           #  0x2e09    (en: 'left transposition bracket', google translation)
  - "⸊": [T: "høyre transposisjonsparentes"]             #  0x2e0a    (en: 'right transposition bracket', google translation)
  - "⸋": [T: "hevet kvadrat"]                         #  0x2e0b    (en: 'raised square', google translation)
- - "⸌": [T: "venstre hevet utelatelsesparentes"]        #  0x2e0c    (en: 'left raised omission bracket', google translation)
- - "⸍": [T: "høyre hevet utelatelsesparentes"]             #  0x2e0d    (en: 'right raised omission bracket', google translation)
+ - "⸌": [T: "venstre hevet utelatelses-parentes"]        #  0x2e0c    (en: 'left raised omission bracket', google translation)
+ - "⸍": [T: "høyre hevet utelatelses-parentes"]             #  0x2e0d    (en: 'right raised omission bracket', google translation)
  - "⸎": [T: "redaksjonell coronis"]                    #  0x2e0e    (en: 'editorial coronis', google translation)
  - "⸏": [T: "paragraphos"]                          #  0x2e0f    (google translation)
  - "⸐": [T: "forgreinet paragraphos"]                          #  0x2e10    (en: 'forked paragraphos', google translation)
@@ -2475,7 +2475,7 @@
  - "㍷": [T: "desimeter"]                           #  0x3377    (en: 'decimeters', google translation)
  - "㍸": [T: "kvadratdesimeter"]                   #  0x3378    (en: 'decimeters squared', google translation)
  - "㍹": [T: "kubikkdesimeter"]                  #  0x3379    (en: 'decimeters cubed', google translation)
- - "㍺": [T: "kvadratisk IU"]               #  0x337a    (en: 'instrumental units', google translation)
+ - "㍺": [T: "kvadratisk I U"]               #  0x337a    (en: 'instrumental units', google translation)
  - "㎀": [T: "pikoampere"]                             #  0x3380    (google translation)
  - "㎁": [T: "nanoampere"]                             #  0x3381    (google translation)
  - "㎂": [T: "mikroampere"]                            #  0x3382    (google translation)
@@ -2514,7 +2514,7 @@
  - "㎣": [T: "kubikkmillimeter"]                     #  0x33a3    (en: 'millimeters cubed', google translation)
  - "㎤": [T: "kubikkcentimeter"]                  #  0x33a4    (en: 'centimeters cubed', google translation)
  - "㎥": [T: "kubikkmeter"]                       #  0x33a5    (en: 'meters cubed', google translation)
- - "㎦": [T: "kubikkilometer"]                      #  0x33a6    (en: 'kilometers cubed', google translation)
+ - "㎦": [T: "kubikk-kilometer"]                      #  0x33a6    (en: 'kilometers cubed', google translation)
  - "㎧": [T: "meter per sekund"]                     #  0x33a7    (en: 'meters per second', google translation)
  - "㎨": [T: "meter per sekund i andre"]             #  0x33a8    (en: 'meters per second squared', google translation)
  - "㎩": [T: "pascal"]                              #  0x33a9    (google translation)
@@ -2547,7 +2547,7 @@
  - "㏄": [T: "kubikkcentimeter"]                      #  0x33c4    (en: 'cubic centimeters', google translation)
  - "㏅": [T: "candela"]                             #  0x33c5    (google translation)
  - "㏆": [T: "coulomb per kilogram"]                    #  0x33c6    (en: 'coulombs per kilogram', google translation)
- - "㏇": [T: "kvadratisk CO"]                          #  0x33c7    (en: 'cardiac output', google translation)
+ - "㏇": [T: "kvadratisk C O"]                          #  0x33c7    (en: 'cardiac output', google translation)
  - "㏈": [T: "desibel"]                              #  0x33c8    (en: 'decibels', google translation)
  - "㏉": [T: "gray"]                                #  0x33c9    (en: 'grays', google translation)
  - "㏊": [T: "hektar"]                               #  0x33ca    (en: 'hectares', google translation)
@@ -2851,8 +2851,8 @@
  - "": [T: "høyrepil under strek"]                 #  0xeb3b    (en: 'rightwards arrow under bar', google translation)
  - "": [T: "venstre-høyre trippel pil"]             #  0xeb3c    (en: 'left right triple arrow', google translation)
  - "": [T: "dobbel-pil nordøst sørøst"]             #  0xeb3f    (en: 'double arrow northeast southeast', google translation)
- - "": [T: "venstre halvsirkelpil mot klokka"]       #  0xeb40    (en: 'anticlockwise left semicircle arrow', google translation)
- - "": [T: "venstre halvsirkelpil med klokka"]         #  0xeb41    (en: 'clockwise left semicircle arrow', google translation)
+ - "": [T: "venstre halvsirkel-pil mot klokka"]       #  0xeb40    (en: 'anticlockwise left semicircle arrow', google translation)
+ - "": [T: "venstre halvsirkel-pil med klokka"]         #  0xeb41    (en: 'clockwise left semicircle arrow', google translation)
  - "": [T: "venstre-høyre-pil i venstre åpen sirkel"]    #  0xeb42    (en: 'left open circle left right arrow', google translation)
  - "": [T: "høyrepil over tilde"]                #  0xeb44    (en: 'rightwards arrow over tilde', google translation)
  - "": [T: "venstrepil over tilde"]               #  0xeb45    (en: 'leftwards arrow over tilde', google translation)
@@ -2861,8 +2861,8 @@
  - "": [T: "venstre-harpun under strek"]             #  0xeb4a    (en: 'leftwards harpoon under bar', google translation)
  - "": [T: "høyre-harpun under strek"]           #  0xeb4b    (en: 'rightwards harpoon under bar', google translation)
  - "": [T: "sammenpresset venstrepil"]              #  0xeb4c    (en: 'squat black leftwards arrow', google translation)
- - "": [T: "høyre halvsirkelpil med klokka"]           #  0xeb50    (en: 'clockwise right semicircle arrow', google translation)
- - "": [T: "høyre halvsirkelpil mot klokka"]         #  0xeb51    (en: 'anticlockwise right semicircle arrow', google translation)
+ - "": [T: "høyre halvsirkel-pil med klokka"]           #  0xeb50    (en: 'clockwise right semicircle arrow', google translation)
+ - "": [T: "høyre halvsirkel-pil mot klokka"]         #  0xeb51    (en: 'anticlockwise right semicircle arrow', google translation)
  - "": [T: "venstre-høyre-harpun i venstre åpen sirkel"]    #  0xeb52    (en: 'left open circle left right harpoon', google translation)
  - "": [T: "oppoverpil til venstre for vertikal strek"]    #  0xeb58    (en: 'upwards arrow leftwards of vertical bar', google translation)
  - "": [T: "nedoverpil til venstre for vertikal strek"]    #  0xeb59    (en: 'downwards arrow leftwards of vertical bar', google translation)
@@ -3565,8 +3565,8 @@
  - "": [T: "horisontal ellipse forlenger"]         #  0xf72d    (en: 'horizontal ellipsis extender', google translation)
  - "": [T: "midtlinje horisontal ellipse forlenger"]    #  0xf72e    (en: 'midline horizontal ellipsis extender', google translation)
  - "": [T: "radikal forlenger"]                     #  0xf8e5    (en: 'radical extender', google translation)
- - "": [T: "vertikal pil forlenger"]               #  0xf8e6    (en: 'vertical arrow extender', google translation)
- - "": [T: "horisontal pil forlenger"]            #  0xf8e7    (en: 'horizontal arrow extender', google translation)
+ - "": [T: "vertikal pil-forlenger"]               #  0xf8e6    (en: 'vertical arrow extender', google translation)
+ - "": [T: "horisontal pil-forlenger"]            #  0xf8e7    (en: 'horizontal arrow extender', google translation)
  - "": [T: "registrert"]         #  0xf8e8    (en: 'registered sign sans serif', google translation)
  - "": [T: "opphavsrett"]            #  0xf8e9    (google translation)
  - "": [T: "varemerke"]           #  0xf8ea    (google translation)
@@ -3625,7 +3625,7 @@
  - "﹤": [T: "liten mindre enn"]                     # 0xfe64
  - "﹥": [T: "liten større enn"]                  # 0xfe65
  - "﹦": [T: "lite likhetstegn"]                        # 0xfe66
- - "＋": [T: "likhetstegn"]                         # 0xff0b
+ - "＋": [T: "pluss"]                         # 0xff0b
  - "＜": [T: "mindre enn"]                           # 0xff1c
  - "＝": [T: "lik"]                              # 0xff1d
  - "＞": [T: "større enn"]                        # 0xff1e

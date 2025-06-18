@@ -648,7 +648,7 @@
   - x: "*"
   - test:
       if: "not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
-      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
   - test:
       if: "IsNode(., '2D')"
       then: [pause: short]
@@ -661,10 +661,9 @@
   replace:
   - test:
       if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
-      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
   - x: "*"
   - x: "SpeakIntentName(name(.), $Verbosity, 'postfix')"
-
 
 - name: infix-intent
   # uncaught intent -- the args have been inserted in the order of speech 
@@ -673,7 +672,7 @@
   replace:
   - test:
       if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
-      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
   - test:
       if: "count(*) = 1"  # in cases such as continued-row, plus/minus might have just one child
       then:
@@ -686,12 +685,11 @@
           replace: [x: "SpeakIntentName(name(.), $Verbosity, 'infix')", pause: auto]
   - test:
       if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
-      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
   - test:
       if: "IsNode(., '2D')"   # add (probably) a slightly longer pause if this came from a 2D node
       then: [pause: short]
       else: [pause: auto]
-
 
 - name: function-intent
   # uncaught intent -- speak as foo of arg1 comma arg2 .... The MathML spec requires arguments to functions
@@ -712,7 +710,7 @@
       # SWEDISH: After correspondence with a mathematician we have decided to not have any punctuation between variables, but a short pause. Length of pause needs to be tested.
   - test:
       if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
-      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
   - test:
       if: "IsNode(., '2D')"
       then: [pause: short]

@@ -205,7 +205,7 @@
   - pause: medium
   - T: "og nevner"      # phrase(the fraction with numerator 5 'and denominator' 8)
   - x: "*[2]"
-  - pause: long
+  - pause: medium
   - test:
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='GeneralEndFrac'"
       then:
@@ -567,12 +567,12 @@
       if: "$log_is_simple"
       then_test:
       - if: "*[1][.='log']"
-        then: [{T: "log"}]      # phrase(the 'log' of x)
+        then: [{T: "log av"}]      # phrase(the 'log' of x)
       - else_if: "*[1][.='lg']"
-        then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
-      - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
-        then: [{T: "den naturlige logaritmen"}]      # phrase(the 'natural log' of the product of 2 numbers)
-        else: [{spell: "'ln'"}]
+        then: [{spell: "'lg'"}, {T: "av"}]      # phrase(the 'lg' of x)
+      - else_if: $ClearSpeak_Log = 'LnAsNaturalLog' or $Verbosity='Verbose'
+        then: [{T: "den naturlige logaritmen av"}]      # phrase(the 'natural log' of the product of 2 numbers)
+        else: [{spell: "'ln'"}, {T: "av"}]
       else:
       - test:
         - if: "*[1][.='log']"

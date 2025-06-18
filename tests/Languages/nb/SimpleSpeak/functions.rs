@@ -120,7 +120,7 @@ fn other_names() {
     test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse")],
                 expr, "exp av x");
     test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Medium")],
-                expr, "eksponentialfunksjonen av x");
+                expr, "eksponensialfunksjonen av x");
 }
 
 #[test]

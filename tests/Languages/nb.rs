@@ -4,14 +4,14 @@
     //mod large_ops;
     //mod menclose;
     //mod mfrac;
-    //mod mroot;
+    //od mroot;
     //mod msup;
     //mod sets;
     //mod symbols_and_adornments;
     //mod multiline;
 //}
 
-//mod SimpleSpeak {
+mod SimpleSpeak {
     //mod functions;
     //mod large_ops;
      //mod menclose;
@@ -23,12 +23,12 @@
     //mod linear_algebra;
     //mod multiline;
     //mod subscripts;
-//}
+}
     
 //mod shared;
 //mod units;
 //mod chemistry;
 //mod alphabets;
-mod intent;
+//mod intent;
 //mod mtable;
 
