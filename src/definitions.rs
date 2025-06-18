@@ -28,8 +28,7 @@ extern crate yaml_rust;
 use yaml_rust::yaml::Hash;
 use yaml_rust::Yaml;
 use crate::errors::*;
-use crate::prefs::*;
-use std::{cell::RefCell, cell::Ref, cell::RefMut, collections::HashSet,  rc::Rc};
+use std::{cell::RefCell, cell::Ref, collections::HashSet, rc::Rc};
 use std::{collections::HashMap, path::Path, path::PathBuf};
 use crate::shim_filesystem::read_to_string_shim;
 
@@ -128,33 +127,24 @@ thread_local!{
     /// See [`Definitions`] for more details.
     pub static SPEECH_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
     pub static BRAILLE_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
-    pub static DEFINITIONS: &'static std::thread::LocalKey<RefCell<Definitions>> = const { &SPEECH_DEFINITIONS };
 }
 
 /// Reads the `definitions.yaml` files specified by current_files -- these are presumed to need updating. 
 ///
 /// If there is a failure during read, the error is propagated to the caller
-pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
+pub fn read_definitions_file(file_path: &Path, definitions: &mut Definitions) -> Result<Vec<PathBuf>> {
     // for each file in `locations`, read the contents and process them
-    let pref_manager = PreferenceManager::get();
-    let pref_manager = pref_manager.borrow();
-    let file_path = pref_manager.get_definitions_file(use_speech_defs);
-    let definitions = if use_speech_defs {&SPEECH_DEFINITIONS} else {&BRAILLE_DEFINITIONS};
-    definitions.with( |defs| defs.borrow_mut().name_to_var_mapping.clear() );
+    definitions.name_to_var_mapping.clear();
     let mut new_files = vec![file_path.to_path_buf()];
-    let mut files_read = read_one_definitions_file(use_speech_defs, file_path).chain_err(|| format!("in file '{}", file_path.to_string_lossy()))?;
+    let mut files_read = read_one_definitions_file(file_path, definitions).chain_err(|| format!("in file '{}", file_path.to_string_lossy()))?;
     new_files.append(&mut files_read);
 
     // merge the contents of `TrigFunctions` into a set that contains all the function names (from `AdditionalFunctionNames`).
-    return definitions.with(|defs| {
-        let mut defs = defs.borrow_mut();
-        make_all_set_references_valid(&mut defs);
-        return Ok(new_files);
-    });
-    
+    make_all_set_references_valid(definitions);
+    return Ok(new_files);
 
     /// Make references to all used set be valid by creating empty sets if they weren't defined
-    fn make_all_set_references_valid(defs: &mut RefMut<Definitions>) {
+    fn make_all_set_references_valid(defs: &mut Definitions) {
         // FIX: this list is created by hand -- it would be better if there was a way to create the list Automatically
         // Note: "FunctionNames" is created in build_all_functions_set() if not already set
         let used_set_names = ["GeometryPrefixOperators", "LikelyFunctionNames", "TrigFunctionNames", "AdditionalFunctionNames", "Arrows", "GeometryShapes"];
@@ -171,7 +161,7 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
     }
 
     /// merge "TrigFunctions" and "AdditionalFunctionNames" into a new set named "FunctionNames"
-    fn build_all_functions_set(defs: &mut RefMut<Definitions>) -> HashSet<String> {
+    fn build_all_functions_set(defs: &Definitions) -> HashSet<String> {
         let trig_functions = defs.get_hashset("TrigFunctionNames").unwrap();
         let mut all_functions = defs.get_hashset("AdditionalFunctionNames").unwrap().clone();
         for trig_name in trig_functions.iter() {
@@ -182,7 +172,7 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
 }
 
 use crate::speech::*;
-fn read_one_definitions_file(use_speech_defs: bool, path: &Path) -> Result<Vec<PathBuf>> {
+fn read_one_definitions_file(path: &Path, definitions: &mut Definitions) -> Result<Vec<PathBuf>> {
     // read in the file contents   
     let definition_file_contents = read_to_string_shim(path)
             .chain_err(|| format!("trying to read {}", path.to_str().unwrap()))?;
@@ -195,7 +185,7 @@ fn read_one_definitions_file(use_speech_defs: bool, path: &Path) -> Result<Vec<P
         let vec = crate::speech::as_vec_checked(variable_def_list)
                     .chain_err(||format!("in file {:?}", path.to_str()))?;
         for variable_def in vec {
-            if let Some(mut added_files) = build_values(variable_def, use_speech_defs, path).chain_err(||format!("in file {:?}", path.to_str()))? {
+            if let Some(mut added_files) = build_values(variable_def, path, definitions).chain_err(||format!("in file {:?}", path.to_str()))? {
                 files_read.append(&mut added_files);
             }
         }
@@ -212,7 +202,7 @@ fn read_one_definitions_file(use_speech_defs: bool, path: &Path) -> Result<Vec<P
 /// name: {a, b, c} -- assume a hash set
 /// name: {a: A, b: B, c: C} -- assume a hashmap
 /// Returns all the files that were read
-fn build_values(definition: &Yaml, use_speech_defs: bool, path: &Path) -> Result<Option<Vec<PathBuf>>> {
+fn build_values(definition: &Yaml, path: &Path, definitions: &mut Definitions) -> Result<Option<Vec<PathBuf>>> {
     // Rule::Definition
     let dictionary = crate::speech::as_hash_checked(definition)?;
     if dictionary.len()!=1 {
@@ -222,7 +212,7 @@ fn build_values(definition: &Yaml, use_speech_defs: bool, path: &Path) -> Result
     let def_name = key.as_str().ok_or_else(|| format!("definition list name '{}' is not a string", yaml_to_type(key)))?;
     if def_name == "include" {
         let do_include_fn = |new_file: &Path| {
-            read_one_definitions_file(use_speech_defs, new_file)
+            read_one_definitions_file(new_file, definitions)
         };
         let include_file_name = value.as_str().ok_or_else(|| format!("definition list include name '{}' is not a string", yaml_to_type(value)))?;
         return Ok( Some(crate::speech::process_include(path, include_file_name, do_include_fn)?) );
@@ -265,12 +255,8 @@ fn build_values(definition: &Yaml, use_speech_defs: bool, path: &Path) -> Result
         }
     };
 
-    let definitions = if use_speech_defs {&SPEECH_DEFINITIONS} else {&BRAILLE_DEFINITIONS};
-    return definitions.with(|definitions| {
-        let name_definition_map = &mut definitions.borrow_mut().name_to_var_mapping;
-        name_definition_map.insert(def_name.to_string(), result);
-        return Ok(None);
-    });
+    definitions.name_to_var_mapping.insert(def_name.to_string(), result);
+    return Ok(None);
 
     fn get_vec_values(values: &Vec<Yaml>) -> Result<Vec<String>> {
         let mut result = Vec::with_capacity(values.len());
@@ -325,7 +311,7 @@ mod tests {
             // Rule::DefinitionList
             //debug!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list, 0));
             for variable_def in variable_def_list.as_vec().unwrap() {
-                if let Err(e) = build_values(variable_def, true, &Path::new("")) {
+                if let Err(e) = SPEECH_DEFINITIONS.with_borrow_mut(|defs| build_values(variable_def, &Path::new(""), defs)) {
                     bail!("{}", crate::interface::errors_to_string(&e.chain_err(||format!("in file {:?}", numbers))));
                 }
             }
@@ -351,7 +337,7 @@ mod tests {
             // Rule::DefinitionList
             //debug!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list, 0));
             for variable_def in variable_def_list.as_vec().unwrap() {
-                if let Err(e) = build_values(variable_def, true, &Path::new("")) {
+                if let Err(e) = SPEECH_DEFINITIONS.with_borrow_mut(|defs| build_values(variable_def, &Path::new(""), defs)) {
                     bail!("{}", crate::interface::errors_to_string(&e.chain_err(||format!("in file {:?}", likely_function_names))));
                 }
             }
@@ -376,15 +362,14 @@ mod tests {
             // Rule::DefinitionList
             //debug!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list, 0));
             for variable_def in variable_def_list.as_vec().unwrap() {
-                if let Err(e) = build_values(variable_def, true, &Path::new("")) {
+                if let Err(e) = SPEECH_DEFINITIONS.with_borrow_mut(|defs| build_values(variable_def, &Path::new(""), defs)) {
                     bail!("{}", crate::interface::errors_to_string(&e.chain_err(||format!("in file {:?}", units))));
                 }
             }
             return Ok(vec![]);
         };
         compile_rule(&units, defs_build_fn).unwrap();
-        SPEECH_DEFINITIONS.with(|defs| {
-            let defs = defs.borrow();
+        SPEECH_DEFINITIONS.with_borrow(|defs| {
             let names = defs.get_hashmap("Units");
             assert!(names.is_some());
             let names = names.unwrap();

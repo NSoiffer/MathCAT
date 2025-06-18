@@ -32,35 +32,38 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
     return BRAILLE_RULES.with(|rules| {
         rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
-        let new_package = Package::new();
-        let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
-        let braille_string = rules_with_context.match_pattern::<String>(mathml)
-                        .chain_err(|| "Pattern match/replacement failure!")?;
-        // debug!("braille_mathml: braille string: {}", &braille_string);
-        let braille_string = braille_string.replace(' ', "");
-        let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
-        let highlight_style = pref_manager.pref_to_string("BrailleNavHighlight");
-        let braille_code = pref_manager.pref_to_string("BrailleCode");
-        let braille = match braille_code.as_str() {
-            "Nemeth" => nemeth_cleanup(pref_manager, braille_string),
-            "UEB" => ueb_cleanup(pref_manager, braille_string),
-            "Vietnam" => vietnam_cleanup(pref_manager, braille_string),
-            "CMU" => cmu_cleanup(pref_manager, braille_string), 
-            "Finnish" => finnish_cleanup(pref_manager, braille_string),
-            "Swedish" => swedish_cleanup(pref_manager, braille_string),
-            "LaTeX" => LaTeX_cleanup(pref_manager, braille_string),
-            "ASCIIMath" => ASCIIMath_cleanup(pref_manager, braille_string),
-            _ => braille_string.trim_matches('⠀').to_string(),    // probably needs cleanup if someone has another code, but this will have to get added by hand
-        };
+        return SPEECH_DEFINITIONS.with_borrow(|definitions| {
+            let new_package = Package::new();
+            let mut rules_with_context = 
+                SpeechRulesWithContext::new(&rules, definitions, new_package.as_document(), nav_node_id);
+            let braille_string = rules_with_context.match_pattern::<String>(mathml)
+                            .chain_err(|| "Pattern match/replacement failure!")?;
+            // debug!("braille_mathml: braille string: {}", &braille_string);
+            let braille_string = braille_string.replace(' ', "");
+            let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
+            let highlight_style = pref_manager.pref_to_string("BrailleNavHighlight");
+            let braille_code = pref_manager.pref_to_string("BrailleCode");
+            let braille = match braille_code.as_str() {
+                "Nemeth" => nemeth_cleanup(pref_manager, braille_string),
+                "UEB" => ueb_cleanup(pref_manager, braille_string),
+                "Vietnam" => vietnam_cleanup(pref_manager, braille_string),
+                "CMU" => cmu_cleanup(pref_manager, braille_string), 
+                "Finnish" => finnish_cleanup(pref_manager, braille_string),
+                "Swedish" => swedish_cleanup(pref_manager, braille_string),
+                "LaTeX" => LaTeX_cleanup(pref_manager, braille_string),
+                "ASCIIMath" => ASCIIMath_cleanup(pref_manager, braille_string),
+                _ => braille_string.trim_matches('⠀').to_string(),    // probably needs cleanup if someone has another code, but this will have to get added by hand
+            };
 
-        return Ok(
-            if highlight_style != "Off" {
-                highlight_braille_chars(braille, &braille_code, highlight_style == "All")
-            } else {
-                let end = braille.len()/3;
-                (braille, 0, end)
-            }
-        );
+            return Ok(
+                if highlight_style != "Off" {
+                    highlight_braille_chars(braille, &braille_code, highlight_style == "All")
+                } else {
+                    let end = braille.len()/3;
+                    (braille, 0, end)
+                }
+            );
+        });
     });
 
     /// highlight with dots 7 & 8 based on the highlight style

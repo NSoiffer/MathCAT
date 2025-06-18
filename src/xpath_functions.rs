@@ -20,6 +20,7 @@
 use sxd_document::dom::{Element, ChildOfElement};
 use sxd_xpath::{Value, Context, context, function::*, nodeset::*};
 use crate::definitions::{Definitions, SPEECH_DEFINITIONS, BRAILLE_DEFINITIONS};
+use crate::prefs::PreferenceManager;
 use regex::Regex;
 use crate::pretty_print::mml_to_string;
 use std::cell::{Ref, RefCell};
@@ -420,25 +421,26 @@ impl Function for IsNode {
     }
 }
 
-struct ToOrdinal;
-impl ToOrdinal {
+#[derive(Clone)]
+struct ToOrdinal<'a> {
+    pref_manager: &'a PreferenceManager,
+    definitions: &'a Definitions,
+}
+impl ToOrdinal<'_> {
     // ordinals often have an irregular start (e.g., "half") before becoming regular.
     // if the number is irregular, return the ordinal form, otherwise return 'None'.
-    fn compute_irregular_fractional_speech(number: &str, plural: bool) -> Option<String> {
-        SPEECH_DEFINITIONS.with(|definitions| {
-            let definitions = definitions.borrow();
-            let words = if plural {
-                definitions.get_vec("NumbersOrdinalFractionalPluralOnes")?
-            } else {
-                definitions.get_vec("NumbersOrdinalFractionalOnes")?
-            };
-            let number_as_int: usize = number.parse().unwrap(); // already verified it is only digits
-            if number_as_int < words.len() {
-                // use the words associated with this irregular pattern.
-                return Some( words[number_as_int].clone() );
-            };
-            return None;
-        })
+    fn compute_irregular_fractional_speech(&self, number: &str, plural: bool) -> Option<String> {
+        let words = if plural {
+            self.definitions.get_vec("NumbersOrdinalFractionalPluralOnes")?
+        } else {
+            self.definitions.get_vec("NumbersOrdinalFractionalOnes")?
+        };
+        let number_as_int: usize = number.parse().unwrap(); // already verified it is only digits
+        if number_as_int < words.len() {
+            // use the words associated with this irregular pattern.
+            return Some( words[number_as_int].clone() );
+        };
+        return None;
     }
 
     /**
@@ -448,136 +450,131 @@ impl ToOrdinal {
      *   plural -- true if answer should be plural
      * Returns the string representation of that number or an error message
      */
-    fn convert(number: &str, fractional: bool, plural: bool) -> Option<String> {
+    fn convert(&self, number: &str, fractional: bool, plural: bool) -> Option<String> {
         lazy_static! {
             static ref NO_DIGIT: Regex = Regex::new(r"[^\d]").unwrap();    // match anything except a digit
         }
-        return SPEECH_DEFINITIONS.with(|definitions| {
-            let definitions = definitions.borrow();
-            let numbers_large = definitions.get_vec("NumbersLarge")?;
+        let numbers_large = self.definitions.get_vec("NumbersLarge")?;
 
-            let pref_manager = crate::prefs::PreferenceManager::get();
-            let pref_manager = pref_manager.borrow();
-            let block_separators = pref_manager.pref_to_string("BlockSeparators");
-            let decimal_separator = pref_manager.pref_to_string("DecimalSeparators");
+        let block_separators = self.pref_manager.pref_to_string("BlockSeparators");
+        let decimal_separator = self.pref_manager.pref_to_string("DecimalSeparators");
 
-            // check number validity (has digits, not a decimal)
-            if number.is_empty() ||  number.contains(&decimal_separator) {
-                return Some(String::from(number));
+        // check number validity (has digits, not a decimal)
+        if number.is_empty() ||  number.contains(&decimal_separator) {
+            return Some(String::from(number));
+        }
+        // remove any block separators
+        let number = match clean_number(number, &block_separators) {
+            None => return Some(String::from(number)),
+            Some(num) => num,
+        };
+
+        // check to see if the number is too big or is not an integer or has non-digits
+        if number.len() > 3*numbers_large.len() {
+            return Some(number);
+        }
+        if NO_DIGIT.is_match(&number) {
+            // this shouldn't have been part of an mn, so likely an error. Log a warning
+            // FIX: log a warning that a non-number was passed to convert()
+            return Some(number);
+        }
+
+        // first deal with the abnormalities of fractional ordinals (one half, etc). That simplifies what remains
+        if fractional {
+            if let Some(string) = self.compute_irregular_fractional_speech(&number, plural) {
+                return Some(string);
             }
-            // remove any block separators
-            let number = match clean_number(number, &block_separators) {
-                None => return Some(String::from(number)),
-                Some(num) => num,
-            };
-    
-            // check to see if the number is too big or is not an integer or has non-digits
-            if number.len() > 3*numbers_large.len() {
-                return Some(number);
-            }
-            if NO_DIGIT.is_match(&number) {
-                // this shouldn't have been part of an mn, so likely an error. Log a warning
-                // FIX: log a warning that a non-number was passed to convert()
-                return Some(number);
-            }
+        }
 
-            // first deal with the abnormalities of fractional ordinals (one half, etc). That simplifies what remains
-            if fractional {
-                if let Some(string) = ToOrdinal::compute_irregular_fractional_speech(&number, plural) {
-                    return Some(string);
-                }
-            }
+        // at this point, we only need to worry about singular/plural distinction
 
-            // at this point, we only need to worry about singular/plural distinction
+        // break into groups of three digits and add 10^3 word (thousands, millions, ...) after each chunk
+        // FIX: add a pause between groups of three -- need to use TTS-specific pause
 
-            // break into groups of three digits and add 10^3 word (thousands, millions, ...) after each chunk
-            // FIX: add a pause between groups of three -- need to use TTS-specific pause
+        // handle special case of trailing zeros
+        // num_thousands_at_end represents the amount to shift NumbersLarge... (e.g., millions->thousands)
+        let num_thousands_at_end = match number.rfind(|ch| ch > '0') { // last non-0 on right
+            Some(n) => (number.len() - 1 - n) / 3 ,
+            None => 0
+        };
+        let (number,_) = number.split_at(number.len() - 3 * num_thousands_at_end); // drop the 0s
 
-            // handle special case of trailing zeros
-            // num_thousands_at_end represents the amount to shift NumbersLarge... (e.g., millions->thousands)
-            let num_thousands_at_end = match number.rfind(|ch| ch > '0') { // last non-0 on right
-                Some(n) => (number.len() - 1 - n) / 3 ,
-                None => 0
-            };
-            let (number,_) = number.split_at(number.len() - 3 * num_thousands_at_end); // drop the 0s
+        // everything is simplified if we add zeros at the start so that block size is a factor of 3
+        let number = match number.len() % 3 {
+            0 => "".to_string() + number,
+            1 => "00".to_string() + number,
+            _ => "0".to_string() + number, // can only be "2" -- compiler doesn't know there aren't other options
+        };
 
-            // everything is simplified if we add zeros at the start so that block size is a factor of 3
-            let number = match number.len() % 3 {
-                0 => "".to_string() + number,
-                1 => "00".to_string() + number,
-                _ => "0".to_string() + number, // can only be "2" -- compiler doesn't know there aren't other options
-            };
+        // At this point we have at least three "digits", and length is a multiple of 3
+        // We have already verified that there are only ASCII digits, so we can subtract '0' to get an index
+        const ASCII_0: usize = 48;
+        let digits = number.as_bytes()
+                    .iter()
+                    .map(|&byte| byte as usize - ASCII_0)
+                    .collect::<Vec<usize>>();
 
-            // At this point we have at least three "digits", and length is a multiple of 3
-            // We have already verified that there are only ASCII digits, so we can subtract '0' to get an index
-            const ASCII_0: usize = 48;
-            let digits = number.as_bytes()
-                        .iter()
-                        .map(|&byte| byte as usize - ASCII_0)
-                        .collect::<Vec<usize>>();
-
-            let mut answer = String::with_capacity(255);  // reasonable max most of the time
-            let large_words = numbers_large;
-            if digits.len() > 3 { 
-                // speak this first groups as cardinal numbers
-                let words = [
-                    definitions.get_vec("NumbersHundreds")?,
-                    definitions.get_vec("NumbersTens")?,
-                    definitions.get_vec("NumbersOnes")?,
-                ];
-                answer = digits[0..digits.len()-3]
-                            .chunks(3)
-                            .enumerate()
-                            .map(|(i, chunk)| {
-                                if chunk[0] != 0 || chunk[1] != 0 || chunk[2] != 0 {
-                                    Some(ToOrdinal::hundreds_to_words(chunk, &words)? + " " + 
-                                        &large_words[num_thousands_at_end + digits.len()/3 - 1 - i] + " ")
-                                } else {
-                                    Some("".to_string())
-                                }
-                            })
-                            .collect::<Option<Vec<String>>>()?
-                            .join("");  // can't use " " because 1000567 would get extra space in the middle
-                if num_thousands_at_end > 0 {
-                    // add on "billionths", etc and we are done
-                    let large_words = if plural {
-                        definitions.get_vec("NumbersOrdinalPluralLarge")
-                    } else {
-                        definitions.get_vec("NumbersOrdinalLarge")
-                    };
-                    return Some(answer + &large_words?[num_thousands_at_end]);
-                }
-            };
-
-            // all that is left is to speak the hundreds part, possibly followed by "thousands", "billions", etc
-            let words = match (num_thousands_at_end > 0, plural) {
-                (true, _) => [
-                    definitions.get_vec("NumbersHundreds")?,
-                    definitions.get_vec("NumbersTens")?,
-                    definitions.get_vec("NumbersOnes")?,
-                ],
-                (false, true) => [
-                    definitions.get_vec("NumbersOrdinalPluralHundreds")?,
-                    definitions.get_vec("NumbersOrdinalPluralTens")?,
-                    definitions.get_vec("NumbersOrdinalPluralOnes")?,
-                ],
-                (false, false) => [
-                    definitions.get_vec("NumbersOrdinalHundreds")?,
-                    definitions.get_vec("NumbersOrdinalTens")?,
-                    definitions.get_vec("NumbersOrdinalOnes")?,
-                ],
-            };
-            answer += &ToOrdinal::hundreds_to_words(&digits[digits.len()-3..], &words)?;
+        let mut answer = String::with_capacity(255);  // reasonable max most of the time
+        let large_words = numbers_large;
+        if digits.len() > 3 {
+            // speak this first groups as cardinal numbers
+            let words = [
+                self.definitions.get_vec("NumbersHundreds")?,
+                self.definitions.get_vec("NumbersTens")?,
+                self.definitions.get_vec("NumbersOnes")?,
+            ];
+            answer = digits[0..digits.len()-3]
+                        .chunks(3)
+                        .enumerate()
+                        .map(|(i, chunk)| {
+                            if chunk[0] != 0 || chunk[1] != 0 || chunk[2] != 0 {
+                                Some(self.hundreds_to_words(chunk, &words)? + " " +
+                                    &large_words[num_thousands_at_end + digits.len()/3 - 1 - i] + " ")
+                            } else {
+                                Some("".to_string())
+                            }
+                        })
+                        .collect::<Option<Vec<String>>>()?
+                        .join("");  // can't use " " because 1000567 would get extra space in the middle
             if num_thousands_at_end > 0 {
+                // add on "billionths", etc and we are done
                 let large_words = if plural {
-                    definitions.get_vec("NumbersOrdinalPluralLarge")?
+                    self.definitions.get_vec("NumbersOrdinalPluralLarge")
                 } else {
-                    definitions.get_vec("NumbersOrdinalLarge")?
+                    self.definitions.get_vec("NumbersOrdinalLarge")
                 };
-                answer = answer + " " + &large_words[num_thousands_at_end];
+                return Some(answer + &large_words?[num_thousands_at_end]);
             }
-            return Some(answer);
-        });
+        };
+
+        // all that is left is to speak the hundreds part, possibly followed by "thousands", "billions", etc
+        let words = match (num_thousands_at_end > 0, plural) {
+            (true, _) => [
+                self.definitions.get_vec("NumbersHundreds")?,
+                self.definitions.get_vec("NumbersTens")?,
+                self.definitions.get_vec("NumbersOnes")?,
+            ],
+            (false, true) => [
+                self.definitions.get_vec("NumbersOrdinalPluralHundreds")?,
+                self.definitions.get_vec("NumbersOrdinalPluralTens")?,
+                self.definitions.get_vec("NumbersOrdinalPluralOnes")?,
+            ],
+            (false, false) => [
+                self.definitions.get_vec("NumbersOrdinalHundreds")?,
+                self.definitions.get_vec("NumbersOrdinalTens")?,
+                self.definitions.get_vec("NumbersOrdinalOnes")?,
+            ],
+        };
+        answer += &self.hundreds_to_words(&digits[digits.len()-3..], &words)?;
+        if num_thousands_at_end > 0 {
+            let large_words = if plural {
+                self.definitions.get_vec("NumbersOrdinalPluralLarge")?
+            } else {
+                self.definitions.get_vec("NumbersOrdinalLarge")?
+            };
+            answer = answer + " " + &large_words[num_thousands_at_end];
+        }
+        return Some(answer);
 
         /// Remove block separators and convert alphanumeric digits to ascii digits
         fn clean_number(number: &str, block_separators: &str) -> Option<String> {
@@ -605,34 +602,31 @@ impl ToOrdinal {
     }
 
 
-    fn hundreds_to_words(number: &[usize], words: &[Ref<Vec<String>>; 3]) -> Option<String> {
+    fn hundreds_to_words(&self, number: &[usize], words: &[Ref<Vec<String>>; 3]) -> Option<String> {
         assert!( number.len() == 3 );
-        return SPEECH_DEFINITIONS.with(|definitions| {
-            let definitions = definitions.borrow();
-            if number[0] != 0 && number[1] == 0 && number[2] == 0 {
-                return Some(words[0][number[0]].clone());
-            }
+        if number[0] != 0 && number[1] == 0 && number[2] == 0 {
+            return Some(words[0][number[0]].clone());
+        }
 
-            let mut hundreds = definitions.get_vec("NumbersHundreds")?[number[0]].clone();
-            if !hundreds.is_empty() {
-                hundreds += " ";
-            }
+        let mut hundreds = self.definitions.get_vec("NumbersHundreds")?[number[0]].clone();
+        if !hundreds.is_empty() {
+            hundreds += " ";
+        }
 
-            if number[1] != 0 && number[2] == 0 {
-                return Some(hundreds + &words[1][number[1]]);
-            }
+        if number[1] != 0 && number[2] == 0 {
+            return Some(hundreds + &words[1][number[1]]);
+        }
 
-            if 10*number[1] < words[2].len() {
-                // usurp regular ordering to handle something like '14'
-                return Some(hundreds + &words[2][10*number[1] + number[2]]);
-            } else {
-                return Some(hundreds + &definitions.get_vec("NumbersTens")?[number[1]] + " " + &words[2][number[2]]);
-            }
-        });
+        if 10*number[1] < words[2].len() {
+            // usurp regular ordering to handle something like '14'
+            return Some(hundreds + &words[2][10*number[1] + number[2]]);
+        } else {
+            return Some(hundreds + &self.definitions.get_vec("NumbersTens")?[number[1]] + " " + &words[2][number[2]]);
+        }
     }
 }
 
-impl Function for ToOrdinal {
+impl Function for ToOrdinal<'_> {
     // convert a node to an ordinal number
     fn evaluate<'d>(&self,
                         _context: &context::Evaluation<'_, 'd>,
@@ -652,12 +646,12 @@ impl Function for ToOrdinal {
         let node = validate_one_node(args.pop_nodeset()?, "ToOrdinal")?;
         return match node {
             Node::Text(t) =>  Ok( Value::String(
-                match ToOrdinal::convert(t.text(), fractional, plural) {
+                match self.convert(t.text(), fractional, plural) {
                     None => t.text().to_string(),
                     Some(ord) => ord,
                 } ) ),
             Node::Element(e) => Ok( Value::String(
-                match ToOrdinal::convert(&get_text_from_element(e), fractional, plural) {
+                match self.convert(&get_text_from_element(e), fractional, plural) {
                     None => get_text_from_element(e).to_string(),
                     Some(ord) => ord,
                 } ) ),
@@ -667,9 +661,11 @@ impl Function for ToOrdinal {
 }
 
 
-struct ToCommonFraction;
+struct ToCommonFraction<'a> {
+    to_ordinal: ToOrdinal<'a>,
+}
 
-impl Function for ToCommonFraction {
+impl Function for ToCommonFraction<'_> {
     // convert a node to a common fraction (if the numerator and denominator are within given limits)
     fn evaluate<'d>(&self,
                         _context: &context::Evaluation<'_, 'd>,
@@ -693,7 +689,7 @@ impl Function for ToCommonFraction {
             let denom = children[1].element().unwrap();
             let denom = get_text_from_element( denom );
             let mut answer = num.clone() + " ";
-            answer += &match ToOrdinal::convert(&denom, true, num!="1") {
+            answer += &match self.to_ordinal.convert(&denom, true, num!="1") {
                 None => denom,
                 Some(ord) => ord,
             };
@@ -1417,13 +1413,25 @@ impl Function for ReplaceAll {
 }
 
 /// Add all the functions defined in this module to `context`.
-pub fn add_builtin_functions(context: &mut Context) {
+pub fn add_builtin_functions<'a: 'b, 'b>(pref_manager: &'a PreferenceManager, definitions: &'a Definitions, context: &'b mut Context) {
     context.set_function("NestingChars", crate::braille::NemethNestingChars);
     context.set_function("BrailleChars", crate::braille::BrailleChars);
     context.set_function("NeedsToBeGrouped", crate::braille::NeedsToBeGrouped);
     context.set_function("IsNode", IsNode);
-    context.set_function("ToOrdinal", ToOrdinal);
-    context.set_function("ToCommonFraction", ToCommonFraction);
+
+    // sxd-xpath `Function` type has a `+ 'static` bound but our
+    // functions depend on preferences and definitions.
+    // https://github.com/shepmaster/sxd-xpath/issues/149
+    //
+    // Safe because preferences and definitions are either global
+    // (stateful API) or outlive the context (not exposed in stateless API).
+    unsafe fn extend_lifetime<'z>(r: ToOrdinal<'z>) -> ToOrdinal<'static> {
+        std::mem::transmute::<ToOrdinal<'z>, ToOrdinal<'static>>(r)
+    }
+    let to_ordinal = unsafe { extend_lifetime(ToOrdinal { pref_manager, definitions }) };
+    context.set_function("ToCommonFraction", ToCommonFraction { to_ordinal: to_ordinal.clone() });
+    context.set_function("ToOrdinal", to_ordinal);
+
     context.set_function("IsBracketed", IsBracketed);
     context.set_function("IsInDefinition", IsInDefinition);
     context.set_function("DefinitionValue", DefinitionValue);
@@ -1449,12 +1457,16 @@ pub fn add_builtin_functions(context: &mut Context) {
 mod tests {
     use super::*;
     use sxd_document::parser;
-    use crate::interface::{trim_element, get_element};
+    use crate::element_util::{trim_element, get_element};
+    use crate::prefs::PreferenceManager;
 
 
     fn init_word_list() {
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        let result = crate::definitions::read_definitions_file(true);
+        let result =
+            crate::definitions::SPEECH_DEFINITIONS.with_borrow_mut(|defs|
+                crate::definitions::read_definitions_file(
+                    PreferenceManager::get().borrow().get_definitions_file(true), defs));
         if let Err(e) = result {
             panic!("unable to read 'Rules/Languages/en/definitions.yaml\n{}", e.to_string());
         }
@@ -1463,94 +1475,114 @@ mod tests {
     #[test]
     fn ordinal_one_digit() {
         init_word_list();
-        assert_eq!("zeroth", ToOrdinal::convert("0", false, false).unwrap());
-        assert_eq!("second", ToOrdinal::convert("2", false, false).unwrap());
-        assert_eq!("ninth", ToOrdinal::convert("9", false, false).unwrap());
+        SPEECH_DEFINITIONS.with_borrow(|definitions| {
+            let pref_manager = PreferenceManager::get();
+            let to_ordinal = ToOrdinal { pref_manager: &pref_manager.borrow(), definitions: definitions };
 
-        assert_eq!("zeroth", ToOrdinal::convert("0", false, true).unwrap());
-        assert_eq!("seconds", ToOrdinal::convert("2", false, true).unwrap());
-        assert_eq!("ninths", ToOrdinal::convert("9", false, true).unwrap());
+            assert_eq!("zeroth", to_ordinal.convert("0", false, false).unwrap());
+            assert_eq!("second", to_ordinal.convert("2", false, false).unwrap());
+            assert_eq!("ninth", to_ordinal.convert("9", false, false).unwrap());
 
-        assert_eq!("first", ToOrdinal::convert("1", true, false).unwrap());
-        assert_eq!("half", ToOrdinal::convert("2", true, false).unwrap());
-        assert_eq!("half", ToOrdinal::convert("02", true, false).unwrap());
-        assert_eq!("ninth", ToOrdinal::convert("9", true, false).unwrap());
+            assert_eq!("zeroth", to_ordinal.convert("0", false, true).unwrap());
+            assert_eq!("seconds", to_ordinal.convert("2", false, true).unwrap());
+            assert_eq!("ninths", to_ordinal.convert("9", false, true).unwrap());
 
-        assert_eq!("halves", ToOrdinal::convert("2", true, true).unwrap());
-        assert_eq!("halves", ToOrdinal::convert("002", true, true).unwrap());
-        assert_eq!("ninths", ToOrdinal::convert("9", true, true).unwrap());
+            assert_eq!("first", to_ordinal.convert("1", true, false).unwrap());
+            assert_eq!("half", to_ordinal.convert("2", true, false).unwrap());
+            assert_eq!("half", to_ordinal.convert("02", true, false).unwrap());
+            assert_eq!("ninth", to_ordinal.convert("9", true, false).unwrap());
+
+            assert_eq!("halves", to_ordinal.convert("2", true, true).unwrap());
+            assert_eq!("halves", to_ordinal.convert("002", true, true).unwrap());
+            assert_eq!("ninths", to_ordinal.convert("9", true, true).unwrap());
+        });
     }
 
     #[test]
     fn ordinal_two_digit() {
         init_word_list();
-        assert_eq!("tenth", ToOrdinal::convert("10", false, false).unwrap());
-        assert_eq!("seventeenth", ToOrdinal::convert("17", false, false).unwrap());
-        assert_eq!("thirty second", ToOrdinal::convert("32", false, false).unwrap());
-        assert_eq!("fortieth", ToOrdinal::convert("40", false, false).unwrap());
+        SPEECH_DEFINITIONS.with_borrow(|definitions| {
+            let pref_manager = PreferenceManager::get();
+            let to_ordinal = ToOrdinal { pref_manager: &pref_manager.borrow(), definitions: definitions };
 
-        assert_eq!("tenths", ToOrdinal::convert("10", false, true).unwrap());
-        assert_eq!("sixteenths", ToOrdinal::convert("16", false, true).unwrap());
-        assert_eq!("eighty eighths", ToOrdinal::convert("88", false, true).unwrap());
-        assert_eq!("fiftieths", ToOrdinal::convert("50", false, true).unwrap());
+            assert_eq!("tenth", to_ordinal.convert("10", false, false).unwrap());
+            assert_eq!("seventeenth", to_ordinal.convert("17", false, false).unwrap());
+            assert_eq!("thirty second", to_ordinal.convert("32", false, false).unwrap());
+            assert_eq!("fortieth", to_ordinal.convert("40", false, false).unwrap());
 
-        assert_eq!("eleventh", ToOrdinal::convert("11", true, false).unwrap());
-        assert_eq!("forty fourth", ToOrdinal::convert("44", true, false).unwrap());
-        assert_eq!("ninth", ToOrdinal::convert("9", true, false).unwrap());
-        assert_eq!("ninth", ToOrdinal::convert("00000009", true, false).unwrap());
-        assert_eq!("sixtieth", ToOrdinal::convert("60", true, false).unwrap());
+            assert_eq!("tenths", to_ordinal.convert("10", false, true).unwrap());
+            assert_eq!("sixteenths", to_ordinal.convert("16", false, true).unwrap());
+            assert_eq!("eighty eighths", to_ordinal.convert("88", false, true).unwrap());
+            assert_eq!("fiftieths", to_ordinal.convert("50", false, true).unwrap());
 
-        assert_eq!("tenths", ToOrdinal::convert("10", true, true).unwrap());
-        assert_eq!("tenths", ToOrdinal::convert("0010", true, true).unwrap());
-        assert_eq!("elevenths", ToOrdinal::convert("11", true, true).unwrap());
-        assert_eq!("nineteenths", ToOrdinal::convert("19", true, true).unwrap());
-        assert_eq!("twentieths", ToOrdinal::convert("20", true, true).unwrap());
-        assert_eq!("nineteenths", ToOrdinal::convert("𝟏𝟗", true, true).unwrap());
+            assert_eq!("eleventh", to_ordinal.convert("11", true, false).unwrap());
+            assert_eq!("forty fourth", to_ordinal.convert("44", true, false).unwrap());
+            assert_eq!("ninth", to_ordinal.convert("9", true, false).unwrap());
+            assert_eq!("ninth", to_ordinal.convert("00000009", true, false).unwrap());
+            assert_eq!("sixtieth", to_ordinal.convert("60", true, false).unwrap());
+
+            assert_eq!("tenths", to_ordinal.convert("10", true, true).unwrap());
+            assert_eq!("tenths", to_ordinal.convert("0010", true, true).unwrap());
+            assert_eq!("elevenths", to_ordinal.convert("11", true, true).unwrap());
+            assert_eq!("nineteenths", to_ordinal.convert("19", true, true).unwrap());
+            assert_eq!("twentieths", to_ordinal.convert("20", true, true).unwrap());
+            assert_eq!("nineteenths", to_ordinal.convert("𝟏𝟗", true, true).unwrap());
+        });
     }
 
     #[test]
     fn ordinal_three_digit() {
         init_word_list();
-        assert_eq!("one hundred first", ToOrdinal::convert("101", false, false).unwrap());
-        assert_eq!("two hundred tenth", ToOrdinal::convert("210", false, false).unwrap());
-        assert_eq!("four hundred thirty second", ToOrdinal::convert("432", false, false).unwrap());
-        assert_eq!("four hundred second", ToOrdinal::convert("402", false, false).unwrap());
+        SPEECH_DEFINITIONS.with_borrow(|definitions| {
+            let pref_manager = PreferenceManager::get();
+            let to_ordinal = ToOrdinal { pref_manager: &pref_manager.borrow(), definitions: definitions };
 
-        assert_eq!("one hundred first", ToOrdinal::convert("101", true, false).unwrap());
-        assert_eq!("two hundred second", ToOrdinal::convert("202", true, false).unwrap());
-        assert_eq!("four hundred thirty second", ToOrdinal::convert("432", true, false).unwrap());
-        assert_eq!("five hundred third", ToOrdinal::convert("503", true, false).unwrap());
+            assert_eq!("one hundred first", to_ordinal.convert("101", false, false).unwrap());
+            assert_eq!("two hundred tenth", to_ordinal.convert("210", false, false).unwrap());
+            assert_eq!("four hundred thirty second", to_ordinal.convert("432", false, false).unwrap());
+            assert_eq!("four hundred second", to_ordinal.convert("402", false, false).unwrap());
 
-        assert_eq!("three hundred elevenths", ToOrdinal::convert("311", false, true).unwrap());
-        assert_eq!("four hundred ninety ninths", ToOrdinal::convert("499", false, true).unwrap());
-        assert_eq!("nine hundred ninetieths", ToOrdinal::convert("990", false, true).unwrap());
-        assert_eq!("six hundred seconds", ToOrdinal::convert("602", false, true).unwrap());
+            assert_eq!("one hundred first", to_ordinal.convert("101", true, false).unwrap());
+            assert_eq!("two hundred second", to_ordinal.convert("202", true, false).unwrap());
+            assert_eq!("four hundred thirty second", to_ordinal.convert("432", true, false).unwrap());
+            assert_eq!("five hundred third", to_ordinal.convert("503", true, false).unwrap());
 
-        assert_eq!("seven hundredths", ToOrdinal::convert("700", true, true).unwrap());
-        assert_eq!("one hundredths", ToOrdinal::convert("100", true, true).unwrap());
-        assert_eq!("eight hundred seventeenths", ToOrdinal::convert("817", true, true).unwrap());
+            assert_eq!("three hundred elevenths", to_ordinal.convert("311", false, true).unwrap());
+            assert_eq!("four hundred ninety ninths", to_ordinal.convert("499", false, true).unwrap());
+            assert_eq!("nine hundred ninetieths", to_ordinal.convert("990", false, true).unwrap());
+            assert_eq!("six hundred seconds", to_ordinal.convert("602", false, true).unwrap());
+
+            assert_eq!("seven hundredths", to_ordinal.convert("700", true, true).unwrap());
+            assert_eq!("one hundredths", to_ordinal.convert("100", true, true).unwrap());
+            assert_eq!("eight hundred seventeenths", to_ordinal.convert("817", true, true).unwrap());
+        });
     }
     #[test]
     fn ordinal_large() {
         init_word_list();
-        assert_eq!("one thousandth", ToOrdinal::convert("1000", false, false).unwrap());
-        assert_eq!("two thousand one hundredth", ToOrdinal::convert("2100", false, false).unwrap());
-        assert_eq!("thirty thousandth", ToOrdinal::convert("30000", false, false).unwrap());
-        assert_eq!("four hundred thousandth", ToOrdinal::convert("400000", false, false).unwrap());
+        SPEECH_DEFINITIONS.with_borrow(|definitions| {
+            let pref_manager = PreferenceManager::get();
+            let to_ordinal = ToOrdinal { pref_manager: &pref_manager.borrow(), definitions: definitions };
 
-        assert_eq!("four hundred thousandth", ToOrdinal::convert("400000", true, false).unwrap());
-        assert_eq!("five hundred thousand second", ToOrdinal::convert("500002", true, false).unwrap());
-        assert_eq!("six millionth", ToOrdinal::convert("6000000", true, false).unwrap());
-        assert_eq!("sixty millionth", ToOrdinal::convert("60000000", true, false).unwrap());
+            assert_eq!("one thousandth", to_ordinal.convert("1000", false, false).unwrap());
+            assert_eq!("two thousand one hundredth", to_ordinal.convert("2100", false, false).unwrap());
+            assert_eq!("thirty thousandth", to_ordinal.convert("30000", false, false).unwrap());
+            assert_eq!("four hundred thousandth", to_ordinal.convert("400000", false, false).unwrap());
 
-        assert_eq!("seven billionths", ToOrdinal::convert("7000000000", false, true).unwrap());
-        assert_eq!("eight trillionths", ToOrdinal::convert("8000000000000", false, true).unwrap());
-        assert_eq!("nine quadrillionths", ToOrdinal::convert("9000000000000000", false, true).unwrap());
-        assert_eq!("one quintillionth", ToOrdinal::convert("1000000000000000000", false, false).unwrap());
+            assert_eq!("four hundred thousandth", to_ordinal.convert("400000", true, false).unwrap());
+            assert_eq!("five hundred thousand second", to_ordinal.convert("500002", true, false).unwrap());
+            assert_eq!("six millionth", to_ordinal.convert("6000000", true, false).unwrap());
+            assert_eq!("sixty millionth", to_ordinal.convert("60000000", true, false).unwrap());
 
-        assert_eq!("nine billion eight hundred seventy six million five hundred forty three thousand two hundred tenths", ToOrdinal::convert("9876543210", true, true).unwrap());
-        assert_eq!("nine billion five hundred forty three thousand two hundred tenths", ToOrdinal::convert("9000543210", true, true).unwrap());
-        assert_eq!("zeroth", ToOrdinal::convert("00000", false, false).unwrap());
+            assert_eq!("seven billionths", to_ordinal.convert("7000000000", false, true).unwrap());
+            assert_eq!("eight trillionths", to_ordinal.convert("8000000000000", false, true).unwrap());
+            assert_eq!("nine quadrillionths", to_ordinal.convert("9000000000000000", false, true).unwrap());
+            assert_eq!("one quintillionth", to_ordinal.convert("1000000000000000000", false, false).unwrap());
+
+            assert_eq!("nine billion eight hundred seventy six million five hundred forty three thousand two hundred tenths", to_ordinal.convert("9876543210", true, true).unwrap());
+            assert_eq!("nine billion five hundred forty three thousand two hundred tenths", to_ordinal.convert("9000543210", true, true).unwrap());
+            assert_eq!("zeroth", to_ordinal.convert("00000", false, false).unwrap());
+        });
     }
 
 

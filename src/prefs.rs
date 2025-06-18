@@ -216,10 +216,20 @@ thread_local!{
 //   Also note that if 'error' is not an empty string, SpeechRules can't work so using those requires a check.
 #[derive(Debug, Default)]
 pub struct PreferenceManager {
-    rules_dir: PathBuf,                   // full path to rules dir
-    error: String,                        // empty/default string if fields are set, otherwise error message
-    user_prefs: Preferences,              // prefs that come from reading prefs.yaml (system and user locations)
-    api_prefs: Preferences,               // prefs set by API calls (along with some defaults not in the user settings such as "pitch")
+    // Path to the rules directory.
+    rules_dir: PathBuf,
+
+    // Stateful mode: empty/default string if fields are set, otherwise error message.
+    // Stateless mode: unused.
+    error: String,
+    
+    // Stateful mode: these prefs come from reading prefs.yaml (system and user locations)
+    // Stateless mode: set explicitly when building the context.
+    user_prefs: Preferences,
+
+    // In stateful mode, prefs set by API calls (along with some defaults not in the user settings such as "pitch")
+    api_prefs: Preferences,
+
     sys_prefs_file: Option<FileAndTime>,  // the system prefs.yaml file
     user_prefs_file: Option<FileAndTime>, // the user prefs.yaml file
     intent: PathBuf,                      // the intent rule style file
@@ -255,7 +265,7 @@ impl fmt::Display for PreferenceManager {
 }
 
 impl PreferenceManager {
-    /// Initialize (the) PreferenceManager (a global var).
+    /// Initialize a PreferenceManager.
     /// 'rules_dir' is the path to "Rules" unless the env var MathCATRulesDir is set
     /// 
     /// If rules_dir is an empty PathBuf, the existing rules_dir is used (an error if it doesn't exist)
@@ -272,7 +282,23 @@ impl PreferenceManager {
         return Ok( () );
     }
 
+    pub fn initialize_for_stateless(&mut self, rules_dir: PathBuf) -> Result<()> {
+        // No need to canonicalize the path as we do not cache anything.
+        self.set_rules_dir(&rules_dir)?;
+        
+        // We don't want to read local preference files in the stateless version,
+        // so we don't call set_preference files here.
 
+        let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone();
+        let language = language.as_str().unwrap();
+        self.set_separators(language)?;
+
+        self.set_all_files(&rules_dir)?;
+        return Ok( () );
+    }
+
+
+    /// Returns the global preference manager.
     pub fn get() -> Rc<RefCell<PreferenceManager>> {
         return PREF_MANAGER.with( |pm| pm.clone() );
     }
@@ -835,6 +861,41 @@ impl PreferenceManager {
     }
 }
 
+
+// Builds a PreferenceManager for stateless mode.
+pub(crate) struct PreferenceManagerBuilder {
+    pref_manager: Rc<RefCell<PreferenceManager>>,
+    rules_dir: PathBuf,
+}
+
+impl PreferenceManagerBuilder {
+    pub fn new() -> PreferenceManagerBuilder {
+        let result = PreferenceManagerBuilder {
+            pref_manager: Rc::new(RefCell::new(PreferenceManager::default())),
+            rules_dir: PathBuf::new(),
+        };
+        result.pref_manager.borrow_mut().user_prefs = Preferences::user_defaults();
+        return result;
+    }
+
+    // Sets the rules directory.
+    pub fn set_rules_dir(&mut self, path: &Path) {
+        self.rules_dir = path.into();
+    }
+
+
+    pub fn set_string_pref(&mut self, key: &str, value: &str) {
+        self.pref_manager.borrow_mut().user_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+    }
+
+    pub fn build(mut self) -> Result<Rc<RefCell<PreferenceManager>>> {
+        // We never read the local preference files in stateless mode.
+        self.set_string_pref("CheckRuleFiles", "None");
+
+        self.pref_manager.borrow_mut().initialize_for_stateless(self.rules_dir)?;
+        return Ok(self.pref_manager);
+    }
+}
 
 #[cfg(test)]
 mod tests {

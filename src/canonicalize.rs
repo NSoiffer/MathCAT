@@ -6,7 +6,9 @@
 //! * known "bad" MathML is cleaned up (this will likely be an ongoing effort)
 //! * mrows are added based on operator priorities from the MathML Operator Dictionary
 #![allow(clippy::needless_return)]
+use crate::definitions::Definitions;
 use crate::errors::*;
+use crate::prefs::PreferenceManager;
 use std::rc::Rc;
 use std::cell::RefCell;
 use sxd_document::dom::*;
@@ -398,33 +400,6 @@ pub fn get_presentation_element(element: Element) -> (usize, Element) {
 	}
 }
 
-/// Canonicalize does several things:
-/// 1. cleans up the tree so all extra white space is removed (should only have element and text nodes)
-/// 2. normalize the characters
-/// 3. clean up "bad" MathML based on known output from some converters (TODO: still a work in progress)
-/// 4. the tree is "parsed" based on the mo (priority)/mi/mn's in an mrow
-///    *  this adds mrows mrows and some invisible operators (implied times, function app, ...)
-///    * extra mrows are removed
-///    * implicit mrows are turned into explicit mrows (e.g, there will be a single child of 'math')
-///
-/// Canonicalize is pretty conservative in adding new mrows and won't do it if:
-/// * there is an intent attr
-/// * if the mrow starts and ends with a fence (e.g, French open interval "]0,1[")
-///
-/// An mrow is never deleted unless it is redundant.
-/// 
-/// Whitespace handling:
-/// Whitespace complicates parsing and also pattern matching (e.g., is it a mixed number which tests for a number preceding a fraction)
-/// The first attempt which mostly worked was to shove whitespace into adjacent mi/mn/mtext. That has a problem with distinguish different uses for whitespace
-/// The second attempt was to leave it in the parse and make it an mo when appropriate, but there were some cases where it should be prefix and wasn't caught
-/// The third attempt (and the current one) is to make it an attribute on adjacent elements.
-///   This preserves the data-width attr (with new name) added in the second attempt that helps resolve whether something is tweaking, a real space, or an omission.
-///   It adds data-previous-space-width/data-following-space-width with values to indicate with the space was on the left or right (typically it placed on the previous token because that's easier)
-pub fn canonicalize(mathml: Element) -> Result<Element> {
-	let context = CanonicalizeContext::new();
-	return context.canonicalize(mathml);
-}
-
 #[derive(Debug, PartialEq)]
 enum FunctionNameCertainty {
 	True,
@@ -453,6 +428,20 @@ lazy_static! {
 }
 
 
+#[derive(PartialEq)]
+struct CanonicalizeContextPatternsOptions {
+	decimal_separator: String,
+	block_separator: String,
+}
+impl CanonicalizeContextPatternsOptions {
+	fn from_prefs(pref_manager: &PreferenceManager) -> CanonicalizeContextPatternsOptions {
+		return CanonicalizeContextPatternsOptions {
+			decimal_separator: pref_manager.pref_to_string("BlockSeparators"),
+			block_separator: pref_manager.pref_to_string("DecimalSeparators"),
+		}
+	}
+}
+
 struct CanonicalizeContextPatterns {
 	decimal_separator: Regex,
 	block_separator: Regex,
@@ -464,13 +453,13 @@ struct CanonicalizeContextPatterns {
 }
 
 impl CanonicalizeContextPatterns {
-	fn new(block_separator_pref: &str, decimal_separator_pref: &str) -> CanonicalizeContextPatterns {
-		let block_separator = Regex::new(&format!("[{}]", regex::escape(block_separator_pref))).unwrap();
-		let decimal_separator = Regex::new(&format!("[{}]", regex::escape(decimal_separator_pref))).unwrap();
+	fn new(options: &CanonicalizeContextPatternsOptions) -> CanonicalizeContextPatterns {
+		let block_separator = Regex::new(&format!("[{}]", regex::escape(&options.block_separator))).unwrap();
+		let decimal_separator = Regex::new(&format!("[{}]", regex::escape(&options.decimal_separator))).unwrap();
 		// allows just "." and also matches an empty string, but those are ruled out elsewhere
-		let digit_only_decimal_number = Regex::new(&format!(r"^\d*{}?\d*$", regex::escape(decimal_separator_pref))).unwrap();
-		let block_3digit_pattern = get_number_pattern_regex(block_separator_pref, decimal_separator_pref, 3, 3);
-		let block_3_5digit_pattern = get_number_pattern_regex(block_separator_pref, decimal_separator_pref, 3, 5);
+		let digit_only_decimal_number = Regex::new(&format!(r"^\d*{}?\d*$", regex::escape(&options.decimal_separator))).unwrap();
+		let block_3digit_pattern = get_number_pattern_regex(&options.block_separator, &options.decimal_separator, 3, 3);
+		let block_3_5digit_pattern = get_number_pattern_regex(&options.block_separator, &options.decimal_separator, 3, 5);
 		// Note: on en.wikipedia.org/wiki/Decimal_separator, show '3.14159 26535 89793 23846'
 		let block_4digit_hex_pattern =  Regex::new(r"^[0-9a-fA-F]{4}([ \u00A0\u202F][0-9a-fA-F]{4})*$").unwrap();
 		let block_1digit_pattern =  Regex::new(r"^((\d(\uFFFF\d)?)(\d([, \u00A0\u202F]\d){2})*)?([\.](\d(\uFFFF\d)*)?)?$").unwrap();
@@ -499,9 +488,10 @@ impl CanonicalizeContextPatterns {
 /// Profiling showed that creating new contexts was very time consuming because creating the RegExs is very expensive
 /// Profiling set_mathml (which does the canonicalization) spends 65% of the time in Regex::new, of which half of it is spent in this initialization.
 struct CanonicalizeContextPatternsCache {
-	block_separator_pref: String,
-	decimal_separator_pref: String,
 	patterns: Rc<CanonicalizeContextPatterns>,
+
+	// options act as the cache key
+	options: CanonicalizeContextPatternsOptions,
 }
 
 thread_local!{
@@ -512,12 +502,10 @@ impl CanonicalizeContextPatternsCache {
 	fn new() -> CanonicalizeContextPatternsCache {
 		let pref_manager = crate::prefs::PreferenceManager::get();
 		let pref_manager = pref_manager.borrow();
-		let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
-		let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
+		let options = CanonicalizeContextPatternsOptions::from_prefs(&pref_manager);
 		return CanonicalizeContextPatternsCache {
-			patterns: Rc::new( CanonicalizeContextPatterns::new(&block_separator_pref, &decimal_separator_pref) ),
-			block_separator_pref,
-			decimal_separator_pref
+			patterns: Rc::new( CanonicalizeContextPatterns::new(&options) ),
+			options: options,
 		}
 	}
 
@@ -525,34 +513,62 @@ impl CanonicalizeContextPatternsCache {
 		return PATTERN_CACHE.with( |cache| {
 			let pref_manager_rc = crate::prefs::PreferenceManager::get();
 			let pref_manager = pref_manager_rc.borrow();
-			let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
-			let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
+			let new_options = CanonicalizeContextPatternsOptions::from_prefs(&pref_manager);
 
 			let mut cache = cache.borrow_mut();
-			if block_separator_pref != cache.block_separator_pref || decimal_separator_pref != cache.decimal_separator_pref {
+			if new_options != cache.options {
 				// update the cache
-				cache.patterns = Rc::new( CanonicalizeContextPatterns::new(&block_separator_pref, &decimal_separator_pref) );
-				cache.block_separator_pref = block_separator_pref;
-				cache.decimal_separator_pref = decimal_separator_pref;
+				cache.patterns = Rc::new( CanonicalizeContextPatterns::new(&new_options) );
+				cache.options = new_options;
 			}
 			return cache.patterns.clone();
 		})
 	}
 }
 
-struct CanonicalizeContext {
+pub (crate) struct CanonicalizeContext {
 	patterns: Rc<CanonicalizeContextPatterns>,
 }
 
 
 impl CanonicalizeContext {
-	fn new() -> CanonicalizeContext {
+	pub fn new_uncached(pref_manager: &PreferenceManager) -> CanonicalizeContext {
+		return CanonicalizeContext {
+			patterns: Rc::new( CanonicalizeContextPatterns::new(
+				&CanonicalizeContextPatternsOptions::from_prefs(pref_manager)) ),
+		};
+	}
+
+	/// Returns the context backed by global preferences and cache.
+	pub fn new_from_global_prefs_cached() -> CanonicalizeContext {
 		return CanonicalizeContext {
 			patterns: CanonicalizeContextPatternsCache::get(),
 		};
 	}
 
-	fn canonicalize<'a>(&self, mut mathml: Element<'a>) -> Result<Element<'a>> {
+	/// Canonicalize does several things:
+	/// 1. cleans up the tree so all extra white space is removed (should only have element and text nodes)
+	/// 2. normalize the characters
+	/// 3. clean up "bad" MathML based on known output from some converters (TODO: still a work in progress)
+	/// 4. the tree is "parsed" based on the mo (priority)/mi/mn's in an mrow
+	///    *  this adds mrows mrows and some invisible operators (implied times, function app, ...)
+	///    * extra mrows are removed
+	///    * implicit mrows are turned into explicit mrows (e.g, there will be a single child of 'math')
+	///
+	/// Canonicalize is pretty conservative in adding new mrows and won't do it if:
+	/// * there is an intent attr
+	/// * if the mrow starts and ends with a fence (e.g, French open interval "]0,1[")
+	///
+	/// An mrow is never deleted unless it is redundant.
+	/// 
+	/// Whitespace handling:
+	/// Whitespace complicates parsing and also pattern matching (e.g., is it a mixed number which tests for a number preceding a fraction)
+	/// The first attempt which mostly worked was to shove whitespace into adjacent mi/mn/mtext. That has a problem with distinguish different uses for whitespace
+	/// The second attempt was to leave it in the parse and make it an mo when appropriate, but there were some cases where it should be prefix and wasn't caught
+	/// The third attempt (and the current one) is to make it an attribute on adjacent elements.
+	///   This preserves the data-width attr (with new name) added in the second attempt that helps resolve whether something is tweaking, a real space, or an omission.
+	///   It adds data-previous-space-width/data-following-space-width with values to indicate with the space was on the left or right (typically it placed on the previous token because that's easier)
+	pub fn canonicalize<'a>(&self, definitions: &Definitions, mut mathml: Element<'a>) -> Result<Element<'a>> {
 		// debug!("MathML before canonicalize:\n{}", mml_to_string(mathml));
 	
 		if name(mathml) != "math" {
@@ -566,15 +582,15 @@ impl CanonicalizeContext {
 			mathml = root.children()[0].element().unwrap();
 		}
 		CanonicalizeContext::assure_mathml(mathml)?;
-		let mathml = self.clean_mathml(mathml).unwrap();	// 'math' is never removed
+		let mathml = self.clean_mathml(definitions, mathml).unwrap();	// 'math' is never removed
 		self.assure_nary_tag_has_one_child(mathml);
 		// debug!("Not chemistry -- retry:\n{}", mml_to_string(mathml));
-		let mut converted_mathml = self.canonicalize_mrows(mathml)
+		let mut converted_mathml = self.canonicalize_mrows(definitions, mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(mathml)))?;
 		if !crate::chemistry::scan_and_mark_chemistry(converted_mathml) {
 			// debug!("canonicalize before canonicalize_mrows:\n{}", mml_to_string(converted_mathml));
 			self.assure_nary_tag_has_one_child(converted_mathml);
-			converted_mathml = self.canonicalize_mrows(mathml)
+			converted_mathml = self.canonicalize_mrows(definitions, mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(mathml)))?;
 		}
 		debug!("\nMathML after canonicalize:\n{}", mml_to_string(converted_mathml));
@@ -739,7 +755,7 @@ impl CanonicalizeContext {
 	///   "arg trig" functions, pseudo scripts, and others
 	/// 
 	/// Returns 'None' if the element should not be in the tree.
-	fn clean_mathml<'a>(&self, mathml: Element<'a>) -> Option<Element<'a>> {
+	fn clean_mathml<'a>(&self, definitions: &Definitions, mathml: Element<'a>) -> Option<Element<'a>> {
 		// Note: this works bottom-up (clean the children first, then this element)
 		lazy_static! {
 			static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap();
@@ -858,7 +874,7 @@ impl CanonicalizeContext {
 						as_element(following_siblings[0]).remove_from_parent();
 					}
 					return Some(mathml);
-				} else if let Some(result) = merge_arc_trig(mathml) {
+				} else if let Some(result) = merge_arc_trig(definitions, mathml) {
 						return Some(result);
 				} else if IS_PRIME.is_match(text) {
 					let new_text = merge_prime_text(text);
@@ -867,9 +883,9 @@ impl CanonicalizeContext {
 				} else if text == "..." {
 					mathml.set_text("…");
 					return Some(mathml);
-				} else if let Some(result) = split_points(mathml) {
+				} else if let Some(result) = split_points(definitions, mathml) {
 					return Some(result);
-				} else if let Some(result) = merge_mi_sequence(mathml) {
+				} else if let Some(result) = merge_mi_sequence(definitions, mathml) {
 					return Some(result);
 				} else {
 					return Some(mathml);
@@ -878,11 +894,11 @@ impl CanonicalizeContext {
 			"mtext" => {
 				// debug!("before merge_arc_trig: {}", mml_to_string(mathml));
 
-				if let Some(result) = merge_arc_trig(mathml) {
+				if let Some(result) = merge_arc_trig(definitions, mathml) {
 					return Some(result);
 				};
 			
-				if let Some(result) = split_points(mathml) {
+				if let Some(result) = split_points(definitions, mathml) {
 					return Some(result);
 				}
 				
@@ -919,7 +935,7 @@ impl CanonicalizeContext {
 				} else {
 					match text {
 						"arc" | "arc " | "arc " /* non-breaking space */ => {
-							if let Some(result) = merge_arc_trig(mathml) {
+							if let Some(result) = merge_arc_trig(definitions, mathml) {
 								return Some(result);
 							}
 						},
@@ -942,27 +958,25 @@ impl CanonicalizeContext {
 
 				// common bug: trig functions, lim, etc., should be mi
 				// same for ellipsis ("…")
-				return crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
-					if ["…", "⋯", "∞"].contains(&text) ||
-					   definitions.borrow().get_hashset("FunctionNames").unwrap().contains(text) ||
-					   definitions.borrow().get_hashset("GeometryShapes").unwrap().contains(text) {
-						set_mathml_name(mathml, "mi");
-						return Some(mathml);
-					}
-					if IS_PRIME.is_match(text) {
-						let new_text = merge_prime_text(text);
-						mathml.set_text(&new_text);
-						return Some(mathml);
-					}
-					if CURRENCY_SYMBOLS.contains(text) {
-						set_mathml_name(mathml, "mi");
-						return Some(mathml);
-					}
+				if ["…", "⋯", "∞"].contains(&text) ||
+					definitions.get_hashset("FunctionNames").unwrap().contains(text) ||
+					definitions.get_hashset("GeometryShapes").unwrap().contains(text) {
+					set_mathml_name(mathml, "mi");
 					return Some(mathml);
-				});
+				}
+				if IS_PRIME.is_match(text) {
+					let new_text = merge_prime_text(text);
+					mathml.set_text(&new_text);
+					return Some(mathml);
+				}
+				if CURRENCY_SYMBOLS.contains(text) {
+					set_mathml_name(mathml, "mi");
+					return Some(mathml);
+				}
+				return Some(mathml);
 				// note: chemistry test is done later as part of another phase of chemistry cleanup
 			},
-			"mfenced" => {return self.clean_mathml( convert_mfenced_to_mrow(mathml) )},
+			"mfenced" => {return self.clean_mathml(definitions, convert_mfenced_to_mrow(mathml))},
 			"mstyle" | "mpadded" => {
 				// Throw out mstyle and mpadded -- to do this, we need to avoid mstyle being the arg of clean_mathml
 				// FIX: should probably push the attrs down to the children (set in 'self')
@@ -972,7 +986,7 @@ impl CanonicalizeContext {
 					return if parent_requires_child {Some( CanonicalizeContext::make_empty_element(mathml) )} else {None};
 				} else if children.len() == 1 {
 					let is_from_mhchem = element_name == "mpadded" && is_from_mhchem_hack(mathml);
-					if let Some(new_mathml) = self.clean_mathml( as_element(children[0]) ) {
+					if let Some(new_mathml) = self.clean_mathml(definitions, as_element(children[0])) {
 						// "lift" the child up so all the links (e.g., siblings) are correct
 						mathml.replace_children(new_mathml.children());
 						set_mathml_name(mathml, name(new_mathml));
@@ -992,7 +1006,7 @@ impl CanonicalizeContext {
 					// wrap the children in an mrow, but maintain tree siblings by changing mpadded/mstyle to mrow
 					set_mathml_name(mathml, "mrow");
 					mathml.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
-					return self.clean_mathml(mathml);	// now it's an mrow so a different path next time
+					return self.clean_mathml(definitions, mathml);	// now it's an mrow so a different path next time
 				}
 			},
 			"mphantom" | "malignmark" | "maligngroup"=> {
@@ -1016,7 +1030,7 @@ impl CanonicalizeContext {
 				// The compromise is to move the annotations into an attr named data-annotation[-xml]-<encoding-name>
 				// The attribute is put on presentation element root
 				let presentation = get_presentation_element(mathml).1;
-				let new_presentation = if let Some(presentation) = self.clean_mathml(presentation) {
+				let new_presentation = if let Some(presentation) = self.clean_mathml(definitions, presentation) {
 					presentation
 				} else {
 					// probably shouldn't happen, but just in case
@@ -1033,7 +1047,7 @@ impl CanonicalizeContext {
 						return if parent_requires_child {Some(mathml)} else {None};
 					} else if children.len() == 1 && CanonicalizeContext::is_ok_to_merge_mrow_child(mathml) {
 						let is_from_mhchem = is_from_mhchem_hack(mathml);
-						if let Some(new_mathml) = self.clean_mathml(as_element(children[0])) {
+						if let Some(new_mathml) = self.clean_mathml(definitions, as_element(children[0])) {
 							// "lift" the child up so all the links (e.g., siblings) are correct
 							mathml.replace_children(new_mathml.children());
 							set_mathml_name(mathml, name(new_mathml));
@@ -1067,7 +1081,7 @@ impl CanonicalizeContext {
 				let mut i = 0;
 				while i < children.len() {
 					if let Some(child) = children[i].element() {
-						match self.clean_mathml(child) {
+						match self.clean_mathml(definitions, child) {
 							None => {
 								mathml.remove_child(child);
 								// don't increment 'i' because there is one less child now and so everything shifted left
@@ -1094,7 +1108,7 @@ impl CanonicalizeContext {
 									// crate::canonicalize::assure_mathml(get_parent(start_of_change)).unwrap();    // FIX: find a recovery -- we're in deep trouble if this isn't true
 									if start_of_change != child {
 										// debug!("clean_mathml: start_of_change != mathml -- mathml={}", mml_to_string(mathml));
-										return self.clean_mathml(mathml);	// restart cleaning
+										return self.clean_mathml(definitions, mathml);	// restart cleaning
 									}
 								}										
 								i += 1;
@@ -1531,7 +1545,7 @@ impl CanonicalizeContext {
 		}
 
 		/// If arg is "arc" (with optional space), merge the following element in if a trig function (sibling is deleted)
-		fn merge_arc_trig(leaf: Element) -> Option<Element> {
+		fn merge_arc_trig<'a>(definitions: &Definitions, leaf: Element<'a>) -> Option<Element<'a>> {
 			assert!(is_leaf(leaf));
 			let leaf_text = as_text(leaf);
 			if !(leaf_text == "arc" || leaf_text == "arc " || leaf_text == "arc " /* non-breaking space */ ) {
@@ -1549,18 +1563,16 @@ impl CanonicalizeContext {
 				return None;
 			}
 
-			return crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
-				// change "arc" "cos" to "arccos" -- we look forward because calling loop stores previous node
-				let following_text = as_text(following_sibling);
-				if definitions.borrow().get_hashset("TrigFunctionNames").unwrap().contains(following_text) {
-					let new_text = "arc".to_string() + following_text;
-					set_mathml_name(leaf, "mi");
-					leaf.set_text(&new_text);
-					following_sibling.remove_from_parent();
-					return Some(leaf);
-				}
-				return None;
-			})
+			// change "arc" "cos" to "arccos" -- we look forward because calling loop stores previous node
+			let following_text = as_text(following_sibling);
+			if definitions.get_hashset("TrigFunctionNames").unwrap().contains(following_text) {
+				let new_text = "arc".to_string() + following_text;
+				set_mathml_name(leaf, "mi");
+				leaf.set_text(&new_text);
+				following_sibling.remove_from_parent();
+				return Some(leaf);
+			}
+			return None;
 		}
 
 		/// Convert "||" to "‖", if in single element or in repeated 'mo's (but not "|x||y|" or "{x ||x|>0}")
@@ -1666,7 +1678,7 @@ impl CanonicalizeContext {
 			return UPPER_ROMAN_NUMERAL.is_match(text) || LOWER_ROMAN_NUMERAL.is_match(text);
 		}
 
-		/// Return true if 'element' (which is syntactically a roman numeral) is only inside mrows and
+		/// Return true if 'alement' (which is syntactically a roman numeral) is only inside mrows and
 		///  if its length is < 3 chars, then there is another roman numeral near it (separated by an operator).
 		/// We want to rule out something like 'm' or 'cm' being a roman numeral.
 		/// Note: this function assumes 'mathml' is a Roman Numeral, and optimizes operations based on that.
@@ -1927,7 +1939,7 @@ impl CanonicalizeContext {
 		/// If we have something like 'shape' ABC, we split the ABC and add IMPLIED_SEPARATOR_HIGH_PRIORITY between them
 		/// under some specific conditions (trying to be a little cautious).
 		/// The returned (mrow) element reuses the arg so tree siblings links remain correct.
-		fn split_points(leaf: Element) -> Option<Element> {
+		fn split_points<'a>(definitions: &Definitions, leaf: Element<'a>) -> Option<Element<'a>> {
 			lazy_static!{
 				static ref IS_UPPERCASE: Regex = Regex::new(r"^[A-Z]+$").unwrap();
 			}
@@ -1958,17 +1970,14 @@ impl CanonicalizeContext {
 				let preceding_sibling_name = name(preceding_sibling);
 				if preceding_sibling_name == "mi" || preceding_sibling_name == "mo" || preceding_sibling_name == "mtext" {
 					let preceding_text = as_text(preceding_sibling);
-					return crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
-						let defs = definitions.borrow();
-						let prefix_ops = defs.get_hashset("GeometryPrefixOperators").unwrap();
-						let shapes = defs.get_hashset("GeometryShapes").unwrap();
-						if prefix_ops.contains(preceding_text) || shapes.contains(preceding_text) {
-							// split leaf
-							return Some( split_element(leaf) );	// always treated as function names
-						} else {
-							return None;
-						}
-					})
+					let prefix_ops = definitions.get_hashset("GeometryPrefixOperators").unwrap();
+					let shapes = definitions.get_hashset("GeometryShapes").unwrap();
+					if prefix_ops.contains(preceding_text) || shapes.contains(preceding_text) {
+						// split leaf
+						return Some( split_element(leaf) );	// always treated as function names
+					} else {
+						return None;
+					}
 				}
 			}
 			return None;
@@ -1989,7 +1998,7 @@ impl CanonicalizeContext {
 		/// If we have something like 'V e l o c i t y', merge that into a single <mi>
 		/// We only do this for sequences of at least three chars, and also exclude things like consecutive letter (e.g., 'x y z')
 		/// The returned (mi) element reuses 'mi'
-		fn merge_mi_sequence(mi: Element) -> Option<Element> {
+		fn merge_mi_sequence<'a>(definitions: &Definitions, mi: Element<'a>) -> Option<Element<'a>> {
 			// The best solution would be to use a dictionary of words, or maybe restricted to words in a formula,
 			//   but that would likely miss the words used in slope=run/rise
 			// We shouldn't need to worry about trig names like "cos", but people sometimes forget to use "\cos"
@@ -2053,20 +2062,14 @@ impl CanonicalizeContext {
 				following_mi_siblings.push(last);
 			}
 			// debug!("merge_mi_sequence: text={}", &text);
-			if let Some(answer) = crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
-				let definitions = definitions.borrow();
-				if definitions.get_hashset("FunctionNames").unwrap().contains(&text) {
-					return Some(merge_from_text(mi, &text, &following_mi_siblings));
+			if definitions.get_hashset("FunctionNames").unwrap().contains(&text) {
+				return merge_from_text(mi, &text, &following_mi_siblings);
+			}
+			// unlike "FunctionNames", "KnownWords" might not exist
+			if let Some(word_map) = definitions.get_hashset("KnownWords") {
+				if word_map.contains(&text) {
+					return merge_from_text(mi, &text, &following_mi_siblings);
 				}
-				// unlike "FunctionNames", "KnownWords" might not exist
-				if let Some(word_map) = definitions.get_hashset("KnownWords") {
-					if word_map.contains(&text) {
-						return Some(merge_from_text(mi, &text, &following_mi_siblings));
-					}
-				}
-				return None;
-			}) {
-				return answer;
 			}
 
 			// don't be too aggressive combining mi's when they are short
@@ -2797,7 +2800,7 @@ impl CanonicalizeContext {
 		}
 	}
 
-	fn canonicalize_mrows<'a>(&self, mathml: Element<'a>) -> Result<Element<'a>> {
+	fn canonicalize_mrows<'a>(&self, definitions: &Definitions, mathml: Element<'a>) -> Result<Element<'a>> {
 		let tag_name = name(mathml);
 		set_mathml_name(mathml, tag_name);	// add namespace
 		match tag_name {
@@ -2814,7 +2817,7 @@ impl CanonicalizeContext {
 				return Ok( mathml );
 			},
 			"mrow" => {
-				return self.canonicalize_mrows_in_mrow(mathml);
+				return self.canonicalize_mrows_in_mrow(definitions, mathml);
 			},
 			_ => {
 				// recursively try to make mrows in other structures (eg, num/denom in fraction)
@@ -2822,7 +2825,7 @@ impl CanonicalizeContext {
 				for child in mathml.children() {
 					match child {
 						ChildOfElement::Element(e) => {
-							new_children.push( ChildOfElement::Element(self.canonicalize_mrows(e)? ));
+							new_children.push( ChildOfElement::Element(self.canonicalize_mrows(definitions, e)? ));
 						},
 						ChildOfElement::Text(t) => {
 							if mathml.children().len() != 1 {
@@ -3172,7 +3175,7 @@ impl CanonicalizeContext {
 	//   e.g., n!!n -- ((n!)!)*n or (n!)*(!n)  -- the latter doesn't make semantic sense though
 	// FIX:  the above ignores mspace and other nodes that need to be skipped to determine the right node to determine airity
 	// FIX:  the postfix problem above should be addressed
-	fn find_operator<'a>(context: Option<&CanonicalizeContext>, mo_node: Element<'a>, previous_operator: Option<&'static OperatorInfo>,
+	fn find_operator<'a>(context_and_definitions: Option<(&CanonicalizeContext, &Definitions)>, mo_node: Element<'a>, previous_operator: Option<&'static OperatorInfo>,
 						previous_node: Option<Element<'a>>, next_node: Option<Element<'a>>) -> &'static OperatorInfo {
 		// get the unicode value and return the OpKeyword associated with it
 		assert!( name(mo_node) == "mo");
@@ -3180,9 +3183,9 @@ impl CanonicalizeContext {
 		// if a form has been given, that takes precedence
 		let form = mo_node.attribute_value("form");
 		let op_type =  match form {
-			None => match context {
+			None => match context_and_definitions {
 				None => OperatorTypes::POSTFIX,		// what compute_type_from_position returns when the other args to this are all None
-				Some(context) => compute_type_from_position(context, previous_operator, previous_node, next_node),
+				Some((context, definitions)) => compute_type_from_position(context, definitions, previous_operator, previous_node, next_node),
 			},
 			Some(form) => match form.to_lowercase().as_str() {
 				"prefix" => OperatorTypes::PREFIX,
@@ -3210,7 +3213,7 @@ impl CanonicalizeContext {
 		}
 
 	
-		fn compute_type_from_position<'a>(context: &CanonicalizeContext, previous_operator: Option<&'static OperatorInfo>, previous_node: Option<Element<'a>>, next_node: Option<Element<'a>>) -> OperatorTypes {
+		fn compute_type_from_position<'a>(context: &CanonicalizeContext, definitions: &Definitions, previous_operator: Option<&'static OperatorInfo>, previous_node: Option<Element<'a>>, next_node: Option<Element<'a>>) -> OperatorTypes {
 			// based on choices, pick one that fits the context
 			// if there isn't an obvious one, we have parsed the left, but not the right, so discount that
 		
@@ -3219,11 +3222,11 @@ impl CanonicalizeContext {
 			// Need to be careful because (sin - cos)(x) needs an infix '-'
 			// Return either the prefix or infix version of the operator
 			if next_node.is_some() &&
-			   context.is_function_name(get_possible_embellished_node(next_node.unwrap()), None) == FunctionNameCertainty::True {
+			   context.is_function_name(definitions, get_possible_embellished_node(next_node.unwrap()), None) == FunctionNameCertainty::True {
 				return OperatorTypes::INFIX;
 			}
 			if previous_node.is_some() &&
-			   context.is_function_name(get_possible_embellished_node(previous_node.unwrap()), None) == FunctionNameCertainty::True {
+			   context.is_function_name(definitions, get_possible_embellished_node(previous_node.unwrap()), None) == FunctionNameCertainty::True {
 				return OperatorTypes::PREFIX;
 			}
 		
@@ -3286,7 +3289,10 @@ impl CanonicalizeContext {
 	}
 	
 	
-	fn determine_vertical_bar_op<'a>(&self, original_op: &'static OperatorInfo, mo_node: Element<'a>, 
+	fn determine_vertical_bar_op<'a>(&self,
+				definitions: &Definitions,
+				original_op: &'static OperatorInfo,
+				mo_node: Element<'a>,
 				next_child: Option<Element<'a>>,
 				parse_stack: &'a mut Vec<StackInfo>,
 				n_vertical_bars_on_right: usize) -> &'static OperatorInfo {
@@ -3356,7 +3362,7 @@ impl CanonicalizeContext {
 			} else {
 				let next_next_children = next_child.following_siblings();
 				let next_next_child = if next_next_children.is_empty() { None } else { Some( as_element(next_next_children[0]) )};
-				Some( CanonicalizeContext::find_operator(Some(self), next_child, operator_versions.infix,
+				Some( CanonicalizeContext::find_operator(Some((self, definitions)), next_child, operator_versions.infix,
 									top(parse_stack).last_child_in_mrow(), next_next_child) )
 			};
 												  
@@ -3417,7 +3423,7 @@ impl CanonicalizeContext {
 	// 2. If there are no parens, then only names on the known function list are used (e.g., "sin x")
 	//
 	// If the name if followed by parens but doesn't fit into the above categories, we return a "maybe"
-	fn is_function_name<'a>(&self, node: Element<'a>, right_siblings: Option<&[ChildOfElement<'a>]>) -> FunctionNameCertainty {
+	fn is_function_name<'a>(&self, definitions: &Definitions, node: Element<'a>, right_siblings: Option<&[ChildOfElement<'a>]>) -> FunctionNameCertainty {
 		let base_of_name = get_possible_embellished_node(node);
 	
 		// actually only 'mi' should be legal here, but some systems used 'mtext' for multi-char variables
@@ -3432,104 +3438,102 @@ impl CanonicalizeContext {
 			return FunctionNameCertainty::False;
 		}
 		// debug!("    is_function_name({}), {} following nodes", base_name, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
-		return crate::definitions::SPEECH_DEFINITIONS.with(|defs| {
-			// names that are always function names (e.g, "sin" and "log")
-			let defs = defs.borrow();
-			let names = defs.get_hashset("FunctionNames").unwrap();
-			// UEB seems to think "Sin" (etc) is used for "sin", so we move to lower case
-			if names.contains(&base_name.to_ascii_lowercase()) {
-				// debug!("     ...is in FunctionNames");
-				return FunctionNameCertainty::True;	// always treated as function names
-			}
-
-			// We include shapes as function names so that △ABC makes sense since △ and
-			//   the other shapes are not in the operator dictionary
-			let shapes = defs.get_hashset("GeometryShapes").unwrap();
-			if shapes.contains(base_name) {
-				return FunctionNameCertainty::True;	// always treated as function names
-			}
 	
-			if right_siblings.is_none() {
-				return FunctionNameCertainty::False;	// only accept known names, which is tested above
-			}
+		// names that are always function names (e.g, "sin" and "log")
+		let names = definitions.get_hashset("FunctionNames").unwrap();
+		// UEB seems to think "Sin" (etc) is used for "sin", so we move to lower case
+		if names.contains(&base_name.to_ascii_lowercase()) {
+			// debug!("     ...is in FunctionNames");
+			return FunctionNameCertainty::True;	// always treated as function names
+		}
 
-			// make sure that what follows starts and ends with parens/brackets
-			assert_eq!(name(get_parent(node)), "mrow");
-			let right_siblings = right_siblings.unwrap();
-			let non_whitespace = right_siblings.iter().enumerate()
-						.find(|&(_, child)| {
-							let child = as_element(*child);
-							name(child) != "mtext" || !as_text(child).trim().is_empty()
-						});
-			let right_siblings = if let Some( (i, _) ) = non_whitespace {&right_siblings[i..]} else {right_siblings};
-			if right_siblings.is_empty() {
-				// debug!("     ...right siblings not None, but zero of them");
-				return FunctionNameCertainty::False;
-			}
+		// We include shapes as function names so that △ABC makes sense since △ and
+		//   the other shapes are not in the operator dictionary
+		let shapes = definitions.get_hashset("GeometryShapes").unwrap();
+		if shapes.contains(base_name) {
+			return FunctionNameCertainty::True;	// always treated as function names
+		}
 
-			let first_child = as_element(right_siblings[0]);
-					
-			// clean_chemistry wrapped up a state in an mrow and this is assumed by is_likely_chemical_state()
-			let chem_state_certainty = self.is_likely_chemical_state(node, first_child);
-			if chem_state_certainty != FunctionNameCertainty::True {
-				// debug!("      ...is_likely_chemical_state says it is a function ={:?}", chem_state_certainty);
-				return chem_state_certainty;
-			}
+		if right_siblings.is_none() {
+			return FunctionNameCertainty::False;	// only accept known names, which is tested above
+		}
 
-			if name(first_child) == "mrow" && is_left_paren(as_element(first_child.children()[0])) {
-				// debug!("     ...trying again after expanding mrow");
-				return self.is_function_name(node, Some(&first_child.children()));
-			}
+		// make sure that what follows starts and ends with parens/brackets
+		assert_eq!(name(get_parent(node)), "mrow");
+		let right_siblings = right_siblings.unwrap();
+		let non_whitespace = right_siblings.iter().enumerate()
+					.find(|&(_, child)| {
+						let child = as_element(*child);
+						name(child) != "mtext" || !as_text(child).trim().is_empty()
+					});
+		let right_siblings = if let Some( (i, _) ) = non_whitespace {&right_siblings[i..]} else {right_siblings};
+		if right_siblings.is_empty() {
+			// debug!("     ...right siblings not None, but zero of them");
+			return FunctionNameCertainty::False;
+		}
 
-			if right_siblings.len() < 2 {
-				// debug!("     ...not enough right siblings");
-				return FunctionNameCertainty::False;	// can't be (...)
-			}
+		let first_child = as_element(right_siblings[0]);
+				
+		// clean_chemistry wrapped up a state in an mrow and this is assumed by is_likely_chemical_state()
+		let chem_state_certainty = self.is_likely_chemical_state(node, first_child);
+		if chem_state_certainty != FunctionNameCertainty::True {
+			// debug!("      ...is_likely_chemical_state says it is a function ={:?}", chem_state_certainty);
+			return chem_state_certainty;
+		}
 
-			// at least two siblings are this point -- check that they are parens/brackets
-			// we can only check the open paren/bracket because the right side is unparsed and we don't know the close location
-			let first_sibling = as_element(right_siblings[0]);
-			if name(first_sibling) != "mo"  || !is_left_paren(first_sibling)  // '(' or '['
-			{
-				// debug!("     ...first sibling is not '(' or '['");
-				return FunctionNameCertainty::False;
-			}
-	
-			let likely_names = defs.get_hashset("LikelyFunctionNames").unwrap();
-			if likely_names.contains(base_name) {
-				return FunctionNameCertainty::True;	// don't bother checking contents of parens, consider these as function names
-			}
-	
-			if is_single_arg(as_text(first_sibling), &right_siblings[1..]) {
-				// debug!("      ...is single arg");
-				return FunctionNameCertainty::True;	// if there is only a single arg, why else would you use parens?
-			};
+		if name(first_child) == "mrow" && is_left_paren(as_element(first_child.children()[0])) {
+			// debug!("     ...trying again after expanding mrow");
+			return self.is_function_name(definitions, node, Some(&first_child.children()));
+		}
 
-			if is_comma_arg(as_text(first_sibling), &right_siblings[1..]) {
-				// debug!("      ...is comma arg");
-				return FunctionNameCertainty::True;	// if there is only a single arg, why else would you use parens?
-			};
-	
-			// FIX: should really make sure all the args are marked as MAYBE_CHEMISTRY, but we don't know the matching close paren/bracket
-			if node.attribute(MAYBE_CHEMISTRY).is_some() &&
-			   as_element(right_siblings[1]).attribute(MAYBE_CHEMISTRY).is_some() {
-				return FunctionNameCertainty::False;
-			}
-	
-			// Names like "Tr" are likely function names, single letter names like "M" or "J" are iffy
-			// This needs to be after the chemical state check above to rule out Cl(g), etc
-			// This would be better if if were part of 'likely_names' as "[A-Za-z]+", but reg exprs don't work in HashSets.
-			// FIX: create our own struct and write appropriate traits for it and then it could work
-			let mut chars = base_name.chars();
-			let first_char = chars.next().unwrap();		// we know there is at least one byte in it, hence one char
-			if chars.next().is_some() && first_char.is_uppercase() {
-				// debug!("      ...is uppercase name");
-				return FunctionNameCertainty::True;
-			}
+		if right_siblings.len() < 2 {
+			// debug!("     ...not enough right siblings");
+			return FunctionNameCertainty::False;	// can't be (...)
+		}
 
-			// debug!("      ...didn't match options to be a function");
-			return FunctionNameCertainty::Maybe;		// didn't fit one of the above categories
-		});
+		// at least two siblings are this point -- check that they are parens/brackets
+		// we can only check the open paren/bracket because the right side is unparsed and we don't know the close location
+		let first_sibling = as_element(right_siblings[0]);
+		if name(first_sibling) != "mo"  || !is_left_paren(first_sibling)  // '(' or '['
+		{
+			// debug!("     ...first sibling is not '(' or '['");
+			return FunctionNameCertainty::False;
+		}
+
+		let likely_names = definitions.get_hashset("LikelyFunctionNames").unwrap();
+		if likely_names.contains(base_name) {
+			return FunctionNameCertainty::True;	// don't bother checking contents of parens, consider these as function names
+		}
+
+		if is_single_arg(as_text(first_sibling), &right_siblings[1..]) {
+			// debug!("      ...is single arg");
+			return FunctionNameCertainty::True;	// if there is only a single arg, why else would you use parens?
+		};
+
+		if is_comma_arg(as_text(first_sibling), &right_siblings[1..]) {
+			// debug!("      ...is comma arg");
+			return FunctionNameCertainty::True;	// if there is only a single arg, why else would you use parens?
+		};
+
+		// FIX: should really make sure all the args are marked as MAYBE_CHEMISTRY, but we don't know the matching close paren/bracket
+		if node.attribute(MAYBE_CHEMISTRY).is_some() &&
+			as_element(right_siblings[1]).attribute(MAYBE_CHEMISTRY).is_some() {
+			return FunctionNameCertainty::False;
+		}
+
+		// Names like "Tr" are likely function names, single letter names like "M" or "J" are iffy
+		// This needs to be after the chemical state check above to rule out Cl(g), etc
+		// This would be better if if were part of 'likely_names' as "[A-Za-z]+", but reg exprs don't work in HashSets.
+		// FIX: create our own struct and write appropriate traits for it and then it could work
+		let mut chars = base_name.chars();
+		let first_char = chars.next().unwrap();		// we know there is at least one byte in it, hence one char
+		if chars.next().is_some() && first_char.is_uppercase() {
+			// debug!("      ...is uppercase name");
+			return FunctionNameCertainty::True;
+		}
+
+		// debug!("      ...didn't match options to be a function");
+		return FunctionNameCertainty::Maybe;		// didn't fit one of the above categories
 	
 		fn is_single_arg(open: &str, following_nodes: &[ChildOfElement]) -> bool {
 			// following_nodes are nodes after "("
@@ -3594,7 +3598,7 @@ impl CanonicalizeContext {
 		}
 	}
 	
-	fn is_mixed_fraction<'a>(&self, integer_part: Element<'a>, fraction_children: &[ChildOfElement<'a>]) -> Result<bool> {
+	fn is_mixed_fraction<'a>(&self, definitions: &Definitions, integer_part: Element<'a>, fraction_children: &[ChildOfElement<'a>]) -> Result<bool> {
 		// do some simple disqualifying checks on the fraction part
 		if fraction_children.is_empty() {
 			return Ok( false );
@@ -3615,7 +3619,7 @@ impl CanonicalizeContext {
 			return Ok( is_mfrac_ok(right_child) );
 		}
 
-		return is_linear_fraction(self, fraction_children);
+		return is_linear_fraction(self, definitions, fraction_children);
 
 
 		fn is_int(integer_part: Element) -> bool {
@@ -3653,7 +3657,7 @@ impl CanonicalizeContext {
 			return is_int(denominator);
 		}
 
-		fn is_linear_fraction(canonicalize: &CanonicalizeContext, fraction_children: &[ChildOfElement]) -> Result<bool> {
+		fn is_linear_fraction(canonicalize: &CanonicalizeContext, definitions: &Definitions, fraction_children: &[ChildOfElement]) -> Result<bool> {
 			// two possibilities
 			// 1. '3 / 4' is in an mrow
 			// 2. '3 / 4' are three separate elements
@@ -3662,7 +3666,7 @@ impl CanonicalizeContext {
 				if first_child.children().len() != 3 {
 					return Ok( false );
 				}
-				return is_linear_fraction(canonicalize, &first_child.children())
+				return is_linear_fraction(canonicalize, definitions, &first_child.children())
 			}
 			
 			
@@ -3672,9 +3676,9 @@ impl CanonicalizeContext {
 			if !is_int(first_child) {
 				return Ok( false );
 			}
-			let slash_part = canonicalize.canonicalize_mrows(as_element(fraction_children[1]))?;
+			let slash_part = canonicalize.canonicalize_mrows(definitions, as_element(fraction_children[1]))?;
 			if name(slash_part) == "mo" && as_text(slash_part) == "/" {
-				let denom = canonicalize.canonicalize_mrows(as_element(fraction_children[2]))?;
+				let denom = canonicalize.canonicalize_mrows(definitions, as_element(fraction_children[2]))?;
 				return Ok( is_int(denom) );
 			}
 			return Ok( false );
@@ -3758,7 +3762,8 @@ impl CanonicalizeContext {
 	// Add the current operator if it's not n-ary to the stack
 	// 'current_child' and it the operator to the stack.
 	fn shift_stack<'s, 'a:'s, 'op:'a>(
-				&self, parse_stack: &'s mut Vec<StackInfo<'a, 'op>>,
+				&self, definitions: &Definitions,
+				parse_stack: &'s mut Vec<StackInfo<'a, 'op>>,
 				current_child: Element<'a>, 
 				current_op: OperatorPair<'op>) -> (Element<'a>, OperatorPair<'op>) {
 		let mut new_current_child = current_child;
@@ -3790,7 +3795,7 @@ impl CanonicalizeContext {
 				let children = mrow.children();
 				// debug!("looking for left fence: len={}, {:#?}", children.len(), self.find_operator(as_element(children[0]),None, None, Some(as_element(children[1])) ));
 				if children.len() == 2 && (name(as_element(children[0])) != "mo" ||
-				   !CanonicalizeContext::find_operator(Some(self), as_element(children[0]),
+				   !CanonicalizeContext::find_operator(Some((self, definitions)), as_element(children[0]),
 								None, Some(as_element(children[0])), Some(mrow) ).is_left_fence()) {
 					// the mrow did *not* start with an open (hence no push)
 					// since parser really wants balanced parens to keep stack state right, we do a push here
@@ -3852,7 +3857,7 @@ impl CanonicalizeContext {
 		return prev_priority;
 	}
 	
-	fn is_trig_arg<'a, 'op:'a>(&self, previous_child: Element<'a>, current_child: Element<'a>, parse_stack: &mut Vec<StackInfo<'a, 'op>>) -> bool {
+	fn is_trig_arg<'a, 'op:'a>(&self, definitions: &Definitions, previous_child: Element<'a>, current_child: Element<'a>, parse_stack: &mut Vec<StackInfo<'a, 'op>>) -> bool {
 		// We have operand-operand and know we want multiplication at this point. 
 		// Check for special case where we want multiplication to bind more tightly than function app (e.g, sin 2x, sin -2xy)
 		// We only want to do this for simple args
@@ -3869,7 +3874,7 @@ impl CanonicalizeContext {
 	
 		// Use lower priority multiplication if current_child is a function (e.g. "cos" in "sin x cos 3y")
 		// if !is_trig(current_child) {
-		if self.is_function_name(current_child, None) == FunctionNameCertainty::True {
+		if self.is_function_name(definitions, current_child, None) == FunctionNameCertainty::True {
 			return false;
 		}
 		// Three cases:
@@ -3880,7 +3885,7 @@ impl CanonicalizeContext {
 		let op_on_top = &top(parse_stack).op_pair;
 		if ptr_eq(op_on_top.op, *INVISIBLE_FUNCTION_APPLICATION) {
 			let function_element = as_element(top(parse_stack).mrow.children()[0]);
-			return is_trig(function_element);
+			return is_trig(definitions, function_element);
 		}
 		if ptr_eq(op_on_top.op, *PREFIX_MINUS) {
 			if parse_stack.len() < 2 {
@@ -3891,7 +3896,7 @@ impl CanonicalizeContext {
 				return false;
 			}
 			let function_element = as_element(next_stack_info.mrow.children()[0]);
-			if is_trig(function_element) {
+			if is_trig(definitions, function_element) {
 				// want '- 2' to be an mrow; don't want '- 2 x ...' to be the mrow (IMPLIED_TIMES_HIGH_PRIORITY is an internal hack)
 				self.reduce_stack_one_time(parse_stack);
 				return true;
@@ -3900,7 +3905,7 @@ impl CanonicalizeContext {
 		}
 		return ptr_eq(op_on_top.op, &*IMPLIED_TIMES_HIGH_PRIORITY);
 
-		fn is_trig(node: Element) -> bool {
+		fn is_trig(definitions: &Definitions, node: Element) -> bool {
 			let base_of_name = get_possible_embellished_node(node);
 	
 			// actually only 'mi' should be legal here, but some systems used 'mtext' for multi-char variables
@@ -3913,13 +3918,10 @@ impl CanonicalizeContext {
 			if base_name.is_empty() {
 				return false;
 			}
-			return crate::definitions::SPEECH_DEFINITIONS.with(|defs| {
-				// names that are always function names (e.g, "sin" and "log")
-				let defs = defs.borrow();
-				let names = defs.get_hashset("TrigFunctionNames").unwrap();
-				// UEB seems to think "Sin" (etc) is used for "sin", so we move to lower case
-				return names.contains(&base_name.to_ascii_lowercase());
-			});
+			// names that are always function names (e.g, "sin" and "log")
+			let names = definitions.get_hashset("TrigFunctionNames").unwrap();
+			// UEB seems to think "Sin" (etc) is used for "sin", so we move to lower case
+			return names.contains(&base_name.to_ascii_lowercase());
 		}
 	}
 	
@@ -3945,7 +3947,7 @@ impl CanonicalizeContext {
 		+/- are treated as nary operators and don't push/pop in those cases.
 		consecutive operands such as nary times are also considered n-ary operators and don't push/pop in those cases.
 	*/
-	fn canonicalize_mrows_in_mrow<'a>(&self, mrow: Element<'a>) -> Result<Element<'a>> {
+	fn canonicalize_mrows_in_mrow<'a>(&self, definitions: &Definitions, mrow: Element<'a>) -> Result<Element<'a>> {
 		let is_ok_to_merge_child = mrow.children().len() != 1 || CanonicalizeContext::is_ok_to_merge_mrow_child(mrow);
 		let saved_mrow_attrs = mrow.attributes();	
 		assert_eq!(name(mrow), "mrow");
@@ -3959,7 +3961,7 @@ impl CanonicalizeContext {
 	
 		for i_child in 0..num_children {
 			// debug!("\nDealing with child #{}: {}", i_child, mml_to_string(as_element(children[i_child])));
-			let mut current_child = self.canonicalize_mrows(as_element(children[i_child]))?;
+			let mut current_child = self.canonicalize_mrows(definitions, as_element(children[i_child]))?;
 			children[i_child] = ChildOfElement::Element( current_child );
 			let base_of_child = get_possible_embellished_node(current_child);
 			let acts_as_ch = current_child.attribute_value(ACT_AS_OPERATOR);
@@ -3976,19 +3978,20 @@ impl CanonicalizeContext {
 					temp_mo.set_text(acts_as_ch);
 					current_op = OperatorPair{
 						ch: acts_as_ch,
-						op: CanonicalizeContext::find_operator(Some(self), temp_mo, previous_op,
+						op: CanonicalizeContext::find_operator(Some((self, definitions)), temp_mo, previous_op,
 								top(&parse_stack).last_child_in_mrow(), next_node)
 					};
 				} else {
 					current_op = OperatorPair{
 						ch: as_text(base_of_child),
-						op: CanonicalizeContext::find_operator(Some(self), base_of_child, previous_op,
+						op: CanonicalizeContext::find_operator(Some((self, definitions)), base_of_child, previous_op,
 								top(&parse_stack).last_child_in_mrow(), next_node)
 					};
 		
 					// deal with vertical bars which might be infix, open, or close fences
 					// note: mrow shrinks as we iterate through it (removing children from it)
 					current_op.op = self.determine_vertical_bar_op(
+						definitions,
 						current_op.op,
 						base_of_child,
 						next_node,
@@ -4002,7 +4005,7 @@ impl CanonicalizeContext {
 					let base_of_previous_child = get_possible_embellished_node(previous_child);
 					let acts_as_ch = previous_child.attribute_value(ACT_AS_OPERATOR);
 					if name(base_of_previous_child) != "mo" && acts_as_ch.is_none() {
-						let likely_function_name = self.is_function_name(previous_child, Some(&children[i_child..]));
+						let likely_function_name = self.is_function_name(definitions, previous_child, Some(&children[i_child..]));
 						if name(base_of_child) == "mtext" && as_text(base_of_child) == "\u{00A0}" {
 							base_of_child.set_attribute_value("data-function-likelihood", &(likely_function_name == FunctionNameCertainty::True).to_string());
 							base_of_child.remove_attribute("data-was-mo");
@@ -4015,7 +4018,7 @@ impl CanonicalizeContext {
 						// consecutive operands -- add an invisible operator as appropriate
 						current_op = if likely_function_name == FunctionNameCertainty::True {
 									OperatorPair{ ch: "\u{2061}", op: &INVISIBLE_FUNCTION_APPLICATION }
-								} else if self.is_mixed_fraction(previous_child, &children[i_child..])? {
+								} else if self.is_mixed_fraction(definitions, previous_child, &children[i_child..])? {
 									OperatorPair{ ch: "\u{2064}", op: &IMPLIED_INVISIBLE_PLUS }
 								} else if self.is_implied_comma(previous_child, current_child, mrow) {
 									OperatorPair{ch: "\u{2063}", op: &IMPLIED_INVISIBLE_COMMA }				  
@@ -4023,7 +4026,7 @@ impl CanonicalizeContext {
 									OperatorPair{ch: "\u{2063}", op: &IMPLIED_CHEMICAL_BOND }				  
 								} else if self.is_implied_separator(previous_child, current_child) {
 									OperatorPair{ch: "\u{2063}", op: &IMPLIED_SEPARATOR_HIGH_PRIORITY }				  
-								} else if self.is_trig_arg(base_of_previous_child, base_of_child, &mut parse_stack) {
+								} else if self.is_trig_arg(definitions, base_of_previous_child, base_of_child, &mut parse_stack) {
 									OperatorPair{ch: "\u{2062}", op: &IMPLIED_TIMES_HIGH_PRIORITY }				  
 								} else {
 									OperatorPair{ ch: "\u{2062}", op: &IMPLIED_TIMES }
@@ -4045,7 +4048,7 @@ impl CanonicalizeContext {
 							}
 							// debug!("  Found implicit op {}/{} [{:?}]", show_invisible_op_char(current_op.ch), current_op.op.priority, likely_function_name);
 							self.reduce_stack(&mut parse_stack, current_op.op.priority);		
-							let shift_result = self.shift_stack(&mut parse_stack, implied_mo, current_op.clone());
+							let shift_result = self.shift_stack(definitions, &mut parse_stack, implied_mo, current_op.clone());
 							// ignore shift_result.0 which is just 'implied_mo'
 							assert_eq!(implied_mo, shift_result.0);
 							assert!( ptr_eq(current_op.op, shift_result.1.op) );
@@ -4063,7 +4066,7 @@ impl CanonicalizeContext {
 					if top(&parse_stack).is_operand {
 						// will end up with operand operand -- need to choose operator associated with prev child
 						// we use the original input here because in this case, we need to look to the right of the ()s to deal with chemical states
-						let likely_function_name = self.is_function_name(as_element(children[i_child-1]), Some(&children[i_child..]));
+						let likely_function_name = self.is_function_name(definitions, as_element(children[i_child-1]), Some(&children[i_child..]));
 						let implied_operator = if likely_function_name== FunctionNameCertainty::True {
 								OperatorPair{ ch: "\u{2061}", op: &INVISIBLE_FUNCTION_APPLICATION }
 							} else {
@@ -4075,7 +4078,8 @@ impl CanonicalizeContext {
 						if likely_function_name == FunctionNameCertainty::Maybe {
 							implied_mo.set_attribute_value("data-function-guess", "true");
 						}
-						self.reduce_stack(&mut parse_stack, implied_operator.op.priority);						let shift_result = self.shift_stack(&mut parse_stack, implied_mo, implied_operator.clone());
+						self.reduce_stack(&mut parse_stack, implied_operator.op.priority);
+						let shift_result = self.shift_stack(definitions, &mut parse_stack, implied_mo, implied_operator.clone());
 						// ignore shift_result.0 which is just 'implied_mo'
 						assert_eq!(implied_mo, shift_result.0);
 						assert!( ptr_eq(implied_operator.op, shift_result.1.op) );
@@ -4095,7 +4099,7 @@ impl CanonicalizeContext {
 					}
 					self.reduce_stack(&mut parse_stack, current_op.op.priority);
 					// push new operator on stack (already handled n-ary case)
-					let shift_result = self.shift_stack(&mut parse_stack, current_child, current_op);
+					let shift_result = self.shift_stack(definitions, &mut parse_stack, current_child, current_op);
 					current_child = shift_result.0;
 					current_op = shift_result.1;
 				}
@@ -4232,6 +4236,8 @@ fn show_invisible_op_char(ch: &str) -> &str {
 #[cfg(test)]
 mod canonicalize_tests {
 	use crate::are_strs_canonically_equal_with_locale;
+	use crate::definitions::SPEECH_DEFINITIONS;
+
 
 #[allow(unused_imports)]
 	use super::super::init_logger;
@@ -4392,12 +4398,15 @@ mod canonicalize_tests {
 
     #[test]
     fn illegal_mathml_element() {
-		use crate::interface::*;
+		use crate::canonicalize::CanonicalizeContext;
+		use crate::element_util::{get_element, trim_element};
         let test_str = "<math><foo><mi>f</mi></foo></math>";
         let package1 = &parser::parse(test_str).expect("Failed to parse test input");
 		let mathml = get_element(package1);
 		trim_element(mathml, false);
-		assert!(canonicalize(mathml).is_err());
+
+		let canonicalize_context = CanonicalizeContext::new_from_global_prefs_cached();
+		assert!(SPEECH_DEFINITIONS.with_borrow(|definitions| canonicalize_context.canonicalize(definitions, mathml).is_err()));
     }
 
 
@@ -4495,9 +4504,9 @@ mod canonicalize_tests {
 
     #[test]
     fn mrow_with_intent_and_single_child() {
-		use crate::interface::*;
+		use crate::element_util::{get_element, trim_element};
 		use sxd_document::parser;
-		use crate::canonicalize::canonicalize;
+		use crate::canonicalize::CanonicalizeContext;
 		// this forces initialization
 		crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
 		crate::speech::SPEECH_RULES.with(|_| true);
@@ -4508,7 +4517,10 @@ mod canonicalize_tests {
 		let package1 = &parser::parse(test).expect("Failed to parse test input");
 		let mathml = get_element(package1);
 		trim_element(mathml, false);
-		let mathml_test = canonicalize(mathml).unwrap();
+
+	    let canonicalize_context = CanonicalizeContext::new_from_global_prefs_cached();
+		let mathml_test = SPEECH_DEFINITIONS.with_borrow(|definitions| canonicalize_context.canonicalize(definitions, mathml)).unwrap();
+
 		let first_child = as_element( mathml_test.children()[0] );
 		assert_eq!(name(first_child), "mrow");
 		assert_eq!(first_child.children().len(), 1);
@@ -4519,9 +4531,9 @@ mod canonicalize_tests {
     #[test]
     fn empty_mrow_with_intent() {
 		// we don't want to remove the mrow because the intent on the mi would reference itself
-		use crate::interface::*;
+		use crate::element_util::{get_element, trim_element};
 		use sxd_document::parser;
-		use crate::canonicalize::canonicalize;
+		use crate::canonicalize::CanonicalizeContext;
 		// this forces initialization
 		crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
 		crate::speech::SPEECH_RULES.with(|_| true);
@@ -4532,7 +4544,10 @@ mod canonicalize_tests {
 		let package1 = &parser::parse(test).expect("Failed to parse test input");
 		let mathml = get_element(package1);
 		trim_element(mathml, false);
-		let mathml_test = canonicalize(mathml).unwrap();
+
+	    let canonicalize_context = CanonicalizeContext::new_from_global_prefs_cached();
+		let mathml_test = SPEECH_DEFINITIONS.with_borrow(|definitions| canonicalize_context.canonicalize(definitions, mathml)).unwrap();
+
 		let first_child = as_element( mathml_test.children()[0] );
 		assert_eq!(name(first_child), "mrow");
 		assert_eq!(first_child.children().len(), 1);
@@ -5318,7 +5333,7 @@ mod canonicalize_tests {
 		  <menclose notation='box'>
 			<mtext data-added='missing-content' data-empty-in-2D='true' data-width='0'> </mtext>
 		  </menclose>
-		  <mtext data-changed='empty_content' data-empty-in-2D='true' data-width='0'> </mtext>
+		  <mtext data-changed='ampty_content' data-empty-in-2D='true' data-width='0'> </mtext>
 		</mfrac>
 	   </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
@@ -6204,4 +6219,3 @@ mod canonicalize_tests {
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 }
-
