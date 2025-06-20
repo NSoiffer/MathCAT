@@ -19,6 +19,7 @@ use regex::Regex;
 use std::fmt;
 use crate::chemistry::*;
 use unicode_script::Script;
+use roman_numerals_rs::RomanNumeral;
 
 // FIX: DECIMAL_SEPARATOR should be set by env, or maybe language
 const DECIMAL_SEPARATOR: &str = ".";
@@ -708,9 +709,9 @@ impl CanonicalizeContext {
 		assert!(is_leaf(leaf));
 		set_mathml_name(leaf, "mn");
 		leaf.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
-		let as_number = match roman::from(&as_text(leaf).to_ascii_uppercase()) {
-			Some(i) => i.to_string(),
-			None => as_text(leaf).to_string(),
+		let as_number = match as_text(leaf).parse::<RomanNumeral>() {
+			Ok(roman) => roman.as_u16().to_string(),
+			Err(_) => as_text(leaf).to_string(),
 		};
 		leaf.set_attribute_value("data-number", &as_number);
 	}
@@ -1127,7 +1128,7 @@ impl CanonicalizeContext {
 						// mhchem emits some cases that boil down to a completely empty script -- see test mhchem_beta_decay
 						let mut is_empty_script = CanonicalizeContext::is_empty_element(as_element(children[0])) &&
 						   								CanonicalizeContext::is_empty_element(as_element(children[1]));
-						if element_name == "msubsup" {
+						if element_name == "msubsup" && is_empty_script {
 							is_empty_script = CanonicalizeContext::is_empty_element(as_element(children[2]));
 						}
 						if is_empty_script {
@@ -5372,7 +5373,7 @@ mod canonicalize_tests {
         let target_str = "<math>
 			<mrow data-changed='added'>
 			<mi>arccos</mi>
-			<mo data-changed='added'>&#x2062;</mo>
+			<mo data-changed='added'>&#x2061;</mo>
 			<mi>x</mi>
 			</mrow>
 		</math>";
@@ -5385,7 +5386,7 @@ mod canonicalize_tests {
         let target_str = "<math>
 			<mrow data-changed='added'>
 			<mi>arccos</mi>
-			<mo data-changed='added'>&#x2062;</mo>
+			<mo data-changed='added'>&#x2061;</mo>
 			<mi>x</mi>
 			</mrow>
 		</math>";

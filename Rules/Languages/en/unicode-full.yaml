@@ -67,7 +67,7 @@
  - "˄": [t: "modifier up arrowhead"]               # 0x2c4
  - "˅": [t: "modifier down arrowhead"]             # 0x2c5
  - "ˆ": [t: "modifier circumflex accent"]          # 0x2c6
- - "ˇ": [t: "caron"]                               # 0x2c7
+ - "ˇ": [t: "check"]                               # 0x2c7
  - "ˈ": [t: "modifier vertical line"]              # 0x2c8
  - "ˉ": [t: "modifier macron"]                     # 0x2c9
  - "ˊ": [t: "modifier acute accent"]               # 0x2ca

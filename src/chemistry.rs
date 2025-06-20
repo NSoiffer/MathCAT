@@ -425,7 +425,7 @@ pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
             set_marked_chemistry_attr(child, CHEM_FORMULA);
         }
 
-        if name(child) == "mrow" && child.attribute(CHEM_FORMULA).is_none() {
+        if child.attribute(CHEM_FORMULA).is_none() {
             // can't be both an equation and a formula...
             let likelihood = likely_chem_equation(child);
             if is_chemistry || likelihood >= CHEMISTRY_THRESHOLD {
@@ -489,6 +489,15 @@ fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
                 for child in mathml.children() {
                     set_marked_chemistry_attr(as_element(child), chem);
                 };
+            }
+            "mfrac" => {
+                let children = mathml.children();
+                debug!("mfrac children: {}", mml_to_string(mathml));
+                let numerator_is_chem_equation = IsBracketed::is_bracketed(as_element(children[0]), "[", "]", false, true);
+                let denominator_is_chem_equation = IsBracketed::is_bracketed(as_element(children[1]), "[", "]", false, true);
+                if  numerator_is_chem_equation && denominator_is_chem_equation {
+                    mathml.set_attribute_value(CHEM_EQUATION, "true");
+                }
             }
             _ => error!("Internal error: {} should not be marked as 'MAYBE_CHEMISTRY'", tag_name),
         }
@@ -769,13 +778,23 @@ fn is_chemistry_sanity_check(mathml: Element) -> bool {
 /// Looks at the children of the element and uses heuristics to decide whether this is a chemical equation.
 /// This assumes canonicalization of characters has happened
 fn likely_chem_equation(mathml: Element) -> isize {
-    if name(mathml) != "mrow" && name(mathml) != "mtd" {
+    // mfrac -- could be a ratio of concentrations
+    if name(mathml) != "mrow" && name(mathml) != "mtd" && name(mathml) != "mfrac" {
         return NOT_CHEMISTRY;
     }
 
     // debug!("start likely_chem_equation:\n{}", mml_to_string(mathml));
 	// mrow -- check the children to see if we are likely to be a chemical equation
 
+    // concentrations should either be unscripted or have a superscript
+    // they occur in mrows or mfracs
+    if IsBracketed::is_bracketed(mathml, "[", "]", false, true) {
+        let parent_name = name(get_parent(mathml));
+        if parent_name == "mfrac" || parent_name == "mrow" || parent_name == "msup" || parent_name == "math" {
+            return if as_element(mathml.children()[0]).attribute(CHEM_FORMULA).is_some() {CHEMISTRY_THRESHOLD}  else {NOT_CHEMISTRY};
+        }
+    }
+    
     // possible improvement -- give bonus points for consecutive (not counting invisible separators) chemical elements on top of the existing points
 	let mut likelihood = 0;						// indicator of likely match
 	let mut has_equilibrium_constant = false;
@@ -981,7 +1000,7 @@ fn likely_chem_superscript(sup: Element) -> isize {
 /// * fences around a chemical formula
 /// * an mrow made up of only chemical formulas
 fn likely_chem_formula(mathml: Element) -> isize {
-    // debug!("start likely_chem_formula:\n{}", mml_to_string(mathml));
+    debug!("start likely_chem_formula:\n{}", mml_to_string(mathml));
     if let Some(value) = get_marked_value(mathml) {
         return value;       // already marked
     }
@@ -1005,6 +1024,20 @@ fn likely_chem_formula(mathml: Element) -> isize {
                 likely_mrow_chem_formula(mathml)
             }
         },
+        "mfrac" => {
+            let children = mathml.children();
+            let num_likely = likely_chem_formula(as_element(children[0]));
+            let denom_likely = likely_chem_formula(as_element(children[1]));
+            let likely = num_likely.max(denom_likely);
+            if likely < CHEMISTRY_THRESHOLD {NOT_CHEMISTRY} else {likely}
+        }
+        "mtd" => {
+            let mut likely = likely_chem_formula(as_element(mathml.children()[0]));
+            if likely < CHEMISTRY_THRESHOLD {
+                likely = likely_chem_equation(mathml);
+            }
+            likely
+        }
         "mtable" => {
             for mrow in mathml.children() {
                 let mrow = as_element(mrow);
@@ -1042,18 +1075,31 @@ fn likely_chem_formula(mathml: Element) -> isize {
     if likelihood >= 0 {
         mathml.set_attribute_value(MAYBE_CHEMISTRY, &likelihood.to_string());
     }
-    // debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(mathml));
+    debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(mathml));
 
     return likelihood;
 
     fn likely_mrow_chem_formula(mrow: Element) -> isize {
-        // check if it is bracketed -- doesn't add much info
-        let outer_mrow = mrow;
-        let mut mrow = mrow;
-        if (IsBracketed::is_bracketed(mrow, "(", ")", false, false) ||
-            IsBracketed::is_bracketed(mrow, "[", "]", false, false)) &&
-           name(as_element(mrow.children()[1]))  == "mrow" {
-            mrow = as_element(mrow.children()[1]);
+        // For parens, the only reason to add them is to group the children and then indicate that there is more than one molecule
+        if IsBracketed::is_bracketed(mrow, "(", ")", false, false) ||
+           IsBracketed::is_bracketed(mrow, "[", "]", false, false) {
+            // If it is bracketed, it should have a subscript to indicate the number of the element.
+            // We give a pass to unadorned bracketing chars
+            if mrow.children().len() != 3 {
+                return NOT_CHEMISTRY;
+            }
+            let contents = as_element(mrow.children()[1]);
+            let parent = get_parent(mrow);
+            let parent_is_scripted = IsNode::is_scripted(parent);
+            if name(contents) != "mrow" && !parent_is_scripted {
+                return NOT_CHEMISTRY;
+            }
+            let likely = likely_chem_formula(contents);
+            if parent_is_scripted {
+                return likely + 3;
+            } else {
+                return likely;
+            }
         }
 
         let mut likelihood = if is_order_ok(mrow) {0} else {-4};
@@ -1088,11 +1134,6 @@ fn likely_chem_formula(mathml: Element) -> isize {
             }
             // debug!("in likely_chem_formula likelihood={}, child\n{}", likelihood, mml_to_string(child));
             // debug!("   likelihood={} (likely={})", likelihood, likely);
-        }
-
-        if mrow != outer_mrow {
-            // need to set value on inner mrow
-            mrow.set_attribute_value(MAYBE_CHEMISTRY, &likelihood.to_string());
         }
 
         if !is_chem_formula || likelihood <= NOT_CHEMISTRY {
@@ -1502,7 +1543,7 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
     // mostly from chenzhijin.com/en/article/Useful%20Unicode%20for%20Chemists (Arrows and Other)
     static CHEM_EQUATION_OPERATORS: phf::Set<char> = phf_set! {
         '+', '=', '-',
-        '·', '℃', '°', '‡', '∆', '×',
+        '·', '℃', '°', '‡', '∆', '×', '\u{2062}' // invisible times
     };
 
     let elem_name = name(mathml);
@@ -2157,8 +2198,8 @@ mod chem_tests {
                 <mrow><mn>2</mn><mo>&#x2212;</mo></mrow>
             </msup></mrow></math>";
         let target = "<math>
-        <msup data-chem-formula='6'>
-          <mrow data-chem-formula='3'>
+        <msup data-chem-formula='9'>
+          <mrow data-chem-formula='6'>
             <mo>[</mo>
             <mrow data-changed='added' data-chem-formula='3'>
               <mi data-chem-element='1'>S</mi>
@@ -2184,14 +2225,14 @@ mod chem_tests {
         let test = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
                 <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
         let target = " <math>
-                <mrow data-chem-formula='7'>
+                <mrow data-chem-formula='10'>
                     <msub data-chem-formula='3'>
                         <mi data-chem-element='3'>Al</mi>
                         <mn>2</mn>
                     </msub>
                     <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                    <msub data-chem-formula='3'>
-                        <mrow data-chem-formula='3'>
+                    <msub data-chem-formula='6'>
+                        <mrow data-chem-formula='6'>
                         <mo>(</mo>
                         <mrow data-changed='added' data-chem-formula='3'>
                             <mi data-chem-element='1'>S</mi>
@@ -2261,9 +2302,9 @@ mod chem_tests {
             </msup>
         </mrow></math>";
         let target = "<math>
-            <mrow data-chem-formula='13'>
-                <msup data-chem-formula='6'>
-                    <mrow data-chem-formula='5'>
+            <mrow data-chem-formula='19'>
+                <msup data-chem-formula='9'>
+                    <mrow data-chem-formula='8'>
                     <mo>[</mo>
                     <mrow data-changed='added' data-chem-formula='5'>
                         <mi data-chem-element='3'>Cl</mi>
@@ -2278,8 +2319,8 @@ mod chem_tests {
                     <mo>+</mo>
                 </msup>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <msup data-chem-formula='6'>
-                    <mrow data-chem-formula='5'>
+                <msup data-chem-formula='9'>
+                    <mrow data-chem-formula='8'>
                     <mo>[</mo>
                     <mrow data-changed='added' data-chem-formula='5'>
                         <mi data-chem-element='3'>Cl</mi>
@@ -2794,10 +2835,10 @@ mod chem_tests {
         </mrow>
       </math>";
     let target = "<math>
-        <mmultiscripts data-chem-formula='5'>
-            <mrow data-changed='added' data-chem-formula='5'>
+        <mmultiscripts data-chem-formula='8'>
+            <mrow data-changed='added' data-chem-formula='8'>
                 <mo stretchy='false'>(</mo>
-                <mrow data-changed='added' data-chem-formula='3'>
+                <mrow data-changed='added' data-chem-formula='5'>
                 <mi mathvariant='normal' data-chem-element='1'>C</mi>
                 <mo data-changed='added'>&#x2063;</mo>
                 <mmultiscripts data-chem-formula='1'>

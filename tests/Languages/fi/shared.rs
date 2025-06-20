@@ -630,8 +630,8 @@ fn FinME_absolute_value_defition() {
       </mrow>
     </mrow>
   </math>";
-  test("fi", "ClearSpeak", expr, "itseisarvo a; on yhtä suuri kuin; 2 tapausta, tapaus 1; a jos a; on suurempi tai yhtä suuri kuin 0; tapaus 2; negatiivinen a jos a; on pienempi kuin 0");
-  test("fi", "SimpleSpeak", expr, "itseisarvo a; on yhtä suuri kuin; 2 tapausta, tapaus 1; a jos a; on suurempi tai yhtä suuri kuin 0; tapaus 2; negatiivinen a jos a; on pienempi kuin 0")
+  test("fi", "ClearSpeak", expr, "itseisarvo a; on yhtä suuri kuin; 2 tapausta; tapaus 1; a jos a; on suurempi tai yhtä suuri kuin 0; tapaus 2; negatiivinen a jos a; on pienempi kuin 0");
+  test("fi", "SimpleSpeak", expr, "itseisarvo a; on yhtä suuri kuin; 2 tapausta; tapaus 1; a jos a; on suurempi tai yhtä suuri kuin 0; tapaus 2; negatiivinen a jos a; on pienempi kuin 0")
 }
 
 #[test]

@@ -567,6 +567,7 @@
   tag: [mtr, mlabeledtr]
   match: "parent::m:matrix or parent::m:determinant"
   replace:
+  - pause: medium
   - T: "rad"      # phrase(the first 'row' of a matrix)
   - x: "count(preceding-sibling::*)+1"
   - test:
@@ -677,6 +678,7 @@
   tag: [mtr, mlabeledtr]
   match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
   replace:
+  - pause: medium
   - test:
     - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
       then: [{T: "fall"}]      # phrase(in this  'case' x is not equal to y)

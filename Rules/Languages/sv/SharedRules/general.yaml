@@ -517,6 +517,7 @@
   tag: [mtr, mlabeledtr]
   match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
   replace:
+  - pause: medium
   - test:
       if: "parent::m:system-of-equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
            count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']]) != 0"

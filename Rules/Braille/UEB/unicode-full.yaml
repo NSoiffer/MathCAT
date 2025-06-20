@@ -2,6 +2,9 @@
  - "⋇": [t: "1⠌⠯⠦"]             # 0x22C7 (Division times)
  - "⊩": [t: "⠸⠳⠿⠸⠒"]           # 0x22A9 (Forces)
  - "ℏ": [t: "⠈⠒⠓"]              # 0x210F  (reduced Plank's constant)
+ - "ⅆ": [t: "⠙"]                # 0x2146
+ - "ⅇ": [t: "⠑"]                # 0x2147
+ - "ⅈ": [t: "⠊"]                # 0x2148
  - "⨯": [t: "⠐⠦"]               # U+2A2F(VECTOR OR CROSS PRODUCT) -- make the same as 0x00D7 (Multiplication sign)
 
  

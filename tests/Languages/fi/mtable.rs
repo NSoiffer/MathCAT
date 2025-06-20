@@ -252,9 +252,9 @@ fn matrix_2x3_labeled() {
     </math>
                                 ";
     test("fi", "ClearSpeak",  expr,
-        "2 kertaa 3 matriisi; rivi 1 merkinnällä (3.1); sarake 2; 3, sarake 3; 1, sarake 4; 4; rivi 2; sarake 1; 0, sarake 2; 2, sarake 3; 6");
+        "2 kertaa 3 matriisi; rivi 1 merkinnällä (3.1); sarake 1; 3, sarake 2; 1, sarake 3; 4; rivi 2; sarake 1; 0, sarake 2; 2, sarake 3; 6");
     test("fi", "SimpleSpeak", expr,
-        "2 kertaa 3 matriisi; rivi 1 merkinnällä (3.1); sarake 2; 3, sarake 3; 1, sarake 4; 4; rivi 2; sarake 1; 0, sarake 2; 2, sarake 3; 6");
+        "2 kertaa 3 matriisi; rivi 1 merkinnällä (3.1); sarake 1; 3, sarake 2; 1, sarake 3; 4; rivi 2; sarake 1; 0, sarake 2; 2, sarake 3; 6");
 }
 
 #[test]

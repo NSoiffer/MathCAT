@@ -81,6 +81,7 @@ pub fn test_prefs(language: &str, speech_style: &str, test_prefs: Vec<(&str, &st
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
+        prefs.set_user_prefs("Impairment", "Blindness").unwrap();                    // makes testing simpler
         prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
         prefs.set_user_prefs("MathRate", "100").unwrap();                            // makes testing simpler
         prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
@@ -149,7 +150,7 @@ pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &st
         "UEB" | "Nemeth" | _ => set_preference("Language".to_string(), "en".to_string()).unwrap(),
     }
 
-    set_preference("UEB_UseSpacesAroundAllOperators".to_string(), "false".to_string()).unwrap();         // makes testing simpler
+    set_preference("UseSpacesAroundAllOperators".to_string(), "false".to_string()).unwrap();         // makes testing simpler
     for (pref_name, pref_value) in test_prefs.clone() {
         set_preference(pref_name.to_string(), pref_value.to_string()).unwrap();
     };

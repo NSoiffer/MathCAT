@@ -19,7 +19,6 @@ use crate::errors::*;
 use phf::phf_set;
 
 
-
 const MAX_PLACE_MARKERS: usize = 10;
 
 thread_local!{
@@ -393,7 +392,28 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                     Ok( (speech, done)) => {
                         cumulative_speech = cumulative_speech + if loop_count==0 {""} else {" "} + speech.trim();
                         if done {
-                            return Ok(cumulative_speech);
+                            let (tts, rate) = {
+                                let prefs = rules.pref_manager.borrow();
+                                (prefs.pref_to_string("TTS"), prefs.pref_to_string("MathRate"))
+                            };
+                            if rate != "100" {
+                                match tts.as_str() {
+                                    "SSML" => if !cumulative_speech.starts_with("<prosody rate") {
+                                        cumulative_speech = format!("<prosody rate='{}%'>{}</prosody>", &rate, &cumulative_speech);
+                                    }, 
+                                    "SAPI5" => if !cumulative_speech.starts_with("<rate speed") {
+                                        cumulative_speech = format!("<rate speed='{:.1}'>{}</rate>'>",
+                                        10.0*(0.01*rate.parse::<f32>().unwrap_or(100.0)).log(3.0), cumulative_speech);
+                                    },
+                                    _ => (),  // do nothing
+                                }
+                            }
+                                                return Ok( rules.pref_manager.borrow().get_tts()
+                                            .merge_pauses(crate::speech::remove_optional_indicators(
+                                                &cumulative_speech.replace(CONCAT_STRING, "")
+                                                                    .replace(CONCAT_INDICATOR, "")                            
+                                                            )
+                                            .trim_start().trim_end_matches([' ', ',', ';'])) );
                         }
                     },
                     Err(e) => {
@@ -1822,7 +1842,11 @@ mod tests {
             assert_eq!(speech, "move right; row 2; 5, negative 6");
             let speech = test_command("ZoomIn", mathml, "id-13");
             assert_eq!(speech, "zoom in; column 1; 5");
-            return Ok( () );
+            let speech = test_command("ZoomOut", mathml, "row-2");
+            assert_eq!(speech, "zoom out; row 2; 5, negative 6");
+            let speech = test_command("ZoomOut", mathml, "table");
+            assert_eq!(speech, "zoom out; the 2 by 2 matrix; row 1; 9, negative 13; row 2; 5, negative 6");
+        return Ok( () );
         });
     }
 
@@ -1923,7 +1947,7 @@ mod tests {
             let speech = test_command("MoveNext", mathml, "row-2");
             assert_eq!(speech, "move right; case 2; positive x comma; if x, is greater than or equal to 0");
             let speech = test_command("ZoomOut", mathml, "table");
-            assert_eq!(speech, "zoom out; 2 cases, case 1; negative x comma; if x is less than 0; case 2; positive x comma; if x, is greater than or equal to 0");
+            assert_eq!(speech, "zoom out; 2 cases; case 1; negative x comma; if x is less than 0; case 2; positive x comma; if x, is greater than or equal to 0");
             let speech = test_command("ZoomIn", mathml, "row-1");
             assert_eq!(speech, "zoom in; case 1; negative x comma; if x is less than 0");
             set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
@@ -1936,18 +1960,18 @@ mod tests {
     #[test]
     fn base_superscript() -> Result<()> {
         // bug #217 -- zoom into base of parenthesized script 
-        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
-            <msup data-changed='added' id='id-1' data-id-added='true'>
-                <mrow data-changed='added' id='id-2' data-id-added='true'>
-                    <mo stretchy='false' id='id-3' data-id-added='true'>(</mo>
-                    <mrow data-changed='added' id='id-4' data-id-added='true'>
-                        <mn id='id-5' data-id-added='true'>2</mn>
-                        <mo data-changed='added' id='id-6' data-id-added='true'>&#x2062;</mo>
-                        <mi id='id-7' data-id-added='true'>x</mi>
+        let mathml_str = "<math display='block' id='id-0'>
+            <msup id='id-1'>
+                <mrow id='id-2'>
+                    <mo stretchy='false' id='id-3'>(</mo>
+                    <mrow id='id-4'>
+                        <mn id='id-5'>2</mn>
+                        <mo id='id-6'>&#x2062;</mo>
+                        <mi id='id-7'>x</mi>
                     </mrow>
-                    <mo stretchy='false' id='id-8' data-id-added='true'>)</mo>
+                    <mo stretchy='false' id='id-8'>)</mo>
                 </mrow>
-                <mn id='id-9' data-id-added='true'>2</mn>
+                <mn id='id-9'>2</mn>
             </msup>
         </math>";
         init_default_prefs(mathml_str, "Enhanced");
@@ -1958,7 +1982,7 @@ mod tests {
             let speech = test_command("ZoomIn", mathml, "id-4");
             assert_eq!(speech, "zoom in; in base; 2 x");
             let speech = test_command("MoveNext", mathml, "id-9");
-            assert_eq!(speech, "move right; in superscript; 2");
+            assert_eq!(speech, "move right; in exponent; 2");
             return Ok( () );
         });
     }
@@ -1988,13 +2012,13 @@ mod tests {
             // let speech = test_command("ReadCurrent", mathml, "id-2");
             // assert_eq!(speech, "read current; n choose k");
             let speech = test_command("ZoomIn", mathml, "id-4");
-            assert_eq!(speech, "zoom in; n");
+            assert_eq!(speech, "zoom in; in part 1; n");
             let speech = test_command("MoveNext", mathml, "id-5");
-            assert_eq!(speech, "move right; k");
+            assert_eq!(speech, "move right; in part 2; k");
             let speech = test_command("MoveNext", mathml, "id-5");
             assert_eq!(speech, "cannot move right, end of math");
             let speech = test_command("ZoomOut", mathml, "id-1");
-            assert_eq!(speech, "zoom out; n choose k");
+            assert_eq!(speech, "zoom out; out of part 2; n choose k");
             return Ok( () );
         });
     }

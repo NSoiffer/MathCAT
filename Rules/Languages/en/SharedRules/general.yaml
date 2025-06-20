@@ -189,6 +189,14 @@
   - t: "of"      # phrase(the square root 'of' 25 equals 5)
   - x: "*[2]"
 
+- name: repeating-decimal
+  tag: repeating-decimal
+  match: "."
+  replace:
+  - x: "*[1]"
+  - t: "with repeating digits"      # phrase('with repeating digits')
+  - spell: "*[2]"
+
 - name: msubsup-skip-super
   # handles single, double, etc., prime
   tag: [skip-super, say-super]
@@ -475,6 +483,7 @@
   - test:
       if: "not($LineCount=1 or contains(@data-intent-property, ':continued-row:'))"
       then:
+      - pause: medium
       - test:
         - if: "parent::m:piecewise"
           then: [t: "case"]     # phrase('case' 1 of 10 cases)
@@ -948,8 +957,6 @@
           then: [pause: medium]
 
 - name: chemistry
-
-
   tag: chemical-equation
   match: "."
   replace:

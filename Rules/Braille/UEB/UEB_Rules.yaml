@@ -246,7 +246,7 @@
    tag: mo
      # add spaces around comparison operators unless they are in a script position,
    variables: # ratio not spaced in UEB; also make sure it is an infix operator (e.g., "~" can be prefix)
-   - AddSpaces: "$UEB_UseSpacesAroundAllOperators or
+   - AddSpaces: "$UseSpacesAroundAllOperators or
                        ( parent::*[self::m:mrow] and $NewScriptContext='' and
                          .!='∶' and IsInDefinition(., 'Braille', 'NemethComparisonOperators') )"
    match: "."
