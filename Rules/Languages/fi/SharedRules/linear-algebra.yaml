@@ -1,0 +1,35 @@
+---
+
+- name: scalar-determinant
+  tag: determinant
+  match: "count(*)=1 and not(*[1][self::m:mtr])"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  - T: "determinantti"      # phrase(the 'determinant' of a matrix)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: ""      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [T: "loppu determinantti"]      # phrase('end determinant' of a matrix)
+
+- name: subscripted-norm
+  tag: subscripted-norm
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  - x: "*[2]"
+  - T: "normi"      # phrase(the 'norm' can be a measure of distance)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: ""      # phrase(systems 'of' linear equations)
+  - x: "*[1]"

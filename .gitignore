@@ -38,4 +38,5 @@ src/read_speech_rules.rs
 src/rules.pest
 src/.tmp.driveupload
 
+Rules/*/*/*.zip
 .vs

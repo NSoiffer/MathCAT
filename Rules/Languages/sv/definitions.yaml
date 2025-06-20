@@ -1,0 +1,416 @@
+---
+- include: "../../definitions.yaml"
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ],
+
+
+# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
+# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
+# If no ":"s are used, the same speech is used for all forms
+# If bracketing words make sense, they are separated with ";"s
+# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
+# If there are multiple fixities (e.g., see transpose), they are separated with "||
+#   for readability, spaces can be used around any of the delimiter characters
+# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+- IntentMappings: {
+    "indexed-by": "infix= ; nedsänkt: nedsänkt: nedre index; slut nedsänkt: slut nedsänkt: slut nedre index",
+    "modified-variable": "silent= ",
+    "say-super": "infix=upphöjt: övre index: övre index",   # used with 'mo' for superscripts (e.g, "<")
+    "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
+
+    "absolute-value": "function= ; absolutbeloppet; slut absolutbelopp",
+    "binomial": "infix=binomial; över; slut binomial",
+    "limit": "prefix=gränsvärdet då",
+    "lim-sup": "prefix=lim sup då: övre gränsvärdet då: det övre gränsvärdet då", 
+    "lim-inf": "prefix=lim inf då: undre gränsvärdet då : det undre gränsvärdet då", 
+    "logarithm-with-base": "prefix=logg bas: logaritmen med bas: logaritmen med bas",
+    "minus": "infix=minus || prefix=minus",
+    "plus": "infix=plus || prefix=positivt",
+
+    "transpose": "postfix=transponat || function=transponat",
+    "norm": "function=; normen; slut norm",
+    "trace": "function=;spåret; slut spår",
+    "dimension": "function=; dimensionen; slut dimension",
+    # "homomorphism": "function= ; homomorfism; slut homomorfism",                                # doesn't fit function pattern
+    # "kernel": "function= ; noll-rummet : noll-rummet till: noll-rummet till; slut noll-rummet", # doesn't fit function pattern
+    "vector": "function= ; vektor: vektorn: vektorn || prefix=vektor: vektorn: vektorn",
+    "cross-product": "infix=kryss: kryssprodukt: kryssprodukt",
+    "dot-product": "infix=skalärt: skalärprodukt: skalärprodukt",
+
+    "divergence": "function= ; div: divergens: divergens; slut divergens",
+    "curl": "function= ; rotation; slut rotation",
+    "gradient": "function= ; grad: gradient: gradient; slut gradient",
+    "laplacian": "function=laplacian",   # speech engines don't do a good job with "laplacian" (swedish ones might)
+  }
+
+- NavigationParts: {
+    "large-op": "bas; undre gräns; övre gräns",
+    "mfrac": "täljare;nämnare",
+    "fraction": "täljare;nämnare",
+    "msqrt": "rot",
+    "square-root": "rot",
+    "mroot": "rot;rot index",
+    "root": "rot;rot index",
+    "msub": "bas;nedre index",
+    "sub": "bas;nedre index",
+    "msup": "bas;övre index",
+    "say-super": "bas;upphöjt",
+    "skip-super": "bas;upphöjt",
+    "power": "bas;exponent",
+    "msubsup": "bas;nedre index;övre index",
+    "munder": "bas;undre gräns",
+    "mover": "bas;övre gräns",
+    "munderover": "bas;undre gräns;övre gräns",
+
+    # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
+    # it's a hack to put them here, but at least they are grouped with the other navigation parts
+    "in": "i",
+    "out": "ut ur",
+  }
+
+- SIPrefixes: {
+    "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hekto", "da": "deka",
+    "d": "deci", "c": "centi", "m": "milli", "µ": "mikro", "n": "nano", "p": "piko", "f": "femto", "a": "atto", "z": "zepto", "y": "yokto", "r": "ronto", "q": "quekto"
+  }
+
+# this is a list of all units that accept SIPrefixes
+# from www.bipm.org/documents/20126/41483022/SI-Brochure-9-EN.pdf
+#   Prefixes may be used with any of the 29 SI units with special names
+#   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
+- SIUnits: {
+    # base units
+    "A": "ampère",
+    "cd": "candela",
+    "K": "kelvin", "K": "kelvin", # U+212A
+    "g": "gram",
+    "m": "meter",     # British spelling works for US also
+    "mol": "mol",
+    "s": "sekund", "sek": "sekund",  # "sec" not actually legal
+
+    # derived units
+    "Bq": "becquerel",
+    "C": "coulomb",
+    "°C": "grad celsius", "℃": "grad celsius", # should only take negative powers
+    "F": "farad",
+    "Gy": "gray",
+    "H": "henry",
+    "Hz": "hertz",
+    "J": "joule",
+    "kat": "katal",
+    "lm": "lumen",
+    "lx": "lux",
+    "N": "newton",
+    "Ω": "ohm", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN
+    "Pa": "pascal",
+    "S": "siemens",
+    "Sv": "sievert",
+    "T": "tesla",
+    "V": "volt",
+    "W": "watt",
+    "Wb": "weber",
+
+    # accepted (plus a few variants) that take SI prefixes
+    "l": "liter", "L": "liter", "ℓ": "liter",  # Should only take negative powers; British spelling works for US also
+    "t": "ton",           # should only take positive powers
+    "Da": "dalton",
+    "Np": "neper",               # should only take negative powers
+    "u": "atommassenhet",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
+    "eV": "elektronvolt",
+    "rad": "radian",             # should only take negative powers
+    "sr": "steradian",          # should only take negative powers      
+  
+    # others that take a prefix
+    "a": "annum",               # should only take positive powers
+    "as": "bågsekund",          # see en.wikipedia.org/wiki/Minute_and_second_of_arc
+
+    # technically wrong, but used in practice with SI Units
+    "b": "bit",               # should only take positive powers
+    "B": "byte",              # should only take positive powers
+    "Bd": "baud",             # should only take positive powers
+  }
+
+
+- UnitsWithoutPrefixes: {
+    # time
+    "″": "sekund", "\"": "sekund",
+    "′": "minut", "'": "minut","min": "minut",
+    "h": "timme", "hr": "timme", "Hr": "timme", "tim": "timme",
+    "d": "dag", "dy": "dag",
+    "w": "vecka", "wk": "vecka", "v": "vecka",
+    "y": "år", "yr": "år",    
+
+    # angles
+    "°": "grad", "deg": "grad", # should only take negative powers
+    "arcmin": "bågminut",
+    "amin": "bågminut",
+    "am": "bågminut",
+    "MOA": "bågminut",
+    "arcsec": "bågsekund",
+    "asec": "bågsekund",
+
+    # distance
+    "au": "astronomisk enhet", "AU": "astronomisk enhet",
+    "ltyr": "ljusår", "ly": "ljusår",
+    "pc": "parsek",
+    "Å": "ångström", "Å": "ångström",           # U+00C5 and U+212B
+    "fm": "fermi",
+
+    # others
+    "ha": "hektar",
+    # "B": "bel",    # "B" more commonly means bytes
+    "dB": "decibel", # already logarithmic, so not used with SI prefixes
+
+    "amu": "atommassenhet",
+    "atm": "atmosfär",
+    "bar": "bar",
+    "cal": "kalori",
+    "Ci": "curie",
+    "grad": "gon",
+    "M": "molar",
+    "R": "röntgen",
+    "rpm": "varv per minut",
+    "℧": "m-h-o",
+    "dyn": "dyn",
+    "erg": "erg",
+
+    # powers of 2 used with bits and bytes
+    "Kib": "kibi-bit", "Mib": "mebi-bit", "Gib": "gibi-bit", "Tib": "tebi-bit", "Pib": "pebi-bit", "Eib": "exbi-bit", "Zib": "zebi-bit", "Yib": "yobi-bit",
+    "KiB": "kibi-byte", "MiB": "mebi-byte", "GiB": "gibi-byte", "TiB": "tebi-byte", "PiB": "pebi-byte", "EiB": "exbi-byte", "ZiB": "zebi-byte", "YiB": "yobi-byte",
+  }
+
+  # this will only be used if the language is English, so it can be empty for other countries
+  # not necessarily! imperial units can still occur in e.g. Swedish textbooks: "Exercise: convert this into proper units", also some are usen in Swedish cook-books. /Tim
+- EnglishUnits: {
+    # length
+    "in": "tum",
+    "ft": "fot",
+    "mi": "mile",
+    "rd": "rod",
+    "li": "link",
+    "ch": "chain",
+
+    # area
+    "sq in": "kvadrattum", "sq. in": "kvadrattum", "sq. in.": "kvadrattum",
+    "sq ft": "kvadratfot", "sq. ft": "kvadratfot", "sq. ft.": "kvadratfot",
+    "sq yd": "kvadratyard", "sq. yd": "kvadratyard", "sq. yd.": "kvadratyard",
+    "sq mi": "kvadratmile", "sq. mi": "kvadratmile", "sq. mi.": "kvadratmile",
+    "ac": "engelskt tunnland",
+    "FBM": "board foot",
+
+    # volume
+    "cu in": "kubiktum", "cu. in": "kubiktum", "cu. in.": "kubiktum",
+    "cu ft": "kubikfot", "cu. ft": "kubikfot", "cu. ft.": "kubikfot",
+    "cu yd": "kubikyard", "cu. yd": "kubikyard", "cu. yd.": "kubikyard",
+    "bbl": "fat", "BBL": "fat",
+    "pk": "peck",
+    "bu": "skäppa",
+    "tsp": "tesked", "tsk": "tesked",
+    "tbl": "matsked", "tbsp": "matsked", "msk": "matsked",
+
+    # liquid
+    "fl dr": "fluid dram",
+    "fl oz": "fluid ounce",
+    "gi": "gill",
+    "cp": "kopp", "cup": "kopp",
+    "pt": "pint",
+    "qt": "quart",
+    "gal": "gallon",
+
+    # weight
+    "gr": "grain",
+    "dr": "dram",
+    "oz": "uns", "℥": "uns",
+    "lb": "pund",
+    "cwt": "hundredweight",
+    "dwt": "pennyweight",
+    "oz t": "troyuns",
+    "lb t": "troypund",
+
+    # energy
+    "hp": "hästkraft",
+    "BTU": "B-T-U",
+    "°F": "grad fahrenheit", "℉": "grad fahrenheit",
+
+    # other
+    "mph": "mile per hour",
+    "mpg": "mile per gallon",
+  }
+
+- PluralForms: {
+  # SWEDISH: this should be complete. Units not listed here are not modified when pluralised. /Tim
+    "sekund": "sekunder",
+    "grad celsius": "grader celsius",
+    "atommassenhet": "atommassenheter",
+    "radian": "radianer",
+    "steradian": "steradianer",
+    "bågsekund": "bågsekunder",
+    "bit": "bits",
+    "byte": "bytes",
+    "baud": "bauds",
+    "minut": "minuter",
+    "timme": "timmar",
+    "dag": "dagar",
+    "vecka": "veckor",
+    "grad": "grader",
+    "bågminut": "bågminuter",
+    "astronomisk enhet": "astronomiska enheter",
+    "atmosfär": "atmosfärer",
+    "kalori": "kalorier",
+    "kibi-bit": "kibi-bits", 
+    "mebi-bit": "mebi-bits", 
+    "gibi-bit": "gibi-bits", 
+    "tebi-bit": "tebi-bits",
+    "pebi-bit": "pebi-bits",
+    "exbi-bit": "exbi-bits", 
+    "zebi-bit": "zebi-bits", 
+    "yobi-bit": "yobi-bits",
+    "kibi-byte": "kibi-bytes",
+    "mebi-byte": "mebi-bytes",
+    "gibi-byte": "gibi-bytes", 
+    "tebi-byte": "tebi-bytes",
+    "pebi-byte": "pebi-bytes", 
+    "exbi-byte": "exbi-bytes", 
+    "zebi-byte": "zebi-bytes",
+    "yobi-byte": "yobi-bytes",
+    "mile": "miles",
+    "rod": "rods",
+    "link": "links",
+    "chain": "chains",
+    "kvadratmile": "kvadratmiles",
+    "engelskt tunnland": "engelska tunnland",
+    "skäppa": "skäppor",
+    "tesked": "teskedar",
+    "matsked": "matskedar",
+    "fluid dram": "fluid drams",
+    "fluid ounce": "fluid ounces",
+    "kopp": "koppar",
+    "pint": "pints",
+    "quart": "quarts",
+    "grain": "grains",
+    "hundredweight": "hundredweights",
+    "pennyweight": "pennyweights",
+    "hästkraft": "hästkrafter",
+    "grad fahrenheit": "grader fahrenheit",
+    "mile per hour": "miles per hour",
+    "mile per gallon": "miles per gallon",
+  }
+
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+# For English, a regular pattern starts at twenty
+- NumbersOnes: [
+         "noll", "en", "två", "tre", "fyra", "fem", "sex", "sju", "åtta", "nio",
+         "tio", "elva", "tolv", "tretton", "fjorton", "femton", "sexton",
+         "sjutton", "arton", "nitton"
+    ]
+
+- NumbersOrdinalOnes: [
+         "nollte", "första", "andra", "tredje", "fjärde", "femte", "sjätte", "sjunde", "åttonde", "nionde",
+         "tionde", "elfte", "tolfte", "trettonde", "fjortonde", "femtonde", "sextonde",
+         "sjuttonde", "artonde", "nittonde"
+    ]
+
+- NumbersOrdinalPluralOnes: [
+         "nollte", "första", "andra", "tredje", "fjärde", "femte", "sjätte", "sjunde", "åttonde", "nionde",
+         "tionde", "elfte", "tolfte", "trettonde", "fjortonde", "femtonde", "sextonde",
+         "sjuttonde", "artonde", "nittonde"
+    ]
+
+    # stop when regularity begins
+- NumbersOrdinalFractionalOnes: [
+         "nolltedel", "hel", "halv", "tredjedel", "fjärdedel", "femtedel", "sjättedel", "sjundedel", "åttondel", "niondel", "tiondel", "elftedel",
+         "tolftedel", "trettondel", "fjortondel", "femtondel", "sextondel", "sjuttondel", "artondel", "nittondel"
+    ]
+
+    # stop when regularity begins
+- NumbersOrdinalFractionalPluralOnes: [
+         "nolltedelar", "hela", "halva", "tredjedelar", "fjärdedelar", "femtedelar", "sjättedelar", "sjundedelar", "åttondelar", "niondelar",
+         "tiondelar", "elftedelar", "tolftedelar", "trettondelar", "fjortondelar", "femtondelar", "sextondelar",
+         "sjuttondelar", "artondelar", "nittondelar"
+    ]
+
+
+    # What to use for multiples of 10
+- NumbersTens: [
+         "", "tio", "tjugo", "trettio", "fyrtio", "femtio", "sextio", "sjuttio", "åttio", "nittio"
+    ]
+
+- NumbersOrdinalTens: [
+         "", "tionde", "tjugonde", "trettionde", "fyrtionde", "femtionde", "sextionde", "sjuttionde", "åttionde", "nittionde"
+    ]
+
+- NumbersOrdinalPluralTens: [
+         "", "tiondelar", "tjugondelar", "trettiondelar", "fyrtiondelar", "femtiondelar", "sextiondelar", "sjuttiondelar", "åttiondelar", "nittiondelar"
+    ]
+
+
+- NumbersHundreds: [
+       "", "etthundra", "tvåhundra", "trehundra", "fyrahundra", "femhundra",
+         "sexhundra", "sjuhundra", "åttahundra", "niohundra"
+    ]
+
+- NumbersOrdinalHundreds: [
+       "", "hundrade", "tvåhundrade", "trehundrade", "fyrahundrade", "femhundrade",
+         "sexhundrade", "sjuhundrade", "åttahundrade", "niohundrade"
+    ]
+
+- NumbersOrdinalPluralHundreds: [
+       "", "en hundradel", "två hundradelar", "tre hundradelar", "fyra hundradelar", "fem hundradelar",
+         "sex hundradelar", "sju hundradelar", "åtta hundradelar", "nio hundradelar"
+    ]
+      
+
+    # At this point, hopefully the language is regular. If not, code needs to be written
+- NumbersLarge: [
+         "", "tusen", "miljon", "miljard", "biljon", "biljard",
+         "triljon", "triljard", "kvadriljon", "kvadriljard", "kvintiljon",
+         "kvintiljard","sextiljon","sextiljard","septiljon","septiljard",
+         "oktiljon","oktiljard","noniljon","noniljard","deciljon",
+         "deciljard","undeciljon","undeciljard","duodeciljon","tredeciljon",
+         "tredeciljard","quattuordeciljon","uattuordeciljard","quindeciljon","quindeciljard",
+         "sexdeciljon","sexdeciljard","septendeciljon","septendeciljard",
+         "octodeciljon","octodeciljard","novemdeciljon","novemdeciljard","vigintiljon",
+         "vigintiljard","unvigintiljon","unvigintiljard","centiljon","centiljard"
+    ]
+      
+- NumbersOrdinalLarge: [
+         "", "tusende", "miljonte", "miljardte", "biljonte", "biljardte",
+         "triljonte", "triljardte", "kvadriljonte", "kvadriljardte", "kvintiljonte",
+         "kvintiljardte","sextiljonte","sextiljardte","septiljonte","septiljardte",
+         "oktiljonte","oktiljardte","noniljonte","noniljardte","deciljonte",
+         "deciljardte","undeciljonte","undeciljardte","duodeciljonte","tredeciljonte",
+         "tredeciljardte","quattuordeciljonte","uattuordeciljardte","quindeciljonte","quindeciljardte",
+         "sexdeciljonte","sexdeciljardte","septendeciljonte","septendeciljardte",
+         "octodeciljonte","octodeciljardte","novemdeciljonte","novemdeciljardte","vigintiljonte",
+         "vigintiljardte","unvigintiljonte","unvigintiljardte","centiljonte","centiljardte"
+    ]
+      
+- NumbersOrdinalPluralLarge: [
+         "", "tusendelar", "miljondelar", "miljarddelar", "biljondelar", "biljarddelar",
+         "triljondelar", "triljarddelar", "kvadriljondelar", "kvadriljarddelar", "kvintiljondelar",
+         "kvintiljarddelar","sextiljondelar","sextiljarddelar","septiljondelar","septiljarddelar",
+         "oktiljondelar","oktiljarddelar","noniljondelar","noniljarddelar","deciljondelar",
+         "deciljarddelar","undeciljondelar","undeciljarddelar","duodeciljondelar","tredeciljondelar",
+         "tredeciljarddelar","quattuordeciljondelar","uattuordeciljarddelar","quindeciljondelar","quindeciljarddelar",
+         "sexdeciljondelar","sexdeciljarddelar","septendeciljondelar","septendeciljarddelar",
+         "octodeciljondelar","octodeciljarddelar","novemdeciljondelar","novemdeciljarddelar","vigintiljondelar",
+         "vigintiljarddelar","unvigintiljondelar","unvigintiljarddelar","centiljondelar","centiljarddelar"
+    ]

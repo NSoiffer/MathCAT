@@ -1,5 +1,8 @@
 # Translate unicode characters into the target language
 # This makes use of three sources: SRE's translations, MathPlayer's translations, and Google translate.
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+
 
 # The google translate is done via https://github.com/ffreemt/google-stranslate (pip install itranslate)
 # from itranslate import itranslate as translate
@@ -200,16 +203,16 @@ MAX_CHARS_IN_CHUNK = 4500  # 4500 sometimes failed (language code "no")
 TIMEOUT = 2
 import time
 
-def translate_words(words_to_translate: set, lang):
+def translate_words(words_to_translate: set[str], lang):
     if lang == 'nb' or lang == 'nn':
         lang = 'no'  # google doesn't know those variants, but SRE uses them
     translations = {}
 
-    def do_translation_chunk(words: list):
+    def do_translation_chunk(words: set[str]):
         # translate doesn't handle a list properly -- use ".\n" to separate words
-        word_string = ".\n".join(words)
+        word_string = ".\n".join(list(words))
         # chunk_translations = translate(words, from_lang='en', to_lang=lang, url=TRANSLATE_URL)
-        translated_words_str = GoogleTranslate.translate(word_string, src='en', dest=lang).text.lower()
+        translated_words_str: str = GoogleTranslate.translate(word_string, src='en', dest=lang).text.lower()
         # Chinese has "." translated to "。"
         translated_words_str = translated_words_str.replace('。', '.')
         translated_words = translated_words_str.split('.\n')
@@ -233,7 +236,7 @@ def translate_words(words_to_translate: set, lang):
     char_count = 0
     words_to_translate = []
     for word in word_list:
-        words_to_translate.append(word)
+        words_to_translate.add(word)
         char_count += len(word)
         if char_count >= MAX_CHARS_IN_CHUNK:
             do_translation_chunk(words_to_translate)
@@ -409,10 +412,59 @@ def translate_definition(start: int, lines: list[str], translated_lines: list[st
         i += 1
     return i
 
+def build_euro(lang: str):
+    sre = get_sre_euro_dict()
+    list(sre).sort()
+    print(f"Translations: SRE={len(sre)}")
+    with open("latex-braille-unicode.yaml", 'w', encoding='utf8') as out_stream:
+        out_stream.write("---\n")
+        for ch, braille in sre.items():
+            if ch == '"':
+                ch = '\\"'
+            elif ch == '\\':
+                ch = '\\\\'
+            elif ch == '\\127':
+                ch = '\\x7F'
+            first_part = f' - "{ch}": [t: "{braille}"]'
+            try:
+                comment = ''
+                if ch == '\\\\' or ch == '\\"':
+                    comment = hex(ord(ch[1]))
+                elif len(ch) == 1 or len(ch) == 2:
+                    comment = hex(ord(ch))
+                else:
+                    comment = "0" + ch[1:]
+                out_stream.write('{:32}# {}\n'.format(first_part, comment))
+            except:
+                print(f"failed to write a line for ch={ch}")
 
 
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
+def get_sre_euro_dict():
+    dict = {}
+    full_path = SRE_Location + "\\" + "euro" + "\\" + "characters" + "\\"
+    for filename in os.listdir(full_path):
+        if filename == "Braille.json":
+            continue
+        with open(full_path+filename, 'r', encoding='utf8') as in_stream:
+            print("\nReading file {}".format(full_path+filename) )
+            sre_data = json.load(in_stream)
+            sre_data = sre_data[2]
+            dict.update(sre_data)
+    return dict
+
+
+def write_euro_braille_file():
+    file = open("EuroBraille-dict.txt", 'w', encoding='utf8')
+    file.write('{\n')
+    for key, value in get_sre_euro_dict().items():
+        if key == '"':
+            key = '\\"'
+        elif key == '\\':
+            key = '\\\\'
+        file.write('  "%s": "%s",\n' % (key, value))
+    file.write('}\n')
+    file.close()
+
 
 # if os.path.exists("unicode.yaml"):
 #   os.remove("unicode.yaml")
@@ -424,8 +476,9 @@ ACCESS8_Location = r"C:\dev\Access8Math\addon\globalPlugins\Access8Math\locale\s
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
 
 language = "zh-cn"
-build_new_translation("..", language, "unicode")
-build_new_translation("..", language, "unicode-full")
+# build_new_translation("..", language, "unicode")
+# build_new_translation("..", language, "unicode-full")
 
 # see translate_definitions comments -- you need to manually copy the file to google translate. 
 # translate_definitions("..", language)
+build_euro("euro")

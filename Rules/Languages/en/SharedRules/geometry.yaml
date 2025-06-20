@@ -57,3 +57,23 @@
   - x: "*[2]"
   - x: "*[3]"
 
+
+- name: coordinate
+  tag: coordinate
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [t: "the"]      # phrase('the' point at 1, 2)
+  - t: "point"      # phrase(the 'point' at 1, 2)
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [t: "at"]      # phrase('the' point at 1, 2)
+  - pause: short
+  - insert:
+      nodes: "*"
+      replace: [t: "comma", pause: auto]      # phrase(f of x 'comma' y)
+  - pause: short
+  - test:
+      if: "($SpeechStyle='ClearSpeak' and $Verbosity='Verbose') or not(IsNode(*[last()],'leaf'))"
+      then: [t: "end point"]      # phrase(start point, 'end point')

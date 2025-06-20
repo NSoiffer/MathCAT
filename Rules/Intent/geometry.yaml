@@ -4,15 +4,16 @@
   name: geometry-line-segment
   tag: mover
   match:
-    - "*[2][self::m:mo][text()='¯'] and"
+    - "*[2][self::m:mo][.='¯'] and"
     - "*[1][self::m:mrow][count(*)=3 and "
     - "     *[1][self::m:mi and string-length(text()) and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] and"
-    - "     *[2][self::m:mo and (text()='\u2062' or text()='\u2063')] and"
+    - "     *[2][self::m:mo and (.='\u2062' or .='\u2063')] and"
     - "     *[3][self::m:mi and string-length(text()) and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '']"
     - "                  ]"
   replace:
   - intent:
       name: "line-segment"
+      attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
       children:
       - x: "*[1]/*[1]"
       - x: "*[1]/*[3]"
@@ -21,15 +22,16 @@
   name: geometry-ray
   tag: mover
   match:
-    - "*[2][self::m:mo][text()='→'] and"  # u2192
+    - "*[2][self::m:mo][.='→'] and"  # u2192
     - "*[1][self::m:mrow][count(*)=3 and "
     - "     *[1][self::m:mi and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] and"
-    - "     *[2][self::m:mo and (text()='\u2062' or text()='\u2063')] and"
+    - "     *[2][self::m:mo and (.='\u2062' or .='\u2063')] and"
     - "     *[3][self::m:mi and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '']"
     - "                  ]"
   replace:
   - intent:
       name: "ray"
+      attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
       children:
       - x: "*[1]/*[1]"
       - x: "*[1]/*[3]"
@@ -38,15 +40,16 @@
   name: geometry-arc
   tag: mover
   match:
-    - "*[2][self::m:mo][text()='⌒'] and"  # u2192
+    - "*[2][self::m:mo][.='⌒'] and"  # u2192
     - "*[1][self::m:mrow][count(*)=3 and "
     - "     *[1][self::m:mi and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] and"
-    - "     *[2][self::m:mo and (text()='\u2062' or text()='\u2063')] and"
+    - "     *[2][self::m:mo and (.='\u2062' or .='\u2063')] and"
     - "     *[3][self::m:mi and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '']"
     - "    ]"
   replace:
   - intent:
       name: "arc"
+      attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
       children:
       - x: "*[1]/*[1]"
       - x: "*[1]/*[3]"

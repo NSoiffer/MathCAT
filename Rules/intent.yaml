@@ -8,7 +8,7 @@
 -
   name: turn-off
   tag: "!*"     # turn off matching -- runs before specific rules
-  match: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"
+  match: "$SpeechStyle = 'LiteralSpeak' or ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
   replace:
   - test:
       - if: "*"
@@ -26,11 +26,9 @@
             xpath-name: "name(.)"
             children: []
 
--
-   include: "Intent/geometry.yaml"
-
--
-   include: "Intent/linear-algebra.yaml"
+- include: "Intent/geometry.yaml"
+- include: "Intent/linear-algebra.yaml"
+- include: "Intent/calculus.yaml"
 
 -
   # this is last because other rules are/should be(???) more specific
@@ -41,6 +39,7 @@
   name: ignore-punctuation
   tag: math
   match: "*[1][self::m:mrow and count(*)=2 and *[2][translate(.,'.,;:?', '')='']]"
+  variables: [TableProperty: "''"]
   replace:
   - test:
       if: "*[1]/*[1]"
@@ -55,6 +54,7 @@
   name: default
   tag: math
   match: "."
+  variables: [TableProperty: "''"]
   replace:
   - test:
       if: "*"

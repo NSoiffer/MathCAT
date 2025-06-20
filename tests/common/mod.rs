@@ -4,7 +4,7 @@
 use regex::Regex;
 extern crate lazy_static;
 use lazy_static::lazy_static;
-use libmathcat::interface::*;
+pub use libmathcat::interface::*;
 
 #[allow(dead_code)] 
 pub fn init_logger() {
@@ -22,6 +22,11 @@ pub fn abs_rules_dir_path() -> String {
     return std::env::current_exe().unwrap().parent().unwrap()
                 .join("../../../Rules")
                 .to_str().unwrap().to_string();
+    // use std::path::PathBuf;
+    // let out_dir = std::env::var_os("OUT_DIR").unwrap();
+    // println!("abs_rules_dir_path: out_dir={:?}", out_dir);
+    // let out_dir = PathBuf::from(&out_dir);
+    // return PathBuf::from(&out_dir).join("Rules").to_string_lossy().to_string();
 }
 
 
@@ -42,7 +47,7 @@ fn check_answer(test: &str, target: &str, failure_message: &str) {
     match get_spoken_text() {
         Ok(speech) => assert_eq!(target, strip_spaces(speech), "\ntest with {} failed", failure_message),
         Err(e) => panic!("{}", errors_to_string(&e)),
-    };    
+    };
 }
 
 // Compare the result of speaking the mathml input to the output 'speech'
@@ -53,10 +58,13 @@ pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
-        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
-        prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
-        prefs.set_user_prefs("Verbosity", "Medium");
-        prefs.set_user_prefs("Impairment", "Blindness");
+        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
+        prefs.set_user_prefs("MathRate", "100").unwrap();                            // makes testing simpler
+        prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
+        prefs.set_user_prefs("Verbosity", "Medium").unwrap();
+        prefs.set_user_prefs("Impairment", "Blindness").unwrap();
+        prefs.set_user_prefs("DecimalSeparators", ".").unwrap();
+        prefs.set_user_prefs("BlockSeparators", ", ").unwrap();
     });
 
     set_preference("Language".to_string(), language.to_string()).unwrap();
@@ -73,9 +81,10 @@ pub fn test_prefs(language: &str, speech_style: &str, test_prefs: Vec<(&str, &st
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
-        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
-        prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
-        prefs.set_user_prefs("Verbosity", "Medium");
+        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
+        prefs.set_user_prefs("MathRate", "100").unwrap();                            // makes testing simpler
+        prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
+        prefs.set_user_prefs("Verbosity", "Medium").unwrap();
     });
 
     set_preference("Language".to_string(), language.to_string()).unwrap();
@@ -108,7 +117,9 @@ pub fn test_ClearSpeak_prefs(language: &str, prefs: Vec<(&str, &str)>, mathml: &
 #[allow(non_snake_case)]
 pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
+    set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
     set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
+    set_preference("LaTeX_UseShortName".to_string(), "false".to_string()).unwrap();
     // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
     // log::debug!("\nsetting Language");
     match code {
@@ -122,7 +133,7 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     match get_braille("".to_string()) {
         Ok(result) => assert_eq!(braille, &result),
         Err(e) => panic!("{}", errors_to_string(&e)),
-    };    
+    };
 }
 
 #[allow(dead_code)]     // used in testing
@@ -149,6 +160,69 @@ pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &st
     match get_braille("".to_string()) {
         Ok(result) => assert_eq!(braille, &result),
         Err(e) => panic!("{}", errors_to_string(&e)),
-    };    
+    };
+}
+
+#[allow(dead_code)]
+pub fn test_intent(mathml: &str, target: &str, test_prefs: Vec<(&str, &str)>) {
+    use sxd_document::{parser, dom::Element};
+    set_rules_dir(abs_rules_dir_path()).unwrap();
+    libmathcat::speech::SPEECH_RULES.with(|rules| {
+        let rules = rules.borrow_mut();
+        let mut prefs = rules.pref_manager.borrow_mut();
+        prefs.set_user_prefs("DecimalSeparators", ".").unwrap();
+        prefs.set_user_prefs("BlockSeparators", ", ").unwrap();
+    });
+
+    // crate::speech::SpeechRules::initialize_all_rules().unwrap();
+    set_preference("IntentErrorRecovery".to_string(), "Error".to_string()).unwrap();
+    set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();      // avoids possibility of "LiteralSpeak"
+    for (pref_name, pref_value) in test_prefs.clone() {
+        set_preference(pref_name.to_string(), pref_value.to_string()).unwrap();
+    };
+
+    let package = &parser::parse(target).expect("Failed to parse target input");
+    let target = get_element(package);
+    trim_element(target, true);
+
+    let new_package = parser::parse(mathml);
+    if let Err(e) = new_package {
+        panic!("Invalid MathML:\n{}\nError is: {}", &mathml, &e.to_string());
+    }
+
+    let new_package = new_package.unwrap();
+    let mathml = get_element(&new_package);
+    let computed_intent = match libmathcat::get_intent(mathml, new_package.as_document()) {
+        Ok(e) => e,
+        Err(e) => panic!("in intent_from_mathml: {}", libmathcat::errors_to_string(&e)),
+    };
+    
+    // remove some attrs that make it harder to handwrite what the intent is:
+    //    'id' and 'data-id-added'; leaving 'data-from-mathml' as that is used by the code
+    clean_attrs(computed_intent);
+
+    match is_same_element(computed_intent, target) {
+        Ok(_) => return ,
+        Err(e) => {
+            println!("target:\n{}", libmathcat::pretty_print::mml_to_string(target));
+            println!("computed intent:\n{}", libmathcat::pretty_print::mml_to_string(computed_intent));
+            panic!("{}", e)
+        },
+    }
+
+    fn clean_attrs<'a>(mathml: Element<'a>) -> Element<'a> {
+        mathml.remove_attribute("id");
+        mathml.remove_attribute("data-id-added");
+
+        let children = mathml.children();
+        if children.is_empty() || (children.len() == 1 && children[0].element().is_none()) {
+            return mathml;
+        }
+        
+        for child in children {
+            clean_attrs(child.element().unwrap());
+        }
+        return mathml;
+    }
 }
 

@@ -5,13 +5,14 @@
 //! In the future, there will hopefully be a nice UI that writes out the YAML file.
 //!
 //! AT prefs are set via the API given in the [crate::interface] module.
-//! These in turn call [`PreferenceManager::set_api_string_pref`] and [`PreferenceManager::set_api_float_pref`].
+//! These in turn call [`PreferenceManager::set_string_pref`] and [`PreferenceManager::set_api_float_pref`].
 //! Ultimately, user and api prefs are stored in a hashmap.
 //!
 //! Preferences can be found in a few places:
 //! 1. Language-independent prefs found in the Rules dir
 //! 2. Language-specific prefs
 //! 3. Language-region-specific prefs
+//! 
 //! If there are multiple definitions, the later ones overwrite the former ones.
 //! This means that region-specific variants will overwrite more general variants.
 //!
@@ -25,15 +26,19 @@ extern crate dirs;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::path::{Path, PathBuf};
-use std::time::SystemTime;
-use crate::speech::{as_str_checked, RulesFor};
-use crate::interface::errors_to_string;
-use std::collections::HashMap;
+use crate::speech::{as_str_checked, RulesFor, FileAndTime};
+use std::collections::{HashMap, HashSet};
+use phf::phf_set;
 use crate::shim_filesystem::*;
 use crate::errors::*;
 
 /// Use to indicate preference not found with Preference::to_string()
 pub static NO_PREFERENCE: &str = "\u{FFFF}";
+
+lazy_static! {
+    static ref DEFAULT_LANG: Yaml = Yaml::String("en".to_string());
+}
+
 
 // Preferences are recorded here
 /// Preferences are stored in a HashMap. It maps the name of the pref (a String) to its value (stored as YAML string/float)
@@ -43,7 +48,7 @@ pub struct Preferences {
     prefs: PreferenceHashMap        // FIX: pub so can get at iterator, should add iterator to Preferences instead
 }
 
-use std::fmt; 
+use std::fmt;
 impl fmt::Display for Preferences {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut pref_vec: Vec<(&String, &Yaml)> = self.prefs.iter().collect();
@@ -60,20 +65,23 @@ impl Preferences{
     fn user_defaults() -> Preferences {
         let mut prefs = PreferenceHashMap::with_capacity(39);
         prefs.insert("Language".to_string(), Yaml::String("en".to_string()));
+        prefs.insert("LanguageAuto".to_string(), Yaml::String("".to_string()));     // illegal value so change will be recognized
         prefs.insert("SpeechStyle".to_string(), Yaml::String("ClearSpeak".to_string()));
-        prefs.insert("Verbosity".to_string(), Yaml::String("medium".to_string()));
+        prefs.insert("Verbosity".to_string(), Yaml::String("Medium".to_string()));
         prefs.insert("SpeechOverrides_CapitalLetters".to_string(), Yaml::String("".to_string())); // important for testing
         prefs.insert("Blind".to_string(), Yaml::Boolean(true));
-        prefs.insert("MathRate".to_string(), Yaml::String("100.0".to_string()));
-        prefs.insert("PauseFactor".to_string(), Yaml::String("100.0".to_string()));
-        prefs.insert("NavMode".to_string(), Yaml::String("enhanced".to_string()));
-        prefs.insert("Overview".to_string(), Yaml::String("read".to_string()));
+        prefs.insert("MathRate".to_string(), Yaml::Real("100.0".to_string()));
+        prefs.insert("PauseFactor".to_string(), Yaml::Real("100.0".to_string()));
+        prefs.insert("NavMode".to_string(), Yaml::String("Enhanced".to_string()));
+        prefs.insert("Overview".to_string(), Yaml::Boolean(false));
         prefs.insert("ResetOverView".to_string(), Yaml::Boolean(true));
-        prefs.insert("NavVerbosity".to_string(), Yaml::String("verbose".to_string()));
+        prefs.insert("NavVerbosity".to_string(), Yaml::String("Verbose".to_string()));
         prefs.insert("AutoZoomOut".to_string(), Yaml::Boolean(true));
         prefs.insert("BrailleCode".to_string(), Yaml::String("Nemeth".to_string()));
         prefs.insert("BrailleNavHighlight".to_string(), Yaml::String("EndPoints".to_string()));
         prefs.insert("UEB_START_MODE".to_string(), Yaml::String("Grade2".to_string()));
+        prefs.insert("DecimalSeparators".to_string(), Yaml::String(".".to_string()));
+        prefs.insert("BlockSeparators".to_string(), Yaml::String(", \u{00A0}\u{202F}".to_string()));
     
         return Preferences{ prefs };
     }
@@ -92,69 +100,22 @@ impl Preferences{
         prefs.insert("CapitalLetters_Pitch".to_string(), Yaml::Real("0.0".to_string()));
         prefs.insert("CapitalLetters_Beep".to_string(), Yaml::Boolean(false));
         prefs.insert("IntentErrorRecovery".to_string(), Yaml::String("IgnoreIntent".to_string()));    // also Error
+        prefs.insert("CheckRuleFiles".to_string(), Yaml::String(
+                    (if cfg!(target_family = "wasm") {"None"} else {"Prefs"}).to_string()));    // avoid checking for rule files being changed (40% speedup!) (All, Prefs, None)
         return Preferences{ prefs };
     }
 
-    // Before we can get the other files, we need the preferences.
-    // To get them we need to read pref files, so the pref file reading is different than the other files
-    fn from_file(rules_dir: &Path) -> Result<(Preferences, FileAndTime)> {
-        let files = Preferences::get_prefs_file_and_time(rules_dir);
-        return DEFAULT_USER_PREFERENCES.with(|defaults| {
-            let system_prefs = Preferences::read_file(&files.files[0], defaults.clone())?;
-            let system_prefs = Preferences::read_file(&files.files[1], system_prefs)?;
-            return Ok((system_prefs, files));
-        });
-    }
-
-    fn get_prefs_file_and_time(rules_dir: &Path) -> FileAndTime {
-        let mut system_prefs_file = rules_dir.to_path_buf();
-        system_prefs_file.push("prefs.yaml");
-
-        let mut result: [Option<PathBuf>; 3] = [None, None, None];
-        if is_file_shim(&system_prefs_file) {
-            result[0] = Some( system_prefs_file );
-        } else {
-            error!("Couldn't open file {}.\nUsing fallback defaults which may be inappropriate.",
-                        system_prefs_file.to_str().unwrap());
-        }
-
-        let user_dir = dirs::config_dir();
-        if let Some(mut user_prefs_file) = user_dir {
-            user_prefs_file.push("MathCAT/prefs.yaml");
-            if is_file_shim(&user_prefs_file) {
-                result[1] = Some( user_prefs_file );
-            }            
-        }
-
-        return FileAndTime {
-            times: if cfg!(target_family = "wasm") {
-                [None, None, None]
-            } else {
-                [PreferenceManager::get_metadata(&result[0]), PreferenceManager::get_metadata(&result[1]), None]
-            },
-            files: result
-        }
-    }
-
-    fn read_file(file: &Option<PathBuf>, mut base_prefs: Preferences) -> Result<Preferences> {
-        let unwrapped_file = match file {
-            None => return Ok(base_prefs),
-            Some(f) => f.as_path(),
-        };
-
-        let file_name = unwrapped_file.to_str().unwrap();
+    fn read_prefs_file(file: &Path, mut base_prefs: Preferences) -> Result<Preferences> {
+        let file_name = file.to_str().unwrap();
         let docs;
-        debug!("read_file in prefs.rs");
-        match read_to_string_shim(unwrapped_file) {
+        match read_to_string_shim(file) {
             Err(e) => {
                 bail!("Couldn't read file {}\n{}", file_name, e);
             },
             Ok( file_contents) => {
                 match YamlLoader::load_from_str(&file_contents) {
                     Err(e) => {
-                        error!("Yaml parse error ('{}') in file {}.\nUsing fallback defaults which may be inappropriate.",
-                                    e, file_name);
-                        return Ok(base_prefs);
+                        bail!("Yaml parse error ('{}') in preference file {}.", e, file_name);
                     },
                     Ok(d) => docs = d,
                 }
@@ -162,13 +123,10 @@ impl Preferences{
             }
         }
         if docs.len() != 1 {
-            error!("Yaml error in file {}.\nFound {} 'documents' -- should only be 1.",
-                        file_name, docs.len());
-            return Ok(base_prefs);
+            bail!("MathCAT: error in prefs file '{}'.\nFound {} 'documents' -- should only be 1.", file_name, docs.len());
         }
 
         let doc = &docs[0];
-
         if cfg!(debug_assertions) {
             verify_keys(doc, "Speech", file_name)?;
             verify_keys(doc, "Navigation", file_name)?;
@@ -240,62 +198,6 @@ impl Preferences{
 }
 
 
-/// When looking for a file, there are up to three possible locations tracked by this type
-/// in a non-error situation, at least the first slot should be Some(...).
-///
-/// Preferences can be found in a few places:
-/// 1. Language-independent prefs found in the Rules dir
-/// 2. Language-specific prefs
-/// 3. Language-region-specific prefs
-/// If there are multiple definitions, the later ones overwrite the former ones.
-/// This means that region-specific variants will overwrite more general variants.
-///
-/// Note: the first entry is the first thing found, which might be '2' or '3' in the list above.
-pub type Locations = [Option<PathBuf>; 3];
-type Times = [Option<SystemTime>; 3];
-
-pub fn are_locations_same(loc1: &Locations, loc2: &Locations) -> bool {
-    return loc1[0] == loc2[0] &&
-           loc1[1] == loc2[1] &&
-           loc1[2] == loc2[2];
-}
-
-#[derive(Debug, Clone, Default)]
-struct FileAndTime {
-    files: Locations,
-    times: Times             // ~time file was read (used to see if it was updated and needs to be re-read) 
-}
-
-impl PartialEq for FileAndTime {
-    fn eq(&self, other: &Self) -> bool {
-        let is_equal = self.files[0] == other.files[0] && self.times[0] == other.times[0];  // '0' always exists
-        if !is_equal || self.files[1].is_none() {
-            return is_equal;
-        }
-        let is_equal = self.files[1] == other.files[1] && self.times[1] == other.times[1];
-        if !is_equal || self.files[2].is_none() {
-            return is_equal;
-        }
-        return self.files[2] == other.files[2] && self.times[2] == other.times[2];
-    }
-}
-impl Eq for FileAndTime {}
-
-impl FileAndTime {
-    fn invalidate(&mut self) {
-        // just enough so that is_valid() will say that this does match a flushed out value
-        self.files[0] = None;
-    }
-
-    fn is_valid(&self) -> bool {
-        return self.files[0].is_some();
-    }
-}
-
-pub fn is_valid(locations: &Locations) -> bool {
-    return locations[0].is_some();
-}
-
 thread_local!{
     static DEFAULT_USER_PREFERENCES: Preferences = Preferences::user_defaults();
     static DEFAULT_API_PREFERENCES: Preferences = Preferences::api_defaults();
@@ -314,24 +216,24 @@ thread_local!{
 //   Also note that if 'error' is not an empty string, SpeechRules can't work so using those requires a check.
 #[derive(Debug, Default)]
 pub struct PreferenceManager {
-    rules_dir: Option<PathBuf>,         // full path to rules dir
-    error: String,                      // empty/default string if fields are set, otherwise error message
-    user_prefs: Preferences,            // prefs that come from reading prefs.yaml (system and user locations)
-    api_prefs: Preferences,             // prefs set by API calls (along with some defaults not in the user settings such as "pitch")
-    pref_files: FileAndTime,            // the "raw" user preference files (converted to 'user_prefs')
-    intent: FileAndTime,                // the intent rule style file(s)
-    speech: FileAndTime,                // the speech rule style file(s)
-    overview: FileAndTime,              // the overview rule file(s)
-    navigation: FileAndTime,            // the navigation rule file(s)
-    speech_unicode: FileAndTime,        // short unicode.yaml file(s)
-    speech_unicode_full: FileAndTime,   // full unicode.yaml file(s)
-    braille: FileAndTime,               // the braille rule file
-    braille_unicode: FileAndTime,       // short braille unicode file
-    braille_unicode_full: FileAndTime,  // full braille unicode file
-    speech_defs: FileAndTime,           // the definition.yaml file(s)
-    braille_defs: FileAndTime,           // the definition.yaml file(s)
+    rules_dir: PathBuf,                   // full path to rules dir
+    error: String,                        // empty/default string if fields are set, otherwise error message
+    user_prefs: Preferences,              // prefs that come from reading prefs.yaml (system and user locations)
+    api_prefs: Preferences,               // prefs set by API calls (along with some defaults not in the user settings such as "pitch")
+    sys_prefs_file: Option<FileAndTime>,  // the system prefs.yaml file
+    user_prefs_file: Option<FileAndTime>, // the user prefs.yaml file
+    intent: PathBuf,                      // the intent rule style file
+    speech: PathBuf,                      // the speech rule style file
+    overview: PathBuf,                    // the overview rule file
+    navigation: PathBuf,                  // the navigation rule file
+    speech_unicode: PathBuf,              // short unicode.yaml file
+    speech_unicode_full: PathBuf,         // full unicode.yaml file
+    speech_defs: PathBuf,                 // the definition.yaml file
+    braille: PathBuf,                     // the braille rule file
+    braille_unicode: PathBuf,             // short braille unicode file
+    braille_unicode_full: PathBuf,        // full braille unicode file
+    braille_defs: PathBuf,                // the definition.yaml file
 }
-
 
 
 impl fmt::Display for PreferenceManager {
@@ -342,68 +244,13 @@ impl fmt::Display for PreferenceManager {
         } else {
             writeln!(f, "  user prefs:\n{}", self.user_prefs)?;
             writeln!(f, "  api prefs:\n{}", self.api_prefs)?;
-            writeln!(f, "  style files: {:?}", self.speech.files)?;
-            writeln!(f, "  unicode files: {:?}", self.speech_unicode.files)?;
-            writeln!(f, "  intent files: {:?}", self.intent.files)?;
-            writeln!(f, "  speech definition files: {:?}", self.speech_defs.files)?;
-            writeln!(f, "  braille definition files: {:?}", self.braille_defs.files)?;
+            writeln!(f, "  style files: {:?}", self.speech.as_path())?;
+            writeln!(f, "  unicode files: {:?}", self.speech_unicode.as_path())?;
+            writeln!(f, "  intent files: {:?}", self.intent.as_path())?;
+            writeln!(f, "  speech definition files: {:?}", self.speech_defs)?;
+            writeln!(f, "  braille definition files: {:?}", self.braille_defs)?;
         }
         return Ok(());
-    }
-}
-
-#[derive(Default)]
-pub struct FilesChanged {
-    pub speech_rules: bool,
-    pub speech_unicode_short: bool,
-    pub speech_unicode_full: bool,
-    pub braille_rules: bool,
-    pub braille_unicode_short: bool,
-    pub braille_unicode_full: bool,
-    pub intent: bool,
-    pub speech_defs: bool,
-    pub braille_defs: bool,
-    pub navigate_rules: bool,
-    pub overview_rules: bool,
-}
-
-impl fmt::Display for FilesChanged {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "FilesChanged {{\n  Speech: rules {}, short {}, full {}", self.speech_rules, self.speech_unicode_short, self.speech_unicode_full)?;
-        writeln!(f, "  Braille: rules {}, short {}, full {}", self.braille_rules, self.braille_unicode_short, self.braille_unicode_full)?;
-        writeln!(f, "  Intent {}, Defs {}/{}", self.intent, self.speech_defs, self.braille_defs)?;
-        return Ok(());
-    }
-}
-
-impl FilesChanged {
-    pub fn new(pref_name: &str) -> Option<FilesChanged> {
-        return match pref_name {
-            "Language" => Some(FilesChanged{
-                speech_rules: true,
-                speech_unicode_short: true,
-                speech_unicode_full: true,
-                braille_rules: false,
-                braille_unicode_short: false,
-                braille_unicode_full: false,
-                intent: false,
-                speech_defs: true,
-                braille_defs: true,
-                navigate_rules: true,
-                overview_rules: true,
-            }),
-            "SpeechStyle" => Some( FilesChanged {
-                speech_rules: true, 
-                ..Default::default()
-            }),
-            "BrailleCode" => Some( FilesChanged {
-                braille_rules: true, 
-                braille_unicode_short: true, 
-                braille_unicode_full: true, 
-                ..Default::default()
-            }),
-            _ => None,
-        }
     }
 }
 
@@ -413,45 +260,18 @@ impl PreferenceManager {
     /// 
     /// If rules_dir is an empty PathBuf, the existing rules_dir is used (an error if it doesn't exist)
     pub fn initialize(&mut self, rules_dir: PathBuf) -> Result<()> {
-        let mut rules_dir = rules_dir;
-        if rules_dir.as_os_str().is_empty() {
-            assert!(self.rules_dir.is_some());
-            rules_dir = self.rules_dir.clone().unwrap();
-        }
-
-        // first, read in the preferences -- need to determine which files to read next
-        // the prefs files are in the rules dir and the user dir; differs from other files
-        if self.api_prefs.prefs.is_empty() {
-            self.api_prefs = Preferences{ prefs: DEFAULT_API_PREFERENCES.with(|defaults| defaults.prefs.clone()) };
-        }
-
-        let pref_files;
-        if  self.user_prefs.prefs.is_empty() || !PreferenceManager::is_file_up_to_date(&self.pref_files) {
-            let (user_prefs, pref_files_internal) = Preferences::from_file(&rules_dir)?;
-            self.user_prefs = user_prefs;
-            pref_files = Some(pref_files_internal);
-        } else {
-            pref_files = None;
-        }
-
-        match PreferenceManager::find_rules_dir(&rules_dir) {
-            Ok(rules_dir) => {
-                #[allow(clippy::unnecessary_unwrap)]  // using 'if let...' is messy here
-                let pref_files = if pref_files.is_some() {pref_files.unwrap()} else {Preferences::get_prefs_file_and_time(&rules_dir)};
-                match self.set_all_files(&rules_dir, pref_files) {
-                    Ok(_) => {
-                        self.error = String::new();
-                        return Ok(())
-                    },
-                    Err(e) => self.error = errors_to_string(&e),
-                }
-            },
-            Err(e) => {
-                self.error = errors_to_string(&e);
-            },
+        #[cfg(not(target_family = "wasm"))]
+        let rules_dir = match rules_dir.canonicalize() {
+            Err(e) => bail!("set_rules_dir: could not canonicalize path {}: {}", rules_dir.display(), e.to_string()),
+            Ok(rules_dir) =>  rules_dir,
         };
-        bail!("{}", self.error);
+
+        self.set_rules_dir(&rules_dir)?;
+        self.set_preference_files()?;
+        self.set_all_files(&rules_dir)?;
+        return Ok( () );
     }
+
 
     pub fn get() -> Rc<RefCell<PreferenceManager>> {
         return PREF_MANAGER.with( |pm| pm.clone() );
@@ -468,156 +288,285 @@ impl PreferenceManager {
         return merged_prefs;
     }
 
-    fn set_all_files(&mut self, rules_dir: &Path, pref_files: FileAndTime) -> Result<()> {
-        // try to find ./Rules/lang/style.yaml and ./Rules/lang/style.yaml
-        // we go through a series of fallbacks -- we try to maintain the language if possible
-
-        let style_file_name = self.pref_to_string("SpeechStyle") + "_Rules.yaml";
-        // FIX: should look for other style files in the same language dir if one is not found before move to default
-        
-        let language = self.pref_to_string("Language");
-        let language = if language.as_str() == "Auto" {"en"} else {language.as_str()};       // avoid 'temp value dropped while borrowed' error
-
-        self.rules_dir = Some(rules_dir.to_path_buf());
-        self.pref_files = pref_files;
-        let mut speech_rules_dir = rules_dir.to_path_buf();
-        speech_rules_dir.push("Languages");
-
-    
-        PreferenceManager::set_file_and_time(
-            &speech_rules_dir, language, Some("en"), &style_file_name, &mut self.speech)?;
-        PreferenceManager::set_file_and_time(
-            &speech_rules_dir, language, Some("en"), "overview.yaml", &mut self.overview)?;
-        PreferenceManager::set_file_and_time(
-            &speech_rules_dir, language, Some("en"), "navigate.yaml", &mut self.navigation)?;
-
-        PreferenceManager::set_file_and_time(
-            &speech_rules_dir, language, Some("en"), "unicode.yaml", &mut self.speech_unicode)?;
-        PreferenceManager::set_file_and_time(
-            &speech_rules_dir, language, Some("en"), "unicode-full.yaml", &mut self.speech_unicode_full)?;
-
-        let mut braille_rules_dir = rules_dir.to_path_buf();
-        braille_rules_dir.push("Braille");
-        let braille_code = self.pref_to_string("BrailleCode");
-        let braille_file = braille_code.clone() + "_Rules.yaml";
-        PreferenceManager::set_file_and_time(
-            &braille_rules_dir, &braille_code, Some("Nemeth"), &(braille_file), &mut self.braille)?;
-
-        PreferenceManager::set_file_and_time(
-            &braille_rules_dir, &braille_code, Some("Nemeth"), "unicode.yaml", &mut self.braille_unicode)?;
-        PreferenceManager::set_file_and_time(
-            &braille_rules_dir, &braille_code, Some("Nemeth"), "unicode-full.yaml", &mut self.braille_unicode_full)?;
-        PreferenceManager::set_file_and_time(
-            &speech_rules_dir, language, Some("en"), "intent.yaml", &mut self.intent)?;
-        PreferenceManager::set_file_and_time(
-            &speech_rules_dir, language, Some("en"), "definitions.yaml", &mut self.speech_defs)?;
-
-        // FIX: this is hack -- it should probably be part of the braille rules. See #12
-        let lang_for_braille = match self.pref_to_string("BrailleCode").as_str() {
-            "Vietnam" => "vi",
-            "CMU" => if language == "pt" {"pt"} else {"es"},
-            "UEB" => "en",
-            "Nemeth" | _ => if language == "el" {"el"} else {"en"},
-        };
-        PreferenceManager::set_file_and_time(
-            &speech_rules_dir, lang_for_braille, Some("en"), "definitions.yaml", &mut self.braille_defs)?;
-        return Ok(());
-    }
-
-
-    fn set_file_and_time(rules_dir: &Path, lang: &str, default_lang: Option<&str>, file_name: &str, file_and_time: &mut FileAndTime) -> Result<()> {
-        if file_and_time.is_valid() {
-            return Ok( () );
+    /// Set the rules dir and return failure if it is a bad directory (non-existent, can't find all files, ...)
+    fn set_rules_dir(&mut self, rules_dir: &Path) -> Result<()> {
+        // Fix: should make sure all files exists -- fail if not true
+        if !is_dir_shim(rules_dir) {
+            bail!("Unable to find MathCAT Rules directory '{}'", rules_dir.to_string_lossy())
         }
-
-        file_and_time.files = PreferenceManager::get_files(rules_dir, lang, default_lang, file_name)?;
-        let files = &file_and_time.files;
-        file_and_time.times = if cfg!(target_family = "wasm") {
-            [None, None, None]
-        } else {
-            [PreferenceManager::get_metadata(&files[0]), PreferenceManager::get_metadata(&files[1]), PreferenceManager::get_metadata(&files[2])]
-        };
+        self.rules_dir = rules_dir.to_path_buf();
         return Ok( () );
     }
 
-    fn get_metadata(path: &Option<PathBuf>) -> Option<SystemTime> {
-        use std::fs;
-        if let Some(path) = path {
-            let metadata = fs::metadata(path);
-            if let Ok(metadata) = metadata {
-                if let Ok(mod_time) = metadata.modified() {
-                    return Some(mod_time);
-                }
-            }
+    /// Read the preferences from the files (if not up to date) and set the preferences and preference files
+    /// Returns failure if the files don't exist or have errors
+    pub fn set_preference_files(&mut self) -> Result<()> {
+        // first, read in the preferences -- need to determine which files to read next
+        // the prefs files are in the rules dir and the user dir; differs from other files
+        if self.api_prefs.prefs.is_empty() {
+            self.api_prefs = Preferences{ prefs: DEFAULT_API_PREFERENCES.with(|defaults| defaults.prefs.clone()) };
         }
-        return None;
+
+        let should_update_system_prefs = self.sys_prefs_file.is_none() || !self.sys_prefs_file.as_ref().unwrap().is_up_to_date();
+        let should_update_user_prefs = self.user_prefs_file.is_none() || !self.user_prefs_file.as_ref().unwrap().is_up_to_date();
+        if !(should_update_system_prefs || should_update_user_prefs) {
+            return Ok( () );            // no need to do anything else
+        }
+
+        let mut prefs = Preferences::default();
+
+        let mut system_prefs_file = self.rules_dir.to_path_buf();
+        system_prefs_file.push("prefs.yaml");
+        if is_file_shim(&system_prefs_file) {
+            let defaults = DEFAULT_USER_PREFERENCES.with(|defaults| defaults.clone());
+            prefs = Preferences::read_prefs_file(&system_prefs_file, defaults)?;
+            self.sys_prefs_file = Some( FileAndTime::new_with_time(system_prefs_file.clone()) );
+        } else {
+            error!("MathCAT couldn't open file system preference file '{}'.\nUsing fallback defaults which may be inappropriate.",
+                        system_prefs_file.to_str().unwrap());
+        };
+
+        let mut user_prefs_file = dirs::config_dir();
+        if let Some(mut user_prefs_file_path_buf) = user_prefs_file {
+            user_prefs_file_path_buf.push("MathCAT/prefs.yaml");
+            if is_file_shim(&user_prefs_file_path_buf) {
+                prefs = Preferences::read_prefs_file(&user_prefs_file_path_buf, prefs)?;
+            }
+            // set the time otherwise keeps needing to do updates
+            self.user_prefs_file = Some( FileAndTime::new_with_time(user_prefs_file_path_buf.clone()) );
+            user_prefs_file = Some(user_prefs_file_path_buf);
+        }
+
+        if prefs.prefs.is_empty() {
+            let user_prefs_file_name = match user_prefs_file {
+                None => "No user config directory".to_string(),
+                Some(file) => file.to_string_lossy().to_string(),
+            };
+            bail!("Didn't find preferences in rule directory ('{}') or user directory ('{}')", &system_prefs_file.to_string_lossy(), user_prefs_file_name);
+        }
+        self.set_files_based_on_changes(&prefs)?;
+        self.user_prefs = prefs;
+
+        // set computed values for BLOCK_SEPARATORS and DECIMAL_SEPARATORS (a little messy about the language due immutable and mutable borrows)
+        let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone();
+        let language = language.as_str().unwrap();
+        self.set_separators(language)?;
+        
+        return Ok( () );
     }
 
-   fn get_files(rules_dir: &Path, lang: &str, default_lang: Option<&str>, file_name: &str) -> Result<Locations> {
+    fn set_all_files(&mut self, rules_dir: &Path) -> Result<()> {
+        // try to find ./Rules/lang/style.yaml and ./Rules/lang/style.yaml
+        // we go through a series of fallbacks -- we try to maintain the language if possible
+
+        let language = self.pref_to_string("Language");
+        let language = if language.as_str() == "Auto" {"en"} else {language.as_str()};       // avoid 'temp value dropped while borrowed' error
+        let language_dir = rules_dir.to_path_buf().join("Languages");
+        self.set_speech_files(&language_dir, language, None)?;  // also sets style file
+
+        let braille_code = self.pref_to_string("BrailleCode");
+        let braille_dir = rules_dir.to_path_buf().join("Braille");
+        self.set_braille_files(&braille_dir, &braille_code)?;
+        return Ok(());
+    }
+
+    fn set_speech_files(&mut self, language_dir: &Path, language: &str, new_speech_style: Option<&str>) -> Result<()> {
+        PreferenceManager::unzip_files(language_dir, language, Some("en"))?;
+        self.intent = PreferenceManager::find_file(language_dir, language, Some("en"), "intent.yaml")?;
+        self.overview = PreferenceManager::find_file(language_dir, language, Some("en"), "overview.yaml")?;
+        self.navigation = PreferenceManager::find_file(language_dir, language, Some("en"), "navigate.yaml")?;
+
+        self.speech_unicode = PreferenceManager::find_file(language_dir, language, Some("en"), "unicode.yaml")?;
+        self.speech_unicode_full = PreferenceManager::find_file(language_dir, language, Some("en"), "unicode-full.yaml")?;
+
+        self.speech_defs = PreferenceManager::find_file(language_dir, language, Some("en"), "definitions.yaml")?;
+
+        match new_speech_style {
+            Some(style_name) => self.set_style_file(language_dir, language, style_name)?,
+            // use the old style name if one isn't given
+            None => self.set_style_file(language_dir, language, &self.pref_to_string("SpeechStyle"))?,
+        }
+        return Ok( () );
+    }
+
+    fn set_style_file(&mut self, language_dir: &Path, language: &str, style_file_name: &str) -> Result<()> {
+        let style_file_name = style_file_name.to_string() + "_Rules.yaml";
+        self.speech = PreferenceManager::find_file(language_dir, language, Some("en"), &style_file_name)?;
+        return Ok( () );
+    }
+
+    fn set_braille_files(&mut self, braille_rules_dir: &Path, braille_code_name: &str) -> Result<()> {
+        // Fix: Currently the braille code and the directory it lives in have to have the same name
+        PreferenceManager::unzip_files(braille_rules_dir, braille_code_name, Some("UEB"))?;
+
+        let braille_file = braille_code_name.to_string() + "_Rules.yaml";
+
+        self.braille = PreferenceManager::find_file(braille_rules_dir, braille_code_name, Some("UEB"), &(braille_file))?;
+
+        self.braille_unicode = PreferenceManager::find_file(braille_rules_dir, braille_code_name, Some("UEB"), "unicode.yaml")?;
+        self.braille_unicode_full = PreferenceManager::find_file(braille_rules_dir, braille_code_name, Some("UEB"), "unicode-full.yaml")?;
+
+        self.braille_defs = PreferenceManager::find_file(braille_rules_dir, braille_code_name, Some("UEB"), "definitions.yaml")?;
+        return Ok( () );
+    }
+
+    /// If some preferences have changed, we may need to recompute other ones
+    /// The key prefs are Language, SpeechStyle, and BrailleCode, along with DecimalSeparator
+    fn set_files_based_on_changes(&mut self, new_prefs: &Preferences) -> Result<()> {
+        let old_language = self.user_prefs.prefs.get("Language");       // not set if first time
+        if old_language.is_none() {
+            return Ok( () );            // if "Language" isn't set yet, nothing else is either -- first time through, so no updating needed.
+        }
+
+        let old_language = old_language.unwrap();
+        let new_language = new_prefs.prefs.get("Language").unwrap();
+        if old_language != new_language {
+            let language_dir = self.rules_dir.to_path_buf().join("Languages");
+            self.set_speech_files(&language_dir, new_language.as_str().unwrap(), None)?;  // also sets style file
+        } else {
+            let old_speech_style = self.user_prefs.prefs.get("SpeechStyle").unwrap();
+            let new_speech_style = new_prefs.prefs.get("SpeechStyle").unwrap();
+            let language_dir = self.rules_dir.to_path_buf().join("Languages");
+            if old_speech_style != new_speech_style {
+                self.set_speech_files(&language_dir, new_language.as_str().unwrap(), new_speech_style.as_str())?;
+            }
+        }
+
+        let old_braille_code = self.user_prefs.prefs.get("BrailleCode").unwrap();
+        let new_braille_code = new_prefs.prefs.get("BrailleCode").unwrap();
+        if old_braille_code != new_braille_code {
+            let braille_code_dir = self.rules_dir.to_path_buf().join("Braille");
+            self.set_braille_files(&braille_code_dir, new_braille_code.as_str().unwrap())?;  // also sets style file
+        }
+
+        return Ok( () );
+    }
+
+    /// Unzip the files if needed
+    /// Returns true if it unzipped them
+    pub fn unzip_files(path: &Path, language: &str, default_lang: Option<&str>) -> Result<bool> {
+        thread_local!{
+            /// when a language/braille code dir is unzipped, it is recorded here
+            static UNZIPPED_FILES: RefCell<HashSet<String>> = RefCell::new( HashSet::with_capacity(31));
+        }
+        
+        // ignore regional subdirs
+        let dir = PreferenceManager::get_language_dir(path, language, default_lang)?;
+        let zip_file_name = language.to_string() + ".zip";
+        let zip_file_path = dir.join(&zip_file_name);
+        let zip_file_string = zip_file_path.to_string_lossy().to_string();
+        if UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow().contains(&zip_file_string)) {
+            return Ok(false);
+        }
+
+        let result = match zip_extract_shim(&dir, &zip_file_name) {
+            Err(e) => {
+                if language.contains('-') {
+                    // try again in parent dir of regional language
+                    let language = language.split('-').next().unwrap_or(language);
+                    return PreferenceManager::unzip_files(path, language, default_lang);
+                }
+                bail!("Couldn't open zip file {}: {}.", zip_file_string, e)
+            },
+            Ok(result) => {
+                result
+            },
+        };
+        UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow_mut().insert(zip_file_string) );
+        return Ok(result);
+    }
+
+    /// Set BlockSeparators and DecimalSeparators
+    /// FIX: changing these values could change the parse, so we really should reparse the original expr, but that doesn't exist anymore (store the original string???)
+    fn set_separators(&mut self, language_country: &str) -> Result<()> {
+        // This list was generated from https://en.wikipedia.org/wiki/Decimal_separator#Countries_using_decimal_point
+        // The countries were then mapped to language(s) using https://en.wikipedia.org/wiki/List_of_official_languages_by_country_and_territory
+        // When a language was used in other countries that used a "," separator, the language+country is listed 
+        //   Sometimes there are multiple languages used in a country -- they are all listed, sometimes with a country code
+        // The country code isn't used when the language is used in smaller countries (i.e, when "." is more likely correct)
+        //   This decision is sometimes a bit arbitrary
+        //   For example, Swahili (sw) is used in: Democratic Republic of the Congo, Kenya, Rwanda, Tanzania, and Uganda.
+        //   Of these, Kenya, Tanzania, and Uganda are listed as using "." and I include Swahili in the list below.
+        static USE_DECIMAL_SEPARATOR: phf::Set<&str> = phf_set! {
+            "en", "bn", "km", "el-cy", "tr-cy", "zh", "es-do", "ar", "es-sv", "es-gt", "es-hn", "hi", "as", "gu", "kn", "ks",
+            "ml", "mr", "ne", "or", "pa", "sa", "sd", "ta", "te", "ur", "he", "ja", "sw", "ko", "de-li", "ms", "dv", "mt", "es-mx", "my",
+            "af-na", "es-ni", "es-pa", "fil", "ms-sg", "si", "th",
+            "es-419", // latin america
+        };
+        
+        let decimal_separator = self.pref_to_string("DecimalSeparator");
+        if !["Auto", ",", "."].contains(&decimal_separator.as_str()) {
+            return Ok( () );
+        }
+
+        if language_country == "Auto" && decimal_separator == "Auto" {
+            return Ok( () );        // "Auto" doesn't tell us anything -- we will get called again when Language is set
+        }
+
+        let language_country = language_country.to_ascii_lowercase();
+        let language_country = &language_country;
+        let mut lang_country_split = language_country.split('-');
+        let language = lang_country_split.next().unwrap_or("");
+        let country = lang_country_split.next().unwrap_or("");
+        let mut use_period = decimal_separator == ".";
+        if decimal_separator == "Auto" {
+            // if we don't have a match for the lang-country, then just try lang
+            use_period = USE_DECIMAL_SEPARATOR.contains(language_country) || USE_DECIMAL_SEPARATOR.contains(language);
+        }
+        // debug!("set_separators: use_period: {}", use_period);
+        self.user_prefs.prefs.insert("DecimalSeparators".to_string(), Yaml::String((if use_period {"."} else {","}).to_string()));
+        let mut block_separators =  (if use_period {", \u{00A0}\u{202F}"} else {". \u{00A0}\u{202F}"}).to_string();
+        if country == "ch" || country == "li" { // Switzerland and Liechtenstein also use ` as a block separator, at least in some cases
+            block_separators.push('\'');
+        }
+        self.user_prefs.prefs.insert("BlockSeparators".to_string(), Yaml::String(block_separators));
+        return Ok( () );
+    }
+
+
+    /// Find a file matching `file_name` by starting in the regional directory and looking to the language.
+    /// If that fails, fall back to looking for the default repeating the same process -- something needs to be found or MathCAT crashes
+    fn find_file(rules_dir: &Path, lang: &str, default_lang: Option<&str>, file_name: &str) -> Result<PathBuf> {
         // rules_dir: is the root of the search
         //   to that we add the language dir(s)
         //   if file_name doesn't exist in the language dir(s), we try to find it in the default dir
         //   the exception to this is if it ends with _Rules.yaml, we look for other _Rules.yaml files
-        // returns all the locations of the file_name from Rules downward
+        // returns the location of the file_name found
 
         // start by trying to find a dir that exists
-        let mut lang_dir = get_language_dir(rules_dir, lang);
-        let mut default_lang = default_lang;
-        if lang_dir.is_none() {
-            // try again with the default lang if there is one
-            if default_lang.is_some() {
-                lang_dir = get_language_dir(rules_dir, default_lang.unwrap());
-                if lang_dir.is_none() {
-                    // We are done for -- MathCAT can't do anything without the required files!
-                    bail!("Wasn't able to find/read directory for language {}\n
-                           Wasn't able to find/read MathCAT default language directory: {}",
-                          lang, rules_dir.join(default_lang.unwrap_or("")).as_os_str().to_str().unwrap());
-                }
-
-                // the default lang dir exists -- prevent retrying with it.
-                default_lang = None;
-                warn!("Couldn't find rules for language {}, ", lang)
-            }
-        }
-
+        let lang_dir = PreferenceManager::get_language_dir(rules_dir, lang, default_lang)?;
         // now find the file name in the dirs
         // we start with the deepest dir and walk back to towards Rules
-        // since the order of the rules should be Rules, Rules/lang, Rules/lang/region,
-        //   found files are added starting at the end
-        let mut result: Locations = [None, None, None];
-        let mut i = 3;
-        let lang_dir = lang_dir.unwrap();
-        for os_path in lang_dir.ancestors() {
+        let mut alternative_style_file = None;      // back up in case we don't find the target style in lang_dir
+        let looking_for_style_file = file_name.ends_with("_Rules.yaml");
+        for os_path in lang_dir.ancestors() {   // ancestor returns self and ancestors
             let path = PathBuf::from(os_path).join(file_name);
+            // debug!("find_file: checking file: {}", path.to_string_lossy());
             if is_file_shim(&path) {
-                i -= 1;
-                result[i] =  Some(path);
+                // we make an exception for definitions.yaml -- there a language specific checks for Hundreds, etc
+                if !(file_name == "definitions.yaml" && os_path.ends_with("Rules")) {
+                    return Ok(path);
+                }
             };
+            if looking_for_style_file && alternative_style_file.is_none() {
+                if let Ok(alt_file_path) = find_any_style_file(os_path) {
+                    alternative_style_file = Some(alt_file_path);
+                }
+            }
             if os_path.ends_with("Rules") {
+                // at root of Rules directory
                 break;
             }
         }
 
-        if i < 3 {
-            result.rotate_left(i);      // move the 'None(s) to the end
-            return Ok(result);     // found at least one file
+        if let Some(result) = alternative_style_file {
+            // debug!("find_file: found alternative_style_file '{}'", result.to_string_lossy());
+            return Ok(result);     // found an alternative style file in the same lang dir
         }
 
         if let Some(default_lang) = default_lang {
-            if file_name.ends_with("_Rules.yaml") {
-                // try to find other style files
-                match get_fallback_speech_style(lang_dir.as_path()) {
-                    None => {
-                        // didn't find a file -- retry with default
-                        // FIX: give a warning that default dir is being used
-                        return PreferenceManager::get_files(rules_dir, default_lang, None, file_name);
-                    },
-                    Some(file_name) => {
-                        // found a speech style, retry with that
-                        return PreferenceManager::get_files(rules_dir, lang, Some(default_lang), &file_name);
-                    }
-                }
-            }
+            // try again with the default language (we're likely in trouble)
+            return PreferenceManager::find_file(rules_dir, default_lang, None, file_name);
         }
         
         // We are done for -- MathCAT can't do anything without the required files!
@@ -626,242 +575,87 @@ impl PreferenceManager {
                Looking for file: {}",
             rules_dir.to_str().unwrap(), lang, file_name);
 
-        fn get_language_dir(rules_dir: &Path, lang: &str) -> Option<PathBuf> {
-            // return 'Rules/Language/fr', 'Rules/Language/en/gb', etc, if they exist.
-            // fall back to main language, and then to default_dir if language dir doesn't exist
-            let mut full_path = rules_dir.to_path_buf();
-            let lang_parts = lang.split('-');
-            for part in lang_parts {
-                full_path.push(Path::new(part));
-                if !is_dir_shim(&full_path) {
-                    break;
-                }
+        // try to find a xxx_Rules.yaml file -- returns an error if none is found ()
+        fn find_any_style_file(path: &Path) -> Result<PathBuf> {    
+            // try to find a xxx_Rules.yaml file
+            // we find the first file because this is the deepest (most language specific) speech rule file
+            match find_file_in_dir_that_ends_with_shim(path, "_Rules.yaml") {
+                None => bail!{"didn't find file"},
+                Some(file_name) => return Ok(path.to_path_buf().join(file_name)),
             }
+        }
+    }
+
+    fn get_language_dir(rules_dir: &Path, lang: &str, default_lang: Option<&str>) -> Result<PathBuf> {
+        // return 'Rules/Language/fr', 'Rules/Language/en/gb', etc, if they exist.
+        // fall back to main language, and then to default_dir if language dir doesn't exist
+        let mut full_path = rules_dir.to_path_buf();
+        full_path.push(lang.replace('-', "/"));
+        for parent in full_path.ancestors() {
+            if parent == rules_dir {
+                break;
+            } else if is_dir_shim(parent) {
+                return Ok(parent.to_path_buf());
+            }
+        }
+
+        // didn't find the language -- try again with the default language
+        match default_lang {
+            Some(default_lang) => {
+                warn!("Couldn't find rules for language {}, ", lang);
+                return PreferenceManager::get_language_dir(rules_dir, default_lang, None);
+            },
+            None => {
+                // We are done for -- MathCAT can't do anything without the required files!
+                bail!("Wasn't able to find/read directory for language {}\n
+                        Wasn't able to find/read MathCAT default language directory: {}",
+                        lang, rules_dir.join(default_lang.unwrap_or("")).as_os_str().to_str().unwrap());
+            }
+        }
+    }
+
     
-            // make sure something got added...
-            if rules_dir == full_path {
-                return None;    // didn't find a dir
-            } else {
-                return Some(full_path);
-            }
-        }
-    
-        fn get_fallback_speech_style(lang_dir: &Path) -> Option<String> {
-            for os_path in lang_dir.ancestors() {
-                if os_path.ends_with("Rules") {
-                    return None;
-                }
-                let entries = match os_path.read_dir() {
-                    Err(_) => return None,          // I don't think this is possible
-                    Ok(os_path) => os_path,
-                };
-                for dir_entry in entries.flatten() {
-                    if dir_entry.file_name().to_str().unwrap_or("").ends_with("_Rules.yaml") {
-                        return Some(dir_entry.file_name().to_str().unwrap().to_string());
-                    }
-                }
-            }
-            return None;
-        }
-    }
-    
-    fn find_rules_dir(rules_dir: &Path) -> Result<PathBuf> {
-        let mut bad_env_value = String::default();
-        if let Ok(env_var) = std::env::var("MathCATRulesDir") {
-            let path_buf = PathBuf::from(&env_var);
-            if is_dir_shim(&path_buf) {
-                return Ok(path_buf);
-            }
-            bad_env_value = format!("MathCATRulesDir='{}' is not a directory -- ignoring\n", &env_var);
-            warn!("{}", &bad_env_value);
-        }
-        
-        if is_dir_shim(rules_dir) {
-            return Ok(PathBuf::from(rules_dir));
-        };
-
-        // we are done for -- can't do anything without a rules dir
-        bail!("MathCAT could not find a rules dir -- something failed in installation?\n{}Could not find rules dir in {} or lacking permissions to read the dir!",
-                    &bad_env_value, rules_dir.to_str().unwrap_or("rules dir is none???"));
-    }
-
-    pub fn is_up_to_date(&mut self) -> Result<Option<FilesChanged>> {
-        if !PreferenceManager::is_file_up_to_date(&self.pref_files) {
-            self.invalidate_old_prefs()?
-        }
-
-        let files_changed = FilesChanged {
-            speech_rules: !PreferenceManager::is_file_up_to_date(&self.speech),
-            speech_unicode_short: !PreferenceManager::is_file_up_to_date(&self.speech_unicode),
-            speech_unicode_full: !PreferenceManager::is_file_up_to_date(&self.speech_unicode_full),
-            braille_rules: !PreferenceManager::is_file_up_to_date(&self.braille),
-            braille_unicode_short: !PreferenceManager::is_file_up_to_date(&self.braille_unicode),
-            braille_unicode_full: !PreferenceManager::is_file_up_to_date(&self.braille_unicode_full),
-            intent: !PreferenceManager::is_file_up_to_date(&self.intent),
-            speech_defs: !PreferenceManager::is_file_up_to_date(&self.speech_defs),
-            braille_defs: !PreferenceManager::is_file_up_to_date(&self.braille_defs),
-            navigate_rules: !PreferenceManager::is_file_up_to_date(&self.navigation),
-            overview_rules: !PreferenceManager::is_file_up_to_date(&self.overview),
-        };
-
-        if files_changed.speech_rules ||
-           files_changed.speech_unicode_short ||
-           files_changed.speech_unicode_full ||
-           files_changed.braille_rules ||
-           files_changed.braille_unicode_short ||
-           files_changed.braille_unicode_full ||
-           files_changed.intent ||
-           files_changed.speech_defs ||
-           files_changed.braille_defs ||
-           files_changed.navigate_rules ||
-           files_changed.overview_rules {
-            return Ok( Some(files_changed) );
-        } else {
-            return Ok(None);
-        }
-    }
-
-    fn invalidate_old_prefs(&mut self) -> Result<()> {
-        // Note: to_string() is needed because &str is borrowed from self and resetting the value causes a problem
-        let old_language = self.user_prefs.prefs.get("Language").unwrap().as_str().unwrap().to_string();
-        let old_style = self.user_prefs.prefs.get("SpeechStyle").unwrap().as_str().unwrap().to_string();
-        let old_braille = self.user_prefs.prefs.get("BrailleCode").unwrap().as_str().unwrap().to_string();
-        (self.user_prefs, self.pref_files) = Preferences::from_file(self.rules_dir.as_ref().unwrap().as_path())?;
-
-        let new_language = self.user_prefs.prefs.get("Language").unwrap().as_str().unwrap().to_string();
-        let new_style = self.user_prefs.prefs.get("SpeechStyle").unwrap().as_str().unwrap().to_string();
-        let new_braille = self.user_prefs.prefs.get("BrailleCode").unwrap().as_str().unwrap().to_string();
-        if old_language != new_language {
-            self.invalidate(&FilesChanged::new("Language").unwrap());
-        }
-        if old_style != new_style {
-            self.invalidate(&FilesChanged::new("SpeechStyle").unwrap());
-        }
-        if old_braille != new_braille {
-            self.invalidate(&FilesChanged::new("BrailleCode").unwrap());
-        }
-        return Ok( () )
-    }
-
-    fn is_file_up_to_date(ft: &FileAndTime) -> bool {
-        return  ft.is_valid() &&
-                is_older(&ft.files[0], ft.times[0]) &&
-                is_older(&ft.files[1], ft.times[1]) &&
-                is_older(&ft.files[2], ft.times[2]);
-
-        fn is_older(path: &Option<PathBuf>, time: Option<SystemTime>) -> bool {
-            // if let Some(path_buf) = path {
-            //     debug!("p={}", path_buf.to_str().unwrap());
-            //     debug!("p.metadata={:?}", path_buf.metadata());
-            //     debug!("p.metadata.modified={:?}", path_buf.metadata().unwrap().modified());
-            //     debug!("p.metadata.modified.duration_since={:?}", path_buf.metadata().unwrap().modified().unwrap().duration_since(time));    
-            // }
-            return match (path, time) {
-                (Some(p), Some(t)) => {
-                    let file_mod_time = p.metadata().unwrap().modified().unwrap();
-                    return file_mod_time <= t;
-                },
-                _ => true,
-            }           
-        }
-    }
-
-    pub fn invalidate(&mut self, files_changed: &FilesChanged) {
-        if files_changed.speech_rules {
-            self.speech.invalidate();
-        }
-        if files_changed.speech_unicode_short {
-            self.speech_unicode.invalidate();
-        }
-        if files_changed.speech_unicode_full {
-            self.speech_unicode_full.invalidate();
-        }
-        if files_changed.braille_rules {
-            self.braille.invalidate();
-        }
-        if files_changed.braille_unicode_short {
-            self.braille_unicode.invalidate();
-        }
-        if files_changed.braille_unicode_full {
-            self.braille_unicode_full.invalidate();
-        }
-        if files_changed.intent {
-            self.intent.invalidate();
-        }
-        if files_changed.speech_defs {
-            self.speech_defs.invalidate();
-        }
-        if files_changed.braille_defs {
-            self.braille_defs.invalidate();
-        }
-        if files_changed.navigate_rules {
-            self.navigation.invalidate();
-        }
-        if files_changed.overview_rules {
-            self.overview.invalidate();
-        }
-    }
-
     /// Return the speech rule style file locations.
-    pub fn get_rule_file(&self, name: &RulesFor) -> &Locations {
+    pub fn get_rule_file(&self, name: &RulesFor) -> &Path {
         if !self.error.is_empty() {
             panic!("Internal error: get_rule_file called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
-        return match name {
-            RulesFor::Intent => &self.intent.files,
-            RulesFor::Speech => &self.speech.files,
-            RulesFor::OverView => &self.overview.files,
-            RulesFor::Navigation => &self.navigation.files,
-            RulesFor::Braille => &self.braille.files,
+        let files = match name {
+            RulesFor::Intent => &self.intent,
+            RulesFor::Speech => &self.speech,
+            RulesFor::OverView => &self.overview,
+            RulesFor::Navigation => &self.navigation,
+            RulesFor::Braille => &self.braille,
         };
+        return files.as_path();
     }
 
     /// Return the unicode.yaml file locations.
-    pub fn get_speech_unicode_file(&self) ->(PathBuf, PathBuf) {
+    pub fn get_speech_unicode_file(&self) ->(&Path, &Path) {
         if !self.error.is_empty() {
             panic!("Internal error: get_speech_unicode_file called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
-        return (self.speech_unicode.files[0].as_ref().unwrap().to_path_buf(), self.speech_unicode_full.files[0].as_ref().unwrap().to_path_buf());
-    }
-
-    /// Return the speech rule style file locations.
-    pub fn get_braille_file(&self) -> &Locations {
-        if !self.error.is_empty() {
-            panic!("Internal error: get_braille_file called on invalid PreferenceManager -- error message\n{}", &self.error);
-        };
-
-        return &self.braille.files;
+        return (self.speech_unicode.as_path(), self.speech_unicode_full.as_path());
     }
 
     /// Return the unicode.yaml file locations.
-    pub fn get_braille_unicode_file(&self) -> (PathBuf, PathBuf) {
+    pub fn get_braille_unicode_file(&self) -> (&Path, &Path) {
         if !self.error.is_empty() {
             panic!("Internal error: get_braille_unicode_file called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
-        return (self.braille_unicode.files[0].as_ref().unwrap().to_path_buf(), self.braille_unicode_full.files[0].as_ref().unwrap().to_path_buf());
+        return (self.braille_unicode.as_path(), self.braille_unicode_full.as_path());
     }
 
     /// Return the definitions.yaml file locations.
-    pub fn get_definitions_file(&mut self, use_speech_defs: bool) -> &Locations {
+    pub fn get_definitions_file(&self, use_speech_defs: bool) -> &Path {
         if !self.error.is_empty() {
             panic!("Internal error: get_definitions_file called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
-        if !is_valid(if use_speech_defs {&self.speech_defs.files} else {&self.braille_defs.files}) {
-            let language = self.pref_to_string("Language");
-            let language = if language.as_str() == "Auto" {"en"} else {language.as_str()};       // avoid 'temp value dropped while borrowed' error
-            if let Some(speech_rules_dir) = &self.rules_dir {  // if 'None', then initialization and it doesn't matter.
-                let mut speech_rules_dir = speech_rules_dir.clone();
-                speech_rules_dir.push("Languages");
-    
-                // by this point, prefs and files should have been set already so the call to get_files() in set_file_and_time() shouldn't fail (hence unwrap)
-                PreferenceManager::set_file_and_time(
-                    &speech_rules_dir, language, Some("en"), "definitions.yaml", if use_speech_defs {&mut self.speech_defs} else {&mut self.braille_defs}).unwrap();
-            }
-        }
-        return if use_speech_defs {&self.speech_defs.files} else {&self.braille_defs.files};
+        let defs_file = if use_speech_defs {&self.speech_defs} else {&self.braille_defs};
+        return defs_file;
     }
 
     /// Return the TTS engine currently in use.
@@ -882,12 +676,76 @@ impl PreferenceManager {
     }
 
     /// Set the string-valued preference.
-    pub fn set_api_string_pref(&mut self, key: &str, value: &str) {
+    /// 
+    /// Note: changing the language, speech style, or braille code might fail if the files don't exist.
+    ///   If this happens, the preference is not set and an error is returned.
+    /// If "LanguageAuto" is set, we assume "Language" has already be checked to be "Auto"
+    pub fn set_string_pref(&mut self, key: &str, value: &str) -> Result<()> {
         if !self.error.is_empty() {
-            panic!("Internal error: set_api_string_pref called on invalid PreferenceManager -- error message\n{}", &self.error);
+            panic!("Internal error: set_string_pref called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
-        self.api_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+        // don't do an update if the value hasn't changed
+        let mut is_user_pref = true;
+        if let Some(pref_value) = self.api_prefs.prefs.get(key) {
+            if pref_value.as_str().unwrap() != value {
+                is_user_pref = false;
+                self.reset_files_from_preference_change(key, value)?;
+            }
+        } else if let Some(pref_value) = self.user_prefs.prefs.get(key) {
+            if pref_value.as_str().unwrap() != value {
+                self.reset_files_from_preference_change(key, value)?;
+            }
+        } else {
+            bail!("{} is an unknown MathCAT preference!", key);
+        }
+
+        // debug!("Setting ({}) {} to '{}'", if is_user_pref {"user"} else {"sys"}, key, value);
+        if is_user_pref {
+            // a little messy about the DecimalSeparator due immutable and mutable borrows
+            let current_decimal_separator = self.user_prefs.prefs.get("DecimalSeparator").unwrap().clone();
+            let current_decimal_separator = current_decimal_separator.as_str().unwrap();
+            let is_decimal_separators_changed = key == "DecimalSeparator" && current_decimal_separator != value;
+            let is_language_changed = key == "Language" && self.user_prefs.prefs.get("Language").unwrap().as_str().unwrap() != value;
+            self.user_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+            if is_decimal_separators_changed || (current_decimal_separator == "Auto" && is_language_changed) {
+                // a little messy about the language due immutable and mutable borrows)
+                let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone();
+                let language = language.as_str().unwrap();
+                self.set_separators(language)?;
+            }
+        } else {
+            self.api_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+        }
+        return Ok( () );
+    }
+
+    fn reset_files_from_preference_change(&mut self, changed_pref: &str, changed_value: &str) -> Result<()> {       
+        if changed_pref == "Language" && changed_value == "Auto" {
+            // Language must have had a non-Auto value -- set LanguageAuto to old value so (probable) next change to LanguageAuto works well
+            self.api_prefs.prefs.insert("LanguageAuto".to_string(),
+                                self.api_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone() );
+            return Ok( () );
+        }
+
+        let changed_pref = if changed_pref == "LanguageAuto" {"Language"} else {changed_pref};
+        let language_dir = self.rules_dir.to_path_buf().join("Languages");
+        match changed_pref {
+            "Language" => {
+                self.set_speech_files(&language_dir, changed_value, None)?
+            },
+            "SpeechStyle" => {
+                let language = self.pref_to_string("Language");
+                let language = if language.as_str() == "Auto" {"en"} else {language.as_str()};       // avoid 'temp value dropped while borrowed' error
+                self.set_style_file(&language_dir, language, changed_value)?
+            },
+            "BrailleCode" => {
+                let braille_dir = self.rules_dir.to_path_buf().join("Braille");
+                self.set_braille_files(&braille_dir, changed_value)?
+            },
+            _ => (),
+        }
+        return Ok( () );
     }
 
     /// Set the number-valued preference.
@@ -953,20 +811,33 @@ impl PreferenceManager {
     // }
 
     /// Warning!!! This is meant for testing only -- it overwrites any values from a user pref file and will be overwritten if the file is reread.
-    /// Probably set_preference() is more appropriately called.
-    pub fn set_user_prefs(&mut self, name: &str, value: &str) {
+    ///  set_preference() is the function that should be called.
+    /// This differs from set_preference in that the user preferences are changed, not the api ones
+    pub fn set_user_prefs(&mut self, key: &str, value: &str) -> Result<()> {
         if !self.error.is_empty() {
             panic!("Internal error: set_user_prefs called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
-        self.user_prefs.set_string_value(name, value);
+        
+        self.reset_files_from_preference_change(key, value)?;
+        let is_decimal_separators_changed = key == "DecimalSeparator" && self.user_prefs.prefs.get("DecimalSeparator").unwrap().as_str().unwrap() != value;
+        let is_language_changed = key == "Language" && self.user_prefs.prefs.get("Language").unwrap().as_str().unwrap() != value;
+        self.user_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+        if is_decimal_separators_changed || is_language_changed {
+            // set computed values for BLOCK_SEPARATORS and DECIMAL_SEPARATORS (a little messy about the language due immutable and mutable borrows)
+            let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone();
+            let language = language.as_str().unwrap();
+            self.set_separators(language)?;
+        }
+
+        return Ok(());
     }
 }
 
 
 #[cfg(test)]
 mod tests {
-
-    use crate::set_preference;
+    #[allow(unused_imports)]
+    use crate::init_logger;
 
     // For these tests, it is assumed that there are Rules subdirs zz and zz/aa dir; there is no zz/ab
     // definitions.yaml is in Rules, zz, aa dirs
@@ -980,19 +851,55 @@ mod tests {
     }
     /// Return a relative path to Rules dir (ie, .../Rules/zz... returns zz/...)
     /// strip .../Rules from file path
-    fn rel_path(rules_dir: &Option<PathBuf>, path: &Option<PathBuf>) -> PathBuf {
-        match rules_dir {
-            None => panic!("Rules dir not found"),
-            Some(rules_dir) => {
-                match path {
-                    None => panic!("No path found"),
-                    Some(path) => {
-                        let stripped_path = path.strip_prefix(rules_dir).unwrap();
-                        return stripped_path.to_path_buf();        
-                    }
-                }
-            }
-        }
+    fn rel_path<'a>(rules_dir: &'a Path, path: &'a Path) -> &'a Path {
+        let stripped_path = path.strip_prefix(rules_dir).unwrap();
+        return stripped_path
+    }
+
+    #[test]
+    fn separators() {
+        PREF_MANAGER.with(|pref_manager| {
+            let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            pref_manager.set_user_prefs("Language", "en").unwrap();
+            pref_manager.set_user_prefs("DecimalSeparator", "Auto").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ".");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ", \u{00A0}\u{202F}");
+
+            pref_manager.set_user_prefs("Language", "sv").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ",");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ". \u{00A0}\u{202F}");
+
+            // test potentially ambiguous language (defaults to comma decimal separator)
+            pref_manager.set_user_prefs("Language", "es").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ",");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ". \u{00A0}\u{202F}");
+
+            // test country override
+            pref_manager.set_user_prefs("Language", "es-mx").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ".");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ", \u{00A0}\u{202F}");
+
+            pref_manager.set_user_prefs("DecimalSeparator", ",").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ",");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ". \u{00A0}\u{202F}");
+
+            pref_manager.set_user_prefs("DecimalSeparator", ".").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ".");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ", \u{00A0}\u{202F}");
+
+            // set to illegal value -- should leave values as before
+            pref_manager.set_user_prefs("DecimalSeparator", ";").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ".");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ", \u{00A0}\u{202F}");
+
+            // manual
+            pref_manager.set_user_prefs("DecimalSeparators", ",").unwrap();
+            pref_manager.set_user_prefs("BlockSeparators", " ").unwrap();
+            pref_manager.set_user_prefs("DecimalSeparator", "None").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ",");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), " ");
+        });
     }
 
     #[test]
@@ -1000,40 +907,55 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Language", "en");
-            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
-            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
-            pref_manager.initialize(PathBuf::new()).unwrap();
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
+            pref_manager.set_user_prefs("Language", "en").unwrap();
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("Language"), "en");
+            assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "ClearSpeak");
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
         });
     }
 
     #[test]
     fn find_style_other_language() {
+        // zz dir should have both ClearSpeak and SimpleSpeak styles
+        // zz-aa dir should have only ClearSpeak style and unicode.yaml that includes the zz unicode but overrides "+"
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Language", "en");
-            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
-            pref_manager.set_user_prefs("Language", "zz");
-            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
-            pref_manager.initialize(PathBuf::new()).unwrap();
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+            pref_manager.set_user_prefs("Language", "en").unwrap();
+            pref_manager.set_user_prefs("SpeechStyle", "SimpleSpeak").unwrap();
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/en/SimpleSpeak_Rules.yaml"));
+
+            pref_manager.set_user_prefs("Language", "zz").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("Language"), "zz");
+            assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "SimpleSpeak");
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/SimpleSpeak_Rules.yaml"));
+
+            // make sure language stays the same
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "ClearSpeak");
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+
+            // make sure language stays the same
+            pref_manager.set_user_prefs("SpeechStyle", "SimpleSpeak").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "SimpleSpeak");
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/SimpleSpeak_Rules.yaml"));
         });
     }
 
     #[test]
-    fn find_unicode_files() {
+    fn find_regional_overrides() {
+        // zz dir should have both ClearSpeak and SimpleSpeak styles
+        // zz-aa dir should have ClearSpeak style and unicode.yaml that includes the zz unicode but overrides "+"
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
-            pref_manager.set_user_prefs("Language", "zz-aa");
-            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
-            pref_manager.initialize(PathBuf::new()).unwrap();
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap();
+            pref_manager.set_user_prefs("Language", "zz-aa").unwrap();
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/aa/ClearSpeak_Rules.yaml"));
 
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[1]), PathBuf::from("Languages/zz/aa/ClearSpeak_Rules.yaml"));
+            pref_manager.set_user_prefs("SpeechStyle", "SimpleSpeak").unwrap();
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/SimpleSpeak_Rules.yaml"));
         });
     }
 
@@ -1042,121 +964,101 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
-            pref_manager.set_user_prefs("Language", "zz-ab");
-            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
-            pref_manager.initialize(PathBuf::new()).unwrap();
-
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap();
+            pref_manager.set_user_prefs("Language", "zz-ab").unwrap();
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
         });
     }
 
     #[test]
     fn found_all_files() {
-        fn count_files(ft: &FileAndTime) -> usize {
-            return ft.files.iter().filter(|path| path.is_some()).count();
-        }
-        fn assert_helper(count: usize, correct: usize, file_name: &str) {
-            assert_eq!(count, correct, "In looking for '{}', found {} files, should have found {}", 
-                    file_name, count, correct);
-        }
-
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
-            pref_manager.set_user_prefs("Language", "zz-aa");
-            pref_manager.set_user_prefs("BrailleCode", "UEB");
-            let mut files_changed = FilesChanged::new("Language").unwrap();
-            files_changed.braille_rules = true;
-            files_changed.braille_unicode_short = true;
-            files_changed.braille_unicode_full = true;
-            pref_manager.invalidate(&files_changed);
-            pref_manager.initialize(PathBuf::new()).unwrap();
-            
-            assert_helper(count_files(&pref_manager.speech), 2, "ClearSpeak_Rules.yaml");
-            assert_helper(count_files(&pref_manager.speech_unicode), 1, "unicode.yaml");
-            assert_helper(count_files(&pref_manager.braille), 1, "Nemeth_Rules.yaml");
-            assert_helper(count_files(&pref_manager.braille_unicode), 1, "unicode.yaml");
-            assert_helper(count_files(&pref_manager.intent), 1, "intent.yaml");
-            assert_helper(count_files(&pref_manager.speech_defs), 3,"definitions.yaml");
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap();
+            pref_manager.set_user_prefs("Language", "zz-aa").unwrap();
+            pref_manager.set_user_prefs("BrailleCode", "UEB").unwrap();
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.intent.as_path()), PathBuf::from("intent.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.overview.as_path()), PathBuf::from("Languages/zz/overview.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech_defs.as_path()), PathBuf::from("Languages/zz/aa/definitions.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/aa/ClearSpeak_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech_unicode.as_path()), PathBuf::from("Languages/zz/aa/unicode.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech_unicode_full.as_path()), PathBuf::from("Languages/zz/unicode-full.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.braille.as_path()), PathBuf::from("Braille/UEB/UEB_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.braille_unicode.as_path()), PathBuf::from("Braille/UEB/unicode.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.braille_unicode_full.as_path()), PathBuf::from("Braille/UEB/unicode-full.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.braille_defs.as_path()), PathBuf::from("Braille/UEB/definitions.yaml"));
     
-            pref_manager.set_user_prefs("Language", "zz-ab");
-            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
-            pref_manager.initialize(PathBuf::new()).unwrap();
-
-            assert_helper(count_files(&pref_manager.speech), 1, "ClearSpeak_Rules.yaml");
-            assert_helper(count_files(&pref_manager.speech_unicode), 1, "unicode.yaml");
-            assert_helper(count_files(&pref_manager.braille), 1, "Nemeth_Rules.yaml");
-            assert_helper(count_files(&pref_manager.braille_unicode), 1, "unicode.yaml");
-            assert_helper(count_files(&pref_manager.intent), 1, "intent.yaml");
-            assert_helper(count_files(&pref_manager.speech_defs), 2, "definitions.yaml");
+            pref_manager.set_user_prefs("Language", "zz-ab").unwrap();
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.intent.as_path()), PathBuf::from("intent.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.overview.as_path()), PathBuf::from("Languages/zz/overview.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech_defs.as_path()), PathBuf::from("Languages/zz/definitions.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech_unicode.as_path()), PathBuf::from("Languages/zz/unicode.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech_unicode_full.as_path()), PathBuf::from("Languages/zz/unicode-full.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.braille.as_path()), PathBuf::from("Braille/UEB/UEB_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.braille_unicode.as_path()), PathBuf::from("Braille/UEB/unicode.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.braille_unicode_full.as_path()), PathBuf::from("Braille/UEB/unicode-full.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.braille_defs.as_path()), PathBuf::from("Braille/UEB/definitions.yaml"));
         })
-    }
-
-    #[test]
-    fn file_found_order() {
-        PREF_MANAGER.with(|pref_manager| {
-            let mut pref_manager = pref_manager.borrow_mut();
-            pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Language", "zz-aa");
-            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
-            pref_manager.initialize(PathBuf::new()).unwrap();
-
-            let mut iter = pref_manager.speech_defs.files.iter();
-            assert_eq!(rel_path(&pref_manager.rules_dir, iter.next().unwrap()), Path::new("definitions.yaml"));
-            assert_eq!(rel_path(&pref_manager.rules_dir, iter.next().unwrap()), Path::new("Languages/zz/definitions.yaml"));
-            assert_eq!(rel_path(&pref_manager.rules_dir, iter.next().unwrap()), Path::new("Languages/zz/aa/definitions.yaml"));
-            assert_eq!(iter.next(), None, "Should not be any files left")
-        });
     }
 
     #[test]
     fn test_prefs() {
         PREF_MANAGER.with(|pref_manager| {
-            let mut pref_manager = pref_manager.borrow_mut();
-            pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            // first test with internal settings
+            {
+                let mut pref_manager = pref_manager.borrow_mut();
+                pref_manager.initialize(abs_rules_dir_path()).unwrap();
+    
+                pref_manager.set_user_prefs("Language", "en").unwrap();
+                pref_manager.set_user_prefs("ClearSpeak_AbsoluteValue", "Determinant").unwrap();
+                pref_manager.set_user_prefs("ResetNavMode", "true").unwrap();
+                pref_manager.set_user_prefs("BrailleCode", "Nemeth").unwrap();
+                assert_eq!(pref_manager.pref_to_string("Language").as_str(), "en");
+                assert_eq!(pref_manager.pref_to_string("SubjectArea").as_str(), "General");
+                assert_eq!(pref_manager.pref_to_string("ClearSpeak_AbsoluteValue").as_str(), "Determinant");
+                assert_eq!(pref_manager.pref_to_string("ResetNavMode").as_str(), "true");
+                assert_eq!(pref_manager.pref_to_string("BrailleCode").as_str(), "Nemeth");
+                assert_eq!(pref_manager.pref_to_string("X_Y_Z").as_str(), NO_PREFERENCE);
+            }
 
-            pref_manager.set_user_prefs("Language", "en");
-            pref_manager.set_user_prefs("SubjectArea", "General");
-            pref_manager.set_user_prefs("ClearSpeak_AbsoluteValue", "Auto");
-            pref_manager.set_user_prefs("ResetNavMode", "false");
-            pref_manager.set_user_prefs("BrailleCode", "Nemeth");
-            let mut files_changed = FilesChanged::new("Language").unwrap();
-            files_changed.braille_rules = true;
-            files_changed.braille_unicode_short = true;
-            files_changed.braille_unicode_full = true;
-            pref_manager.invalidate(&files_changed);
-            pref_manager.initialize(PathBuf::new()).unwrap();
+            // now test with the interface
+            {
+                use crate::interface::{set_preference, get_preference};
+                set_preference("Language".to_string(), "zz".to_string()).unwrap();
+                set_preference("ClearSpeak_AbsoluteValue".to_string(), "Cardinality".to_string()).unwrap();
+                set_preference("Overview".to_string(), "true".to_string()).unwrap();
+                set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
+                assert_eq!(&get_preference("Language".to_string()).unwrap(), "zz");
+                assert_eq!(&get_preference("ClearSpeak_AbsoluteValue".to_string()).unwrap(), "Cardinality");
+                assert_eq!(&get_preference("Overview".to_string()).unwrap(), "true");
+                assert_eq!(&get_preference("BrailleCode".to_string()).unwrap(), "UEB");
+                assert!(&get_preference("X_Y_Z".to_string()).is_err());
 
-            assert_eq!(pref_manager.pref_to_string("Language").as_str(), "en");
-            assert_eq!(pref_manager.pref_to_string("SubjectArea").as_str(), "General");
-            assert_eq!(pref_manager.pref_to_string("ClearSpeak_AbsoluteValue").as_str(), "Auto");
-            assert_eq!(pref_manager.pref_to_string("ResetNavMode").as_str(), "false");
-            assert_eq!(pref_manager.pref_to_string("BrailleCode").as_str(), "Nemeth");
-            assert_eq!(pref_manager.pref_to_string("X_Y_Z").as_str(), NO_PREFERENCE);
+            }
         });
     }
 
     #[test]
     fn test_language_change() {
+        // set_preference borrows the pref manager, so the previous borrow's lifetime needs to be ended before using it
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Language", "en");
-            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
-            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
-            pref_manager.initialize(PathBuf::new()).unwrap();
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
+        });
+        crate::interface::set_preference("Language".to_string(), "en".to_string()).unwrap();
+        crate::interface::set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        PREF_MANAGER.with(|pref_manager| {
+            let pref_manager = pref_manager.borrow_mut();
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Speech)), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
         });
 
-
-        // set_preference borrows the pref manager, so the previous borrow's lifetime needed to be ended by here
-        set_preference("Language".to_string(), "zz".to_string()).unwrap();
-        let pref_manager = PreferenceManager::get();
-        let mut pref_manager = pref_manager.borrow_mut();
-        pref_manager.initialize(PathBuf::new()).unwrap();
-        assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+        crate::interface::set_preference("Language".to_string(), "zz".to_string()).unwrap();
+        PREF_MANAGER.with(|pref_manager| {
+            let pref_manager = pref_manager.borrow_mut();
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Speech)), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+        });
     }
     
     #[test]
@@ -1164,18 +1066,13 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Language", "en");
-            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
-            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
-            pref_manager.initialize(PathBuf::new()).unwrap();
+            pref_manager.set_user_prefs("Language", "en").unwrap();
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap();
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Speech)), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
 
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
-
-            pref_manager.set_user_prefs("SpeechStyle", "SimpleSpeak");
-            pref_manager.invalidate(&FilesChanged::new("SpeechStyle").unwrap());
-            pref_manager.initialize(PathBuf::new()).unwrap();
+            pref_manager.set_user_prefs("SpeechStyle", "SimpleSpeak").unwrap();
             
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/en/SimpleSpeak_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Speech)), PathBuf::from("Languages/en/SimpleSpeak_Rules.yaml"));
         });
     }
 
@@ -1184,54 +1081,59 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Verbosity", "Terse");
+            pref_manager.set_user_prefs("Verbosity", "Terse").unwrap();
 
             assert_eq!(&pref_manager.pref_to_string("Verbosity"), "Terse");
 
-            pref_manager.set_user_prefs("BrailleCode", "UEB");
-            pref_manager.invalidate(&FilesChanged::new("BrailleCode").unwrap());
-            pref_manager.initialize(PathBuf::new()).unwrap();            
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Braille)[0]), PathBuf::from("Braille/UEB/UEB_Rules.yaml"));
+            pref_manager.set_user_prefs("BrailleCode", "UEB").unwrap();
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Braille)), PathBuf::from("Braille/UEB/UEB_Rules.yaml"));
+
+            // make sure they show up when building context for speech generation
+            let merged_prefs = pref_manager.merge_prefs();
+            assert_eq!(merged_prefs.get("Verbosity").unwrap().as_str().unwrap(), "Terse");
+        });
+
+        crate::interface::set_preference("NavVerbosity".to_string(), "Terse".to_string()).unwrap();
+        PREF_MANAGER.with(|pref_manager| {
+            let pref_manager = pref_manager.borrow_mut();
+            let merged_prefs = pref_manager.merge_prefs();
+            assert_eq!(merged_prefs.get("NavVerbosity").unwrap().as_str().unwrap(), "Terse");
         });
     }
 
-    use std::fs;
     #[test]
-    // #[ignore]
+    #[ignore]   // this is an ugly test for #262 -- it changes the prefs file and so is a bad thing in general
     fn test_up_to_date() {
+        use std::fs;
         use std::thread::sleep;
         use std::time::Duration;
+        use crate::interface;
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Language", "zz-aa");   // move to a directory where making a time change doesn't really matter
-            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
-            pref_manager.initialize(PathBuf::new()).unwrap();
-
-            // First test to make sure the up_to_date check works -- need to do in this test since the order of testing is random
-            let files_changed = pref_manager.is_up_to_date().unwrap();        
-            assert!(files_changed.is_none(), "files_changed={}", files_changed.unwrap());
-            
-            // Note: need to use pattern match to avoid borrow problem
-            // Don't change a speech related file because 'test_is_up_to_date' might fail 
-            if let Some(file_name) = &pref_manager.get_definitions_file(true)[1] {
-                let file_name_as_str = file_name.to_str().unwrap();
-                let contents = fs::read(file_name).expect(&format!("Failed to write file {} during test", file_name_as_str));
-                #[allow(unused_must_use)] { 
-                    fs::write(file_name, contents);
-                    sleep(Duration::from_millis(10));
-                }
-                let files_changed = pref_manager.is_up_to_date().unwrap();
-                assert!(files_changed.is_some());
-                let files_changed = files_changed.unwrap();
-                assert!(&files_changed.speech_defs);
-                assert!(!&files_changed.speech_rules);
-                assert!(!&files_changed.speech_unicode_short);
-            } else {
-                panic!("First path is 'None'");
-            }
-
-            // open the file, read all the contents, then write them back so the time changes
+            assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "ClearSpeak");
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
         });
+        interface::set_mathml("<math><mo>+</mo><mn>10</mn></math>".to_string()).unwrap();
+        assert_eq!(interface::get_spoken_text().unwrap(), "ClearSpeak positive from zz 10");
+        
+        let mut file_path = PathBuf::default();
+        let mut contents = vec![];
+        PREF_MANAGER.with(|pref_manager| {
+            let pref_manager = pref_manager.borrow();
+            if let Some(file_name) = pref_manager.user_prefs_file.as_ref().unwrap().debug_get_file() {
+                file_path = PathBuf::from(file_name);
+                contents = fs::read(&file_path).expect(&format!("Failed to write file {} during test", file_name));
+                let changed_contents = String::from_utf8(contents.clone()).unwrap()
+                                .replace("SpeechStyle: ClearSpeak", "SpeechStyle: SimpleSpeak");
+                fs::write(&file_path, changed_contents).unwrap();
+                sleep(Duration::from_millis(5));  // make sure the time changes enough to be recognized
+            }
+        });
+        assert_eq!(interface::get_spoken_text().unwrap(), "SimpleSpeak positive from zz 10");
+        fs::write(&file_path, contents).unwrap();
+
+                // assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "SimpleSpeak");
+                // assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/SimpleSpeak_Rules.yaml"));
     }
 }

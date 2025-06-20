@@ -45,7 +45,7 @@
       - "     ((self::m:mi or self::m:mo) and string-length(text())=1) or"
       - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
       - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-      - "     IsInDefinition(., 'Arrows')"
+      - "     IsInDefinition(., 'Braille', 'Arrows')"
       - "    ]"
       then:
       - x: "*[2]"
@@ -67,7 +67,7 @@
    name: common-fraction-mixed-number
    tag: mfrac
    match:
-      - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
+      - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
       - "*[1][self::m:mn][not(contains(., '.'))]   and" 
       - "*[2][self::m:mn][not(contains(., '.'))]"
    replace: 
@@ -232,13 +232,13 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
-    - if: "text()='-' or text() = ':'"
+    - if: ".='-' or .=':'"
       then: [t: "⠤"]
-    - else_if: "text()='=' or text() = '∷'"
+    - else_if: ".='=' or .='∷'"
       then: [t: "⠭"]
-    - else_if: "text()='≡'"
+    - else_if: ".='≡'"
       then: [t: "⠿"]
-    - else_if: "text()='≣'"
+    - else_if: ".='≣'"
       then: [t: "⠸⠠⠤"]      # see #237 -- not defined, so use UEB
       else: [x: "text()"]    # shouldn't happen
 
@@ -249,7 +249,7 @@
    tag: mo
    match:
       - "parent::*[count(*) = 2 and name()='mrow' and not(preceding-sibling::*)] and"
-      - "IsInDefinition(., 'GeometryPrefixOperators')"
+      - "IsInDefinition(., 'Braille', 'GeometryPrefixOperators')"
    replace:
       - x: "text()"
       - t: ""
@@ -258,7 +258,7 @@
    name: default
    tag: mo
      # add spaces around comparison operators unless they are in a script position,
-   variables: [MaybeAddSpaces: "parent::*[self::m:mrow] and $NewScriptContext='' and IsInDefinition(., 'NemethComparisonOperators')"]
+   variables: [MaybeAddSpaces: "parent::*[self::m:mrow] and $NewScriptContext='' and IsInDefinition(., 'Braille', 'NemethComparisonOperators')"]
    match: "."
    replace:
       - test:
@@ -266,12 +266,12 @@
          then:
             - test:
                if: "preceding-sibling::* and 
-                    not(IsInDefinition(preceding-sibling::*[1], 'NemethPunctAndOpenBeforeSymbols'))" #Rule 151
+                    not(IsInDefinition(preceding-sibling::*[1], 'Braille', 'NemethPunctAndOpenBeforeSymbols'))" #Rule 151
                then: [t: ""]
       - x: "text()"
       - test:
          if: "$MaybeAddSpaces and following-sibling::* and 
-              not(IsInDefinition(following-sibling::*[1], 'NemethPunctAndOpenAfterSymbols'))" #Rule 151"
+              not(IsInDefinition(following-sibling::*[1], 'Braille', 'NemethPunctAndOpenAfterSymbols'))" #Rule 151"
          then: [t: ""]
 
 -
@@ -284,56 +284,56 @@
 - 
   name: sin
   tag: mi
-  match: "text()='sin'"
+  match: ".='sin'"
   replace:
   - t: "⠻⠎"
    
 - 
   name: cos
   tag: mi
-  match: "text()='cos'"
+  match: ".='cos'"
   replace:
   - t: "⠻⠉"
    
 - 
   name: tan
   tag: mi
-  match: "text()='tan'"
+  match: ".='tan'"
   replace:
   - t: "⠻⠞"
    
 - 
   name: cot
   tag: mi
-  match: "text()='cot'"
+  match: ".='cot'"
   replace:
   - t: "⠻⠉⠞"
    
 - 
   name: arcsin
   tag: mi
-  match: "text()='arcsin'"
+  match: ".='arcsin'"
   replace:
   - t: "⠁⠗⠉⠻⠎"
    
 - 
   name: arccos
   tag: mi
-  match: "text()='arccos'"
+  match: ".='arccos'"
   replace:
   - t: "⠁⠗⠉⠻⠉"
    
 - 
   name: arctan
   tag: mi
-  match: "text()='arctan'"
+  match: ".='arctan'"
   replace:
   - t: "⠁⠗⠉⠻⠞"
    
 - 
   name: arccot
   tag: mi
-  match: "text()='arccot'"
+  match: ".='arccot'"
   replace:
   - t: "⠁⠗⠉⠻⠉⠞"
 
@@ -345,10 +345,10 @@
   replace:
   - test:
       if:
-      - "IsInDefinition(., 'Units') or"
+      - "IsInDefinition(., 'Braille', 'Units') or"
       - "(string-length(.)=1 and @mathvariant='normal' and"
           # avoid chemical elements and also states (e.g., "(g)")
-      - " not(@data-chem-element) and parent::*[1][not(@data-chem-equation='1')]"
+      - " not(@data-chem-element) and parent::*[1][not(@data-chem-equation>='1')]"
       - ")"
       then: [t: "W"]
   - x: "BrailleChars(., 'Vietnam')"
@@ -384,18 +384,26 @@
 -
   name: angle   # angles need a shape indicator -- not sure this is the best test (three letters in base, have invisible separators)
   tag: mover
-  match: "*[2][text()='^'] and *[1][
+  match: "*[2][.='^'] and *[1][
             self::m:mrow and count(*)=5 and
-            *[1][self::m:mi] and *[2][text()='\u2063'] and *[3][self::m:mi] and *[4][text()='\u2063'] and *[5][self::m:mi]
+            *[1][self::m:mi] and *[2][.='\u2063'] and *[3][self::m:mi] and *[4][.='\u2063'] and *[5][self::m:mi]
           ]"
   replace:
   - t: "⠫⠛"     # shape indicator, g
   - x: "*[1]"
 
 -
+  name: overparen
+  tag: mover
+  match: "*[2][.='⏜']"
+  replace:
+  - t: "⠫⠠⠗"     # shape indicator, overparen
+  - x: "*[1]"
+
+-
    name: single-char-exceptions    # GTM 12
    tag: [mover, munder]
-   match: "*[2][string-length(.) = 1 and ( translate(., '_¯→.˙~^','')='' or (self::m:mover and text()='⌒') )]"
+   match: "*[2][string-length(.) = 1 and ( translate(., '_¯→.˙~^','')='' or (self::m:mover and .='⌒') )]"
    replace: 
    - test:
       # omit grouping indicators in the following cases
@@ -405,9 +413,9 @@
       - "     ((self::m:mi or self::m:mo) and string-length(text())=1) or"
       - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
       - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-      - "     IsInDefinition(., 'Arrows')"
+      - "     IsInDefinition(., 'Braille', 'Arrows')"
       - "    ]) and"
-      - "not(*[1][self::m:mn] and preceding-sibling::*[1][text()='\u2062'][preceding-sibling::*[1][self::m:mn]])"  # need to make clear this 'mn' is base
+      - "not(*[1][self::m:mn] and preceding-sibling::*[1][.='\u2062'][preceding-sibling::*[1][self::m:mn]])"  # need to make clear this 'mn' is base
       then: [x: "*[1]"]
       else:
       - t: "⠣"
@@ -420,15 +428,15 @@
       if: "self::m:munder"
       then: [t: "⠠"]
    - test:
-      - if: "*[2][text()='_' or text()='¯']"
+      - if: "*[2][.='_' or .='¯']"
         then: [T: "⠨⠱"]
-      - else_if: "*[2][text()='→']"
+      - else_if: "*[2][.='→']"
         then: [T: "⠨⠔⠳⠕"]
-      - else_if: "*[2][text()='.' or text()='˙']"
+      - else_if: "*[2][.='.' or .='˙']"
         then: [t: "⠘⠲"]
-      - else_if: "*[2][text()='~']"
+      - else_if: "*[2][.='~']"
         then: [t: "⠸⠱"]
-      - else_if: "*[2][text()='^']"
+      - else_if: "*[2][.='^']"
         then: [t: "⠐⠱ "]
         else: [t: "⠨⠸⠱"]    # arc/⌒
 
@@ -447,7 +455,7 @@
       # omit grouping indicators in the following cases
       if:
       - "not((self::m:mover or self::m:munder) and "
-      - "    *[1][self::m:mn] and preceding-sibling::*[1][text()='\u2062'][preceding-sibling::*[1][self::m:mn]]"  # need to make clear this 'mn' is base
+      - "    *[1][self::m:mn] and preceding-sibling::*[1][.='\u2062'][preceding-sibling::*[1][self::m:mn]]"  # need to make clear this 'mn' is base
       - "   )"
       then: [x: "*[1]"]
       else:
@@ -474,7 +482,7 @@
          - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
          - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
          - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-         - "     IsInDefinition(., 'Arrows')"
+         - "     IsInDefinition(., 'Braille', 'Arrows')"
          - "    ]"
          then: [x: "*[2]"]
          else:
@@ -507,7 +515,7 @@
       - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
       - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
       - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-      - "     IsInDefinition(., 'Arrows')"
+      - "     IsInDefinition(., 'Braille', 'Arrows')"
       - "    ]"
       then: [x: "*[1]"]
       else:
@@ -530,7 +538,7 @@
          - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
          - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
          - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-         - "     IsInDefinition(., 'Arrows')"
+         - "     IsInDefinition(., 'Braille', 'Arrows')"
          - "    ]"
          then: [x: "*[2]"]
          else:
@@ -550,7 +558,7 @@
          - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
          - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
          - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-         - "     IsInDefinition(., 'Arrows')"
+         - "     IsInDefinition(., 'Braille', 'Arrows')"
          - "    ]"
          then: [x: "*[3]"]
          else:
@@ -589,7 +597,7 @@
                - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
                - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
                - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-               - "     IsInDefinition(., 'Arrows')"
+               - "     IsInDefinition(., 'Braille', 'Arrows')"
                - "    ]"
                then: [x: "$Prescripts[1]"]
                else:
@@ -612,7 +620,7 @@
                - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
                - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
                - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-               - "     IsInDefinition(., 'Arrows')"
+               - "     IsInDefinition(., 'Braille', 'Arrows')"
                - "    ]"
                then: [x: "$Prescripts[2]"]
                else:
@@ -638,7 +646,7 @@
                   - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
                   - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
                   - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-                  - "     IsInDefinition(., 'Arrows')"
+                  - "     IsInDefinition(., 'Braille', 'Arrows')"
                   - "    ]"
                   then: [x: "$Prescripts[3]"]
                   else:
@@ -661,7 +669,7 @@
                   - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
                   - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
                   - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-                  - "     IsInDefinition(., 'Arrows')"
+                  - "     IsInDefinition(., 'Braille', 'Arrows')"
                   - "    ]"
                   then: [x: "$Prescripts[4]"]
                   else:
@@ -691,7 +699,7 @@
                - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
                - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
                - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-               - "     IsInDefinition(., 'Arrows')"
+               - "     IsInDefinition(., 'Braille', 'Arrows')"
                - "    ]"
                then: [x: "$Postscripts[1]"]
                else:
@@ -714,7 +722,7 @@
                - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
                - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
                - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-               - "     IsInDefinition(., 'Arrows')"
+               - "     IsInDefinition(., 'Braille', 'Arrows')"
                - "    ]"
                then: [x: "$Postscripts[2]"]
                else:
@@ -740,7 +748,7 @@
                   - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
                   - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
                   - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-                  - "     IsInDefinition(., 'Arrows')"
+                  - "     IsInDefinition(., 'Braille', 'Arrows')"
                   - "    ]"
                   then: [x: "$Postscripts[3]"]
                   else:
@@ -763,7 +771,7 @@
                   - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
                   - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
                   - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-                  - "     IsInDefinition(., 'Arrows')"
+                  - "     IsInDefinition(., 'Braille', 'Arrows')"
                   - "    ]"
                   then: [x: "$Postscripts[4]"]
                   else:
@@ -789,7 +797,7 @@
                      - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
                      - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
                      - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-                     - "     IsInDefinition(., 'Arrows')"
+                     - "     IsInDefinition(., 'Braille', 'Arrows')"
                      - "    ]"
                      then: [x: "$Postscripts[5]"]
                      else:
@@ -812,7 +820,7 @@
                      - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
                      - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
                      - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-                     - "     IsInDefinition(., 'Arrows')"
+                     - "     IsInDefinition(., 'Braille', 'Arrows')"
                      - "    ]"
                      then: [x: "$Postscripts[6]"]
                      else:
@@ -838,7 +846,7 @@
                         - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
                         - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
                         - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-                        - "     IsInDefinition(., 'Arrows')"
+                        - "     IsInDefinition(., 'Braille', 'Arrows')"
                         - "    ]"
                         then: [x: "$Postscripts[7]"]
                         else:
@@ -861,7 +869,7 @@
                         - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
                         - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
                         - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-                        - "     IsInDefinition(., 'Arrows')"
+                        - "     IsInDefinition(., 'Braille', 'Arrows')"
                         - "    ]"
                         then: [x: "$Postscripts[8]"]
                         else:
@@ -898,7 +906,7 @@
    tag: menclose
    match: "."
    # FIX: can't find a rule that says anything about comparison operator spacing and enclosure
-   variables: [AddSpaces: "parent::*[self::m:mrow] and *[1][ self::m:mo and IsInDefinition(., 'NemethComparisonOperators')]"]
+   variables: [AddSpaces: "parent::*[self::m:mrow] and *[1][ self::m:mo and IsInDefinition(., 'Braille', 'NemethComparisonOperators')]"]
    replace:
    - test:
       if: "contains(concat(' ', normalize-space(@notation), ' '), ' left ')"                  #avoid 'leftarrow'
@@ -975,7 +983,7 @@
       - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
       - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
       - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-      - "     IsInDefinition(., 'Arrows')"
+      - "     IsInDefinition(., 'Braille', 'Arrows')"
       - "    ]"
       then: [x: "*[1]"]
       else:
