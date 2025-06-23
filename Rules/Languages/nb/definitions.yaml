@@ -228,7 +228,7 @@
     "lb t": "pound troy",
 
     # energy
-    "hp": "hestekraft",
+    "hp": "hestekraft", "hk": "hestekraft",
     "BTU": "B-T-U",
     "°F": "grad fahrenheit", "℉": "grad fahrenheit",
 
@@ -280,7 +280,7 @@
     "kvadratmile": "kvadratmiles",
     "engelsk acre": "engelske acre",
     "bushel": "bushels",
-    "teskje": "tesskjeer",
+    "teskje": "teskjeer",
     "spiseskje": "spiseskjeer",
     #"fluid dram": "fluid drams",
     "fluid ounce": "fluid ouncer",
@@ -381,7 +381,7 @@
     ]
 
 - NumbersOrdinalPluralHundreds: [
-       "", "en hundredel", "to hundredeler", "tre hundredeler", "fire hundredeler", "fem hundredeler",
+       "", "én hundredel", "to hundredeler", "tre hundredeler", "fire hundredeler", "fem hundredeler",
          "seks hundredeler", "sju hundredeler", "åtte hundredeler", "ni hundredeler"
     ]
       
@@ -391,34 +391,40 @@
          "", "tusen", "million", "milliard", "billion", "billiard",
          "trillion", "trilliard", "kvadrillion", "kvadrilliard", "kvintillion",
          "kvintilliard","sekstillion","sekstilliard","septillion","septilliard",
-         "oktillion","oktilliard","nonillion","nonilliard","desillion",
-         "desilliard","undesillion","undesilliard","duodesillion","tredesillion",
-         "tredesilliard","kvattordesillion","kvattordesilliard","kvindesillion","kvindesilliard",
-         "seksdesillion","seksdesilliard","septendesillion","septendesilliard",
-         "oktodesillion","oktodesilliard","novemdesillion","novemdesilliard","vigintillion",
-         "vigintilliard","unvigintillion","unvigintilliard","centillion","centilliard"
+         "oktillion","oktilliard","nonillion","nonilliard","desillion"
     ]
+         #NORWEGIAN: These big numbers are never used.
+         #"desilliard","undesillion","undesilliard","duodesillion","tredesillion",
+         #"tredesilliard","kvattordesillion","kvattordesilliard","kvindesillion","kvindesilliard",
+         #"seksdesillion","seksdesilliard","septendesillion","septendesilliard",
+         #"oktodesillion","oktodesilliard","novemdesillion","novemdesilliard","vigintillion",
+         #"vigintilliard","unvigintillion","unvigintilliard","centillion","centilliard"
+    #]
       
 - NumbersOrdinalLarge: [
          "", "tusende", "millionte", "milliardte", "billionte", "billiardte",
          "trillionte", "trilliardte", "kvadrillionte", "kvadrilliardte", "kvintillionte",
          "kvintilliardte","sekstillionte","sekstilliardte","septillionte","septilliardte",
-         "oktillionte","oktilliardte","nonillionte","nonilliardte","desillionte",
-         "desilliardte","undesillionte","undesillardte","duodesillionte","tredesillionte",
-         "tredesilliardte","kvattordesillionte","kvattordesilliardte","kvindesillionte","kvindesilliardte",
-         "seksdesillionte","seksdesilliardte","septendesillionte","septendesilliardte",
-         "oktodesillionte","oktodesilliardte","novemdesillionte","novemdesilliardte","vigintillionte",
-         "vigintilliardte","unvigintillionte","unvigintilliardte","centillionte","centilliardte"
+         "oktillionte","oktilliardte","nonillionte","nonilliardte","desillionte"
     ]
+         
+         #"desilliardte","undesillionte","undesillardte","duodesillionte","tredesillionte",
+         #"tredesilliardte","kvattordesillionte","kvattordesilliardte","kvindesillionte","kvindesilliardte",
+         #"seksdesillionte","seksdesilliardte","septendesillionte","septendesilliardte",
+         #"oktodesillionte","oktodesilliardte","novemdesillionte","novemdesilliardte","vigintillionte",
+         #"vigintilliardte","unvigintillionte","unvigintilliardte","centillionte","centilliardte"
+    #]
       
 - NumbersOrdinalPluralLarge: [
          "", "tusendeler", "milliondeler", "milliarddeler", "billiondeler", "billiarddeler",
          "trilliondeler", "trilliarddeler", "kvadrilliondeler", "kvadrilliarddeler", "kvintilliondeler",
          "kvintilliarddeler","sekstilliondeler","sekstilliarddeler","septilliondeler","septilliarddeler",
-         "oktilliondeler","oktilliarddeler","nonilliondeler","nonilliarddeler","desilliondeler",
-         "desilliarddeler","undesilliondeler","undesilliarddeler","duodesilliondeler","tredesilliondeler",
-         "tredesilliarddeler","kvattordesilliondeler","kvattordesilliarddeler","kvindesilliondeler","kvindesilliarddeler",
-         "seksdesilliondeler","seksdesilliarddeler","septendesilliondeler","septendesilliarddeler",
-         "oktodesilliondeler","oktodesilliarddeler","novemdesilliondeler","novemdesilliarddeler","vigintilliondeler",
-         "vigintilliarddeler","unvigintilliondeler","unvigintilliarddeler","centilliondeler","centilliarddeler"
+         "oktilliondeler","oktilliarddeler","nonilliondeler","nonilliarddeler","desilliondeler"
     ]
+         
+         #"desilliarddeler","undesilliondeler","undesilliarddeler","duodesilliondeler","tredesilliondeler",
+         #"tredesilliarddeler","kvattordesilliondeler","kvattordesilliarddeler","kvindesilliondeler","kvindesilliarddeler",
+         #"seksdesilliondeler","seksdesilliarddeler","septendesilliondeler","septendesilliarddeler",
+         #"oktodesilliondeler","oktodesilliarddeler","novemdesilliondeler","novemdesilliarddeler","vigintilliondeler",
+         #"vigintilliarddeler","unvigintilliondeler","unvigintilliarddeler","centilliondeler","centilliarddeler"
+    #]
