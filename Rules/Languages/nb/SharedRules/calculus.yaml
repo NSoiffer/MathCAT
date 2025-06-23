@@ -2,7 +2,7 @@
 
 - name: divergence
   tag: divergence
-  match: "."
+  match: "count(*) = 1"
   replace:
   - test:
       if: "$Verbosity='Verbose'"
@@ -15,7 +15,7 @@
 
 - name: curl
   tag: curl
-  match: "."
+  match: "count(*) = 1"
   replace:
   - test: 
       if: "$Verbosity='Verbose'"
@@ -28,7 +28,7 @@
 
 - name: gradient
   tag: gradient
-  match: "."
+  match: "count(*) = 1"
   replace:
   - T: "gradienten til"
   - test:
