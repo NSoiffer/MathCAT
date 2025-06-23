@@ -28,7 +28,7 @@
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
-      then: [{pause: short}]
+      then: [pause: short]
       else: [{pause: short}, {T: "slutt rot"}, {pause: short}]  # phrase(start the square root of x 'end of root')
 
 - name: default
@@ -39,11 +39,11 @@
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][.='2']"
-        then: [{T: "kvadratroten"}]        # phrase(the 'square root' of x)
+        then: [T: "kvadratroten"]        # phrase(the 'square root' of x)
       - else_if: "*[2][.='3']"
-        then: [{T: "kubikkroten"}]        # phrase(the 'cube root' of x)
+        then: [T: "kubikkroten"]        # phrase(the 'cube root' of x)
       - else_if: "*[2][not(contains(., ','))]"
-        then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]        # phrase(the square 'root' of x)
+        then: [x: "ToOrdinal(*[2])", T: "roten"]        # phrase(the square 'root' of x)
       else:
       - T: "roten av grad"      # phrase(the square 'root' of 36)
       - x: "*[2]"
@@ -52,27 +52,29 @@
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
-      then: [{pause: short}]
-      else: [{T: "slutt rot"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
+      then: [pause: short]
+      else: [T: "slutt rot", pause: short]      # phrase(start the fifth root of x 'end of root')
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
+# NORWEGIAN: Changed decimal point to comma.
 - name: common-fraction
   tag: fraction
   match:
-  - "*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
-  - "*[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]"
+  - "*[1][self::m:mn][not(contains(., ',')) and text()<20]   and"
+  - "*[2][self::m:mn][not(contains(., ',')) and 2<= text() and text()<=10]"
   variables: [IsPlural: "*[1]!=1"]
   replace:
   - x: "*[1]"
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
+# NORWEGIAN: Changed decimal point to comma.
 - name: common-fraction-mixed-number
   tag: fraction
   match:
   - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
-  - "*[1][self::m:mn][not(contains(., '.'))]   and"
-  - "*[2][self::m:mn][not(contains(., '.')) and text()<=10]"
+  - "*[1][self::m:mn][not(contains(., ','))]   and"
+  - "*[2][self::m:mn][not(contains(., ',')) and text()<=10]"
   variables: [IsPlural: "*[1]!=1"]
   replace:
   - x: "*[1]"
@@ -112,11 +114,11 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - T: "over"      # phrase(the fraction 3 'over' 4)
   - test:
       if: "not(IsNode(*[2],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - x: "*[2]"
   - pause: short
   - T: "slutt brøk"      # phrase(start 7 over 8 'end of fraction')
@@ -142,8 +144,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][.=2]"
-      then: {T: "i andre"}      # phrase(5 'squared' equals 25)
-      else: {T: "i tredje"}      # phrase(5 'cubed' equals 125)
+      then: [T: "i andre"]      # phrase(5 'squared' equals 25)
+      else: [T: "i tredje"]      # phrase(5 'cubed' equals 125)
 
 - name: function-power
   tag: power
@@ -165,8 +167,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][.=2]"
-      then: {T: "i andre"}      # phrase(5 'squared' equals 25)
-      else: {T: "i tredje"}      # phrase(5 'cubed' equals 125)
+      then: [T: "i andre"]      # phrase(5 'squared' equals 25)
+      else: [T: "i tredje"]      # phrase(5 'cubed' equals 125)
 
 - name: simple-integer
   tag: power
@@ -288,7 +290,8 @@
   - "          not(self::m:math) ] and "       # rule out [x] standing alone
   - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
   - "( IsNode(*[2], 'simple')  ) and"
-  - "not(ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
+  - "not(preceding-sibling::*[1][.='\u2062' and @data-function-guess]) and"                                                                          
+  - "not(ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
   # missing clause: 'a positive fraction that is spoken as an ordinal
   #   (either by the Ordinal preference or by the default rules_'
   replace:
