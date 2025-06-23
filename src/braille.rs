@@ -2063,7 +2063,7 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "n" => "⠼",     // number indicator for drop numbers (special case with close parens)
     "t" => "⠱",     // shape terminator
     "W" => "⠀",     // whitespace"
-    "𝐖"=> "⠀",     // whitespace
+    "𝐖"=> "⠀ ⠀",     // doubled whitespace (don't want collapsed to a single whitespace --add a regular space in between and remove it later)
     "s" => "⠆",     // typeface single char indicator
     "w" => "",     // typeface word indicator
     "e" => "",     // typeface & capital terminator 
@@ -2073,39 +2073,55 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "—" => "⠠⠤",   // normal dash (2014) -- assume all normal dashes are unified here [RUEB appendix 3]
     "―" => "⠐⠠⠤",  // long dash (2015) -- assume all long dashes are unified here [RUEB appendix 3]
     "(" => "⠦",     // Not really needed, but done for consistency with ")"
-    ")" => "⠴",     // Needed for rules with drop numbers to avoid mistaking for dropped 0
+    ")" => "⠴",     // Needed for rules with drop numbers to avoid mistaking for dropped 0, also for whitespace removal
+    "{" => "⠫",     // Not really needed, but done for consistency with "}"
+    "}" => "⠻",     // for whitespace removal
+    "[" => "⠷",     // Not really needed, but done for consistency with "]"
+    "]" => "⠾",     // for whitespace removal
     "↑" => "⠬",     // superscript
     "↓" => "⠡",     // subscript
-    "#" => "",      // signals end of script
+    "|" => "⠸",    // vertical bar
+    "#" => "⠼",      // signals end of script, also start of fraction in numeric fraction
     "Z" => "⠐",     // signals end of index of root, integrand/lim from function ("zone change")
 
 };
 
 fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     lazy_static! {
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓Nn𝑁WwZ,()])").unwrap();
+        // don't include '𝐖' (special cased below)
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓|Nn𝑁W𝐖w#Z,(){}\[\]])").unwrap();
         // Numbers need to end with a space, but sometimes there is one there for other reasons
         static ref DROP_NUMBER_SEPARATOR: Regex = Regex::new(r"(n.)\)").unwrap();
-        static ref NUMBER_MATCH: Regex = Regex::new(r"((N.)+[^WN𝐶#↑↓Z])").unwrap();
+
+        // Numbers typically end with a space, but sometimes not (captured by the following regexes)
+        // Ellipsis at the end of a number are treated as being part of the number (in match, we don't add whitespace)
+        static ref DROP_UNNEEDED_SPACE: Regex = Regex::new(r"(((N.)+)[W𝐖]([N𝐶#↑↓Z)}\]|,]|(⠄⠄⠄)))").unwrap();
     }
 
-    // debug!("finnish_cleanup: start={}", raw_braille);
+    debug!("finnish_cleanup: start={}", raw_braille);
     let result = DROP_NUMBER_SEPARATOR.replace_all(&raw_braille, |cap: &Captures| {
         // match includes the char after the number -- insert the whitespace before it
         // debug!("DROP_NUMBER_SEPARATOR match='{}'", &cap[1]);
         return cap[1].to_string() + "𝐶)";       // hack to use "𝐶" instead of dot 6 directly, but works for NUMBER_MATCH
     });
     let result = result.replace('n', "N");  // avoids having to modify remove_unneeded_mode_changes()
-    let result = NUMBER_MATCH.replace_all(&result, |cap: &Captures| {
+    let result = DROP_UNNEEDED_SPACE.replace_all(&result, |cap: &Captures| {
         // match includes the char after the number -- insert the whitespace before it
-        // debug!("NUMBER_MATCH match='{}'", &cap[1]);
-        let mut chars = cap[0].chars();
-        let last_char = chars.next_back().unwrap(); // unwrap safe since several chars were matched
-        return chars.as_str().to_string() + "W" + &last_char.to_string();
+        debug!("NUMBER_MATCH match #caps={}", cap.len());
+        debug!("  cap[0]='{}'\n  cap[1]='{}'\n  cap[2]='{}'\n  cap[3]='{}'\n  cap[4]='{}'\n  cap[5]='{:?}'",
+                &cap[0], &cap[1], &cap[2], &cap[3], &cap[4], cap.get(5));
+        if &cap[4] == "⠄" && cap.get(5).is_some() && &cap[5] == "⠄⠄" {
+            return cap[1].to_string() + "⠄⠄⠄";  // don't add whitespace after ellipsis
+        } else {
+            // remove whitespace after the number, which means deleting the char in cap[1]
+            let number = &cap[2];  // remove the last char
+            return number.to_string() + &cap[4];
+        }
     });
+    debug!("   after number match={}", &result);
 
     // FIX: need to implement this -- this is just a copy of the Vietnam code
-    let result = result.replace("CG", "⠘")
+    let result = result.replace("CG", "⠸")
                                     .replace("𝔹C", "⠩")
                                     .replace("DC", "⠰");
 
@@ -2130,17 +2146,18 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
             "D" => &fraktur,
             "V" => &greek_variant,
             _ => match FINNISH_INDICATOR_REPLACEMENTS.get(matched_char) {
-                None => {error!("REPLACE_INDICATORS and SWEDISH_INDICATOR_REPLACEMENTS are not in sync: missing '{}'", matched_char); ""},
+                None => {error!("REPLACE_INDICATORS and FINISH_INDICATOR_REPLACEMENTS are not in sync: missing '{}'", matched_char); ""},
                 Some(&ch) => ch,
             },
         }
     });
 
-    // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces
-    // let result = result.trim_start_matches('⠀').trim_end_matches('⠀');
+    // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces (also zone end)
+    let result = result.trim_start_matches('⠀').trim_end_matches(&['⠀', '⠐']);
+    debug!("   after trim={}", &result);
     let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
-   
-    return result.to_string();
+    // hack for "|:" which requires a double space
+    return result.replace(" ","");
 }
 
 
@@ -2808,93 +2825,75 @@ impl NeedsToBeGrouped {
         }
     }
 
-    /// FIX: what needs to be implemented?
-    fn needs_grouping_for_finnish(mathml: Element, is_base: bool) -> bool {
-        use crate::xpath_functions::IsInDefinition;
-        let mut node_name = name(mathml);
-        if mathml.attribute_value("data-roman-numeral").is_some() {
-            node_name = "mi";           // roman numerals don't follow number rules
+    /// Returns true if the mathml needs to be grouped according to the Finnish rules.
+    /// In general, this means if the expression contains a space, it needs to be grouped.
+    fn needs_grouping_for_finnish(mathml: Element, _is_base: bool) -> bool {
+        // Because we don't know the braille at this point, "the braille contains a space" is tricky.
+        // Some ok cases are: numbers, -numbers, runs of letters
+        // If the components satisfy the above, then powers, roots, function calls, grouping, are ok
+        use crate::canonicalize::operator_priority;
+
+        let element_name = name(mathml);
+        if is_leaf(mathml) &&
+            // 'mn' can have whitespace because that doesn't generate a space in braille
+           (element_name == "mn" || !as_text(mathml).find(char::is_whitespace).is_none()) {
+            return false;
+        }
+        if IsBracketed::is_bracketed(mathml, "", "", false, true) {
+            return false;
         }
 
-        // FIX: the leaf rules are from UEB -- check the Swedish rules
-        match node_name {
-            "mn" => {   
-                if !is_base {
-                    return false;
-                }                                                                                        // clause 1
-                // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
-                let parent = get_parent(mathml);   // there is always a "math" node
-                let grandparent = if name(parent) == "math" {parent} else {get_parent(parent)};
-                if name(grandparent) != "mrow" {
-                    return false;
+        let parent = get_parent(mathml);   // there is always a "math" node
+        let parent_name = name(parent);
+        if parent_name == "mfrac" && mathml.preceding_siblings().is_empty(){
+            // In the numerator, the "spacing" rule doesn't apply -- we need to group it if the main operator is precedence lower than division
+            const MULTIPLICATION_PRIORITY: usize = 390;   // FIX: don't hardcode
+
+            if element_name != "mrow" {
+                return false;
+            }
+            if let Some((i, &child)) = mathml.children().iter().enumerate().find(|(_, &child)| {
+                let child = as_element(child);
+                name(child) == "mo"
+            }) {
+                let fixity = if i == 0 {"prefix"} else if i == mathml.children().len() {"postfix"} else {"infix"};
+                return match operator_priority(as_element(child), fixity) {
+                    None => true,       // didn't find operator, assume grouping is needed
+                    Some(priority) => priority < MULTIPLICATION_PRIORITY,
                 }
-                let preceding = parent.preceding_siblings();
-                if preceding.len()  < 2 {
-                    return false;
+            }
+        }
+
+        if element_name == "mrow" {
+            // a leading '-' is allowed
+            // FIX: what else?
+            let children = mathml.children();
+            if children.len() == 2 {
+                let first_child = as_element(children[0]);
+                if name(first_child) == "mo" && as_text(first_child) == "-" {
+                    return NeedsToBeGrouped::needs_grouping_for_finnish(as_element(children[1]), false);
                 }
-                // any 'mn' would be separated from this node by invisible times
-                let previous_child = as_element(preceding[preceding.len()-1]);
-                if name(previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
-                    let previous_child = as_element(preceding[preceding.len()-2]);
-                    return name(previous_child) == "mn"
+            }
+            return !is_run_of_letters(mathml);
+        }
+        return false;
+
+        fn is_run_of_letters(mrow: Element) -> bool {
+            // check if all children are letters
+            for child in mrow.children() {
+                let child_name = name(as_element(child));
+                if (child_name == "mi" || child_name == "mtext") &&
+                    as_text(as_element(child)).chars().all(|c| c.is_alphabetic()) {
+                    continue;
+                } else if child_name == "mrow" {
+                    if !is_run_of_letters(as_element(child)) {
+                        return false;
+                    }
                 } else {
                     return false;
                 }
-            },
-            "mi" | "mo" | "mtext" => {
-                let text = as_text(mathml);
-                let parent = get_parent(mathml);   // there is always a "math" node
-                let parent_name = name(parent);   // there is always a "math" node
-                if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains([' ', '\u{00A0}']) {
-                    return false;
-                }
-                let mut chars = text.chars();
-                let first_char = chars.next().unwrap();             // canonicalization assures it isn't empty;
-                let is_one_char = chars.next().is_none();
-                // '¨', etc., brailles as two chars -- there probably is some exception list but I haven't found it -- these are the ones I know about
-                return !((is_one_char && !['¨', '″', '‴', '⁗'].contains(&first_char)) ||                       // clause 8
-                            // "lim", "cos", etc., appear not to get parens, but the rules don't mention it (tests show it)
-                            IsInDefinition::is_defined_in(text, &SPEECH_DEFINITIONS, "FunctionNames").unwrap() ||
-                            IsInDefinition::is_defined_in(text, &SPEECH_DEFINITIONS, "Arrows").unwrap() ||          // clause 4
-                            IsInDefinition::is_defined_in(text, &SPEECH_DEFINITIONS, "GeometryShapes").unwrap());   // clause 5
-            },
-            "mrow" => {
-                // check for bracketed exprs
-                if IsBracketed::is_bracketed(mathml, "", "", false, true) {
-                    return false;
-                }
-
-                let parent = get_parent(mathml); // safe since 'math' is always at root
-                if name(parent) == "mfrac" {
-                    let children = mathml.children();
-                    if mathml.preceding_siblings().is_empty() {
-                        // numerator: check for multiplication -- doesn't need grouping in numerator
-                        if children.len() >= 3 {
-                            let operator = as_element(children[1]);
-                            if name(operator) == "mo" {
-                                let ch = as_text(operator);
-                                if ch == "\u{2062}" || ch == "⋅" || ch == "×"  {
-                                    return false;
-                                }
-                            }
-                        }
-                        return true;
-                    } else {
-                        // denominator
-                        return true;
-                    }
-
-                }
-                // check for prefix at start
-                // example 7.12 has "2-" in superscript and is grouped, so we don't consider postfix ops
-                let children = mathml.children();
-                if children.len() == 2 &&
-                    (name(as_element(children[0])) == "mo") {
-                    return false;
-                }
-                return true;
-            },
-            _ => return false,
+            }
+            return true;
         }
     }
 
@@ -2945,7 +2944,7 @@ impl NeedsToBeGrouped {
                 // exclude simple fractions -- they are not bracketed with start/end marks
                 let children = mathml.children();
                 return !(NeedsToBeGrouped::needs_grouping_for_swedish(as_element(children[0]), true) ||
-                         NeedsToBeGrouped::needs_grouping_for_swedish(as_element(children[0]), true));
+                         NeedsToBeGrouped::needs_grouping_for_swedish(as_element(children[1]), true));
             },
             // At least for msup (Ex 7.7, and 7.32 and maybe more), spec seems to feel grouping is not needed.
             // "msub" | "msup" | "msubsup" | "munder" | "mover" | "munderover" => return true,

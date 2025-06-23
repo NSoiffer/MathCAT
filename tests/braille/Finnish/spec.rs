@@ -83,6 +83,12 @@ fn p7_decimal_point_endless_with_grouping_nbsp_ellipses() {
 }
 
 #[test]
+fn p7_decimal_point_endless_with_grouping_nbsp_ellipses_mathtype() {
+    let expr = "<math><mn>1</mn><mo>,</mo><mn>234</mn><mo>&#xA0;</mo><mn>657</mn><mo>&#xA0;</mo><mn>234</mn><mo>&#x2026;</mo></math>";
+    test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
+}
+
+#[test]
 fn p7_decimal_point_endless_no_grouping_ellipses() {
     let expr = "<math><mn>1,234657234…</mn></math>";
     test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
@@ -96,13 +102,13 @@ fn p7_decimal_point_endless_with_grouping_space_ellpses() {
 
 #[test]
 fn p9_units_percent() {
-    let expr = "<math><mn>9</mn><mi>%</mi></math>";
+    let expr = "<math><mn>99</mn><mi>%</mi></math>";
     test_braille("Finnish", expr, "⠼⠊⠊⠀⠹");
 }
 
 #[test]
 fn p9_units_permille() {
-    let expr = "<math><mn>9</mn><mi>‰</mi></math>";
+    let expr = "<math><mn>115</mn><mi>‰</mi></math>";
     test_braille("Finnish", expr, "⠼⠁⠁⠑⠀⠒⠹");
 }
 
@@ -132,7 +138,7 @@ fn p10_currency_euro() {
 
 #[test]
 fn p10_currency_dollar() {
-    let expr = "<math><mi>$</mi><mn>25</mn></math>";
+    let expr = "<math><mi>$</mi><mn>35</mn></math>";
     test_braille("Finnish", expr, "⠠⠙⠼⠉⠑");
 }
 
@@ -162,7 +168,7 @@ fn p13_plus() {
 
 #[test]
 fn p13_minus_not_equal() {
-    let expr = "<math><mn>5</mn><mo>−</mo><mn>4</mn><mo>≠</mo><mn>2</mn></math>";
+    let expr = "<math><mn>5</mn><mo>−</mo><mn>2</mn><mo>≠</mo><mn>2</mn></math>";
     test_braille("Finnish", expr, "⠼⠑⠀⠤⠼⠃⠀⠐⠶⠼⠃");
 }
 
@@ -247,7 +253,7 @@ fn p15_fractions_minus() {
       <mn>2</mn>
       <mn>5</mn>
     </mfrac>
-    <mo>−</mo>
+    <mo>+</mo>
     <mfrac>
       <mn>1</mn>
       <mn>3</mn>
@@ -293,33 +299,22 @@ fn p16_fractional() {
 
 #[test]
 fn p16_absolute_value() {
-    let expr = "<math>
-  <mrow>
-    <mi>|</mi>
-    <mo>−</mo>
-  </mrow>
-  <mrow>
-    <mo>(</mo>
-    <mn>2</mn>
-    <mo>+</mo>
-    <mn>3</mn>
-    <mo>)</mo>
-    <mi>|</mi>
-    <mo>=</mo>
-  </mrow>
-  <mrow>
-    <mi>|</mi>
-    <mo>−</mo>
-  </mrow>
-  <mrow>
-    <mn>7</mn>
-    <mi>|</mi>
-    <mo>=</mo>
-  </mrow>
-  <mrow>
-    <mn>7</mn>
-  </mrow>
-</math>";
+    let expr = " <math>
+      <mrow>
+        <mrow>
+          <mo>|</mo>
+          <mrow>
+            <mo>-</mo>
+            <mrow><mo>(</mo><mrow><mn>2</mn><mo>+</mo><mn>5</mn></mrow><mo>)</mo></mrow>
+          </mrow>
+          <mo>|</mo>
+        </mrow>
+        <mo>=</mo>
+        <mrow><mo>|</mo><mrow><mo>-</mo><mn>7</mn></mrow><mo>|</mo></mrow>
+        <mo>=</mo>
+        <mn>7</mn>
+      </mrow>
+    </math>";
     test_braille("Finnish", expr, "⠸⠤⠦⠼⠃⠀⠖⠼⠑⠴⠸⠀⠶⠸⠤⠼⠛⠸⠀⠶⠼⠛");
 }
 
@@ -601,7 +596,7 @@ fn p23_equation_1_with_invisible_multiplication() {
 }
 
 #[test]
-fn p23_equation_solving_notation() {
+fn p22_equation_solving_notation() {
     let expr = "<math>
     <mn>5</mn>
     <mi>x</mi>
@@ -644,7 +639,7 @@ fn p24_fraction_2() {
       <mi>x</mi>
     </mrow>
     <mrow>
-      <mn>2</mn>
+      <mn>6</mn>
       <mo>&#8290;</mo>
       <mo>(</mo>
       <mn>1</mn>
@@ -704,7 +699,7 @@ fn p25_long_fraction() {
     </mfrac>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠦⠦⠭⠬⠀⠤⠼⠛⠀⠭⠀⠖⠼⠁⠃⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠃⠚⠴⠴⠀⠌⠦⠦⠭⠬⠀⠤⠼⠓⠀⠭⠀⠖⠼⠁⠑⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠁⠋⠴⠴");
+    test_braille("Finnish", expr, "⠦⠭⠬⠀⠤⠼⠛⠀⠭⠀⠖⠼⠁⠃⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠃⠚⠴⠀⠌⠦⠭⠬⠀⠤⠼⠓⠀⠭⠀⠖⠼⠁⠑⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠁⠋⠴");
 }
 
 #[test]
@@ -845,18 +840,14 @@ fn p27_sqrt() {
       </mfrac>
     </msup>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <msqrt>
       <mn>4</mn>
     </msqrt>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <mn>2</mn>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠼⠙⠬⠼⠁⠰⠀⠶⠩⠼⠙⠀⠶⠼⠃");
+    test_braille("Finnish", expr, "⠼⠙⠬⠼⠁⠆⠀⠶⠩⠼⠙⠀⠶⠼⠃");
 }
 
 #[test]
@@ -987,7 +978,7 @@ fn p34_vector_dot_product() {
     </mover>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠧⠱⠀⠠⠥⠱");
+    test_braille("Finnish", expr, "⠧⠱⠀⠄⠥⠱");
 }
 
 #[test]
@@ -1253,12 +1244,12 @@ fn p41_function_with_parts_with_arrow() {
       </mrow>
 </math>
 ";
-    test_braille("Finnish", expr, "⠋⠒⠀⠭⠀⠤⠱ ⠫⠤⠼⠁⠂⠀⠭⠀⠣⠶⠀⠤⠼⠁⠀⠐⠐⠀⠭⠬⠀⠖⠼⠃⠀⠭⠂⠀⠤⠼⠁⠀⠣⠀⠭⠀⠣⠶⠀⠼⠁⠀⠐⠐⠀⠤⠭⠀⠖⠼⠉⠂⠀⠭⠀⠱⠀⠼⠁⠻");
+    test_braille("Finnish", expr, "⠋⠒⠀⠭⠀⠤⠱⠀⠫⠤⠼⠁⠂⠀⠭⠀⠣⠶⠀⠤⠼⠁⠀⠐⠐⠀⠭⠬⠀⠖⠼⠃⠀⠭⠂⠀⠤⠼⠁⠀⠣⠀⠭⠀⠣⠶⠀⠼⠁⠀⠐⠐⠀⠤⠭⠀⠖⠼⠉⠂⠀⠭⠀⠱⠀⠼⠁⠻");
 }
 
 #[test]
 // Two 5-dots separate the rows in the 2D math. Format: [whitespace][dot 5][dot 5][whitespace]. This is not an operator.
-fn function_with_parts() {
+fn p40_function_with_parts() {
   let expr = "<math>
       <mi>f</mi>
       <mo>(</mo>
@@ -1317,7 +1308,7 @@ fn function_with_parts() {
          </mrow>
       </mrow>
 </math>";
-  test_braille("Finnish", expr, "⠋⠦⠭⠴ ⠶⠫⠤⠼⠁⠂⠀⠭⠀⠣⠶⠀⠤⠼⠁⠀⠐⠐⠀⠭⠬⠀⠖⠼⠃⠀⠭⠂⠀⠤⠼⠁⠀⠣⠀⠭⠀⠣⠶⠀⠼⠁⠀⠐⠐⠀⠤⠭⠀⠖⠼⠉⠂⠀⠭⠀⠱⠀⠼⠁⠻");
+  test_braille("Finnish", expr, "⠋⠦⠭⠴⠀⠶⠫⠤⠼⠁⠂⠀⠭⠀⠣⠶⠀⠤⠼⠁⠀⠐⠐⠀⠭⠬⠀⠖⠼⠃⠀⠭⠂⠀⠤⠼⠁⠀⠣⠀⠭⠀⠣⠶⠀⠼⠁⠀⠐⠐⠀⠤⠭⠀⠖⠼⠉⠂⠀⠭⠀⠱⠀⠼⠁⠻");
 }
 
 // Two 5-dots separate the rows in the 2D math. Format: [whitespace][dot 5][dot 5][whitespace]. This is not an operator.

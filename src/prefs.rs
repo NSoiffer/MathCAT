@@ -868,6 +868,10 @@ mod tests {
             assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ".");
             assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ", \u{00A0}\u{202F}");
 
+            pref_manager.set_user_prefs("Language", "fi").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ",");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ". \u{00A0}\u{202F}");
+
             pref_manager.set_user_prefs("Language", "sv").unwrap();
             assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ",");
             assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ". \u{00A0}\u{202F}");

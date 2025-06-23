@@ -333,6 +333,30 @@ pub fn is_relational_op(mo: Element) -> bool {
 	return CanonicalizeContext::find_operator(None, mo, None, None, None).priority == *EQUAL_PRIORITY;
 }
 
+/// Simplified computation of for finding the priority.
+/// 'fixity' should be one of "prefix", "infix", or "postfix"
+/// Returns None if the operator is unknown
+pub fn operator_priority(mo: Element, fixity: &str) -> Option<usize> {
+	let found_op_info = if mo.attribute_value(CHEMICAL_BOND).is_some() {
+		Some(&*IMPLIED_CHEMICAL_BOND)
+	} else {
+		OPERATORS.get(as_text(mo))
+	};
+
+	let op_type = match fixity {
+		"prefix" => OperatorTypes::PREFIX,
+		"postfix" => OperatorTypes::POSTFIX,
+		"infix" | _ => OperatorTypes::INFIX,
+	};
+	return match found_op_info {
+		None => None,
+		Some(op_info) => {
+			let matching_op_info = CanonicalizeContext::find_operator_info(op_info, op_type, false);
+			if ptr_eq(matching_op_info, *ILLEGAL_OPERATOR_INFO) {None} else {Some(matching_op_info.priority)}
+		}
+	}
+}
+
 pub fn set_mathml_name(element: Element, new_name: &str) {
 	element.set_name(QName::with_namespace_uri(Some("http://www.w3.org/1998/Math/MathML"), new_name));
 }
@@ -2468,11 +2492,12 @@ impl CanonicalizeContext {
 		fn handle_pseudo_scripts(mrow: Element) -> Element {
 			// from https://www.w3.org/TR/MathML3/chapter7.html#chars.pseudo-scripts
 			static PSEUDO_SCRIPTS: phf::Set<&str> = phf_set! {
-				"\"", "'", "*", "`", "ª", "°", "²", "³", "´", "¹", "º",
+				"\"", "'", "*", "`", "ª", "°", "²", "³", "´", "¹", "º", "˚",
 				"‘", "’", "“", "”", "„", "‟",
 				"′", "″", "‴", "‵", "‶", "‷", "⁗",
 			};
 	
+			debug!("handle_pseudo_scripts: {}", mml_to_string(mrow));
 			assert!(name(mrow) == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(name(mrow)), "non-mrow passed to handle_pseudo_scripts: {}", mml_to_string(mrow));
 			let mut children = mrow.children();
 			// check to see if mrow of all pseudo scripts
@@ -2518,7 +2543,8 @@ impl CanonicalizeContext {
 			return mrow;
 
 			fn is_pseudo_script(child: Element) -> bool {
-				if name(child) == "mo" {
+				let child_name = name(child);
+				if child_name == "mo" || child_name == "mtext" || child_name == "mi" {
 					let text = as_text(child);
 					if PSEUDO_SCRIPTS.contains(as_text(child)) {
 						// don't script a pseudo-script
@@ -3122,7 +3148,7 @@ impl CanonicalizeContext {
 			// FIX: MathType generates the wrong version of union and intersection ops (binary instead of unary)
 		} else if !is_base && (parent_name == "msup" || parent_name == "msubsup") {
 			mo_text = match mo_text {
-				"\u{00BA}"| "\u{2092}"| "\u{20D8}"| "\u{2218}" => "\u{00B0}",		// circle-like objects -> degree
+				"\u{00BA}"| "\u{2092}"| "\u{20D8}"| "\u{2218}" | "\u{02DA}" => "\u{00B0}",		// circle-like objects -> degree
 				_ => mo_text,
 			};
 		} else {
@@ -3172,7 +3198,7 @@ impl CanonicalizeContext {
 	//   e.g., n!!n -- ((n!)!)*n or (n!)*(!n)  -- the latter doesn't make semantic sense though
 	// FIX:  the above ignores mspace and other nodes that need to be skipped to determine the right node to determine airity
 	// FIX:  the postfix problem above should be addressed
-	fn find_operator<'a>(context: Option<&CanonicalizeContext>, mo_node: Element<'a>, previous_operator: Option<&'static OperatorInfo>,
+	pub fn find_operator<'a>(context: Option<&CanonicalizeContext>, mo_node: Element<'a>, previous_operator: Option<&'static OperatorInfo>,
 						previous_node: Option<Element<'a>>, next_node: Option<Element<'a>>) -> &'static OperatorInfo {
 		// get the unicode value and return the OpKeyword associated with it
 		assert!( name(mo_node) == "mo");
@@ -3202,7 +3228,7 @@ impl CanonicalizeContext {
 		}
 	
 		let found_op_info = found_op_info.unwrap();
-		let matching_op_info = find_operator_info(found_op_info, op_type, form.is_some());
+		let matching_op_info = CanonicalizeContext::find_operator_info(found_op_info, op_type, form.is_some());
 		if ptr_eq(matching_op_info, *ILLEGAL_OPERATOR_INFO) {
 			return op_not_in_operator_dictionary(op_type);
 		} else {
@@ -3243,23 +3269,6 @@ impl CanonicalizeContext {
 				return OperatorTypes::INFIX;
 			}
 		}
-
-		fn find_operator_info(op_info: &OperatorInfo, op_type: OperatorTypes, from_form_attr: bool) -> &OperatorInfo {
-			if op_info.is_operator_type(op_type) {
-				return op_info;
-			} else if let Some(next_op_info) = op_info.next {
-				if next_op_info.is_operator_type(op_type) {
-					return next_op_info;
-				} else if let Some(last_op_info) = next_op_info.next {
-					if last_op_info.is_operator_type(op_type) {
-						return last_op_info;
-					}
-				}
-			}
-
-			// didn't find op_info that matches -- if type is not forced, then return first value (any is probably ok) 
-			return if from_form_attr {&ILLEGAL_OPERATOR_INFO} else {op_info};
-		}
 	
 		fn op_not_in_operator_dictionary(op_type: OperatorTypes) -> &'static OperatorInfo {
 			return match op_type {
@@ -3268,6 +3277,23 @@ impl CanonicalizeContext {
 				_ => &DEFAULT_OPERATOR_INFO_INFIX,	// should only be infix
 			};
 		}
+	}
+	
+	fn find_operator_info(op_info: &OperatorInfo, op_type: OperatorTypes, from_form_attr: bool) -> &OperatorInfo {
+		if op_info.is_operator_type(op_type) {
+			return op_info;
+		} else if let Some(next_op_info) = op_info.next {
+			if next_op_info.is_operator_type(op_type) {
+				return next_op_info;
+			} else if let Some(last_op_info) = next_op_info.next {
+				if last_op_info.is_operator_type(op_type) {
+					return last_op_info;
+				}
+			}
+		}
+
+		// didn't find op_info that matches -- if type is not forced, then return first value (any is probably ok) 
+		return if from_form_attr {&ILLEGAL_OPERATOR_INFO} else {op_info};
 	}
 	
 	fn n_vertical_bars_on_right(&self, remaining_children: &[ChildOfElement], vert_bar_ch: &str) -> usize {

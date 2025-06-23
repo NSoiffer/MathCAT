@@ -126,6 +126,8 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     match code {
         "Vietnam" => set_preference("Language".to_string(), "vi".to_string()).unwrap(),
         "CMU" => set_preference("Language".to_string(), "es".to_string()).unwrap(),
+        "Finnish" | "ASCIIMath-fi" => set_preference("Language".to_string(), "fi".to_string()).unwrap(),
+        "Swedish" => set_preference("Language".to_string(), "sv".to_string()).unwrap(),
         "UEB" | "Nemeth" | _ => set_preference("Language".to_string(), "en".to_string()).unwrap(),
     }
     if let Err(e) = set_mathml(mathml.to_string()) {
