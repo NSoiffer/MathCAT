@@ -6,10 +6,12 @@
   replace:
   - with:
       variables:
-      - ClearSpeak_Fractions: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_Fractions='Auto', 'EndFrac', $ClearSpeak_Fractions)"
-      - ClearSpeak_AbsoluteValue: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
-      - ClearSpeak_Roots: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
-      - ClearSpeak_Matrix: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_Matrix='Auto', 'EndMatrix', $ClearSpeak_Matrix)"
+      - ClearSpeak_Fractions: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Fractions='Auto', 'EndFrac', $ClearSpeak_Fractions)"
+      - ClearSpeak_AbsoluteValue: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
+      - ClearSpeak_Roots: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
+      - ClearSpeak_Matrix: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Matrix='Auto', 'EndMatrix', $ClearSpeak_Matrix)"
+
+      - MatchingPause: false()
       # should be set at mtable level, but unknown intents make that impossible to know
       - IsColumnSilent: false()
       replace:
@@ -55,9 +57,11 @@
   replace:
   - bookmark: "@id"
   - test:
-      if: "string-length(.) = 1 and text() != '_'"       # need unicode.tdl to kick in for single letter tokens
+    - if: "string-length(.) = 1 and text() != '_'"       # need unicode.tdl to kick in for single letter tokens
       then: [x: "text()"]
-      else: [x: "translate(., '-_', '  ')" ]   # from intent literals
+    - else_if: "@data-chem-element"                      # NavMode=Character needs this
+      then: [spell: "text()", pause: "short"]
+      else: [x: "translate(., '-_\u00A0', '  ')"]   # from intent literals or from extra spaces added (which get deleted)
 
 - name: default
   tag: ms
@@ -73,7 +77,7 @@
   replace: [x: "*"]
 
 
-- name: structure-simple
+- name: literal-simple
   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
   # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
   # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
@@ -87,7 +91,7 @@
   - x: "*[2]"
   - pause: short
 
-- name: structure-default
+- name: literal-default
   tag: mfrac
   match: "."
   replace:
@@ -96,11 +100,11 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - T: "over"               # phrase("the fraction x 'over' y")
   - test:
       if: "not(IsNode(*[2],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - x: "*[2]"
   - pause: short
   - T: "slutt brøk"          # phrase("start of fraction x over y 'end over'")
@@ -108,7 +112,7 @@
 
 
 # not sure what really should be said for these since we should not assume they are square roots
-- name: structure-default
+- name: literal-default
   tag: msqrt
   match: "."
   replace:
@@ -123,7 +127,7 @@
       then: [T: "slutt rottegn"] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
-- name: structure-default
+- name: literal-default
   tag: mroot
   match: "."
   replace:
@@ -151,7 +155,8 @@
   - x: "*[2]"
   - pause: short
 
-# NORWEGIAN: Removed test for Verbosity.
+# NORWEGIAN: Removed the following test: #if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1" 
+# NORWEGIAN: Added "pause: short" before "senket"
 - name: no-end-sub
   tag: indexed-by
   # invisible comma -- want "x 1 when subscript is an integer"
@@ -159,15 +164,12 @@
   replace:
   - x: "*[1]"
   - pause: short
-  #- test:
-      #if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"        
-      #then: [T: "senket"]      # phrase(x 'sub' 2)
   - T: "senket"
   - x: "*[2]"
   - pause: short
 
 
-- name: structure
+- name: literal
   tag: msub
   match: "."
   replace:
@@ -175,7 +177,7 @@
   - T: "senket"              # phrase(x 'sub' 2)
   - x: "*[2]"
 
-- name: structure
+- name: literal
   tag: [msup, msubsup]
   match: "."
   replace:
@@ -189,7 +191,7 @@
       if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
       then:  [x: "*[last()]"]
       else_test:
-          if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
+          if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"  # FIX: is this test necessary?
           then:
           - T: "hevet"      # phrase(x 'super' 2)
           - x: "*[last()]"
@@ -276,8 +278,8 @@
       then:
       - with:
           variables:
-          - PreSubscript: "IFTHENELSE($Verbosity='Verbose', 'senket', 'senket')"
-          - PreSuperscript: "IFTHENELSE($Verbosity='Verbose', 'hevet', 'hevet')"
+          - PreSubscript: "IfThenElse($Verbosity='Verbose', 'senket', 'senket')"
+          - PreSuperscript: "IfThenElse($Verbosity='Verbose', 'hevet', 'hevet')"
           replace:
           - test: # only bother announcing if there is more than one prescript
               if: "count($Prescripts) > 2"
@@ -330,8 +332,8 @@
       then:
       - with:
           variables:
-          - PostSubscript: "IFTHENELSE($Verbosity='Verbose', 'senket', 'senket')"
-          - PostSuperscript: "IFTHENELSE($Verbosity='Verbose', 'hevet', 'hevet')"
+          - PostSubscript: "IfThenElse($Verbosity='Verbose', 'senket', 'senket')"
+          - PostSuperscript: "IfThenElse($Verbosity='Verbose', 'hevet', 'hevet')"
           replace:
           - test: # only bother announcing if there is more than one postscript
               if: "count($Postscripts) > 2"
@@ -451,15 +453,15 @@
   - T: "rad"      # phrase(the first 'row' of a matrix)
   - x: "count(preceding-sibling::*)+1"
   - test:
-      if: self::m:mlabeledtr
+      if: "self::m:mlabeledtr"
       then:
       - T: "med etiketten"      # phrase(the line 'with label' first equation)
       - x: "*[1]/*"
       - pause: short
   - pause: medium
   - test:
-      if: self::m:mlabeledtr
-      then: [{x: "*[position()>1]"}]
+      if: "self::m:mlabeledtr"
+      then: [x: "*[position()>1]"]
       else: {x: "*"}
 
 - name: default
@@ -479,10 +481,10 @@
   - test:
     # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
     - if: count(following-sibling::*) > 0
-      then: {pause: short}
+      then: [pause: short]
     - else_if: count(../following-sibling::*) > 0
-      then: {pause: medium}
-      else: {pause: long}
+      then: [pause: medium]
+      else: [pause: long]
 
 
 - name: empty-box
@@ -648,7 +650,7 @@
   - x: "*"
   - test:
       if: "not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
   - test:
       if: "IsNode(., '2D')"
       then: [pause: short]
@@ -661,7 +663,7 @@
   replace:
   - test:
       if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
   - x: "*"
   - x: "SpeakIntentName(name(.), $Verbosity, 'postfix')"
 
@@ -672,7 +674,7 @@
   replace:
   - test:
       if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
   - test:
       if: "count(*) = 1"  # in cases such as continued-row, plus/minus might have just one child
       then:
@@ -685,7 +687,7 @@
           replace: [x: "SpeakIntentName(name(.), $Verbosity, 'infix')", pause: auto]
   - test:
       if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
   - test:
       if: "IsNode(., '2D')"   # add (probably) a slightly longer pause if this came from a 2D node
       then: [pause: short]
@@ -709,8 +711,9 @@
       #     then: [x: "','"]
       # SWEDISH: After correspondence with a mathematician we have decided to not have any punctuation between variables, but a short pause. Length of pause needs to be tested.
   - test:
+                                                                                      
       if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
   - test:
       if: "IsNode(., '2D')"
       then: [pause: short]
