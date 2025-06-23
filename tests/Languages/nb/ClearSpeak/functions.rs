@@ -296,7 +296,7 @@ fn explicit_times_none_superscript() {
         <mrow><mi>x</mi><mi>y</mi></mrow>
         <mo>)</mo></mrow>
         </mrow></math>";
-        test("nb", "ClearSpeak", expr, "b x y");
+        test("nb", "ClearSpeak", expr, "b; startparentes; x y, sluttparentes");
     }
 
     #[test]

@@ -212,7 +212,7 @@ fn no_times_sqrt() {
         <mrow><mi>x</mi><mi>y</mi></mrow>
         <mo>)</mo></mrow>
         </mrow></math>";
-        test("nb", "SimpleSpeak", expr, "b x y");
+        test("nb", "SimpleSpeak", expr, "b; startparentes; x y, sluttparentes");
     }
 
     #[test]
