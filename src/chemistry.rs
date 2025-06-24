@@ -80,15 +80,18 @@ static CHEM_EQUATION_ARROWS: phf::Set<char> = phf_set! {
     '\u{1f8d0}', '\u{1f8d1}', '\u{1f8d2}', '\u{1f8d3}', '\u{1f8d4}', '\u{1f8d5}',         // proposed Unicode equilibrium arrows
 };
 
+// Returns true if the 'property' (should have ":") is in the intent
+fn has_chem_intent(mathml: Element, property: &str) -> bool {
+    if let Some(intent) = mathml.attribute_value(INTENT_ATTR) {
+        let head = intent.split('(').next().unwrap();
+        return head.contains(property);
+    }
+    return false;
+}
 
 pub fn is_chemistry_off(mathml: Element) -> bool {
-    lazy_static! {
-        static ref INTENT_STRUCTURE: Regex = Regex::new(r"literal([ \t\n:(]|$)").unwrap();
-    }
-    if let Some(intent) = mathml.attribute_value(INTENT_ATTR) {
-        if INTENT_STRUCTURE.is_match(intent) {
-            return true;
-        }
+    if has_chem_intent(mathml, ":chemical-formula") || has_chem_intent(mathml, ":chemical-equation") {
+        return false;
     }
     let pref_manager = crate::prefs::PreferenceManager::get();
     return pref_manager.borrow().pref_to_string("Chemistry") == "Off";
@@ -414,13 +417,13 @@ pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
         // need to determine if it is an equation or a formula
         latex.trim_start().starts_with(r"\ce") 
     } else {
-        false
+        has_chem_intent(mathml, ":chemical-formula") || has_chem_intent(mathml, ":chemical-equation")
     };
 
     if is_chemistry || is_chemistry_sanity_check(mathml) {
         assert_eq!(mathml.children().len(), 1);
         let likelihood = likely_chem_formula(child);
-        if likelihood >= CHEMISTRY_THRESHOLD {
+        if likelihood >= CHEMISTRY_THRESHOLD || has_chem_intent(mathml, ":chemical-formula") {
             child.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
             set_marked_chemistry_attr(child, CHEM_FORMULA);
         }
@@ -428,7 +431,7 @@ pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
         if child.attribute(CHEM_FORMULA).is_none() {
             // can't be both an equation and a formula...
             let likelihood = likely_chem_equation(child);
-            if is_chemistry || likelihood >= CHEMISTRY_THRESHOLD {
+            if is_chemistry || likelihood >= CHEMISTRY_THRESHOLD || has_chem_intent(mathml, ":chemical-equation") {
                 child.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
                 set_marked_chemistry_attr(child, CHEM_EQUATION);
             }
@@ -1523,16 +1526,12 @@ fn likely_chem_formula_operator(mathml: Element) -> isize {
         }
 
         fn is_legal_triple_bond(left: &str, right: &str) -> bool {
-            // from en.wikipedia.org/wiki/Triple_bond
+            // According to https://tinyurl.com/rkynhwj3 (from physics.org)
+            // triple bonds can be formed between any of B, C, N, and O
+            // Apparently they can also be forced in other cases, but they are rare.
             // 'B' is from studiousguy.com/triple-bond-examples/
-            #![allow(clippy::if_same_then_else)]
-            if left=="C" && (right == "C" || right == "N" || right == "O") {
-                return true;
-            } else if left == "B" && right == "B" {
-                return true;
-            } else {
-                return left == "N" && right == "C";
-            }
+            return  (left == "B"  || left == "C"  || left == "N"  || left == "O") &&
+                    (right == "B" || right == "C" || right == "N" || right == "O");
         }
     }
 }
