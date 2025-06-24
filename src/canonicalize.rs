@@ -346,7 +346,7 @@ pub fn operator_priority(mo: Element, fixity: &str) -> Option<usize> {
 	let op_type = match fixity {
 		"prefix" => OperatorTypes::PREFIX,
 		"postfix" => OperatorTypes::POSTFIX,
-		"infix" | _ => OperatorTypes::INFIX,
+		_ => OperatorTypes::INFIX,
 	};
 	return match found_op_info {
 		None => None,

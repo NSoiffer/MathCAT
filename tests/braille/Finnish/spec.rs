@@ -1850,41 +1850,41 @@ fn p64_sodium_ion() {
 fn p64_copper_ion() {
     // From MathType
     let expr = "<math><msup><mrow><mtext>Cu</mtext></mrow><mrow><mn>2</mn><mo>+</mo></mrow></msup></math>";
-    test_braille("Finnish", expr, "⠠⠉⠕⠬⠦⠼⠃⠀⠖⠴");
+    test_braille("Finnish", expr, "⠠⠉⠥⠬⠦⠼⠃⠀⠖⠴");
 }
 
 #[test]
 fn p64_chemistry_1() {
-    let expr = "<math><msubsup><mrow><mi>S</mi><mi>O</mi></mrow><mn>4</mn><mrow><mn>2</mn><mo>+</mo></mrow></msubsup></math>";
+    let expr = "<math><msubsup><mrow><mi>S</mi><mi>O</mi></mrow><mn>4</mn><mrow><mn>2</mn><mo>-</mo></mrow></msubsup></math>";
     test_braille("Finnish", expr, "⠠⠎⠠⠕⠲⠬⠦⠼⠃⠀⠤⠴");
 }
 
 #[test]
 fn p64_chemistry_bond_1() {
-    let expr = "<math><mi>H</mi><mo>-</mo><mi>H</mi></math>";
+    let expr = "<math intent=':chemical-formula'><mi>H</mi><mo>-</mo><mi>H</mi></math>";
     test_braille("Finnish", expr, "⠠⠓⠀⠒⠠⠓");
 }
 
 #[test]
 fn p64_chemistry_bond_1_alternative() {
-    let expr = "<math><mi>H</mi><mo>:</mo><mi>H</mi></math>";
-    test_braille("Finnish", expr, "⠠⠓⠀⠒⠠⠓");
+    let expr = "<math intent=':chemical-formula'><mi>H</mi><mo>:</mo><mi>H</mi></math>";
+    test_braille("Finnish", expr, "⠠⠓⠀⠆⠠⠓");
 }
 
 #[test]
 fn p64_chemistry_bond_2() {
-    let expr = "<math><mi>O</mi><mo>=</mo><mi>O</mi></math>";
+    let expr = "<math intent=':chemical-formula'><mi>O</mi><mo>=</mo><mi>O</mi></math>";
     test_braille("Finnish", expr, "⠠⠕⠀⠒⠒⠠⠕");
 }
 
 #[test]
 fn p64_chemistry_bond_2_alternative() {
-    let expr = "<math><mi>O</mi><mo>∷</mo><mi>O</mi></math>";
-    test_braille("Finnish", expr, "⠠⠕⠀⠒⠒⠠⠕");
+    let expr = "<math intent=':chemical-formula'><mi>O</mi><mo>∷</mo><mi>O</mi></math>";
+    test_braille("Finnish", expr, "⠠⠕⠀⠶⠠⠕");
 }
 
 #[test]
 fn p64_chemistry_bond_3() {
-    let expr = "<math><mi>N</mi><mo>≡</mo><mi>N</mi></math>";
+    let expr = "<math intent=':chemical-formula'><mi>N</mi><mo>≡</mo><mi>N</mi></math>";
     test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝");
 }

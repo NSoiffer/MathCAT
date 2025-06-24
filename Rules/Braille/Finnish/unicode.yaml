@@ -401,9 +401,11 @@
         else: [t: "⠖"]          # unary plus
  - "-":                         # 0x002D (minus)
      - test:
-        if: "self::m:mo and parent::m:mrow and preceding-sibling::*"
-        then: [t: "W⠤"]        # infix minus
-        else: [t: "⠤"]         # unary minus
+        - if: "@data-chemical-bond"
+          then: [t: "W⠒"]
+        - else_if: "self::m:mo and parent::m:mrow and preceding-sibling::*"
+          then: [t: "W⠤"]        # infix minus
+          else: [t: "⠤"]         # unary minus
  - ".":                 # 0x002E # FI: used as a thousand separator
     - test:
         if: "self::m:mn"
@@ -417,15 +419,22 @@
    # sometimes (for division or ratio) it is dots 34 and sometimes (for function def) it is dots 25
    # the following is a very crude test that looks for "XXX : YYY → ZZZ". Awaiting better information to improve the test.
     - test:
-        - if: "preceding-sibling::*[1][name(BaseNode(.))='mi'] and 
+        - if: "@data-chemical-bond"
+          then: [t: "W⠆"]
+        - else_if: "preceding-sibling::*[1][name(BaseNode(.))='mi'] and 
                following-sibling::*[1][self::m:mrow and *[2][.='→']]"
           then: [t: "⠒W"]
           else: [t: "W⠌"]
 
  - "<": [T: "W⠣W"]               # 0x003C (less than sign)
- - "=": [T: "W⠶"]                # 0x003D (regular equals sign)
+ - "=":                          # 0x003D (regular equals sign)
+     - test:
+        - if: "@data-chemical-bond"
+          then: [t: "W⠒⠒"]
+          else: [t: "W⠶"]
+
  - ">": [T: "W⠱W"]               # 0x003E (greater than sign ( regular ))
- - "?": [t: "⠢"]                # 0x003F (Question mark)
+ - "?": [t: "P⠢"]                # 0x003F (Question mark)
  - "[": [T: "["]                # 0x005B (left square bracket)
  - "]": [T: "]"]                # 0x005D (right square bracket)
  - "{": [T: "{"]                # 0x007B ( left curly brace)
@@ -520,12 +529,17 @@
  - "∬": [T: "⠮⠮"]               # # 0x222C (double integral) FI: not in the specification
  - "∭": [T: "⠮⠮⠮"]              # 0x222D (triple integral) FI: not in the specification
  - "∂": [T: "⠈⠙"]                # 0x2202 (partial derivative (round d))
+ - "∷": [T: "W⠶"]                 # 0x2237 (Proportion) [only use in the spec is as a double bond with this value]
  - "≁": [T: "⠐⠨⠶"]                # 0x2241 (not tilde) FI: Not in the specification, so this is a construction. Used in the context of geometry. Tilde has different braille in general text.
  - "≅": [T: "W⠰⠶"]                # 0x2245 (equals sign under tilde)
  - "≈": [T: "W⠸⠶"]                # 0x2248 (double tilde, almost equal to)
  - "≙": [T: "W⠒⠒"]                # 0x2259 (caret over equals sign)
  - "≠": [T: "W⠐⠶"]                # 0x2260 (not equal to)
- - "≡": [T: "W⠰⠶"]                # 0x2261 (identify (is congruent to, is identical with))
+ - "≡":                           # 0x2261 (identify (is congruent to, is identical with))
+     - test:
+        - if: "@data-chemical-bond"
+          then: [t: "W⠒⠒⠒"]
+          else: [t: "W⠰⠶"]
  - "≢": [T: "W⠐⠰⠶"]                # 0x2262 (is not identical to) FI: Not in the specification, but can be used.
  - "≤": [T: "W⠣⠶W"]                # 0x2264 (bar under less than sign (is less than or equal to))
  - "≥": [T: "W⠱⠶W"]                # 0x2265 (bar under greater than sign (is greater than or equal to))

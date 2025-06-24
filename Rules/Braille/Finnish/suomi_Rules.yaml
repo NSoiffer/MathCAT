@@ -345,11 +345,24 @@
 -
   # Chemistry has a special rule for numerical subscripts (note base is not necessarily a chemical element)
   name: chemistry
-  tag: msub
-  match: "*[2][self::m:mn][not(contains(., '.,'))] and ancestor-or-self::*[@data-chem-formula]"
+  tag: [msub, msubsup]
+  match: "*[2][self::m:mn][not(contains(., '.,'))] and (*[1][@data-chem-element] or ancestor-or-self::*[@data-chem-formula])"
   replace:
   - x: "*[1]"
   - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
+  - test:
+      if: "self::m:msubsup"
+      then:
+      - t: "↑"
+      - test:
+          - if: "NeedsToBeGrouped(*[3], 'Finnish', false())"
+            then:
+            - t: "("
+            - x: "*[3]"
+            - t: ")"
+            else:
+            - x: "*[3]" 
+      - t: "W"
 
 -
   name: default
@@ -391,53 +404,36 @@
 
 -
   name: msubsup_default_mmultiscripts_equiv
-  tag: [msubsup, munderover] # mmultiscripts with only sub/sup postscript
+  tag: [msubsup, mmultiscripts] # mmultiscripts with only sub/sup postscript
   match: "count(*)=3"    # catches mmultiscripts equiv
-  variables: [AddSpaces: "IsInDefinition(BaseNode(*[1]), 'Braille', 'NemethComparisonOperators')"]
   replace:
   - test:
-      if: "$AddSpaces"
-      then: [t: "W"]
-  - test:
-      if: "self::m:mundermover and NeedsToBeGrouped(*[1], 'Finnish', true())"
+      if: "(self::m:munder or self::m:mover) and NeedsToBeGrouped(*[1], 'Finnish', true())"
       then:
       - t: "("
       - x: "*[1]"
       - t: ")"
-      else: [x: "*[1]"]
-  - with:
-      variables:
-      - FirstScriptNeedsToBeGrouped: "NeedsToBeGrouped(*[2], 'Finnish', false())"
-      - SecondScriptNeedsToBeGrouped: "NeedsToBeGrouped(*[3], 'Finnish', false())"
-      replace:
-      # the spec says that a start grouping sign is *before* the script indicator
-      - test:
-          if: "$FirstScriptNeedsToBeGrouped"
-          then: [t: "⠘"]
-      - test:
-          if: "self::m:msubsup"
-          then: [t: "⠣"]
-          else: [t: "⠣⠣"]
-      - x: "*[2]"
-      - test:
-          if: "$FirstScriptNeedsToBeGrouped"
-          then: [t: "⠱"]
-
-      - test:
-          if: "$SecondScriptNeedsToBeGrouped"
-          then: [t: "⠘"]
-      - test:
-          if: "self::m:msubsup"
-          then: [t: "⠬"]
-          else: [t: "⠬⠬"]  # mover
-      - x: "*[3]"
-      - test:
-          if: "$SecondScriptNeedsToBeGrouped"
-          then: [t: "⠱"]
-      - t: "#"   # signal end script/numeric mode
+      else:
+      - x: "*[1]"
+  - t: "↓"
   - test:
-      if: "$AddSpaces"
-      then: [t: "W"]
+      - if: "NeedsToBeGrouped(*[2], 'Finnish', false())"
+        then:
+        - t: "("
+        - x: "*[2]"
+        - t: ")"
+        else:
+        - x: "*[2]" 
+  - t: "↑"
+  - test:
+      - if: "NeedsToBeGrouped(*[3], 'Finnish', false())"
+        then:
+        - t: "("
+        - x: "*[3]"
+        - t: ")"
+        else:
+        - x: "*[3]" 
+  - t: "Z"
 
 -
   name: default

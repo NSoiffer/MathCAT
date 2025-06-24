@@ -2461,11 +2461,10 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         let baseline_indicator_hack = PreferenceManager::get().borrow().pref_to_string("BrailleCode") == "Nemeth";
         // debug!("highlight_braille_string: highlight_style={}\n braille={}", highlight_style, braille);
         let mut i_first_modified = 0;
-        for i in 0..chars.len() {
-            let ch = chars[i];
-            let modified_ch = add_dots_to_braille_char(ch, baseline_indicator_hack);
-            chars[i] = modified_ch; 
-            if ch != modified_ch {
+        for (i, ch) in chars.iter_mut().enumerate() {
+            let modified_ch = add_dots_to_braille_char(*ch, baseline_indicator_hack);
+            if *ch != modified_ch {
+                *ch = modified_ch; 
                 i_first_modified = i;
                 break;
             };
@@ -2487,6 +2486,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 
         if &highlight_style == "All" {
             // finish going through the string
+			#[allow(clippy::needless_range_loop)]  // I don't like enumerate/take/skip here
             for i in i_first_modified+1..i_last_modified {
                 chars[i] = add_dots_to_braille_char(chars[i], baseline_indicator_hack);
             };

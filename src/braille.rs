@@ -750,7 +750,7 @@ fn nemeth_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
             if let Some(last_highlighted) = braille.rfind(is_highlighted) {
                 if braille[last_highlighted..].starts_with('𝑏') {
                     let i_after_baseline = last_highlighted + '𝑏'.len_utf8();
-                    if i_after_baseline == braille.len() || braille[i_after_baseline..].starts_with(&['W', 'w', ',', 'P']) {
+                    if i_after_baseline == braille.len() || braille[i_after_baseline..].starts_with(['W', 'w', ',', 'P']) {
                         // shift the highlight to the left after doing just the replacement (if any) that the regex below does
                         // the shift runs until a non blank braille char is found
                         let mut bytes_deleted = 0;
@@ -2060,7 +2060,7 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "𝑐" => "",       // second or latter braille cell of a capital letter
     "𝐶" => "⠠",      // capital that never should get whitespace in front (from chemical element)
     "N" => "⠼",     // number indicator
-    "n" => "⠼",     // number indicator for drop numbers (special case with close parens)
+    "n" => "",     // number indicator for drop numbers (special case with close parens)
     "t" => "⠱",     // shape terminator
     "W" => "⠀",     // whitespace"
     "𝐖"=> "⠀ ⠀",     // doubled whitespace (don't want collapsed to a single whitespace --add a regular space in between and remove it later)
@@ -2095,7 +2095,7 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
         // Numbers typically end with a space, but sometimes not (captured by the following regexes)
         // Ellipsis at the end of a number are treated as being part of the number (in match, we don't add whitespace)
-        static ref DROP_UNNEEDED_SPACE: Regex = Regex::new(r"(((N.)+)[W𝐖]([N𝐶#↑↓Z)}\]|,]|(⠄⠄⠄)))").unwrap();
+        static ref DROP_UNNEEDED_SPACE: Regex = Regex::new(r"(((N.)+)[W𝐖]([n𝐶#↑↓Z)}\]|,]|(⠄⠄⠄)))").unwrap();
     }
 
     debug!("finnish_cleanup: start={}", raw_braille);
@@ -2104,7 +2104,7 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
         // debug!("DROP_NUMBER_SEPARATOR match='{}'", &cap[1]);
         return cap[1].to_string() + "𝐶)";       // hack to use "𝐶" instead of dot 6 directly, but works for NUMBER_MATCH
     });
-    let result = result.replace('n', "N");  // avoids having to modify remove_unneeded_mode_changes()
+    // let result = result.replace('n', "N");  // avoids having to modify remove_unneeded_mode_changes()
     let result = DROP_UNNEEDED_SPACE.replace_all(&result, |cap: &Captures| {
         // match includes the char after the number -- insert the whitespace before it
         debug!("NUMBER_MATCH match #caps={}", cap.len());
@@ -2153,9 +2153,9 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     });
 
     // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces (also zone end)
-    let result = result.trim_start_matches('⠀').trim_end_matches(&['⠀', '⠐']);
+    let result = result.trim_start_matches('⠀').trim_end_matches(['⠀', '⠐']);
     debug!("   after trim={}", &result);
-    let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
+    let result = COLLAPSE_SPACES.replace_all(result, "⠀");
     // hack for "|:" which requires a double space
     return result.replace(" ","");
 }
@@ -2836,7 +2836,7 @@ impl NeedsToBeGrouped {
         let element_name = name(mathml);
         if is_leaf(mathml) &&
             // 'mn' can have whitespace because that doesn't generate a space in braille
-           (element_name == "mn" || !as_text(mathml).find(char::is_whitespace).is_none()) {
+           (element_name == "mn" || as_text(mathml).find(char::is_whitespace).is_some()) {
             return false;
         }
         if IsBracketed::is_bracketed(mathml, "", "", false, true) {
