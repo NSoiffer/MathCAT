@@ -1636,8 +1636,12 @@ pub fn likely_chem_element(mathml: Element) -> isize {
     if as_text(mathml).trim().is_empty() {
         return 0;   // whitespace
     } else if is_chemical_element(mathml) {
-        // single letter = 1; double = 3 -- all elements are ASCII
-        return (if text.len() == 1 {1} else {3}) as isize;
+        // single letter = 1; single letter with mathvarinat="normal" = 2; double = 3 -- all elements are ASCII
+        return (if text.len() == 1 {
+            if mathml.attribute_value("mathvariant").unwrap_or_default() == "normal" {2} else {1}
+        } else {
+            3
+        }) as isize;
     } else if NUCLEAR_SYMBOLS.contains(&text) {
         return 0;
         // not much special about them;
@@ -1974,13 +1978,13 @@ mod chem_tests {
     #[test]
     fn test_double_bond() {
         let test1 = r#"<mrow><mi mathvariant='normal'>C</mi><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub><mo>=</mo><mi>C</mi></mrow>"#;
-        assert!( parse_mathml_string(test1, |mathml| likely_chem_formula(mathml)==6) );
+        assert!( parse_mathml_string(test1, |mathml| likely_chem_formula(mathml)==8) );
         let test2 = r#"<mrow><mi mathvariant='normal'>C</mi><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub><mo>=</mo>
         <mi>C</mi><mi>H</mi><mi>R</mi></mrow>"#;
-        assert!( parse_mathml_string(test2, |mathml| likely_chem_formula(mathml)==10) );
+        assert!( parse_mathml_string(test2, |mathml| likely_chem_formula(mathml)==12) );
         let test3 = r#"<mrow><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub><mi mathvariant='normal'>C</mi><mo>=</mo>
                 <mi>C</mi><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub></mrow>"#;
-        assert!( parse_mathml_string(test3, |mathml| likely_chem_formula(mathml)==8) );
+        assert!( parse_mathml_string(test3, |mathml| likely_chem_formula(mathml)==11) );
         let test4 = r#"<mrow><mi>H</mi><mo>-</mo><mi>N</mi><mo>=</mo><mi>N</mi><mo>-</mo><mi>H</mi></mrow>"#;
         assert!( parse_mathml_string(test4, |mathml| likely_chem_formula(mathml)==10) );
         let test10 = r#"<mrow><mi mathvariant='normal'>C</mi><msub><mi mathvariant='normal'>H</mi><mn>3</mn></msub><mo>=</mo><mi>C</mi></mrow>"#;
@@ -1991,7 +1995,7 @@ mod chem_tests {
     #[ignore]   // It would be good to say "not chemistry" for this, but there aren't rules for that at the moment
     fn test_water_bond() {
         let test11 = r#"<mrow><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub><mi mathvariant='normal'>O</mi><mo>=</mo><mi>O</mi></mrow>"#;
-        assert!( parse_mathml_string(test11, |mathml| {println!("val={}", likely_chem_formula(mathml)); likely_chem_formula(mathml)==13}) );
+        assert!( parse_mathml_string(test11, |mathml| {println!("val={}", likely_chem_formula(mathml)); likely_chem_formula(mathml)==8}) );
         // assert!( parse_mathml_string(test11, |mathml| likely_chem_formula(mathml)==NOT_CHEMISTRY) );
     }
 
@@ -2010,7 +2014,7 @@ mod chem_tests {
         assert!( parse_mathml_string(test5, |mathml| likely_chem_formula(mathml)==10) );
         let test6 = r#"<mrow><mi>H</mi><mo>-</mo><mi>C</mi><mo>≡</mo>
             <mi>C</mi><mo>-</mo><mi mathvariant='normal'>C</mi><msub><mi mathvariant='normal'>H</mi><mn>3</mn></msub></mrow>"#; // 1-Propyne
-        assert!( parse_mathml_string(test6, |mathml| likely_chem_formula(mathml)==12) );
+        assert!( parse_mathml_string(test6, |mathml| likely_chem_formula(mathml)==14) );
         // assert!( parse_mathml_string(test6, |mathml| {println!("val={}", likely_chem_formula(mathml)); likely_chem_formula(mathml)==10}) );
         let test10 = r#"<mrow><mi>O</mi><mo>:::</mo><mi>S</mi></mrow>"#;
         assert!( parse_mathml_string(test10, |mathml| likely_chem_formula(mathml)==NOT_CHEMISTRY) );
@@ -2075,7 +2079,7 @@ mod chem_tests {
             <mrow data-changed='added' data-chem-formula='5'>
                 <mi mathvariant='normal' data-chem-element='1'>S</mi>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <mmultiscripts data-chem-formula='1'>
+                <mmultiscripts data-chem-formula='2'>
                     <mi mathvariant='normal' data-split='true' data-chem-element='1'>O</mi>
                     <mn>2</mn>
                     <none></none>
@@ -2095,10 +2099,10 @@ mod chem_tests {
             </msubsup>
             </mrow></math>"#;
         let target = r#"<math>
-            <mrow data-changed='added' data-chem-formula='6'>
+            <mrow data-changed='added' data-chem-formula='7'>
                 <mi mathvariant='normal' data-chem-element='1'>S</mi>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <msubsup data-chem-formula='4'>
+                <msubsup data-chem-formula='5'>
                     <mi mathvariant='normal' data-split='true' data-chem-element='1'>O</mi>
                     <mn>4</mn>
                     <mrow data-chem-formula='3'><mn>2</mn><mo>-</mo></mrow>
@@ -2126,12 +2130,12 @@ mod chem_tests {
         let test = "<math><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub><mi mathvariant='normal'>O</mi></math>";
         let target = "<math>
             <mrow data-changed='added' data-chem-formula='5'>
-                <msub data-chem-formula='1'>
-                    <mi mathvariant='normal' data-chem-element='1'>H</mi>
+                <msub data-chem-formula='2'>
+                    <mi mathvariant='normal' data-chem-element='2'>H</mi>
                     <mn>2</mn>
                 </msub>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <mi mathvariant='normal' data-chem-element='1'>O</mi>
+                <mi mathvariant='normal' data-chem-element='2'>O</mi>
             </mrow>
         </math>";
         assert!(are_strs_canonically_equal(test, target));
@@ -2169,13 +2173,13 @@ mod chem_tests {
         </math>";
         let target = "<math>
             <mrow data-chem-formula='5'>
-                <mmultiscripts data-chem-formula='1'>
-                    <mi mathvariant='normal' data-chem-element='1'>H</mi>
+                <mmultiscripts data-chem-formula='2'>
+                    <mi mathvariant='normal' data-chem-element='2'>H</mi>
                     <mn>2</mn>
                     <none></none>
                 </mmultiscripts>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <mi mathvariant='normal' data-chem-element='1'>O</mi>
+                <mi mathvariant='normal' data-chem-element='2'>O</mi>
             </mrow>
        </math>";
         assert!(are_strs_canonically_equal(test, target));
@@ -2424,7 +2428,7 @@ mod chem_tests {
             <mrow data-changed='added' data-chem-formula='5'>
             <mi mathvariant='normal' data-chem-element='1'>N</mi>
             <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-            <msub data-chem-formula='1'>
+            <msub data-chem-formula='2'>
                 <mi mathvariant='normal' data-chem-element='1' data-split='true'>H</mi>
                 <mn>3</mn>
             </msub>
@@ -2454,7 +2458,7 @@ mod chem_tests {
             <mrow data-chem-formula='5'>
                 <mi mathvariant='normal' data-chem-element='1'>N</mi>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <mmultiscripts data-mjx-auto-op='false' data-chem-formula='1'>
+                <mmultiscripts data-mjx-auto-op='false' data-chem-formula='2'>
                 <mi mathvariant='normal' data-mjx-auto-op='false' data-split='true' data-chem-element='1'>H</mi>
                 <mn>3</mn>
                 <none></none>
@@ -2493,10 +2497,10 @@ mod chem_tests {
             </mrow>
         </math>";
         let target = "<math>
-            <mrow data-chem-formula='6'>
+            <mrow data-chem-formula='7'>
                 <mi mathvariant='normal' data-chem-element='1'>S</mi>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <mmultiscripts data-chem-formula='4'>
+                <mmultiscripts data-chem-formula='5'>
                     <mi mathvariant='normal' data-split='true' data-chem-element='1'>O</mi>
                     <mn>4</mn>
                     <none/>
@@ -2528,15 +2532,15 @@ mod chem_tests {
                 </mrow>
             </math>";
         let target = "<math>
-            <mrow data-chem-formula='5'>
-                <mmultiscripts data-chem-formula='1'>
-                    <mi mathvariant='normal' data-chem-element='1'>H</mi>
+            <mrow data-chem-formula='6'>
+                <mmultiscripts data-chem-formula='2'>
+                    <mi mathvariant='normal' data-chem-element='2'>H</mi>
                     <mn>3</mn>
                     <none></none>
                 </mmultiscripts>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <mmultiscripts data-chem-formula='2'>
-                    <mi mathvariant='normal' data-chem-element='1'>O</mi>
+                <mmultiscripts data-chem-formula='3'>
+                    <mi mathvariant='normal' data-chem-element='2'>O</mi>
                     <none></none>
                     <mo>+</mo>
                 </mmultiscripts>
@@ -2840,7 +2844,7 @@ mod chem_tests {
                 <mrow data-changed='added' data-chem-formula='5'>
                 <mi mathvariant='normal' data-chem-element='1'>C</mi>
                 <mo data-changed='added'>&#x2063;</mo>
-                <mmultiscripts data-chem-formula='1'>
+                <mmultiscripts data-chem-formula='2'>
                     <mi mathvariant='normal' data-split='true' data-chem-element='1'>H</mi>
                     <mn>3</mn>
                     <none></none>
@@ -2956,16 +2960,16 @@ mod chem_tests {
         </mrow>
       </math>";
     let target = "<math>
-        <mrow data-chem-formula='5'>
-            <mmultiscripts data-previous-space-width='-0.083' data-chem-formula='2'>
-                <mi mathvariant='normal' data-chem-element='1'>O</mi>
+        <mrow data-chem-formula='7'>
+            <mmultiscripts data-previous-space-width='-0.083' data-chem-formula='3'>
+                <mi mathvariant='normal' data-chem-element='2'>O</mi>
                 <mprescripts></mprescripts>
                 <none></none>
                 <mn>18</mn>
             </mmultiscripts>
             <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-            <mmultiscripts data-previous-space-width='0.027999999999999997' data-chem-formula='2'>
-                <mi mathvariant='normal' data-chem-element='1'>O</mi>
+            <mmultiscripts data-previous-space-width='0.027999999999999997' data-chem-formula='3'>
+                <mi mathvariant='normal' data-chem-element='2'>O</mi>
                 <mprescripts></mprescripts>
                 <none></none>
                 <mn>16</mn>
