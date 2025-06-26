@@ -181,7 +181,9 @@ fn p13_times_with_question_mark() {
 
 #[test]
 fn p13_parentheses_invisible_times() {
-    let expr = "<math><mo>(</mo><mn>3</mn><mo>&#8290;</mo><mi>x</mi><mo>+</mo><mn>2</mn><mo>&#8290;</mo><mi>y</mi><mo>)</mo><mo>&#8290;</mo><mo>(</mo><mn>2</mn><mo>&#8290;</mo><mi>x</mi><mo>−</mo><mn>1</mn><mo>)</mo></math>";
+  init_logger();
+    let expr = "<math><mo>(</mo><mn>3</mn><mo>&#8290;</mo><mi>x</mi><mo>+</mo><mn>2</mn><mo>&#8290;</mo><mi>y</mi><mo>)</mo>
+                    <mo>&#8290;</mo><mo>(</mo><mn>2</mn><mo>&#8290;</mo><mi>x</mi><mo>−</mo><mn>1</mn><mo>)</mo></math>";
     test_braille("Finnish", expr, "⠦⠼⠉⠀⠭⠀⠖⠼⠃⠀⠽⠴⠀⠦⠼⠃⠀⠭⠀⠤⠼⠁⠴");
 }
 
@@ -246,8 +248,6 @@ fn p15_fractions_minus() {
     </mfrac>
     <mo>)</mo>
     <mo>−</mo>
-  </mrow>
-  <mrow>
     <mo>(</mo>
     <mfrac>
       <mn>2</mn>
@@ -324,8 +324,6 @@ fn p16_parens_and_brackets() {
   <mrow>
     <mn>92</mn>
     <mo>+</mo>
-  </mrow>
-  <mrow>
     <mo>[</mo>
     <mo>−</mo>
     <mn>2</mn>
@@ -431,8 +429,6 @@ fn p19_fractions_mixed_operations() {
     </mfrac>
     <mo>)</mo>
     <mo>−</mo>
-  </mrow>
-  <mrow>
     <mo>(</mo>
     <mfrac>
       <mn>3</mn>
@@ -676,8 +672,6 @@ fn p25_long_fraction() {
       </mrow>
     </mfrac>
     <mo>:</mo>
-  </mrow>
-  <mrow>
     <mfrac>
       <mrow>
         <msup>
@@ -742,15 +736,11 @@ fn p26_exponent_multiplication_with_parens() {
       <mn>3</mn>
     </msup>
     <mo>⋅</mo>
-  </mrow>
-  <mrow>
     <msup>
       <mn>2</mn>
       <mn>5</mn>
     </msup>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <msup>
       <mn>2</mn>
       <mrow>
@@ -762,8 +752,6 @@ fn p26_exponent_multiplication_with_parens() {
       </mrow>
     </msup>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <msup>
       <mn>2</mn>
       <mn>8</mn>
@@ -782,15 +770,11 @@ fn p26_exponent_multiplication_no_parens() {
       <mn>3</mn>
     </msup>
     <mo>⋅</mo>
-  </mrow>
-  <mrow>
     <msup>
       <mn>2</mn>
       <mn>5</mn>
     </msup>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <msup>
       <mn>2</mn>
       <mrow>
@@ -800,8 +784,6 @@ fn p26_exponent_multiplication_no_parens() {
       </mrow>
     </msup>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <msup>
       <mn>2</mn>
       <mn>8</mn>
@@ -970,8 +952,6 @@ fn p34_vector_dot_product() {
       <mo>‾</mo>
     </mover>
     <mo>⋅</mo>
-  </mrow>
-  <mrow>
     <mover>
       <mi>u</mi>
       <mo>‾</mo>
@@ -1385,41 +1365,41 @@ fn p42_matrix() {
 #[test]
 fn p42_determinant() {
     let expr = "<math>
-<mrow>
-<mo>|</mo>
-<mtable>
-	<mtr>
-    <mtd>
+    <mrow>
+    <mo>|</mo>
+    <mtable>
+      <mtr>
+        <mtd>
+        <mi>a</mi>
+        <mo>+</mo>
+        <mi>b</mi>
+        </mtd>
+        <mtd>
+        <mi>a</mi>
+        <mo>−</mo>
+        <mi>b</mi>
+        </mtd>
+        </mtr>
+        <mtr>
+        <mtd>
+        <mi>a</mi>
+        <mo>−</mo>
+        <mi>b</mi>
+        </mtd>
+        <mtd>
+        <mi>a</mi>
+        <mo>+</mo>
+        <mi>b</mi>
+        </mtd>
+        </mtr>
+    </mtable>
+    <mo>|</mo>
+    </mrow>
+    <mo>=</mo>
+    <mn>4</mn>
     <mi>a</mi>
-    <mo>+</mo>
     <mi>b</mi>
-    </mtd>
-    <mtd>
-    <mi>a</mi>
-    <mo>−</mo>
-    <mi>b</mi>
-    </mtd>
-    </mtr>
-    <mtr>
-    <mtd>
-    <mi>a</mi>
-    <mo>−</mo>
-    <mi>b</mi>
-    </mtd>
-    <mtd>
-    <mi>a</mi>
-    <mo>+</mo>
-    <mi>b</mi>
-    </mtd>
-    </mtr>
-</mtable>
-<mo>|</mo>
-</mrow>
-<mo>=</mo>
-<mn>4</mn>
-<mi>a</mi>
-<mi>b</mi>
-</math>";
+    </math>";
     test_braille("Finnish", expr, "⠸⠁⠀⠖⠃⠀⠀⠁⠀⠤⠃⠸⠀⠐⠐⠀⠸⠁⠀⠤⠃⠀⠀⠁⠀⠖⠃⠸⠀⠶⠼⠙⠀⠁⠃");
 }
 
@@ -1561,8 +1541,8 @@ fn p50_such_that_y_greater_than_x() {
     <mi>𝑦</mi>
     <mo>∈</mo>
     <mi>ℝ</mi>
-    <mi>y</mi>
     <mo>;</mo>
+    <mi>y</mi>
     <mo>&gt;</mo>
     <mi>x</mi>
 </math>";
@@ -1632,8 +1612,6 @@ fn p50_conditional_probability() {
     <mi>A</mi>
     <mo>)</mo>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <mfrac>
       <mrow>
         <mi>P</mi>
@@ -1651,10 +1629,18 @@ fn p50_conditional_probability() {
     </mfrac>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠠⠏⠦⠠⠃⠀⠸⠀⠠⠁⠴⠀⠶⠠⠏⠦⠠⠁⠠⠎⠴⠀⠌⠠⠏⠦⠠⠁⠴");
+    test_braille("Finnish", expr, "⠠⠏⠦⠠⠃⠀⠸⠀⠠⠁⠴⠀⠶⠠⠏⠦⠠⠁⠠⠃⠴⠀⠌⠠⠏⠦⠠⠁⠴");
 }
 
-// Not sure about this MathML markup.
+#[test]
+fn p46_simple_derivative_fraction() {
+    let expr = "<math><mfrac>
+        <mrow><mi>d</mi><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>x</mi></mrow>
+      </mfrac></math>";
+    test_braille("Finnish", expr, "⠙⠋⠦⠭⠴⠀⠌⠙⠭");
+}
+
 #[test]
 fn p50_alternative_derivative_1() {
     let expr = "<math>
@@ -1740,11 +1726,9 @@ fn p51_normal_distribution() {
 
 #[test]
 fn p52_right_circular_cone_volume() {
-    let expr = "<math>
-  <mrow>
+  let expr = "<math>
     <mi>V</mi>
     <mo>=</mo>
-  </mrow>
   <mrow>
     <mfrac>
       <mn>1</mn>
@@ -1764,18 +1748,14 @@ fn p52_right_circular_cone_volume() {
 #[test]
 fn p52_circular_cone_area_equation() {
     let expr = "<math>
-  <mrow>
     <mi>A</mi>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <mi>π</mi>
     <msup>
       <mi>r</mi>
       <mn>2</mn>
     </msup>
     <mo>+</mo>
-  </mrow>
   <mrow>
     <mi>π</mi>
     <mi>r</mi>

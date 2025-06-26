@@ -93,7 +93,6 @@
   replace:
   - x: "*[1]"
   - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
-
 -
   name: default
   tag: mfrac
@@ -182,7 +181,7 @@
    - test:
       if: .[self::m:mlabeledtr]
       then:
-         - t: "⠗⠕⠺W⠇⠁⠃⠑⠇⠸⠒"  # "row label:"
+         - t: "⠗⠊⠧⠊⠝⠀⠕⠞⠎⠊⠅⠅⠕⠱"  # "row label:" ("rivin otsikko:")
          - x: "*[1]/*"           # contents of row label
    - test:
       if: .[self::m:mlabeledtr]
@@ -341,7 +340,7 @@
   match: "*[2][self::m:mn and .='2']"
   replace:
   - x: "*[1]"
-  - t: "↑"
+  - t: "↑W"
 -
   # Chemistry has a special rule for numerical subscripts (note base is not necessarily a chemical element)
   name: chemistry

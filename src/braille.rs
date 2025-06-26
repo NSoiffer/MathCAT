@@ -2052,7 +2052,7 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "1" => "⠀",     // Grade 1 symbol (used for number followed by a letter)
     "L" => "",     // Letter left in to assist in locating letters
     "D" => "XXX",     // German (Deutsche) -- from prefs
-    "G" => "⠨",     // Greek
+    "G" => "⠨",     // lowercase Greek (uppercase is handled with "CG" replacement below)
     "V" => "XXX",    // Greek Variants
     // "H" => "⠠⠠",    // Hebrew
     // "U" => "⠈⠈",    // Russian
@@ -2091,47 +2091,51 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
         // don't include '𝐖' (special cased below)
         static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓|Nn𝑁W𝐖w#Z,(){}\[\]])").unwrap();
         // Numbers need to end with a space, but sometimes there is one there for other reasons
-        static ref DROP_NUMBER_SEPARATOR: Regex = Regex::new(r"(n.)\)").unwrap();
+
+        // Not sure if this is correct -- awaiting reply concerning extend of Greek run. This assumes a single char
+        static ref ADD_SPACE_AFTER_GREEK: Regex = Regex::new(r"(GL.)[^W↑↓]").unwrap();
+        static ref ADD_SEPARATOR_AFTER_DROP_NUMBER_: Regex = Regex::new(r"(n.)\)").unwrap();
 
         // Numbers typically end with a space, but sometimes not (captured by the following regexes)
         // Ellipsis at the end of a number are treated as being part of the number (in match, we don't add whitespace)
-        static ref DROP_UNNEEDED_SPACE: Regex = Regex::new(r"(((N.)+)[W𝐖]([n𝐶#↑↓Z)}\]|,]|(⠄⠄⠄)))").unwrap();
+        static ref REMOVE_UNNEEDED_SPACE: Regex = Regex::new(r"[W𝐖]([n𝐶#↑↓Z)}\]|,])").unwrap();
+        static ref REMOVE_UNNEEDED_SPACE_AFTER: Regex = Regex::new(r"([Z\(\[])W").unwrap();
     }
 
     debug!("finnish_cleanup: start={}", raw_braille);
-    let result = DROP_NUMBER_SEPARATOR.replace_all(&raw_braille, |cap: &Captures| {
+    let result = ADD_SEPARATOR_AFTER_DROP_NUMBER_.replace_all(&raw_braille, |cap: &Captures| {
         // match includes the char after the number -- insert the whitespace before it
         // debug!("DROP_NUMBER_SEPARATOR match='{}'", &cap[1]);
         return cap[1].to_string() + "𝐶)";       // hack to use "𝐶" instead of dot 6 directly, but works for NUMBER_MATCH
     });
+    let result = ADD_SPACE_AFTER_GREEK.replace_all(&result, "${1}W");
+    let result = REMOVE_UNNEEDED_SPACE_AFTER.replace_all(&result, "${1}");
     // let result = result.replace('n', "N");  // avoids having to modify remove_unneeded_mode_changes()
-    let result = DROP_UNNEEDED_SPACE.replace_all(&result, |cap: &Captures| {
-        // match includes the char after the number -- insert the whitespace before it
-        debug!("NUMBER_MATCH match #caps={}", cap.len());
-        debug!("  cap[0]='{}'\n  cap[1]='{}'\n  cap[2]='{}'\n  cap[3]='{}'\n  cap[4]='{}'\n  cap[5]='{:?}'",
-                &cap[0], &cap[1], &cap[2], &cap[3], &cap[4], cap.get(5));
-        if &cap[4] == "⠄" && cap.get(5).is_some() && &cap[5] == "⠄⠄" {
-            return cap[1].to_string() + "⠄⠄⠄";  // don't add whitespace after ellipsis
-        } else {
-            // remove whitespace after the number, which means deleting the char in cap[1]
-            let number = &cap[2];  // remove the last char
-            return number.to_string() + &cap[4];
-        }
-    });
-    debug!("   after number match={}", &result);
+    let result = REMOVE_UNNEEDED_SPACE.replace_all(&result, "$1");
+    // let result = REMOVE_UNNEEDED_SPACE.replace_all(&result, |cap: &Captures| {
+    //     // match includes the char after the number -- insert the whitespace before it
+    //     debug!("NUMBER_MATCH match #caps={}", cap.len());
+    //     debug!("  cap[0]='{}'\n  cap[1]='{}'\n  cap[2]='{}'\n  cap[3]='{}'\n  cap[4]='{}'\n  cap[5]='{:?}'",
+    //             &cap[0], &cap[1], &cap[2], &cap[3], &cap[4], cap.get(5));
+    //     if &cap[4] == "⠄" && cap.get(5).is_some() && &cap[5] == "⠄⠄" {
+    //         return cap[1].to_string() + "⠄⠄⠄";  // don't add whitespace after ellipsis
+    //     } else {
+    //         // remove whitespace after the number, which means deleting the char in cap[1]
+    //         let number = &cap[2];  // remove the last char
+    //         return number.to_string() + &cap[4];
+    //     }
+    // });
+    debug!("    after number match={}", &result);
 
-    // FIX: need to implement this -- this is just a copy of the Vietnam code
-    let result = result.replace("CG", "⠸")
-                                    .replace("𝔹C", "⠩")
-                                    .replace("DC", "⠰");
+    let result = result.replace("CG", "⠸");
 
     // debug!("   after typeface/caps={}", &result);
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
-    let double_struck = pref_manager.pref_to_string("Vietnam_DoubleStruck");
-    let sans_serif = pref_manager.pref_to_string("Vietnam_SansSerif");
-    let fraktur = pref_manager.pref_to_string("Vietnam_Fraktur");
-    let greek_variant = pref_manager.pref_to_string("Vietnam_GreekVariant");
+    let double_struck = pref_manager.pref_to_string("Finnish_DoubleStruck");
+    let sans_serif = pref_manager.pref_to_string("Finnish_SansSerif");
+    let fraktur = pref_manager.pref_to_string("Finnish_Fraktur");
+    let greek_variant = pref_manager.pref_to_string("Finnish_GreekVariant");
 
     // This reuses the code just for getting rid of unnecessary "L"s and "N"s
     let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
@@ -2154,7 +2158,7 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
     // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces (also zone end)
     let result = result.trim_start_matches('⠀').trim_end_matches(['⠀', '⠐']);
-    debug!("   after trim={}", &result);
+    debug!("            after trim={}", &result);
     let result = COLLAPSE_SPACES.replace_all(result, "⠀");
     // hack for "|:" which requires a double space
     return result.replace(" ","");
@@ -2874,26 +2878,54 @@ impl NeedsToBeGrouped {
                     return NeedsToBeGrouped::needs_grouping_for_finnish(as_element(children[1]), false);
                 }
             }
-            return !is_run_of_letters(mathml);
+            return mrow_contains_space_in_braille(mathml);
         }
         return false;
 
-        fn is_run_of_letters(mrow: Element) -> bool {
-            // check if all children are letters
-            for child in mrow.children() {
-                let child_name = name(as_element(child));
-                if (child_name == "mi" || child_name == "mtext") &&
-                    as_text(as_element(child)).chars().all(|c| c.is_alphabetic()) {
-                    continue;
-                } else if child_name == "mrow" {
-                    if !is_run_of_letters(as_element(child)) {
-                        return false;
-                    }
-                } else {
+        fn mrow_contains_space_in_braille(mrow: Element) -> bool {
+            // heuristic to guess if the braille would have a space
+            // the basic idea is that runs of letters don't require a space, and neither does function call with parens
+            assert!(name(mrow) == "mrow");
+            let children = mrow.children();
+            if children.len() == 3 {
+                let op = as_element(children[1]);
+                if name(op) == "mo" && as_text(op) == "\u{2061}" {
                     return false;
                 }
             }
-            return true;
+            debug!("contains_space_in_braille: mrow\n{}", mml_to_string(mrow));
+            let mut allow_parens = false;
+            for child in children {
+                let child = as_element(child);
+                let child_name = name(child);
+                if (child_name == "mi" || child_name == "mtext") &&
+                    as_text(child).chars().all(|c| c.is_alphabetic()) {
+                    debug!("...continuing");
+                    continue;
+                } else if child_name == "mrow" {
+                    // check for function call argument exception
+                    if allow_parens && IsBracketed::is_bracketed(child, "(", ")", false, false) {
+                        let arg_child = as_element(child.children()[1]);
+                        let arg_children = arg_child.children();
+                        if arg_children.len() == 2 {
+                            return false;
+                        }
+                        return (child_name == "mi" || child_name == "mtext") &&
+                                as_text(arg_child).chars().all(|c| c.is_alphabetic());
+                    }
+                    debug!("...checking child of mrow");
+                    if mrow_contains_space_in_braille(child) {
+                        return true;
+                    }
+                } else if child_name == "mo" && as_text(child) == "\u{2061}" {
+                    allow_parens = true;
+                } else {
+                    debug!("...child {} returning true", child_name);
+                    return true;
+                }
+            }
+            debug!("...returning false");
+            return false;
         }
     }
 

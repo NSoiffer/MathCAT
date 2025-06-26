@@ -55,8 +55,15 @@
         else: [t: ""]
 
  - "⁢":                        # 0x2062 (invisible times)
-     - test:   # (...)(...) needs whitespace -- others???
-        if: "preceding-sibling::*[1][self::m:mrow and IsBracketed(., '', '')]"
+     - test:
+        #  don't add whitespace when you have consecutive vars (taking into account pseudo scripts), or...
+        #  if what follows is an opening bracket (any kind) or a 2D structure
+        if: "not(preceding-sibling::*[1][IsNode(., 'leaf') or (self::m:msup and *[2][translate(., '*`ª°²³´¹º‘’“”‟′″‴‵‶‷⁗','')=''] )] and
+                 following-sibling::*[1][IsNode(., 'leaf') ]
+             ) and
+             not(@data-function-guess) and
+             (preceding-sibling::*[1][IsNode(., '2D')] or
+              following-sibling::*[1][IsNode(., '2D') or (self::m:mrow and *[1][.='(' or .='['])])"
         then: [t: "W"]
         else: [t: ""]
 
@@ -318,6 +325,15 @@
         if: "@data-chem-element"
         then: [T: "𝐶L⠽"]
         else: [T: "CL⠽"]
+ - "\\":                       # 0x005C (Backslash)
+     - test:
+          # we need to recognize "set difference" -- heuristic is the operands are both capital letters
+        if: "@intent='set-difference' or
+                    parent::*[1][self::m:mrow and count(*)=3 and
+                              *[1][self::m:mi and string-length(.) = 1 and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] and
+                              *[3][self::m:mi and string-length(.) = 1 and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] ]"
+        then: [t: "W⠳⠩"]        # set difference
+        else: [t: "⠩"]
  - "Z": [T: "CL⠵"]              # 0x5a
  - "Å": [T: "CL⠡"]           # FI: Finnish alphabet
  - "Ä": [T: "CL⠜"]           # FI: Finnish alphabet
@@ -403,6 +419,12 @@
      - test:
         - if: "@data-chemical-bond"
           then: [t: "W⠒"]
+          # we need to recognize "set difference" -- heuristic is the operands are both capital letters
+        - else_if: "@intent='set-difference' or
+                    parent::*[1][self::m:mrow and count(*)=3 and
+                              *[1][self::m:mi and string-length(.) = 1 and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] and
+                              *[3][self::m:mi and string-length(.) = 1 and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] ]"
+          then: [t: "W⠳⠤"]        # set difference
         - else_if: "self::m:mo and parent::m:mrow and preceding-sibling::*"
           then: [t: "W⠤"]        # infix minus
           else: [t: "⠤"]         # unary minus
@@ -426,6 +448,7 @@
           then: [t: "⠒W"]
           else: [t: "W⠌"]
 
+ - ";": [t: "⠆W"]               # 0x003B (Semicolon)
  - "<": [T: "W⠣W"]               # 0x003C (less than sign)
  - "=":                          # 0x003D (regular equals sign)
      - test:
@@ -435,21 +458,26 @@
 
  - ">": [T: "W⠱W"]               # 0x003E (greater than sign ( regular ))
  - "?": [t: "P⠢"]                # 0x003F (Question mark)
+ - "@": [t: "⠈"]               # 0x0040 (Commercial at sign)
  - "[": [T: "["]                # 0x005B (left square bracket)
  - "]": [T: "]"]                # 0x005D (right square bracket)
+ - "_": [t: "⠬"]               # 0x005F (Low line (underscore))
  - "{": [T: "{"]                # 0x007B ( left curly brace)
  - "|":                         # 0x007C (vertical bar)
     - test:
       # catch |: notation
       # last child, inside a mrow with first child not | and the next child of the parent is ":"
-        - if: "not(following-sibling::*) and
+        - if: ". and .. and
+               not(following-sibling::*) and
                parent::*[self::m:mrow and count(*)=2 and not(*[1][.='|']) and
                          parent::*[self::m:mrow] and following-sibling::*[1][.=':']]
                "
-          then: [t: "𝐖|"]
-        - else_if: "parent::*[self::m:mrow and count(*)=3 and *[1]='|'and *[3]='|']"
-          then: [t: "|"]     # absolute value
-          else: [t: "W|W"]   # single vertical bar
+          then: [t: "𝐖⠸"]
+        - else_if: "not(parent::*[self::m:mrow and count(*)=3 and *[1]='|'and *[3]='|'])"
+          then: [t: "W⠸W"]   # single vertical bar
+        - else_if: "parent::*/*[2][self::m:mtable]"
+          then: [t: "⠸"]    # these act as brackets around the rows and shouldn't have whitespace dropped
+          else: [t: "|"]     # absolute value -- need to use "|"" because whitespace needs to caught/dropped before it
  - "\"": [t: "⠸"]
  - "”": [t: "⠸"]
  - "'": [t: "⠨"]
@@ -530,6 +558,7 @@
  - "∭": [T: "⠮⠮⠮"]              # 0x222D (triple integral) FI: not in the specification
  - "∂": [T: "⠈⠙"]                # 0x2202 (partial derivative (round d))
  - "∷": [T: "W⠶"]                 # 0x2237 (Proportion) [only use in the spec is as a double bond with this value]
+ - "∼": [t: "W⠨⠶"]                # 0x223C (simple tilde (is related to, is similar))
  - "≁": [T: "⠐⠨⠶"]                # 0x2241 (not tilde) FI: Not in the specification, so this is a construction. Used in the context of geometry. Tilde has different braille in general text.
  - "≅": [T: "W⠰⠶"]                # 0x2245 (equals sign under tilde)
  - "≈": [T: "W⠸⠶"]                # 0x2248 (double tilde, almost equal to)
