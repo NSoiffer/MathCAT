@@ -175,5 +175,5 @@ fn continued_row() {
   </mtable>
 </math>";
 test("nb", "SimpleSpeak", expr,
-     "2 equations; equation 1; x is equal to y plus 1; equation 2; y is equal to 1");
+     "2 likninger; likning 1; x er lik y pluss 1; likning 2; y er lik 1");
 }

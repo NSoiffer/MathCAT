@@ -14,22 +14,17 @@
   - T: "minus"        # phrase(x 'minus' y)
   - x: "translate(text(), '-_', '')"
 
-# NORWEGIAN: Removed test for Verbosity
 - name: default
   tag: square-root
   match: "."
   replace:
   - T: "kvadratroten av"      # phrase(the 'square root' of x)
-  #- test:
-      #if: "$Verbosity!='Terse'"
-      #then: {T: "av"}   # phrase(the square root 'of' x)
-      #else: {pause: short}
-  #- pause: short
+  # NORWEGIAN: Removed test for Verbosity
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
       then: [pause: short]
-      else: [{pause: short}, {T: "slutt rot"}, {pause: short}]  # phrase(start the square root of x 'end of root')
+      else: [pause: short, T: "slutt rot", pause: short]  # phrase(start the square root of x 'end of root')
 
 - name: default
   tag: root
@@ -53,7 +48,7 @@
   - test:
       if: IsNode(*[1], 'leaf')
       then: [pause: short]
-      else: [T: "slutt rot", pause: short]      # phrase(start the fifth root of x 'end of root')
+      else: [pause: short, T: "slutt rot", pause: short]      # phrase(start the fifth root of x 'end of root')
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own

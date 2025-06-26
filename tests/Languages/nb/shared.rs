@@ -398,7 +398,7 @@ fn literal_speak_with_name() {
         </mrow>
       </mrow>
     </math>"#;
-  test("nb", "LiteralSpeak", expr, "forced f av, venstreparentes; x utropstegn; høyreparentes");
+  test("nb", "LiteralSpeak", expr, "forced f, venstreparentes; x utropstegn; høyreparentes");
 }
 
 #[test]
@@ -417,7 +417,7 @@ fn literal_speak_with_property() {
         </mrow>
       </mrow>
     </math>"#; 
-  test("nb", "LiteralSpeak", expr, "f av, venstreparentes; x utropstegn; høyreparentes");
+  test("nb", "LiteralSpeak", expr, "f, venstreparentes; x utropstegn; høyreparentes");
 }
 
 #[test]
@@ -454,5 +454,5 @@ fn literal_intent_property_with_name() {
         </mrow>
       </mrow>
     </math>"#; 
-  test("nb", "SimpleSpeak", expr, "forced f av; startparentes; x utropstegn; sluttparentes");
+  test("nb", "SimpleSpeak", expr, "forced f; startparentes; x utropstegn; sluttparentes");
 }

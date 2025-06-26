@@ -13,7 +13,7 @@
   tag: number-sets
   match: "count(*)=2 and *[2][.='+' or .='-']"
   replace:
-  # SWEDISH: This test, to see if "the" is supposed to be added or not, is removed from the Swedish translations, as it is not applicable.
+  # NORWEGIAN: Removed test for verbosity
   #- test:
       #if: "$Verbosity!='Terse'"
       #then:
@@ -100,7 +100,7 @@
       if: "$Verbosity!='Terse'"
       then: [T: "evaluert i"]      # phrase(results were 'evaluated at' a given point)
       else: [T: "i"]
-  # SWEDISH: Added a verbosity setting test to allow a shorter form.
+  # SWEDISH/NORWEGIAN: Added a verbosity setting test to allow a shorter form.
   - pause: auto
   - x: "*[2]"
 
@@ -118,13 +118,9 @@
   - x: "*[3]"
   - pause: short
   - T: "og"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
-  # SWEDISH: Removed the expansion of the expression, keeping the output closer to what is actually shown visually.
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [T: "nedre verdi"]      # phrase(results were 'evaluated at' a given point)
-      else: [T: "nedre verdi"]
+  - T: "nedre verdi"
+  # SWEDISH/NORWEGIAN: Removed the expansion of the expression, keeping the output closer to what is actually shown visually.
   - pause: short
-  # SWEDISH: Added a verbosity setting test to allow a shorter form.
   - x: "*[2]"
 
 - name: permutation
@@ -136,12 +132,12 @@
   - T: "elementer av"      # phrase(the solution  involves several 'permutations of' values)
   - x: "*[1]"
 
-# NORWEGIAN: Removed test for Verbosity
+# NORWEGIAN: Removed test for verbosity
 - name: intervals
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
   match: "count(*)=2"
   replace:
-  # SWEDISH: The translate function doesn't work for non-English. Used the solution below instead.
+  # SWEDISH/NORWEGIAN: The translate function doesn't work for non-English. Used the solution below instead.
   - test:
      - if: "self::m:open-interval"
        then: [T: "det åpne intervallet"]
@@ -339,7 +335,7 @@
       if: "$Verbosity='Terse'"
       then: [T: "sin"]        # phrase('sin' is the abbreviation for sine)
       else: [T: "sinus"]      # phrase(the 'sine' of the angle)
-      # SWEDISH: Added short form.
+      # SWEDISH/NORWEGIAN: Added short form.
 
 - name: cos
   tag: mi
@@ -391,7 +387,7 @@
       then: [T: "cotan"]          # phrase(find the 'cotangent' in a right-angle triangle)
       else: [T: "cotangens"]      # phrase(the 'cotangent' is the reciprocal of the tangent)
 
-# NORWEGIAN: Removed tests for Verbosity. We don't say "sin hype" and "sinh" sounds like "sin"
+# NORWEGIAN: Removed tests for verbosity. We don't say "sin hype" etc., and "sinh" sounds like "sin"
 - name: sinh
   tag: mi
   match: ".='sinh'"
@@ -469,17 +465,13 @@
       then: [T: "exp"]      # phrase('exp' means exponential function)
       else: [T: "eksponensialfunksjonen"]      # phrase('exponential' function)  #Norwegian: Spelled wrong for correct pronunciation
 
-# NORWEGIAN: Added this rule from English version, but removed test for Verbosity.    
+# NORWEGIAN: Added this rule from English version, but removed test for verbosity.    
 - name: covariance
   tag: mi
   match: ".='Cov'"
   replace:
   - bookmark: "@id"
   - T: "kovarians"
-  #- test:
-      #if: "$Verbosity='Terse'"
-      #then: [t: "Cov"]      # phrase('Cov' is shorthand for the covariance function)
-      #else: [t: "covariance"]      # phrase('covariance' function)
 
 - # handle both log and ln
   name: log
@@ -501,7 +493,7 @@
         - if: "$Verbosity!='Verbose'"
           then: [spell: "'lg'"]      # phrase(the 'lg' of x)
           else: [T: "tier-logaritmen"]
-      # SWEDISH: We have added the term "lg" for the logarithm with base 10. Also added a verbosity test for long and short form.
+      # SWEDISH/NORWEGIAN: We have added the term "lg" for the logarithm with base 10. Also added a verbosity test for long and short form.
       - else_if: "$Verbosity!='Verbose'"
         then: [spell: "'ln'"]
         else: [T: "den naturlige logaritmen"]      # phrase(the 'natural log' function is used in mathematics)
@@ -632,7 +624,7 @@
 
 
 # simpler reading methods for special case matrices
-# NORWEGIAN: Added these tests from the English version.
+# NORWEGIAN: Added these rules from the English.
 - name: zero-matrix
   tag: matrix
   # select all the non-zero entries -- if there are none of them, then it is a zero matrix
@@ -846,6 +838,7 @@
       if: "$Verbosity='Terse'"
       then: [pause: short]
 
+#NORWEGIAN: Added from English. Not tested
 - name: dimension-by
   tag: mrow
   match: dimension-product

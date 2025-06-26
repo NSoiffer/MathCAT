@@ -61,13 +61,13 @@
         then: [T: "kvadratroten"]      # phrase(5 is the 'square root' of 25)
       - else_if: "*[2][.='3']"
         then: [T: "kubikkroten"]        # phrase(5 is the 'cube root' of 625)
-      - else_if: "*[2][not(contains(., ','))]"   # SWEDISH: Changed decimal point to comma.
+      - else_if: "*[2][not(contains(., ','))]"   # SWEDISH/NORWEGIAN: Changed decimal point to comma.
         then: [x: "ToOrdinal(*[2])", T: "roten"]      # phrase(the square 'root' of 25)
       else:
       - T: "roten av grad"      # phrase(the square 'root' of 36)
       - x: "*[2]"
       - pause: short
-  # SWEDISH: Removed verbosity settings.
+  # SWEDISH/NORWEGIAN: Removed verbosity settings.
   - T: "av"      # phrase(the square root 'of' 36)
   - x: "*[1]"
   - test:
@@ -450,7 +450,6 @@
   - EndToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinalitet', 'absoluttverdi')"
   replace:
   - x: "$WordToSay"
-  #- T: "av"      # phrase(the absolute value 'of' 25)
   - x: "*[1]"
   - test:
       if: "$ClearSpeak_AbsoluteValue = 'AbsEnd'"
@@ -495,8 +494,8 @@
 #  # note that *[2] is an mrow with X, ",", Y, so getting X or Y is a double index
     # onto the [not] [including]... part
 
- # SWEDISH: rewrote the intervals function to better deal with Swedish convention of speaking intervals
- # NORWEGIAN: Removed test for verbosity, cause you should always say "det åpne"
+ # SWEDISH/NORWEGIAN: rewrote the intervals function to better deal with Swedish convention of speaking intervals
+ # NORWEGIAN: Removed test for verbosity, cause you should always say "det åpne" etc.
 - name: ClearSpeak-intervals # avoid overriding with default "intervals" name
   variables:
   - is_intervals_start_infinity: "*[1][self::m:minus and count(*)=1 and *[1][.='∞']]"
@@ -504,10 +503,6 @@
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
   match: "."
   replace:
-  #- test:
-    #- if: "$Verbosity!='Terse'"
-      #then:
-      #- T: "det"
   - test:
     - if: "name(.)='open-interval'"
       then: [T: "det åpne"]
@@ -592,9 +587,7 @@
         - else_if: $ClearSpeak_Log = 'LnAsNaturalLog' or $Verbosity='Verbose'
           then: [T: "den naturlige logaritmen"]      # phrase(the 'natural log' of x)
           else: [spell: "'ln'"]
-      #- test:
-        #- if: "$Verbosity='Verbose'"
-          #then: [{T: "av"}]      # phrase(the natural log 'of' x)
+      #NORWEGIAN: Removed test for verbosity
       - T: "av"
       - pause: short
   - x: "*[3]"
@@ -649,7 +642,7 @@
               - if: "$LineCount > 1 and $ClearSpeak_MultiLineLabel != 'None'"
                 then: [T: "steg"]      # phrase(this is the first 'step' of three steps)
                 else: [T: "steg"]      # phrase(this is the first 'step' of three steps)
-          # SWEDISH: Every expression had to be inflected separately.
+          # SWEDISH/NORWEGIAN: Every expression had to be inflected separately.
       - pause: short
   - x: "*"
 

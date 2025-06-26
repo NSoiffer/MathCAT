@@ -1,29 +1,23 @@
 ---
-# NORWEGIAN: Removed test for Verbosity
 - name: scalar-determinant
   tag: determinant
   match: "count(*)=1 and not(*[1][self::m:mtr])"
   replace:
   - T: "determinanten"      # phrase(the 'determinant' of a matrix)
-  #- test:
-      #if: "$Verbosity!='Terse'"
-      #then:
+  # NORWEGIAN: Removed test for Verbosity
   - T: "til"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
       then: [T: "slutt determinant"]      # phrase('end determinant' of a matrix)
 
-# NORWEGIAN: Removed test for Verbosity
 - name: subscripted-norm
   tag: subscripted-norm
   match: "count(*)=2"
   replace:
   - x: "*[2]"
   - T: "normen"      # phrase(the 'norm' can be a measure of distance)
-  #- test:
-      #if: "$Verbosity!='Terse'"
-      #then:
+  # NORWEGIAN: Removed test for Verbosity
   - T: "til"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
 

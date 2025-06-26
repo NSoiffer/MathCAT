@@ -127,6 +127,7 @@
       then: [T: "slutt rottegn"] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
+# NORWEGIAN: Changed to "med grad", and changed the order of the index and the variable/number in the root.
 - name: literal-default
   tag: mroot
   match: "."
@@ -134,7 +135,6 @@
   - T: "rottegn"
   - T: "med grad"      # phrase("the root of x 'with index' 5")
   - x: "*[2]"
-  # SWEDISH: Check if the order of base and index is correct!
   - pause: short
   - test:
       if: "$Verbosity!='Terse'"
@@ -709,7 +709,7 @@
       # - test:
       #     if: "not(contains(@data-intent-property, ':literal:'))"
       #     then: [x: "','"]
-      # SWEDISH: After correspondence with a mathematician we have decided to not have any punctuation between variables, but a short pause. Length of pause needs to be tested.
+      # SWEDISH/NORWEGIAN: After correspondence with a mathematician we have decided to not have any punctuation between variables, but a short pause. Length of pause needs to be tested.
   - test:
                                                                                       
       if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
