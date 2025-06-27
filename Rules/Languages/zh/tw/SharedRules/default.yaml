@@ -628,7 +628,7 @@
   - x: "*"
   - test:
       if: "not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
   - test:
       if: "IsNode(., '2D')"
       then: [pause: short]
@@ -641,7 +641,7 @@
   replace:
   - test:
       if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
   - x: "*"
   - x: "SpeakIntentName(name(.), $Verbosity, 'postfix')"
 
@@ -652,7 +652,7 @@
   replace:
   - test:
       if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
   - test:
       if: "count(*) = 1"  # in cases such as continued-row, plus/minus might have just one child
       then:
@@ -665,7 +665,7 @@
           replace: [x: "SpeakIntentName(name(.), $Verbosity, 'infix')", pause: auto]
   - test:
       if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
   - test:
       if: "IsNode(., '2D')"   # add (probably) a slightly longer pause if this came from a 2D node
       then: [pause: short]
@@ -690,7 +690,7 @@
       - pause: auto
   - test:
       if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
   - test:
       if: "IsNode(., '2D')"
       then: [pause: short]

@@ -23,53 +23,53 @@
     "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
 
     "absolute-value": "function= ; trị tuyệt đối: trị tuyệt đối của: trị tuyệt đối của; hết trị tuyệt đối",
-    "binomial": "infix=binomial; chọn; end binomial",
-    "limit": "prefix=limit",
-    "lim-sup": "prefix=lim sup as: limit superior as: limit superior as",
-    "lim-inf": "prefix=lim inf as: limit inferior as :  limit inferior as",
+    "binomial": "infix=nhị thức; chọn; hết nhị thức",
+    "limit": "prefix=giới hạn",
+    "lim-sup": "prefix=giới hạn trên khi",
+    "lim-inf": "prefix=giới hạn dưới khi",
     "logarithm-with-base": "prefix=lóc cơ số; lóc của",
     "minus": "infix=trừ || prefix=âm",
     "plus": "infix=cộng || prefix=dương",
 
     "transpose": "postfix=ma trận chuyển vị || function=ma trận chuyển vị",
     "norm": "function=; định mức: định mức: định mức của; end norm",
-    "trace": "function=;vết : vết: vết của; end trace",
-    "dimension": "function=; chiều : chiều: chiều của; end dimension",
-    "homomorphism": "function= ; đồng hình : đồng hình: đồng hình của; end homomorphism",
-    "kernel": "function= ; hạch tâm : hạch tâm: hạch tâm của; end kernel",
+    "trace": "function=;vết : vết: vết của; hết vết",
+    "dimension": "function=; kích thước : kích thước: kích thước của; hết kích thước",
+    "homomorphism": "function= ; đồng cấu : đồng cấu: đồng cấu của; hết đồng cấu",
+    "kernel": "function= ; hạch tâm : hạch tâm: hạch tâm của; hết hạch tâm",
     "vector": "function=véc tơ || prefix=véc tơ",
-    "cross-product": "infix=cross: cross product: cross product",
-    "dot-product": "infix=dot: dot product: dot:dot product",
+    "cross-product": "infix=hướng: tích có hướng: tích có hướng",
+    "dot-product": "infix=chấm: tích vô hướng: dot:tích vô hướng",
 
-    "divergence": "function= ; div: divergence: divergence; end divergence",
-    "curl": "function= ; curl; end curl",
-    "gradient": "function= ; grad: gradient: gradient; end gradient",
-    "laplacian": "function=lahplahsian",   # speech engines don't do a good job with "laplacian"
+    "divergence": "function= ; phân kì: độ phân kì: độ phân kì; hết độ phân kì",
+    "curl": "function= ; vòng xoáy; hết vòng xoáy",
+    "gradient": "function= ; đạo hàm: đạo hàm: đạo hàm; hết đạo hàm",
+    "laplacian": "function=láp-la-xe",   # speech engines don't do a good job with "laplacian"
 }
 
 - NavigationParts: {
-    "large-op": "base; lower limit; upper limit",
-    "mfrac": "numerator;denominator",
-    "fraction": "numerator;denominator",
-    "msqrt": "root",
-    "square-root": "root",
-    "mroot": "root;root index",
-    "root": "root;root index",
-    "msub": "base;subscript",
-    "sub": "base;subscript",
-    "msup": "base;superscript",
-    "say-super": "base;superscript",
-    "skip-super": "base;superscript",
-    "power": "base;exponent",
-    "msubsup": "base;subscript;superscript",
-    "munder": "base;under limit",
-    "mover": "base;upper limit",
-    "munderover": "base;under limit;upper limit",
+    "large-op": "cơ sở; giới hạn dưới; giới hạn trên",
+    "mfrac": "tử số;mẫu số",
+    "fraction": "tử số;mẫu số",
+    "msqrt": "căn",
+    "square-root": "căn",
+    "mroot": "căn;căn bậc",
+    "root": "căn;căn bậc",
+    "msub": "cơ;chỉ số dưới",
+    "sub": "cơ;chỉ số dưới",
+    "msup": "cơ;chỉ số trên",
+    "say-super": "cơ;chỉ số trên",
+    "skip-super": "cơ;chỉ số trên",
+    "power": "cơ;mũ",
+    "msubsup": "cơ;chỉ số dưới;superscript",
+    "munder": "cơ;giới hạn dưới",
+    "mover": "cơ;giới hạn trên",
+    "munderover": "cơ;giới hạn dưới;giới hạn trên",
 
     # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
     # it's a hack to put them here, but at least they are grouped with the other navigation parts
-    "in": "in",
-    "out": "out of",
+    "in": "trong",
+    "out": "ra khỏi",
   }
 
 
@@ -87,19 +87,19 @@
     "A": "amp",
     "cd": "candela",
     "K": "kelvin", "K": "kelvin", # U+212A
-    "g": "gram",
-    "m": "metre",     # British spelling works for US also
-    "mol": "mole",
-    "s": "second", "″": "second", "\"": "second", "sec": "second",  # "sec" not actually legal
+    "g": "ram",
+    "m": "mét",     # British spelling works for US also
+    "mol": "mol",
+    "s": "giây", "″": "giây", "\"": "giây", "sec": "giây",  # "sec" not actually legal
 
     # derived units
     "Bq": "becquerel",
     "C": "coulomb",
-    "°C": "degree celsius", "℃": "degree celsius",
-    "F": "farad",
+    "°C": "độ c", "℃": "degree celsius",
+    "F": "độ f",
     "Gy": "gray",
     "H": "henry",
-    "Hz": "hertz",
+    "Hz": "hẹt",
     "J": "joule",
     "kat": "kattel",
     "lm": "lumen",
@@ -107,7 +107,7 @@
     "N": "newton",
     "Ω": "ohm", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN
     "Pa": "pascal",
-    "rad": "radian",
+    "rad": "ra-đi-ăng",
     "S": "siemens",
     "Sv": "sievert",
     "sr": "sterradion",
@@ -117,7 +117,7 @@
     "Wb": "weber",
 
     # accepted (plus a few variants) that take SI prefixes
-    "l": "litre", "L": "litre", "ℓ": "litre",               # British spelling works for US also
+    "l": "lít", "L": "litre", "ℓ": "litre",               # British spelling works for US also
     "t": "metric ton",
     "Da": "dalton",
     "amu": "atomic mass unit", "u": "atomic mass unit",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
@@ -128,14 +128,14 @@
 
 - UnitsWithoutPrefixes: {
     # time
-    "′": "minute", "'": "minute","min": "minute",
-    "h": "hour", "hr": "hour", "Hr": "hour",
-    "d": "day", "dy": "day",
-    "w": "week", "wk": "week",
-    "y": "year", "yr": "year",    
+    "′": "phút", "'": "phút","min": "phút",
+    "h": "giờ", "hr": "giờ", "Hr": "giờ",
+    "d": "ngày", "dy": "ngày",
+    "w": "tuần", "wk": "tuần",
+    "y": "năm", "yr": "năm",    
 
     # angles (could be temperature)
-    "°": "degree", "deg": "degree",
+    "°": "độ", "deg": "degree",
     "arcmin": "arcminute",
     "amin": "arcminute",
     "am": "arcminute",
@@ -145,13 +145,13 @@
     "as": "arcsecond",
 
     # other accepted units that don't take SI prefixes
-    "ha": "hectare",
+    "ha": "héc-ta",
     "Np": "neper",
     "B": "bel",
-    "dB": "decibel",
+    "dB": "đề-xi-ben",
 
     # distance
-    "ltyr": "light year", "ly": "light year",
+    "ltyr": "năm ánh sáng", "ly": "light year",
     "pc": "parsec",
     "Å": "angstrom", "Å": "angstrom",           # U+00C5 and U+212B
     "fm": "fermi",
@@ -159,7 +159,7 @@
     # others
     "atm": "atmosphere",
     "bar": "bar",
-    "cal": "calorie",
+    "cal": "ca-lo-ri",
     "Ci": "curie",
     "grad": "gradian",
     "M": "molar",
@@ -174,20 +174,20 @@
   # this will only be used if the language is English, so it can be empty for other countries
 - EnglishUnits: {
     # length
-    "in": "inch",
-    "ft": "foot",
-    "mi": "mile",
-    "rd": "rod",
+    "in": "inh",
+    "ft": "bộ",
+    "mi": "dặm",
+    "rd": "sào",
     "li": "link",
-    "ch": "chain",
+    "ch": "xích",
 
     # area
-    "sq in": "square inch", "sq. in": "square inch", "sq. in.": "square inch",
-    "sq ft": "square foot", "sq. ft": "square foot", "sq. ft.": "square foot",
-    "sq yd": "square yard", "sq. yd": "square yard", "sq. yd.": "square yard",
-    "sq mi": "square mile", "sq. mi": "square mile", "sq. mi.": "square mile",
-    "ac": "acre",
-    "FBM": "board foot",
+    "sq in": "inh vuông", "sq. in": "square inch", "sq. in.": "square inch",
+    "sq ft": "bộ vuông", "sq. ft": "square foot", "sq. ft.": "square foot",
+    "sq yd": "thước vuông Anh", "sq. yd": "thước vuông Anh", "sq. yd.": "thước vuông Anh",
+    "sq mi": "dặm vuông", "sq. mi": "dặm vuông", "sq. mi.": "dặm vuông",
+    "ac": "mẫu Anh",
+    "FBM": "bộ ván",
 
     # volume
     "cu in": "cubic inch", "cu. in": "cubic inch", "cu. in.": "cubic inch",
@@ -206,7 +206,7 @@
     "cp": "cup", "cup": "cup",
     "pt": "pint",
     "qt": "quart",
-    "gal": "gallon",
+    "gal": "ga-lông",
 
     # weight
     "gr": "grain",
@@ -219,13 +219,13 @@
     "lb t": "troy pound",
 
     # energy
-    "hp": "horsepower",
+    "hp": "mã lực",
     "BTU": "BTU",
-    "°F": "degree fahrenheit", "℉": "degree fahrenheit",
+    "°F": "độ f", "℉": "độ f",
 
     # other
-    "mph": "mile per hour",
-    "mpg": "mile per gallon",
+    "mph": "dặm trên giờ",
+    "mpg": "dặm trên ga-lông",
   }
 
 - KnownWords: {
