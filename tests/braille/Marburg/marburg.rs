@@ -29,26 +29,27 @@ fn Intro_4() {
 
 #[test]
 fn decimal_numbers_1() {
+    init_logger();
     let expr = r#"<math><mn>7</mn><mo>,</mo><mn>29</mn></math>"#;
-    test_braille("Marburg", expr, "⠼⠛⠃⠊");
+    test_braille_prefs("Marburg", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠛⠂⠃⠊");
 }
 
 #[test]
 fn decimal_numbers_2() {
     let expr = r#"<math><mn>0</mn><mo>,</mo><mn>072</mn></math>"#;
-    test_braille("Marburg", expr, "⠼⠚⠂⠚⠛⠃");
+    test_braille_prefs("Marburg", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠚⠂⠚⠛⠃");
 }
 
 #[test]
 fn decimal_numbers_3() {
     let expr = r#"<math><mn>50</mn><mo>,</mo><mn>347</mn><mo>.</mo><mn>296</mn></math>"#;
-    test_braille("Marburg", expr, "⠼⠑⠚⠂⠉⠙⠛⠄⠃⠊⠋");
+    test_braille_prefs("Marburg", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠑⠚⠂⠉⠙⠛⠄⠃⠊⠋");
 }
 
 #[test]
 fn decimal_numbers_4() {
     let expr = r#"<math><mn>0</mn><mo>,</mo><mn>333</mn><mo>.</mo><mo>.</mo><mo>.</mo><mo>=</mo><mn>0</mn><mo>,</mo><mo>(</mo><mn>3</mn><mo>)</mo></math>"#;
-    test_braille("Marburg", expr, "⠼⠚⠂⠉⠉⠉⠄⠄⠄⠀⠶⠼⠚⠂⠣⠼⠉⠜");
+    test_braille_prefs("Marburg", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠚⠂⠉⠉⠉⠄⠄⠄⠀⠶⠼⠚⠂⠣⠼⠉⠜");
 }
 
 #[test]
@@ -192,7 +193,7 @@ fn signs_of_action_2() {
 #[test]
 fn signs_of_action_3() {
     let expr = r#"<math><mn>24</mn><mo>,</mo><mn>6</mn><mo>+</mo><mn>2</mn><mo>-</mo><mn>4</mn><mo>,</mo><mn>8</mn></math>"#;
-    test_braille("Marburg", expr, "⠼⠃⠙⠂⠋⠀⠖⠼⠃⠀⠤⠼⠙⠂⠓");
+    test_braille_prefs("Marburg", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠃⠙⠂⠋⠀⠖⠼⠃⠀⠤⠼⠙⠂⠓");
 }
 
 #[test]
