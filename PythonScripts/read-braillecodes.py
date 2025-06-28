@@ -10,6 +10,11 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 
 def write_unicode_file(in_file, out_file, braille_code: str):
+    """
+    Read the csv file that comes from the braille math code repository (excel spreadsheet)
+    write out lines like
+    - "⇢": [t: "⠂⠂⠕"]                         # 0x21e2
+    """
     with open(out_file, 'w', encoding="utf8") as out_stream:
         with open(in_file, encoding="utf8") as csv_file:
             csv_reader = csv.DictReader(csv_file, delimiter=',')
@@ -25,6 +30,9 @@ def write_unicode_file(in_file, out_file, braille_code: str):
                         output_line_strings.append(f' - "{ch}": [t: "{row[braille_code]}"] {"# " + hex(ord(ch)):>32}\n')
                     elif len(char_list) > 1:
                         output_line_strings.append(f'#- "{char_list}": "{row[braille_code]}"\n')
+                    else:  # didn't find anything to help understand what unicode character it should be -- output description
+                        output_line_strings.append(f'#- "{row['Symbol Name']}": "{row[braille_code]}"\n')
+                        
                 line_count += 1
             print(f'Processed {line_count} lines.')
 
