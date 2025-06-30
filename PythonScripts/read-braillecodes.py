@@ -4,8 +4,6 @@ import csv
 import html         # entity name conversion [html.unescape(str)]
 import re
 import sys
-
-from attr import has
 sys.stdout.reconfigure(encoding='utf-8')
 
 
