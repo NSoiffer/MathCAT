@@ -46,7 +46,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
             "UEB" => ueb_cleanup(pref_manager, braille_string),
             "Vietnam" => vietnam_cleanup(pref_manager, braille_string),
             "CMU" => cmu_cleanup(pref_manager, braille_string), 
-            "Marburg" => marburg_cleanup(pref_manager, braille_string), 
+            "Polish" => polish_cleanup(pref_manager, braille_string), 
             "Finnish" => finnish_cleanup(pref_manager, braille_string),
             "Swedish" => swedish_cleanup(pref_manager, braille_string),
             "LaTeX" => LaTeX_cleanup(pref_manager, braille_string),
@@ -2040,12 +2040,12 @@ static MARBURG_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 };
 
 
-fn marburg_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
+fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     // lazy_static! {
     //     static ref ADD_WHITE_SPACE: Regex = Regex::new(r"𝘄(.)|𝘄$").unwrap();
     // }
 
-    debug!("marburg_cleanup: start={}", raw_braille);
+    debug!("polish_cleanup: start={}", raw_braille);
     // let result = typeface_to_word_mode(&raw_braille);
 
     // let result = result.replace("tW", "W");
@@ -2448,7 +2448,7 @@ impl BrailleChars {
             "Nemeth" => BrailleChars::get_braille_nemeth_chars(node, text_range),
             "UEB" => BrailleChars:: get_braille_ueb_chars(node, text_range),
             "CMU" => BrailleChars:: get_braille_cmu_chars(node, text_range),
-            "Marburg" => BrailleChars:: get_braille_cmu_chars(node, text_range),
+            "Polish" => BrailleChars:: get_braille_cmu_chars(node, text_range),
             "Vietnam" => BrailleChars:: get_braille_vietnam_chars(node, text_range),
             "Swedish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
             "Finnish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
@@ -3143,7 +3143,7 @@ impl Function for NeedsToBeGrouped {
         if let Node::Element(e) = node {
             let answer = match braille_code.as_str() {
                 "CMU" => NeedsToBeGrouped::needs_grouping_for_cmu(e, is_base),
-                "Marburg" => NeedsToBeGrouped::needs_grouping_for_cmu(e, is_base),
+                "Polish" => NeedsToBeGrouped::needs_grouping_for_cmu(e, is_base),
                 "UEB" => NeedsToBeGrouped::needs_grouping_for_ueb(e, is_base),
                 "Finnish" => NeedsToBeGrouped::needs_grouping_for_finnish(e, is_base),
                 "Swedish" => NeedsToBeGrouped::needs_grouping_for_swedish(e, is_base),

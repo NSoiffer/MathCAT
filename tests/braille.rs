@@ -34,8 +34,8 @@ mod braille {
         mod other;
     }
 
-    mod Marburg {
-        mod marburg;
+    mod Polish {
+        mod spec;
     }
 }
 
