@@ -1,4 +1,5 @@
 import json
+import re
 
 
 UNICODE_TO_ASCII = """ a1b\'k2l@cif/msp"e3h9o6r^djg>ntq,*5<-u8v.%[$+x!&;:4\\0z7(_?w]#y)="""
@@ -236,4 +237,4 @@ def dl2u(dots: list):
 
 # takes a string like 4-346-15
 def ds2u(dots: str):
-    return "".join(list(map(lambda s: dots_to_unicode(int(s)), dots.split('-'))))
+    return "".join(list(map(lambda s: dots_to_unicode(int(s)), re.split(r'\D+', dots))))

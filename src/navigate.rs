@@ -3,7 +3,8 @@
 #![allow(clippy::needless_return)]
 
 use std::cell::{Ref, RefCell, RefMut};
-use sxd_xpath::{Context, Factory, Value};
+use sxd_xpath::context::Evaluation;
+use sxd_xpath::{Context, Value};
 use sxd_document::dom::Element;
 use sxd_document::Package;
 
@@ -290,48 +291,46 @@ pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -
 pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<(Option<String>, Option<f64>)> {
     // First return tuple value is string-value (if string, bool, or single node) or None
     // Second return tuple value is f64 if variable is a number or None
-    // This is ridiculously complicated for what in the end is a hashmap lookup
-    // There isn't an API that lets us get at the value, so we have to setup/build/evaluate an xpath
-    // Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate() 
-    let factory = Factory::new();
-    match factory.build(&("$".to_string() + var_name)) {
-        Err(_) => bail!("Could not compile XPath for variable: {}", var_name),
-        Ok(xpath) => match xpath.unwrap().evaluate(context, mathml) {
-            Ok(val) => return Ok( match val {
-                Value::String(s) => (Some(s), None),
-                Value::Number(f) => (None, Some(f)),
-                Value::Boolean(b) => (Some(format!("{}", b)), None),
-                Value::Nodeset(nodes) => {
-                    if nodes.size() == 1 {
-                        if let Some(attr) = nodes.document_order_first().unwrap().attribute() {
-                            return Ok( (Some(attr.value().to_string()), None) );
-                        }
-                    };
-                    let mut error_message = format!("Variable '{}' set somewhere in navigate.yaml is nodeset and not an attribute: ", var_name);
-                    if nodes.size() == 0 {
-                        error_message += &format!("0 nodes (false) -- {} set to non-existent (following?/preceding?) node", var_name);
-                    } else {
-                        let singular = nodes.size()==1;
-                        error_message += &format!("{} node{}. {}:",
-                                nodes.size(),
-                                if singular {""} else {"s"},
-                                if singular {"Node is"} else {"Nodes are"});
-                        nodes.document_order()
-                            .iter()
-                            .enumerate()
-                            .for_each(|(i, node)| {
-                                match node {
-                                    sxd_xpath::nodeset::Node::Element(mathml) =>
-                                        error_message += &format!("#{}:\n{}",i, mml_to_string(*mathml)),
-                                    _ => error_message += &format!("'{:?}'", node),
-                                }   
-                            })    
-                    };
-                    bail!(error_message);
-                },
-            } ),
-            Err(_) => bail!("Could not find value for navigation variable '{}'", var_name),
-        }
+    // This is slightly roundabout because Context doesn't expose a way to get the values.
+    // Instead, we create an "Evaluation", which is just one level of indirection.
+    // Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate()
+    use sxd_xpath::nodeset::Node;
+    let evaluation = Evaluation::new(context, Node::Element(mathml));
+    return match evaluation.value_of(var_name.into()) {
+        Some(value) => match value {
+            Value::String(s) => Ok((Some(s.clone()), None)),
+            Value::Number(f) => Ok((None, Some(*f))),
+            Value::Boolean(b) => Ok((Some(format!("{}", b)), None)),
+            Value::Nodeset(nodes) => {
+                if nodes.size() == 1 {
+                    if let Some(attr) = nodes.document_order_first().unwrap().attribute() {
+                        return Ok( (Some(attr.value().to_string()), None) );
+                    }
+                };
+                let mut error_message = format!("Variable '{}' set somewhere in navigate.yaml is nodeset and not an attribute: ", var_name);
+                if nodes.size() == 0 {
+                    error_message += &format!("0 nodes (false) -- {} set to non-existent (following?/preceding?) node", var_name);
+                } else {
+                    let singular = nodes.size()==1;
+                    error_message += &format!("{} node{}. {}:",
+                            nodes.size(),
+                            if singular {""} else {"s"},
+                            if singular {"Node is"} else {"Nodes are"});
+                    nodes.document_order()
+                        .iter()
+                        .enumerate()
+                        .for_each(|(i, node)| {
+                            match node {
+                                sxd_xpath::nodeset::Node::Element(mathml) =>
+                                    error_message += &format!("#{}:\n{}",i, mml_to_string(*mathml)),
+                                _ => error_message += &format!("'{:?}'", node),
+                            }   
+                        })    
+                };
+                bail!(error_message);
+            },
+        },
+        None => bail!("Could not find value for navigation variable '{}'", var_name),
     }
 }
 

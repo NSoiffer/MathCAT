@@ -750,7 +750,7 @@ fn nemeth_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
             if let Some(last_highlighted) = braille.rfind(is_highlighted) {
                 if braille[last_highlighted..].starts_with('𝑏') {
                     let i_after_baseline = last_highlighted + '𝑏'.len_utf8();
-                    if i_after_baseline == braille.len() || braille[i_after_baseline..].starts_with(&['W', 'w', ',', 'P']) {
+                    if i_after_baseline == braille.len() || braille[i_after_baseline..].starts_with(['W', 'w', ',', 'P']) {
                         // shift the highlight to the left after doing just the replacement (if any) that the regex below does
                         // the shift runs until a non blank braille char is found
                         let mut bytes_deleted = 0;
