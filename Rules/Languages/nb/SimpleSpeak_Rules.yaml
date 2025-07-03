@@ -42,6 +42,7 @@
       else:
       - T: "roten av grad"      # phrase(the square 'root' of 36)
       - x: "*[2]"
+      - pause: short
   # SWEDISH: Removed verbosity settings.
   - T: "av"      # phrase(the square root 'of' 36)
   - x: "*[1]"
