@@ -15,215 +15,215 @@
 #    Any character which acts as a standing alone character (e.g, "{") needs each braille symbol to be labeled
 #    o -- opening/left side, c -- closing/right side, b -- both open and close (e.g, '"')
 
- - "0": [t: "N⠚"]               # 0x30 
- - "1": [t: "N⠁"]               # 0x31 
- - "2": [t: "N⠃"]               # 0x32 
- - "3": [t: "N⠉"]               # 0x33 
- - "4": [t: "N⠙"]               # 0x34 
- - "5": [t: "N⠑"]               # 0x35 
- - "6": [t: "N⠋"]               # 0x36 
- - "7": [t: "N⠛"]               # 0x37 
- - "8": [t: "N⠓"]               # 0x38 
- - "9": [t: "N⠊"]               # 0x39 
+ - "0": [T: "N⠚"]               # 0x30 
+ - "1": [T: "N⠁"]               # 0x31 
+ - "2": [T: "N⠃"]               # 0x32 
+ - "3": [T: "N⠉"]               # 0x33 
+ - "4": [T: "N⠙"]               # 0x34 
+ - "5": [T: "N⠑"]               # 0x35 
+ - "6": [T: "N⠋"]               # 0x36 
+ - "7": [T: "N⠛"]               # 0x37 
+ - "8": [T: "N⠓"]               # 0x38 
+ - "9": [T: "N⠊"]               # 0x39 
 
 # we stick the drop numbers into the private use area for consistency
- - "\ue000": [t: "N⠴"]               # 0 
- - "\ue001": [t: "N⠂"]               # 1 
- - "\ue002": [t: "N⠆"]               # 2 
- - "\ue003": [t: "N⠒"]               # 3 
- - "\ue004": [t: "N⠲"]               # 4 
- - "\ue005": [t: "N⠢"]               # 5 
- - "\ue006": [t: "N⠖"]               # 6 
- - "\ue007": [t: "N⠶"]               # 7 
- - "\ue008": [t: "N⠦"]               # 8 
- - "\ue009": [t: "N⠔"]               # 9 
+ - "\ue000": [T: "N⠴"]               # 0 
+ - "\ue001": [T: "N⠂"]               # 1 
+ - "\ue002": [T: "N⠆"]               # 2 
+ - "\ue003": [T: "N⠒"]               # 3 
+ - "\ue004": [T: "N⠲"]               # 4 
+ - "\ue005": [T: "N⠢"]               # 5 
+ - "\ue006": [T: "N⠖"]               # 6 
+ - "\ue007": [T: "N⠶"]               # 7 
+ - "\ue008": [T: "N⠦"]               # 8 
+ - "\ue009": [T: "N⠔"]               # 9 
 
 # we stick hex digits into the private use area for consistency
 # these are used when we don't want to add a numeric indicator for subsequent digits (3.3)
- - "\ue00A": [t: "N⠐N⠁"]               # A 
- - "\ue00B": [t: "N⠐N⠃"]               # B 
- - "\ue00C": [t: "N⠐N⠉"]               # C 
- - "\ue00D": [t: "N⠐N⠙"]               # D 
- - "\ue00E": [t: "N⠐N⠑"]               # E 
- - "\ue00F": [t: "N⠐N⠋"]               # F 
+ - "\ue00A": [T: "N⠐N⠁"]               # A 
+ - "\ue00B": [T: "N⠐N⠃"]               # B 
+ - "\ue00C": [T: "N⠐N⠉"]               # C 
+ - "\ue00D": [T: "N⠐N⠙"]               # D 
+ - "\ue00E": [T: "N⠐N⠑"]               # E 
+ - "\ue00F": [T: "N⠐N⠋"]               # F 
 # leave room for the rest of the alphabet
- - "\ue01A": [t: "N⠨N⠁"]               # A 
- - "\ue01B": [t: "N⠨N⠃"]               # B 
- - "\ue01C": [t: "N⠨N⠉"]               # C 
- - "\ue01D": [t: "N⠨N⠙"]               # D 
- - "\ue01E": [t: "N⠨N⠑"]               # E 
- - "\ue01F": [t: "N⠨N⠋"]               # F 
+ - "\ue01A": [T: "N⠨N⠁"]               # A 
+ - "\ue01B": [T: "N⠨N⠃"]               # B 
+ - "\ue01C": [T: "N⠨N⠉"]               # C 
+ - "\ue01D": [T: "N⠨N⠙"]               # D 
+ - "\ue01E": [T: "N⠨N⠑"]               # E 
+ - "\ue01F": [T: "N⠨N⠋"]               # F 
 
- - "a": [t: "L⠁"]               # 0x61 
- - "b": [t: "L⠃"]               # 0x62 
- - "c": [t: "L⠉"]               # 0x63 
- - "d": [t: "L⠙"]               # 0x64 
- - "e": [t: "L⠑"]               # 0x65 
- - "f": [t: "L⠋"]               # 0x66 
- - "g": [t: "L⠛"]               # 0x67 
- - "h": [t: "L⠓"]               # 0x68 
- - "i": [t: "L⠊"]               # 0x69 
- - "j": [t: "L⠚"]               # 0x6a 
- - "k": [t: "L⠅"]               # 0x6b 
- - "l": [t: "L⠇"]               # 0x6c 
- - "m": [t: "L⠍"]               # 0x6d 
- - "n": [t: "L⠝"]               # 0x6e 
- - "o": [t: "L⠕"]
- - "p": [t: "L⠏"]               # 0x70 
- - "q": [t: "L⠟"]               # 0x71 
- - "r": [t: "L⠗"]               # 0x72 
- - "s": [t: "L⠎"]               # 0x73 
- - "t": [t: "L⠞"]               # 0x74 
- - "u": [t: "L⠥"]               # 0x75 
- - "v": [t: "L⠧"]               # 0x76 
- - "w": [t: "L⠺"]               # 0x77 
- - "x": [t: "L⠭"]               # 0x78 
- - "y": [t: "L⠽"]               # 0x79 
- - "z": [t: "L⠵"]               # 0x7a 
+ - "a": [T: "L⠁"]               # 0x61 
+ - "b": [T: "L⠃"]               # 0x62 
+ - "c": [T: "L⠉"]               # 0x63 
+ - "d": [T: "L⠙"]               # 0x64 
+ - "e": [T: "L⠑"]               # 0x65 
+ - "f": [T: "L⠋"]               # 0x66 
+ - "g": [T: "L⠛"]               # 0x67 
+ - "h": [T: "L⠓"]               # 0x68 
+ - "i": [T: "L⠊"]               # 0x69 
+ - "j": [T: "L⠚"]               # 0x6a 
+ - "k": [T: "L⠅"]               # 0x6b 
+ - "l": [T: "L⠇"]               # 0x6c 
+ - "m": [T: "L⠍"]               # 0x6d 
+ - "n": [T: "L⠝"]               # 0x6e 
+ - "o": [T: "L⠕"]
+ - "p": [T: "L⠏"]               # 0x70 
+ - "q": [T: "L⠟"]               # 0x71 
+ - "r": [T: "L⠗"]               # 0x72 
+ - "s": [T: "L⠎"]               # 0x73 
+ - "t": [T: "L⠞"]               # 0x74 
+ - "u": [T: "L⠥"]               # 0x75 
+ - "v": [T: "L⠧"]               # 0x76 
+ - "w": [T: "L⠺"]               # 0x77 
+ - "x": [T: "L⠭"]               # 0x78 
+ - "y": [T: "L⠽"]               # 0x79 
+ - "z": [T: "L⠵"]               # 0x7a 
 
- - "A": [t: "CL⠁"]              # 0x41 
+ - "A": [T: "CL⠁"]              # 0x41 
  - "B":                         # 0x42 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠃"]
-        else: [t: "CL⠃"]
+        then: [T: "𝐶L⠃"]
+        else: [T: "CL⠃"]
  - "C":                         # 0x43 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠉"]
-        else: [t: "CL⠉"]
- - "D": [t: "CL⠙"]              # 0x44 
- - "E": [t: "CL⠑"]              # 0x45 
- - "F": [t: "CL⠋"]              # 0x46 
- - "G": [t: "CL⠛"]              # 0x47 
+        then: [T: "𝐶L⠉"]
+        else: [T: "CL⠉"]
+ - "D": [T: "CL⠙"]              # 0x44 
+ - "E": [T: "CL⠑"]              # 0x45 
+ - "F": [T: "CL⠋"]              # 0x46 
+ - "G": [T: "CL⠛"]              # 0x47 
  - "H":                         # 0x48 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠓"]
-        else: [t: "CL⠓"]
+        then: [T: "𝐶L⠓"]
+        else: [T: "CL⠓"]
  - "I":                         # 0x49 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠊"]
-        else: [t: "CL⠊"]
- - "J": [t: "CL⠚"]              # 0x4a 
+        then: [T: "𝐶L⠊"]
+        else: [T: "CL⠊"]
+ - "J": [T: "CL⠚"]              # 0x4a 
  - "K":                         # 0x4b 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠅"]
-        else: [t: "CL⠅"]
- - "L": [t: "CL⠇"]              # 0x4c 
- - "M": [t: "CL⠍"]              # 0x4d 
+        then: [T: "𝐶L⠅"]
+        else: [T: "CL⠅"]
+ - "L": [T: "CL⠇"]              # 0x4c 
+ - "M": [T: "CL⠍"]              # 0x4d 
  - "N":                         # 0x4e 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠝"]
-        else: [t: "CL⠝"]
+        then: [T: "𝐶L⠝"]
+        else: [T: "CL⠝"]
  - "O":                         # 0x4f 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠕"]
-        else: [t: "CL⠕"]
+        then: [T: "𝐶L⠕"]
+        else: [T: "CL⠕"]
  - "P":                         # 0x50 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠏"]
-        else: [t: "CL⠏"]
- - "Q": [t: "CL⠟"]              # 0x51 
- - "R": [t: "CL⠗"]              # 0x52 
+        then: [T: "𝐶L⠏"]
+        else: [T: "CL⠏"]
+ - "Q": [T: "CL⠟"]              # 0x51 
+ - "R": [T: "CL⠗"]              # 0x52 
  - "S":                         # 0x53 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠎"]
-        else: [t: "CL⠎"]
- - "T": [t: "CL⠞"]              # 0x54 
+        then: [T: "𝐶L⠎"]
+        else: [T: "CL⠎"]
+ - "T": [T: "CL⠞"]              # 0x54 
  - "U":                         # 0x55 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠥"]
-        else: [t: "CL⠥"]
+        then: [T: "𝐶L⠥"]
+        else: [T: "CL⠥"]
  - "V":                         # 0x56 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠧"]
-        else: [t: "CL⠧"]
+        then: [T: "𝐶L⠧"]
+        else: [T: "CL⠧"]
  - "W":                         # 0x57 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠺"]
-        else: [t: "CL⠺"]
- - "X": [t: "CL⠭"]              # 0x58 
+        then: [T: "𝐶L⠺"]
+        else: [T: "CL⠺"]
+ - "X": [T: "CL⠭"]              # 0x58 
  - "Y":                         # 0x59 
     - test:
         if: "@data-chem-element"
-        then: [t: "𝐶L⠽"]
-        else: [t: "CL⠽"]
- - "Z": [t: "CL⠵"]              # 0x5a 
+        then: [T: "𝐶L⠽"]
+        else: [T: "CL⠽"]
+ - "Z": [T: "CL⠵"]              # 0x5a 
 
- - "α": [t: "GL⠁"]              # 0x3b1 
- - "β": [t: "GL⠃"]              # 0x3b2 
- - "γ": [t: "GL⠛"]              # 0x3b3 
- - "δ": [t: "GL⠙"]              # 0x3b4 
- - "ε": [t: "GL⠑"]              # 0x3b5 
- - "ζ": [t: "GL⠵"]              # 0x3b6 
- - "η": [t: "GL⠱"]             # 0x3b7 
- - "θ": [t: "GL⠹"]              # 0x3b8 
- - "ι": [t: "GL⠊"]              # 0x3b9 
- - "κ": [t: "GL⠅"]              # 0x3ba 
- - "λ": [t: "GL⠇"]              # 0x3bb 
- - "μ": [t: "GL⠍"]              # 0x3bc 
- - "ν": [t: "GL⠝"]              # 0x3bd 
- - "ξ": [t: "GL⠭"]              # 0x3be 
- - "ο": [t: "GL⠕"]              # 0x3bf 
- - "π": [t: "GL⠏"]              # 0x3c0 
- - "ρ": [t: "GL⠗"]              # 0x3c1 
- - "ς": [t: "VL⠎"]              # 0x3c2 
- - "σ": [t: "GL⠎"]              # 0x3c3 
- - "τ": [t: "GL⠞"]              # 0x3c4 
- - "υ": [t: "GL⠥"]              # 0x3c5 
- - "φ": [t: "GL⠋"]              # 0x3c6 
- - "χ": [t: "GL⠯"]              # 0x3c7 
- - "ψ": [t: "GL⠽"]              # 0x3c8 
- - "ω": [t: "GL⠺"]              # 0x3c9 
+ - "α": [T: "GL⠁"]              # 0x3b1 
+ - "β": [T: "GL⠃"]              # 0x3b2 
+ - "γ": [T: "GL⠛"]              # 0x3b3 
+ - "δ": [T: "GL⠙"]              # 0x3b4 
+ - "ε": [T: "GL⠑"]              # 0x3b5 
+ - "ζ": [T: "GL⠵"]              # 0x3b6 
+ - "η": [T: "GL⠱"]             # 0x3b7 
+ - "θ": [T: "GL⠹"]              # 0x3b8 
+ - "ι": [T: "GL⠊"]              # 0x3b9 
+ - "κ": [T: "GL⠅"]              # 0x3ba 
+ - "λ": [T: "GL⠇"]              # 0x3bb 
+ - "μ": [T: "GL⠍"]              # 0x3bc 
+ - "ν": [T: "GL⠝"]              # 0x3bd 
+ - "ξ": [T: "GL⠭"]              # 0x3be 
+ - "ο": [T: "GL⠕"]              # 0x3bf 
+ - "π": [T: "GL⠏"]              # 0x3c0 
+ - "ρ": [T: "GL⠗"]              # 0x3c1 
+ - "ς": [T: "VL⠎"]              # 0x3c2 
+ - "σ": [T: "GL⠎"]              # 0x3c3 
+ - "τ": [T: "GL⠞"]              # 0x3c4 
+ - "υ": [T: "GL⠥"]              # 0x3c5 
+ - "φ": [T: "GL⠋"]              # 0x3c6 
+ - "χ": [T: "GL⠯"]              # 0x3c7 
+ - "ψ": [T: "GL⠽"]              # 0x3c8 
+ - "ω": [T: "GL⠺"]              # 0x3c9 
 
- - "Α": [t: "CGL⠁"]             # 0x391 
- - "Β": [t: "CGL⠃"]             # 0x392 
- - "Γ": [t: "CGL⠛"]             # 0x393 
- - "Δ": [t: "CGL⠙"]             # 0x394 
- - "Ε": [t: "CGL⠑"]             # 0x395 
- - "Ζ": [t: "CGL⠵"]             # 0x396 
- - "Η": [t: "CGL⠱ "]            # 0x397 
- - "Θ": [t: "CGL⠹"]             # 0x398 
- - "Ι": [t: "CGL⠊"]             # 0x399 
- - "Κ": [t: "CGL⠅"]             # 0x39a 
- - "Λ": [t: "CGL⠇"]             # 0x39b 
- - "Μ": [t: "CGL⠍"]             # 0x39c 
- - "Ν": [t: "CGL⠝"]             # 0x39d 
- - "Ξ": [t: "CGL⠭"]             # 0x39e 
- - "Ο": [t: "CGL⠕"]             # 0x39f 
- - "Π": [t: "CGL⠏"]             # 0x3a0 
- - "Ρ": [t: "CGL⠗"]             # 0x3a1 
- - "΢": [t: "CGL⠎"]             # 0x3a2 
- - "Σ": [t: "CGL⠎"]             # 0x3a3 
- - "Τ": [t: "CGL⠞"]             # 0x3a4 
- - "Υ": [t: "CGL⠥"]             # 0x3a5 
- - "Φ": [t: "CGL⠋"]             # 0x3a6 
- - "Χ": [t: "CGL⠯"]             # 0x3a7 
- - "Ψ": [t: "CGL⠽"]             # 0x3a8 
- - "Ω": [t: "CGL⠺"]             # 0x3a9
+ - "Α": [T: "CGL⠁"]             # 0x391 
+ - "Β": [T: "CGL⠃"]             # 0x392 
+ - "Γ": [T: "CGL⠛"]             # 0x393 
+ - "Δ": [T: "CGL⠙"]             # 0x394 
+ - "Ε": [T: "CGL⠑"]             # 0x395 
+ - "Ζ": [T: "CGL⠵"]             # 0x396 
+ - "Η": [T: "CGL⠱ "]            # 0x397 
+ - "Θ": [T: "CGL⠹"]             # 0x398 
+ - "Ι": [T: "CGL⠊"]             # 0x399 
+ - "Κ": [T: "CGL⠅"]             # 0x39a 
+ - "Λ": [T: "CGL⠇"]             # 0x39b 
+ - "Μ": [T: "CGL⠍"]             # 0x39c 
+ - "Ν": [T: "CGL⠝"]             # 0x39d 
+ - "Ξ": [T: "CGL⠭"]             # 0x39e 
+ - "Ο": [T: "CGL⠕"]             # 0x39f 
+ - "Π": [T: "CGL⠏"]             # 0x3a0 
+ - "Ρ": [T: "CGL⠗"]             # 0x3a1 
+ - "΢": [T: "CGL⠎"]             # 0x3a2 
+ - "Σ": [T: "CGL⠎"]             # 0x3a3 
+ - "Τ": [T: "CGL⠞"]             # 0x3a4 
+ - "Υ": [T: "CGL⠥"]             # 0x3a5 
+ - "Φ": [T: "CGL⠋"]             # 0x3a6 
+ - "Χ": [T: "CGL⠯"]             # 0x3a7 
+ - "Ψ": [T: "CGL⠽"]             # 0x3a8 
+ - "Ω": [T: "CGL⠺"]             # 0x3a9
 
- - "ϑ": [t: "VL⠹"]              # 0x3d1
- - "ϵ": [t: "VL⠑"]              # 0x3f5
- - "ϰ": [t: "VL⠅"]              # 0x3f0
- - "ϕ": [t: "VL⠋"]              # 0x3d5
- - "ϱ": [t: "VL⠗"]              # 0x3f1
- - "ϖ": [t: "VL⠏"]              # 0x3d6
- - "Ϝ": [t: "VL⠧"]              # 0x3d7
+ - "ϑ": [T: "VL⠹"]              # 0x3d1
+ - "ϵ": [T: "VL⠑"]              # 0x3f5
+ - "ϰ": [T: "VL⠅"]              # 0x3f0
+ - "ϕ": [T: "VL⠋"]              # 0x3d5
+ - "ϱ": [T: "VL⠗"]              # 0x3f1
+ - "ϖ": [T: "VL⠏"]              # 0x3d6
+ - "Ϝ": [T: "VL⠧"]              # 0x3d7
 
- - "µ": [t: "GL⠍"]              # 0x00B5 (Micro (Greek mu))
- - "Ω": [t: "CGL⠺"]             # 0x2126 (Ohm sign (capital Greek omega))
- - "∆": [t: "⠸⠦"]               # 0x2206 (Increment)
- - "∐": [t: "⠘⠻"]              # 0x2210 (CoProduct (capital Greek pi))
+ - "µ": [T: "GL⠍"]              # 0x00B5 (Micro (Greek mu))
+ - "Ω": [T: "CGL⠺"]             # 0x2126 (Ohm sign (capital Greek omega))
+ - "∆": [T: "⠸⠦"]               # 0x2206 (Increment)
+ - "∐": [T: "⠘⠻"]              # 0x2210 (CoProduct (capital Greek pi))
 
  - "⁡":                          # 0x2061⁡ (invisible function apply)
     # add a space if name doesn't have brackets after it or is in FunctionNames list and isn't off the baseline
@@ -235,10 +235,10 @@
                   translate(substring(., 1, 1), 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] or
               ($NewScriptContext='' andnot(ancestor::*[self::m:mfrac]) and following-sibling::*[1][not(self::m:mfrac or IsBracketed(., '', ''))])
              )" 
-        then: [t: "w"]      # follows a function name, so lowercase
-        else: [t: ""]
+        then: [T: "w"]      # follows a function name, so lowercase
+        else: [T: ""]
 
- - "⁢": [t: ""]                        # 0x2062 (invisible times)
+ - "⁢": [T: ""]                        # 0x2062 (invisible times)
     #- test:
         #if: # GTM 9.3.3 (not very clear in rule, but the function name has to start with a lower case latin char ['no indicators'])
         #- "parent::m:mrow and "
@@ -247,64 +247,64 @@
         #- "           (self::m:mrow and translate(*[last()], 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '')] and"
         #- "  following::*[1][self::m:mrow and count(*)=3 and "   # look for function apply
         #- "     *[2][.='⁡'] and *[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']]" 
-        #then: [t: "W"]
-        #else: [t: ""]
- - "⁣": [t: ""]                 # 0x2063⁡ (invisible separator)
+        #then: [T: "W"]
+        #else: [T: ""]
+ - "⁣": [T: ""]                 # 0x2063⁡ (invisible separator)
  - "⁤":                         # 0x2064 (invisible plus)
     - test:
         if: "following-sibling::*[1][self::m:mrow]"   # should be a mixed fraction where the fraction is linear
-        then: [t: "W"]      # 
-        else: [t: ""]
+        then: [T: "W"]      # 
+        else: [T: ""]
 
- - "!": [t: "⠫"]               # 0x21
- - "$": [t: "⠸⠈⠎"]            # 0x24
- - "%": [t: "⠸⠼⠚⠴"]           # 0x25
- - "(": [t: "⠣"]               # 0x0028 (Left parenthesis)
- - ")": [t: "⠜"]               # 0x0029 (Right parenthesis)
- - "[": [t: "⠷"]               # 0x005B (Left square bracket)
- - "]": [t: "⠾"]               # 0x005D (Right square bracket)
- - "}": [t: "⠛⠕"]                # 0x007D (cerrar llaves)
- - "{": [t: "⠶⠪"]                # 0x007B (abrir llaves)
- - "*": [t: "⠐⠦"]                           # 0x2a
-#  - "*": [t: "⠲"]                           # 0x2a
- - "+": [t: "W⠖"]                           # 0x2b
+ - "!": [T: "⠫"]               # 0x21
+ - "$": [T: "⠸⠈⠎"]            # 0x24
+ - "%": [T: "⠸⠼⠚⠴"]           # 0x25
+ - "(": [T: "⠣"]               # 0x0028 (Left parenthesis)
+ - ")": [T: "⠜"]               # 0x0029 (Right parenthesis)
+ - "[": [T: "⠷"]               # 0x005B (Left square bracket)
+ - "]": [T: "⠾"]               # 0x005D (Right square bracket)
+ - "}": [T: "⠛⠕"]                # 0x007D (cerrar llaves)
+ - "{": [T: "⠶⠪"]                # 0x007B (abrir llaves)
+ - "*": [T: "⠐⠦"]                           # 0x2a
+#  - "*": [T: "⠲"]                           # 0x2a
+ - "+": [T: "W⠖"]                           # 0x2b
  - ",":                        # 0x2c (Comma)
      - test:
         if: "self::m:mn"
-        then: [t: "N⠂"]
-        else: [t: ","]
+        then: [T: "N⠂"]
+        else: [T: ","]
  - "-":                            # 0x2d
      - test:
         if: "preceding-sibling::*"
-        then: [t: "W⠤"]
-        else: [t: "⠤"]
+        then: [T: "W⠤"]
+        else: [T: "⠤"]
  - ".":                            # 0x2e
      - test:
         if: "self::m:mn"
-        then: [t: "N⠄"]
-        else: [t: "."]
- - ":": [t: "⠒"]                           # 0x3a
- - "<": [t: "W⠪⠄"]                        # 0x003C (Less than)
- - "=": [t: "W⠶"]                           # 0x3d
- - ">": [t: "W⠕⠂"]                          # 0x3e
+        then: [T: "N⠄"]
+        else: [T: "."]
+ - ":": [T: "⠒"]                           # 0x3a
+ - "<": [T: "W⠪⠄"]                        # 0x003C (Less than)
+ - "=": [T: "W⠶"]                           # 0x3d
+ - ">": [T: "W⠕⠂"]                          # 0x3e
  - "|":                                  # 0x007C (vertical bar)
     - test:
         - if: "parent::*[self::m:mrow and count(*)=3 and *[1]='|'and *[3]='|'] and not(following-sibling::*[1])"
-          then: [t: "⠸W"]               # closing vertical bar for absolute value
-          else: [t: "⠈⠇"]               # absolute value -- opening bar of absolute value or standalone vertical bar
- - "±": [t: "W⠖⠤"]                      # 0xb1
- - "·": [t: "W⠄"]                       # 0x00B7 (Multiplication dot (times))
- - "×": [t: "W⠦"]                       # 0x00D7 (multiplication cross))
- - "…": [t: "⠠⠠⠠"]                     # 0x2d9
+          then: [T: "⠸W"]               # closing vertical bar for absolute value
+          else: [T: "⠈⠇"]               # absolute value -- opening bar of absolute value or standalone vertical bar
+ - "±": [T: "W⠖⠤"]                      # 0xb1
+ - "·": [T: "W⠄"]                       # 0x00B7 (Multiplication dot (times))
+ - "×": [T: "W⠦"]                       # 0x00D7 (multiplication cross))
+ - "…": [T: "⠠⠠⠠"]                     # 0x2d9
 
 
 ##### The following need translations
  - "̊ ": [t: "⠈⠴"]               # 0x0309 (Ring)
  - "ˇ": [t: "⠰⠒"]               # 0x02C7 (Caron)
- - "⌢": [T: "⠈⠒"]             #  0x2322
- - "⌣": [T: "⠠⠒"]           	#  0x2323
- - "⏜": [T: "⠈⠒"]             #  0x232DC
- - "⏝": [T: "⠠⠒"]           	#  0x23DD
+ - "⌢": [t: "⠈⠒"]             #  0x2322
+ - "⌣": [t: "⠠⠒"]           	#  0x2323
+ - "⏜": [t: "⠈⠒"]             #  0x232DC
+ - "⏝": [t: "⠠⠒"]           	#  0x23DD
 
  - "⦜": [t: "⠸⠤"]                # 0x299C (ángulo recto)
  - "⦝": [t: "⠸⠤"]                # 0x299D (ángulo recto)
