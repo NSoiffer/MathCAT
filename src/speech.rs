@@ -1668,10 +1668,13 @@ impl fmt::Display for ContextStack<'_> {
 }
 
 impl<'c, 'r> ContextStack<'c> {
-    fn new<'a,>(pref_manager: &'a PreferenceManager) -> ContextStack<'c> {
+    fn new<'a>(pref_manager: &'a PreferenceManager, context: Option<Context<'c>>) -> ContextStack<'c> {
         let prefs = pref_manager.merge_prefs();
         let mut context_stack = ContextStack {
-            base: ContextStack::base_context(prefs),
+            base: match context {
+                None => ContextStack::base_context(prefs),
+                Some(context) => context,
+            },
             old_values: Vec::with_capacity(31)      // should avoid allocations
         };
         // FIX: the list of variables to set should come from definitions.yaml
@@ -2317,7 +2320,18 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
     pub fn new(speech_rules: &'s SpeechRules, doc: Document<'m>, nav_node_id: &'m str) -> SpeechRulesWithContext<'c, 's, 'm> {
         return SpeechRulesWithContext {
             speech_rules,
-            context_stack: ContextStack::new(&speech_rules.pref_manager.borrow()),
+            context_stack: ContextStack::new(&speech_rules.pref_manager.borrow(), None),
+            doc,
+            nav_node_id,
+            inside_spell: false,
+            translate_count: 0,
+        }
+    }
+
+    pub fn with_context(speech_rules: &'s SpeechRules, doc: Document<'m>, nav_node_id: &'m str, context: Context<'c>) -> SpeechRulesWithContext<'c, 's, 'm> {
+        return SpeechRulesWithContext {
+            speech_rules,
+            context_stack: ContextStack::new(&speech_rules.pref_manager.borrow(), Some(context)),
             doc,
             nav_node_id,
             inside_spell: false,
