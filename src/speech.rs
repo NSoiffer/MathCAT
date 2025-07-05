@@ -1196,6 +1196,7 @@ impl MyXPath {
         return match result {
             Ok(val) => Ok( val ),
             Err(e) => {
+                debug!("MyXPath::evaluate: {}", e.to_string().replace("OwnedPrefixedName { prefix: None, local_part:", "").replace(" }", ""));
                 bail!( "{}\n\n",
                      // remove confusing parts of error message from xpath
                     e.to_string().replace("OwnedPrefixedName { prefix: None, local_part:", "").replace(" }", "") );
@@ -1540,7 +1541,7 @@ struct VariableDefinition {
 
 impl fmt::Display for VariableDefinition {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "[name: {}={}]", self.name, self.value);
+        return write!(f, "['{}'='{}']", self.name, self.value);
     }   
 }
 
@@ -1578,6 +1579,7 @@ impl VariableDefinition {
                     _ => bail!("definition value is not a string, boolean, or number. Found {}",
                             yaml_to_string(value, 1) )
                 };
+
                 return Ok(
                     VariableDefinition{
                         name,
@@ -1599,9 +1601,11 @@ struct VariableDefinitions {
 
 impl fmt::Display for VariableDefinitions {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[")?;
         for def in &self.defs {
             write!(f, "{},", def)?;
         }
+        writeln!(f, "]")?;
         return Ok( () );
     }
 }
@@ -1681,6 +1685,7 @@ impl<'c, 'r> ContextStack<'c> {
         // These can't be set on the <math> tag because of the "translate" command which starts speech at an 'id'
         context_stack.base.set_variable("MatchingPause", Value::Boolean(false));
         context_stack.base.set_variable("IsColumnSilent", Value::Boolean(false));
+        context_stack.base.set_variable("MatchingWhitespace", Value::Boolean(false));
 
 
         return context_stack;
@@ -1731,7 +1736,7 @@ impl<'c, 'r> ContextStack<'c> {
             // set the new value
             let new_value = match def.value.evaluate(&self.base, mathml) {
                 Ok(val) => val,
-                Err(_) => bail!(format!("Can't evaluate variable def for {} with ContextStack {}", def, self)),
+                Err(err) => bail!(format!("xpath error message='{}'\nCan't evaluate variable def for {} with ContextStack {}", err, def, self)),
             };
             let qname = QName::new(def.name.as_str());
             self.base.set_variable(qname, new_value);
