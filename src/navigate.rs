@@ -299,7 +299,7 @@ pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: E
     return match evaluation.value_of(var_name.into()) {
         Some(value) => match value {
             Value::String(s) => Ok((Some(s.clone()), None)),
-            Value::Number(f) => Ok((None, Some(f.clone()))),
+            Value::Number(f) => Ok((None, Some(*f))),
             Value::Boolean(b) => Ok((Some(format!("{}", b)), None)),
             Value::Nodeset(nodes) => {
                 if nodes.size() == 1 {
