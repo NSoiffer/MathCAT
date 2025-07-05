@@ -29,7 +29,7 @@ fn braille_at(braille: &str, index: usize) -> char {
 /// braille the MathML
 /// If 'nav_node_id' is not an empty string, then the element with that id will have dots 7 & 8 turned on as per the pref
 /// Returns the braille string (highlighted) along with the *character* start/end of the highlight (whole string if no highlight)
-pub fn braille_mathml_with_context<'c>(mathml: Element, context: Context<'c>) -> Result<(String, usize, usize)> {
+pub fn braille_mathml_with_context(mathml: Element, context: Context<'_>) -> Result<(String, usize, usize)> {
     return BRAILLE_RULES.with(|rules| {
         let rules = rules.borrow();
         let new_package = Package::new();
@@ -51,7 +51,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
 fn braille_rules_internal<'s:'m, 'm:'c, 'c>(mathml: Element<'m>, mut rules_with_context: SpeechRulesWithContext<'c, 's, 'm>) -> Result<(String, usize, usize)> {
     let braille_string = rules_with_context.match_pattern::<String>(mathml)
                     .chain_err(|| "Pattern match/replacement failure!")?;
-    // debug!("braille_mathml: braille string: {}", &braille_string);
+    debug!("braille_mathml: braille string: {}", &braille_string);
     let braille_string = braille_string.replace(' ', "");
     let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
     let highlight_style = pref_manager.pref_to_string("BrailleNavHighlight");
@@ -2096,6 +2096,7 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "↓" => "⠡",     // subscript
     "|" => "⠸",    // vertical bar
     "#" => "⠼",      // signals end of script, also start of fraction in numeric fraction
+    "p" => "⠠",      // separator (used before punctuation or before parens following a drop number; also next char is not a number)
     "Z" => "⠐",     // signals end of index of root, integrand/lim from function ("zone change")
 
 };
@@ -2103,7 +2104,7 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     lazy_static! {
         // don't include '𝐖' (special cased below)
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓|Nn𝑁W𝐖w#Z,(){}\[\]])").unwrap();
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓|Nn𝑁W𝐖w#pZ,(){}\[\]])").unwrap();
         // Numbers need to end with a space, but sometimes there is one there for other reasons
 
         // Not sure if this is correct -- awaiting reply concerning extend of Greek run. This assumes a single char
@@ -2117,11 +2118,7 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     }
 
     debug!("finnish_cleanup: start={}", raw_braille);
-    let result = ADD_SEPARATOR_AFTER_DROP_NUMBER_.replace_all(&raw_braille, |cap: &Captures| {
-        // match includes the char after the number -- insert the whitespace before it
-        // debug!("DROP_NUMBER_SEPARATOR match='{}'", &cap[1]);
-        return cap[1].to_string() + "𝐶)";       // hack to use "𝐶" instead of dot 6 directly, but works for NUMBER_MATCH
-    });
+    let result = ADD_SEPARATOR_AFTER_DROP_NUMBER_.replace_all(&raw_braille, "${1}p)");
     let result = ADD_SPACE_AFTER_GREEK.replace_all(&result, "${1}W");
     let result = REMOVE_UNNEEDED_SPACE_AFTER.replace_all(&result, "${1}");
     // let result = result.replace('n', "N");  // avoids having to modify remove_unneeded_mode_changes()
@@ -2394,7 +2391,7 @@ impl BrailleChars {
             "CMU" => BrailleChars:: get_braille_cmu_chars(node, text_range),
             "Vietnam" => BrailleChars:: get_braille_vietnam_chars(node, text_range),
             "Swedish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
-            "Finnish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
+            "Finnish" => BrailleChars:: get_braille_finnish_chars(node, text_range),
             _ => return Err(sxd_xpath::function::Error::Other(format!("get_braille_chars: unknown braille code '{}'", code)))
         };
         return match result {
@@ -2595,6 +2592,64 @@ impl BrailleChars {
                 }
             } 
             return text;
+        }
+    }
+
+    fn get_braille_finnish_chars(mathml: Element, text_range: Option<Range<usize>>) -> Result<String> {
+        // Numbers need block separators.
+        // FIX: this needs to deal with typefaces properly -- currently we fall back to UEB behavior
+        let math_variant = mathml.attribute_value("mathvariant");
+        if math_variant.is_none() && name(mathml) == "mn" {
+            let number = as_text(mathml);
+            let number =  match text_range {
+                None => number,
+                Some(range) => &number[range],
+            };
+            let number = number.replace([' ', ' '], ".");       // space and non-breaking space
+            if number.is_ascii() && number.len() > 4 {
+                // at this point, we know each digit is one char in the string
+
+                //let mut braille_chars = braille_replace_chars(&number, mathml)?;
+                let mut parts = number.split(',');      // decimal separator
+                let int_part = parts.next().unwrap();
+                let mut answer = "".to_string();
+                if int_part.len() > 4 && !int_part.contains('.') {   // if it has '.'s, then assume it is already in number blocks
+                    // go thru blocks of three, but start with the leading chars
+                    let excess = int_part.len() % 3;
+                    answer = if excess > 0 {&int_part[..excess]} else {""}.to_string();
+                    for i in 0..int_part.len()/3 {
+                        let start = excess + 3*i;
+                        answer += ".";
+                        answer += &int_part[start..start+3]
+                    }
+                } else {
+                    answer += int_part;
+                }
+                if let Some(decimal_part) = parts.next() {
+                    answer += ",";
+                    if decimal_part.len() > 3  && !decimal_part.contains('.') {   // if it has '.'s, then assume it is already in number blocks
+                        // go thru blocks of three, then add on extra chars (opposite of int loop)
+                        let excess = decimal_part.len() % 3;
+                        for i in 0..decimal_part.len()/3 {
+                            let start = 3*i;
+                            answer += &decimal_part[start..start+3];
+                            if start + 3 < decimal_part.len() {
+                                answer += ".";
+                            }
+                        }
+                        if excess > 0 {
+                            answer += &decimal_part[decimal_part.len()-excess..]
+                        }
+                    } else {
+                        answer += decimal_part;
+                    }
+                }
+                return braille_replace_chars(&answer, mathml);      // what else is possible?
+            }
+            // at this point, we know each digit is one char in the string
+            return braille_replace_chars(&number, mathml);      // what else is possible?
+        } else {
+            return BrailleChars::get_braille_ueb_chars(mathml, text_range);
         }
     }
 
@@ -2847,8 +2902,11 @@ impl NeedsToBeGrouped {
     /// In general, this means if the expression contains a space, it needs to be grouped.
     fn needs_grouping_for_finnish(mathml: Element, _is_base: bool) -> bool {
         // Because we don't know the braille at this point, "the braille contains a space" is tricky.
-        // Some ok cases are: numbers, -numbers, runs of letters
-        // If the components satisfy the above, then powers, roots, function calls, grouping, are ok
+        // We do a few quick checks for things that don't generate white space, and if those checks fall thru,
+        //  we go ahead and generate the braille.
+        // FIX: generating the braille is expensive -- finding a few more quick checks would be useful
+        // Note: generated braille can't be used in the output because all the special marks used by reg exs are gone.
+        // Some ok cases are: numbers, -numbers, letters
         use crate::canonicalize::operator_priority;
 
         let element_name = name(mathml);
@@ -2860,7 +2918,19 @@ impl NeedsToBeGrouped {
         if IsBracketed::is_bracketed(mathml, "", "", false, true) {
             return false;
         }
+        if element_name == "mrow" {
+            // a leading '-' is allowed
+            // FIX: what else?
+            let children = mathml.children();
+            if children.len() == 2 {
+                let first_child = as_element(children[0]);
+                if name(first_child) == "mo" && as_text(first_child) == "-" {
+                    return NeedsToBeGrouped::needs_grouping_for_finnish(as_element(children[1]), false);
+                }
+            }
+        }
 
+        // special numerator check
         let parent = get_parent(mathml);   // there is always a "math" node
         let parent_name = name(parent);
         if parent_name == "mfrac" && mathml.preceding_siblings().is_empty(){
@@ -2881,66 +2951,19 @@ impl NeedsToBeGrouped {
                 }
             }
         }
-
-        if element_name == "mrow" {
-            // a leading '-' is allowed
-            // FIX: what else?
-            let children = mathml.children();
-            if children.len() == 2 {
-                let first_child = as_element(children[0]);
-                if name(first_child) == "mo" && as_text(first_child) == "-" {
-                    return NeedsToBeGrouped::needs_grouping_for_finnish(as_element(children[1]), false);
-                }
-            }
-            return mrow_contains_space_in_braille(mathml);
+        // FIX: this is potentially bad because it lacks the context at the point of the call.
+        // However, at this point in writing the rules, only $RowStart is needed, and that doesn't involve this function
+        let mut context  = Context::new();
+        context.set_namespace("m", "http://www.w3.org/1998/Math/MathML");
+        crate::xpath_functions::add_builtin_functions(&mut context);
+        match braille_mathml_with_context(mathml, context) {
+            Err(e) => {
+                error!("Unable to braille expression in needs_grouping_for_finnish.\nError message is {}\nMathML is\n{}", e, mml_to_string(mathml));
+                return true;    // be conservative
+            },
+            Ok( (braille, _, _)) => return braille.contains('⠀'),
         }
-        return false;
 
-        fn mrow_contains_space_in_braille(mrow: Element) -> bool {
-            // heuristic to guess if the braille would have a space
-            // the basic idea is that runs of letters don't require a space, and neither does function call with parens
-            assert!(name(mrow) == "mrow");
-            let children = mrow.children();
-            if children.len() == 3 {
-                let op = as_element(children[1]);
-                if name(op) == "mo" && as_text(op) == "\u{2061}" {
-                    return false;
-                }
-            }
-            debug!("contains_space_in_braille: mrow\n{}", mml_to_string(mrow));
-            let mut allow_parens = false;
-            for child in children {
-                let child = as_element(child);
-                let child_name = name(child);
-                if (child_name == "mi" || child_name == "mtext") &&
-                    as_text(child).chars().all(|c| c.is_alphabetic()) {
-                    debug!("...continuing");
-                    continue;
-                } else if child_name == "mrow" {
-                    // check for function call argument exception
-                    if allow_parens && IsBracketed::is_bracketed(child, "(", ")", false, false) {
-                        let arg_child = as_element(child.children()[1]);
-                        let arg_children = arg_child.children();
-                        if arg_children.len() == 2 {
-                            return false;
-                        }
-                        return (child_name == "mi" || child_name == "mtext") &&
-                                as_text(arg_child).chars().all(|c| c.is_alphabetic());
-                    }
-                    debug!("...checking child of mrow");
-                    if mrow_contains_space_in_braille(child) {
-                        return true;
-                    }
-                } else if child_name == "mo" && as_text(child) == "\u{2061}" {
-                    allow_parens = true;
-                } else {
-                    debug!("...child {} returning true", child_name);
-                    return true;
-                }
-            }
-            debug!("...returning false");
-            return false;
-        }
     }
 
     // ordinals often have an irregular start (e.g., "half") before becoming regular.

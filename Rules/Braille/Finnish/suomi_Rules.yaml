@@ -97,6 +97,8 @@
   name: default
   tag: mfrac
   match: "."
+  # Note: can't use $Denominator in generation of final string because it is all braille chars, so reg exs won't work
+  variables: [Denominator: "PatternMatchResult(*[2], 'Braille')"]
   replace:
   - test:
       if:  "NeedsToBeGrouped(*[1], 'Finnish', true())"
@@ -105,9 +107,9 @@
       - x: "*[1]"
       - t: ")"
       else: [x: "*[1]"]
-  - t: "⠀⠌"
+  - t: "W⠌"
   - test:
-      if: "NeedsToBeGrouped(*[2], 'Finnish', true())"
+      if: "contains($Denominator, '⠀')"
       then:
       - t: "("
       - x: "*[2]"
@@ -177,7 +179,7 @@
    - test: 
       if: "preceding-sibling::*"
       then: [t: "W⠐⠐W"]         # new line/row
-   - x: $RowStart
+   - x: "$RowStart"
    - test:
       if: .[self::m:mlabeledtr]
       then:

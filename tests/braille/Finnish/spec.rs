@@ -59,26 +59,26 @@ fn p7_decimal_point() {
 
 #[test]
 fn p7_decimal_point_endless_no_grouping() {
-    let expr = "<math><mn>1,234657234...</mn></math>";
+    let expr = "<math><mn>1,234657234</mn><mi>...</mi></math>";
     test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
 
 
 #[test]
 fn p7_decimal_point_endless_with_grouping_space() {
-    let expr = "<math><mn>1,234 657 234...</mn></math>";
+    let expr = "<math><mn>1,234 657 234</mn><mi>...</mi></math>";
     test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
 
 #[test]
 fn p7_decimal_point_endless_with_grouping_nbsp() {
-    let expr = "<math><mn>1,234 657 234...</mn></math>";
+    let expr = "<math><mn>1,234 657 234</mn><mi>...</mi></math>";
     test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
 
 #[test]
 fn p7_decimal_point_endless_with_grouping_nbsp_ellipses() {
-    let expr = "<math><mn>1,234 657 234…</mn></math>";
+    let expr = "<math><mn>1,234 657 234</mn><mi>…</mi></math>";
     test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
 
@@ -90,7 +90,7 @@ fn p7_decimal_point_endless_with_grouping_nbsp_ellipses_mathtype() {
 
 #[test]
 fn p7_decimal_point_endless_no_grouping_ellipses() {
-    let expr = "<math><mn>1,234657234…</mn></math>";
+    let expr = "<math><mn>1,234657234</mn><mi>…</mi></math>";
     test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
 
