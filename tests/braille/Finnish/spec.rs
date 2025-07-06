@@ -398,15 +398,11 @@ fn p19_fractions_sum() {
       <mn>4</mn>
     </mfrac>
     <mo>+</mo>
-  </mrow>
-  <mrow>
     <mfrac>
       <mn>1</mn>
       <mn>4</mn>
     </mfrac>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <mn>1</mn>
   </mrow>
 </math>";
@@ -463,8 +459,6 @@ fn p19_fraction_multiplication_Finnish_notation_multiscripts() {
       </mrow>
     </mmultiscripts>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <mfrac>
       <mrow>
         <mi>a</mi>
@@ -524,8 +518,6 @@ fn p22_fraction_division_Finnish_notation_msup() {
       </mrow>
     </msup>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <mfrac>
       <mrow>
         <mi>b</mi>
@@ -802,8 +794,6 @@ fn p27_exponent_to_large_number() {
       <mn>20</mn>
     </msup>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <mn>1048576</mn>
   </mrow>
 </math>";
@@ -903,16 +893,12 @@ fn p33_vector() {
         <mo>‾</mo>
     </mover>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <mn>3</mn>
     <mover>
       <mi>i</mi>
       <mo>‾</mo>
     </mover>
     <mo>−</mo>
-  </mrow>
-  <mrow>
     <mn>4</mn>
     <mover>
       <mi>j</mi>
@@ -932,8 +918,6 @@ fn p33_parallel_vectors() {
       <mo>‾</mo>
     </mover>
     <mo>∥</mo>
-  </mrow>
-  <mrow>
     <mover>
       <mi>b</mi>
       <mo>‾</mo>
@@ -995,8 +979,6 @@ fn p39_subset() {
   <mrow>
     <mi>B</mi>
     <mo>⊂</mo>
-  </mrow>
-  <mrow>
     <mi>A</mi>
   </mrow>
 </math>";
@@ -1019,22 +1001,14 @@ fn p39_equal_sets_with_mtext() {
   <mrow>
     <mi>C</mi>
     <mo>⊆</mo>
-  </mrow>
-  <mrow>
     <mi>D</mi>
     <mtext> ja </mtext>
     <mi>D</mi>
     <mo>⊆</mo>
-  </mrow>
-  <mrow>
     <mi>C</mi>
     <mo>⇔</mo>
-  </mrow>
-  <mrow>
     <mi>C</mi>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <mi>D</mi>
   </mrow>
 </math>";
@@ -1047,12 +1021,8 @@ fn p39_set_of_points_in_R2() {
   <mrow>
     <mi>A</mi>
     <mo>×</mo>
-  </mrow>
-  <mrow>
     <mi>B</mi>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <mo>{</mo>
     <mo>(</mo>
     <mn>1</mn>
@@ -1496,6 +1466,7 @@ fn limit_approaches_from_below() {
 // This is a hack, so the Finnish substitution notation for integral would work. The intent is might be wrong, but that is what the notation means.
 #[test]
 fn p49_integral_with_Finnish_notation_for_substitution() {
+  init_logger(); 
     let expr = "<math>
   <mrow>
     <msubsup>
@@ -1509,8 +1480,6 @@ fn p49_integral_with_Finnish_notation_for_substitution() {
     <mi>d</mi>
     <mi>x</mi>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <msubsup>
       <mo intent='substitution'>⧸</mo>
       <mn>0</mn>
@@ -1518,7 +1487,7 @@ fn p49_integral_with_Finnish_notation_for_substitution() {
     </msubsup>
     <mfrac>
       <mn>2</mn>
-      <mn>4</mn>
+      <mn>3</mn>
     </mfrac>
     <mi>x</mi>
     <msqrt>
@@ -1578,8 +1547,6 @@ fn p50_binomial_with_factorial() {
       <mo>)</mo>
     </mrow>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <mfrac>
       <mrow>
         <mn>6</mn>
@@ -1711,8 +1678,6 @@ fn p51_normal_distribution() {
       <mrow>
         <mi>p</mi>
         <mo>~</mo>
-      </mrow>
-      <mrow>
         <mi>N</mi>
         <mo>(</mo>
         <mn>58</mn>
@@ -1783,8 +1748,6 @@ fn p52_quadratic_formula() {
   <mrow>
     <mi>x</mi>
     <mo>=</mo>
-  </mrow>
-  <mrow>
     <mfrac>
       <mrow>
         <mo>−</mo>
@@ -1811,6 +1774,13 @@ fn p52_quadratic_formula() {
   </mrow>
 </math>";
     test_braille("Finnish", expr, "⠭⠀⠶⠷⠤⠃⠀⠖⠤⠩⠦⠃⠬⠀⠤⠼⠙⠀⠁⠉⠴⠾⠀⠌⠦⠼⠃⠀⠁⠴");
+}
+
+#[test]
+fn p63_O16() {
+    // From MathType
+    let expr = r#"<math><mmultiscripts><mi mathvariant="normal">O</mi><mprescripts/><mn>8</mn><mn>16</mn></mmultiscripts></math>"#;
+    test_braille("Finnish", expr, "⠡⠼⠓⠬⠼⠁⠋⠠⠕");
 }
 
 #[test]
