@@ -51,7 +51,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
 fn braille_rules_internal<'s:'m, 'm:'c, 'c>(mathml: Element<'m>, mut rules_with_context: SpeechRulesWithContext<'c, 's, 'm>) -> Result<(String, usize, usize)> {
     let braille_string = rules_with_context.match_pattern::<String>(mathml)
                     .chain_err(|| "Pattern match/replacement failure!")?;
-    debug!("braille_mathml: braille string: {}", &braille_string);
+    // debug!("braille_mathml: braille string: {}", &braille_string);
     let braille_string = braille_string.replace(' ', "");
     let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
     let highlight_style = pref_manager.pref_to_string("BrailleNavHighlight");
@@ -2092,6 +2092,8 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "}" => "⠻",     // for whitespace removal
     "[" => "⠷",     // Not really needed, but done for consistency with "]"
     "]" => "⠾",     // for whitespace removal
+    "〘" => "⠣",    // used for divided by
+    "〙" => "⠜",    // used for multiplied by
     "↑" => "⠬",     // superscript
     "↓" => "⠡",     // subscript
     "|" => "⠸",    // vertical bar
@@ -2104,12 +2106,15 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     lazy_static! {
         // don't include '𝐖' (special cased below)
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓|Nn𝑁W𝐖w#pZ,(){}\[\]])").unwrap();
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓|Nn𝑁W𝐖w#pZ,(){}\[\]〘〙])").unwrap();
         // Numbers need to end with a space, but sometimes there is one there for other reasons
 
         // Not sure if this is correct -- awaiting reply concerning extend of Greek run. This assumes a single char
         static ref ADD_SPACE_AFTER_GREEK: Regex = Regex::new(r"(GL.)[^W↑↓]").unwrap();
         static ref ADD_SEPARATOR_AFTER_DROP_NUMBER_: Regex = Regex::new(r"(n.)\)").unwrap();
+
+        static ref REMOVE_UNNEEDED_SPACE_AROUND_MULTIPLIED_BY: Regex = Regex::new(r"W?〙W(N.)").unwrap();
+        static ref REMOVE_UNNEEDED_SPACE_AROUND_DIVIDED_BY: Regex = Regex::new(r"([nN].)W〘").unwrap();
 
         // Numbers typically end with a space, but sometimes not (captured by the following regexes)
         // Ellipsis at the end of a number are treated as being part of the number (in match, we don't add whitespace)
@@ -2120,6 +2125,9 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     debug!("finnish_cleanup: start={}", raw_braille);
     let result = ADD_SEPARATOR_AFTER_DROP_NUMBER_.replace_all(&raw_braille, "${1}p)");
     let result = ADD_SPACE_AFTER_GREEK.replace_all(&result, "${1}W");
+    let result = REMOVE_UNNEEDED_SPACE_AROUND_MULTIPLIED_BY.replace_all(&result, "〙${1}");
+    let result = REMOVE_UNNEEDED_SPACE_AROUND_DIVIDED_BY.replace_all(&result, "${1}〘");
+
     let result = REMOVE_UNNEEDED_SPACE_AFTER.replace_all(&result, "${1}");
     // let result = result.replace('n', "N");  // avoids having to modify remove_unneeded_mode_changes()
     let result = REMOVE_UNNEEDED_SPACE.replace_all(&result, "$1");
@@ -2912,7 +2920,7 @@ impl NeedsToBeGrouped {
         let element_name = name(mathml);
         if is_leaf(mathml) &&
             // 'mn' can have whitespace because that doesn't generate a space in braille
-           (element_name == "mn" || as_text(mathml).find(char::is_whitespace).is_some()) {
+           !(element_name == "mtext" && as_text(mathml).find(char::is_whitespace).is_some()) {
             return false;
         }
         if IsBracketed::is_bracketed(mathml, "", "", false, true) {
@@ -2927,6 +2935,10 @@ impl NeedsToBeGrouped {
                 if name(first_child) == "mo" && as_text(first_child) == "-" {
                     return NeedsToBeGrouped::needs_grouping_for_finnish(as_element(children[1]), false);
                 }
+            }
+            // pick off run of mi's to avoid expensive brailling -- relatively common (especially 'xy')
+            if mathml.children().iter().all(|&child| name(as_element(child)) == "mi") {
+                return false;
             }
         }
 
@@ -2953,6 +2965,7 @@ impl NeedsToBeGrouped {
         }
         // FIX: this is potentially bad because it lacks the context at the point of the call.
         // However, at this point in writing the rules, only $RowStart is needed, and that doesn't involve this function
+        debug!("needs_grouping_for_finnish: need to braille expr for {}", crate::canonicalize::element_summary(mathml));
         let mut context  = Context::new();
         context.set_namespace("m", "http://www.w3.org/1998/Math/MathML");
         crate::xpath_functions::add_builtin_functions(&mut context);

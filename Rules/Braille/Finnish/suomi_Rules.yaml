@@ -97,8 +97,6 @@
   name: default
   tag: mfrac
   match: "."
-  # Note: can't use $Denominator in generation of final string because it is all braille chars, so reg exs won't work
-  variables: [Denominator: "PatternMatchResult(*[2], 'Braille')"]
   replace:
   - test:
       if:  "NeedsToBeGrouped(*[1], 'Finnish', true())"
@@ -109,7 +107,7 @@
       else: [x: "*[1]"]
   - t: "W⠌"
   - test:
-      if: "contains($Denominator, '⠀')"
+      if: "NeedsToBeGrouped(*[2], 'Finnish', true())"
       then:
       - t: "("
       - x: "*[2]"
@@ -343,6 +341,7 @@
   replace:
   - x: "*[1]"
   - t: "↑W"
+
 -
   # Chemistry has a special rule for numerical subscripts (note base is not necessarily a chemical element)
   name: chemistry
@@ -365,6 +364,15 @@
             - x: "*[3]" 
       - t: "W"
 
+-
+  # we look for a superscript that starts with ")"
+  name: divided-by
+  tag: msup
+  match: "*[2][self::m:mrow and count(*)=2 and *[1][.='(']]"
+  replace:
+  - x: "*[1]"
+  - t: "W〘"
+  - x: "*[2]/*[2]"
 -
   name: default
   tag: [msub, msup, munder, mover]
@@ -435,6 +443,31 @@
         else:
         - x: "*[3]" 
   - t: "Z"
+
+-
+  # only the superscript is required for this rule
+  name: atomic-number
+  tag: mmultiscripts
+  match: "count(*)=4 and *[2][self::m:mprescripts] and *[4][self::m:mn]"
+  replace:
+  - test:
+      if: "not(*[3][self::m:none])"
+      then:
+      - t: "↓"
+      - x: "*[3]"
+  - t: "↑"
+  - x: "*[4]"
+  - x: "*[1]"
+
+-
+  # look for xxx) in the pre-superscript
+  name: multiple-by
+  tag: mmultiscripts
+  match: "count(*)=4 and *[2][self::m:mprescripts] and *[3][self::m:none] and *[4][self::m:mrow and count(*)=2 and *[2][.=')']]"
+  replace:
+  - x: "*[4]/*[1]"
+  - t: "〙W"
+  - x: "*[1]"
 
 -
   name: default

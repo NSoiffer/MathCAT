@@ -58,14 +58,18 @@
      - test:
         #  don't add whitespace when you have consecutive vars (taking into account pseudo scripts), or...
         #  if what follows is an opening bracket (any kind) or a 2D structure
-        if: "not(preceding-sibling::*[1][IsNode(., 'leaf') or (self::m:msup and *[2][translate(., '*`ª°²³´¹º‘’“”‟′″‴‵‶‷⁗','')=''] )] and
-                 following-sibling::*[1][IsNode(., 'leaf') ]
-             ) and
-             not(@data-function-guess) and
-             (preceding-sibling::*[1][IsNode(., '2D')] or
-              following-sibling::*[1][IsNode(., '2D') or (self::m:mrow and *[1][.='(' or .='['])])"
-        then: [t: "W"]
-        else: [t: ""]
+        if: "@data-function-guess='true' or
+             (preceding-sibling::*[1][self::m:mi or
+                                     (self::m:msup and *[2][translate(., '*`ª°²³´¹º‘’“”‟′″‴‵‶‷⁗','')='']) or
+                                     (self::m:mrow and *[last()][self::m:mi])] and
+              (following-sibling::*[1][self::m:mi or
+                                      (self::m:mrow and *[1][self::m:mi])])
+             ) or
+              preceding-sibling::*[1][self::m:mn] and following-sibling::*[1][self::m:mi and .='…'] or
+              preceding-sibling::*[1][self::m:mi and (.='$' or .='£')] and following-sibling::*[1][self::m:mn]
+            "
+        then: [t: ""]
+        else: [t: "W"]
 
  - "⁣": [T: ""]                 # 0x2063⁡ (invisible separator)
  - "⁤": [T: ""]                 # 0x2064 (invisible plus)
@@ -434,7 +438,16 @@
         then: [T: "N⠄"]
         else: [T: "⠄"]
 
- - "/": [T: "W⠌"]                # 0x002F (diagonal fraction line)
+ - "/":                         # 0x002F (diagonal fraction line)
+    - test:
+        if: "@intent='substitution' or parent::*[self::m:msubsup or self::m:munderover]"
+        then: [T: "⠸"]          # see p44 (similar to integral)
+        else: [T: "W⠌"]
+ - "⧸":                         # 0x002F (diagonal fraction line)
+    - test:
+        if: "@intent='substitution' or parent::*[self::m:msubsup or self::m:munderover]"
+        then: [T: "⠸"]          # see p44 (similar to integral)
+        else: [T: "W⠌"]
  - "÷": [T: "W⠌"]               # 0x00F7 FI: Used as division sign.
 
  - ":":                         # 0x003A (colon)
