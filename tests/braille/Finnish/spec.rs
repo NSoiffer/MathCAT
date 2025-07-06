@@ -561,7 +561,7 @@ fn p23_equation_1_no_invisible_multiplication() {
     <mo>−</mo>
     <mn>7</mn>
 </math>";
-    test_braille("Finnish", expr, "⠼⠃⠀⠁⠉⠀⠌⠦⠼⠃⠀⠙⠴⠀⠣⠼⠃⠀⠶⠁⠉⠀⠌⠙");
+    test_braille("Finnish", expr, "⠼⠃⠀⠭⠀⠖⠼⠉⠀⠶⠤⠼⠉⠀⠭⠀⠤⠼⠛");
 }
 
 #[test]
@@ -580,7 +580,7 @@ fn p23_equation_1_with_invisible_multiplication() {
     <mo>−</mo>
     <mn>7</mn>
 </math>";
-    test_braille("Finnish", expr, "⠼⠃⠀⠁⠉⠀⠌⠦⠼⠃⠀⠙⠴⠀⠣⠼⠃⠀⠶⠁⠉⠀⠌⠙");
+    test_braille("Finnish", expr, "⠼⠃⠀⠭⠀⠖⠼⠉⠀⠶⠤⠼⠉⠀⠭⠀⠤⠼⠛");
 }
 
 #[test]
@@ -614,7 +614,7 @@ fn p24_fraction() {
     </mrow>
   </mfrac>
 </math>";
-    test_braille("Finnish", expr, "⠼⠉⠀⠽⠀⠌⠼⠙⠀⠶⠼⠉⠲⠀⠽");
+    test_braille("Finnish", expr, "⠦⠼⠑⠀⠖⠼⠛⠴⠀⠌⠦⠼⠃⠀⠄⠼⠉⠴");
 }
 
 #[test]
