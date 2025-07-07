@@ -20,26 +20,31 @@
 
     "absolute-value": "function= ; absoluttverdien; slutt absoluttverdi",
     "binomial": "infix=binomialkoeffisient; over; slutt binomialkoeffisient",
+    #"greatest-common-divisor": "function=gcd: gcd: største felles divisor",              #NORWEGIAN: We say "største felles divisor til 8 og 4" (greatest common divisor to 8 and 4)
+    #"imaginary-part": "function=imaginærdelen, imaginærdelen, imaginærdelen",
+    #"least-common-multiple": "function=lcm: lcm: minste felles multiplum"                #NORWEGIAN: We say "minste felles multiplum til 2 og 6" (least common multiplum to 2 and 6)
     "limit": "prefix=grenseverdien når",
     "lim-sup": "prefix=den øvre grenseverdien når", 
     "lim-inf": "prefix=den nedre grenseverdien når", 
     "logarithm-with-base": "prefix=log med grunntall: logaritmen med grunntall: logaritmen med grunntall",
+    #"natural-logarithm": "function=l n: den naturlige logaritmen: den naturlige logaritmen",
     "minus": "infix=minus || prefix=minus",
     "plus": "infix=pluss || prefix=positiv",
+    #"real-part": "function=realdelen",
 
     "transpose": "postfix=transponert || function=transponert",
-    #"norm": "function=; normen; slutt norm",
+    #"norm": "function=; normen; slutt norm",                                            #NORWEGIAN: We say "normen til" (the norm to), so this rule is in linear-algebra
     "trace": "function=;sporet; slutt spor",
-    #"dimension": "function=; dimensjonen; slutt dimensjon",
+    #"dimension": "function=; dimensjonen; slutt dimensjon",                             #NORWEGIAN: We say "dimensjonen til" (the dimension to), so this rule is in linear-algebra
     # "homomorphism": "function= ; homomorfism; slut homomorfism",                                # doesn't fit function pattern
     # "kernel": "function= ; noll-rummet : noll-rummet till: noll-rummet till; slut noll-rummet", # doesn't fit function pattern
     "vector": "function= ; vektor: vektoren: vektoren || prefix=vektor: vektoren: vektoren",
     "cross-product": "infix=kryss: kryssprodukt: kryssprodukt",
     "dot-product": "infix=prikk: skalarprodukt: skalarprodukt",
 
-    "divergence": "function= ; div: divergens: divergens; slutt divergens",
-    "curl": "function= ; curl; slutt curl",
-    "gradient": "function= ; grad: gradient: gradient; slutt gradient",
+    #"divergence": "function= ; div: divergens: divergens; slutt divergens",             #NORWEGIAN: We say "divergensen til" (the divergence to), so this rule is in calculus. 
+    #"curl": "function= ; curl; slutt curl",                                             #NORWEGIAN: We say "curlen til" (the curl to), so this rule is in calculus
+    #"gradient": "function= ; grad: gradient: gradient; slutt gradient",                 #NORWEGIAN: We say "gradienten til" (the gradient to), so this rule is in calculus
     "laplacian": "function=laplace",   # speech engines don't do a good job with "laplacian" (swedish ones might)
   }
 
