@@ -1,0 +1,56 @@
+---
+
+- name: laplacian
+  tag: laplacian
+  match: "count(*) <= 1"   # can be on ∇^2 or on enclosing mrow
+  replace:
+  - t: "lahplahsian"      # phrase('laplacian' of x)  -- "LahPlahsian" sounds better with speech engines tested
+  - test:
+      if: "count(*) = 1"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: [t: "z"]             # phrase(function 'of' one variable) -- note OneCore voices spell out "div"
+      - test:
+          if: "not(IsNode(*[1], 'leaf'))"
+          then: [pause: short]
+      - x: "*[1]"
+
+- name: divergence
+  tag: divergence
+  match: "count(*) = 1"
+  replace:
+  - test:
+      if: "$Verbosity='Terse'"
+      then: [t: "dihv"]             # phrase('div' is short for divergence) -- note OneCore voices spell out "div"
+      else: [t: "rozbieżność"]      # phrase('divergence of' this function from the mean)
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [pause: short]
+  - x: "*[1]"
+
+- name: curl
+  tag: curl
+  match: "count(*) = 1"
+  replace:
+  - t: "kędzior"      # phrase(the 'curl of' a field)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [t: "z"]             # phrase(function 'of' one variable) -- note OneCore voices spell out "div"
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [pause: short]
+  - x: "*[1]"
+
+- name: gradient
+  tag: gradient
+  match: "count(*) = 1"
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [t: "gradient"]      # phrase(the hill has a 'gradient of' five percent)
+      else: [t: "del"]      # phrase(the delete key is labeled 'del')
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [pause: short]
+  - x: "*[1]"
