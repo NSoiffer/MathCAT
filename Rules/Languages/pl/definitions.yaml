@@ -15,30 +15,30 @@
     "say-super": "infix=super: superscript: superscript",   # used with 'mo' for superscripts (e.g, "<")
     "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
 
-    "absolute-value": "function= ; absolute value: the absolute value: the absolute value; end absolute value",
-    "binomial": "infix=binomial; choose; end binomial",
+    "absolute-value": "function= ; wartość bezwzględna: wartość bezwzględna z: wartość bezwzględna z; koniec wartośći bezwzględnej",
+    "binomial": "infix=dwumian; choose; koniec dwumianu",
     # "closed-interval": "other=closed-interval; from,to; end closed-interval",
-    "greatest-common-divisor": "function=gcd: the gcd: the greatest common divisor",
+    "greatest-common-divisor": "function=nwd: NWD: największy wspulny dzielnik",
     "imaginary-part": "function=imaginary part, the imaginary part, the imaginary part",
-    "least-common-multiple": "function=lcm:the lcm:the least common multiple",
+    "least-common-multiple": "function=NWM:NWM:najmniejszy wspulny mnożnik",
     # "large-op": "infix=over || other=from,to",
-    "limit": "prefix=limit as: the limit as: the limit as",
+    "limit": "prefix=kres: kres zbioru: kres zbioru",
     "lim-sup": "prefix=lim sup as: the limit superior as: the limit superior as",
     "lim-inf": "prefix=lim inf as: the limit inferior as : the limit inferior as",
-    "logarithm-with-base": "prefix=log base: the log base: the log base",
-    "natural-logarithm": "function=l n: natural log: natural log",
-    "minus": "infix=minus || prefix=negative",
-    "plus": "infix=plus || prefix=positive",
+    "logarithm-with-base": "prefix=log o podstawie: logarytm o podstawie: logarytm o podstawie",
+    "natural-logarithm": "function=l n: natural log: logarytm naturalny",
+    "minus": "infix=minus || prefix=ujemny",
+    "plus": "infix=plus || prefix=dodatni",
     # "pochhammer": "infix=permutations of",  # arguments are in reverse order, so can't work here
-    "real-part": "function=the real part",
+    "real-part": "function=część rzeczywista",
 
-    "transpose": "postfix=transpose || function=transpose",
-    "norm": "function=; norm: norm: norm; end norm",
+    "transpose": "postfix=transpozycja || function=transpozycja",
+    "norm": "function=; norma: norma z: norma z; koniec normy",
     "trace": "function=;trace : trace: the trace; end trace",
     "dimension": "function=; dimension : dimension: the dimension; end dimension",
-    "homomorphism": "function= ; homomorphism : homomorphism: the homomorphism; end homomorphism",
-    "kernel": "function= ; kernel : kernel: the kernel; end kernel",
-    "vector": "function= ; vector || prefix=vector",
+    "homomorphism": "function= ; homomorfizm: homomorfizm: homomorfizm; koniec homomorfizmu",
+    "kernel": "function= ; kernel : jądro: jądro z; koniec jądra",
+    "vector": "function= ; vektor || prefix=vektor",
     "cross-product": "infix=cross: cross product: cross product",
     "dot-product": "infix=dot: dot product: dot:dot product",
 
@@ -57,19 +57,19 @@
 
 - NavigationParts: {
     # These are the parts of a formula that can be navigated to
-    "large-op": "base; lower limit; upper limit",
-    "mfrac": "numerator; denominator",
-    "fraction": "numerator; denominator",
-    "msqrt": "root",
-    "square-root": "root",
-    "mroot": "root; root index",
-    "root": "root; root index",
-    "msub": "base; subscript",
-    "sub": "base; subscript",
-    "msup": "base; superscript",
-    "say-super": "base; superscript",
-    "skip-super": "base; superscript",
-    "power": "base; exponent",
+    "large-op": "podstawa; dolne ograniczenie; górne ograniczenie",
+    "mfrac": "licznik; mianownik",
+    "fraction": "licznik; mianownik",
+    "msqrt": "pierwiastek",
+    "square-root": "pierwiastek kwadratowy",
+    "mroot": "pierwiastek; pierwiastek stopnia",
+    "root": "pierwiastek; pierwiastek stopnia",
+    "msub": "podstawa; indeks dolny",
+    "sub": "podstawa; indeks dolny",
+    "msup": "podstawa; indeks górny",
+    "say-super": "podstawa; indeks górny",
+    "skip-super": "podstawa; indeks górny",
+    "power": "podstawa; stopnia",
     "msubsup": "base; subscript; superscript",
     "munder": "base; under limit",
     "mover": "base; upper limit",
@@ -77,8 +77,8 @@
 
     # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
     # it's a hack to put them here, but at least they are grouped with the other navigation parts
-    "in": "in",
-    "out": "out of",
+    "in": "w",
+    "out": "poza",
   }
 
 - OperatorIntentRenaming: {
@@ -106,45 +106,45 @@
 #   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
 - SIUnits: {
     # base units
-    "A": "amp",
+    "A": "amper",
     "cd": "candela",
     "K": "kelvin", "K": "kelvin", # U+212A
     "g": "gram",
-    "m": "metre",     # British spelling works for US also
-    "mol": "mole",
-    "s": "second", "sec": "second",  # "sec" not actually legal
+    "m": "metr",     # polish pronouncation 
+    "mol": "mol",
+    "s": "sekunda", "sec": "sekunda",  # "sec" not actually legal
 
     # derived units
-    "Bq": "becquerel",
-    "C": "coulomb",
-    "°C": "degree celsius", "℃": "degree celsius", # should only take negative powers
+    "Bq": "bekerel",
+    "C": "kulomb",
+    "°C": "stopień celsjusza", "℃": "stopni celsjusza", # should only take negative powers # problem one degreee in polish - stopień, more degrees in polish: stopni
     "F": "farad",
     "Gy": "gray",
     "H": "henry",
     "Hz": "hertz",
-    "J": "joule",
+    "J": "dżul", #pronauncation 
     "kat": "kattel",
     "lm": "lumen",
     "lx": "lux",
-    "N": "newton",
-    "Ω": "ohm", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN
-    "Pa": "pascal",
-    "S": "siemens",
+    "N": "niuton",
+    "Ω": "om", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN
+    "Pa": "paskal",
+    "S": "simens",
     "Sv": "sievert",
     "T": "tesla",
     "V": "volt",
-    "W": "watt",
+    "W": "wat",
     "Wb": "weber",
 
     # accepted (plus a few variants) that take SI prefixes
-    "l": "litre", "L": "litre", "ℓ": "litre",  # Should only take negative powers; British spelling works for US also
-    "t": "metric ton",           # should only take positive powers
+    "l": "litr", "L": "litr", "ℓ": "litre",  # Should only take negative powers; British spelling works for US also
+    "t": "metryczne",           # should only take positive powers
     "Da": "dalton",
     "Np": "neper",               # should only take negative powers
     "u": "atomic mass unit",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
-    "eV": "electronvolt",
+    "eV": "elektronovolt",
     "rad": "radian",             # should only take negative powers
-    "sr": "sterradion",          # should only take negative powers      
+    "sr": "sterradian",          # should only take negative powers      
   
     # others that take a prefix
     "a": "annum",               # should only take positive powers
@@ -159,15 +159,15 @@
 
 - UnitsWithoutPrefixes: {
     # time
-    "″": "second", "\"": "second",
-    "′": "minute", "'": "minute","min": "minute",
-    "h": "hour", "hr": "hour", "Hr": "hour",
-    "d": "day", "dy": "day",
-    "w": "week", "wk": "week",
-    "y": "year", "yr": "year",    
+    "″": "sekunda", "\"": "sekunda",
+    "′": "minuta", "'": "minuta","min": "minuta",
+    "h": "godzina", "godz": "godzina", "Godz": "godzina",
+    "d": "dzień", "d": "dzień",
+    "w": "tydzień", "td": "tydzień",
+    "y": "rok", "r": "rok",    
 
     # angles
-    "°": "degree", "deg": "degree", # should only take negative powers
+    "°": "stopień", "deg": "stopień", # should only take negative powers
     "arcmin": "arcminute",
     "amin": "arcminute",
     "am": "arcminute",
@@ -176,28 +176,28 @@
     "asec": "arcsecond",
 
     # distance
-    "au": "astronomical unit", "AU": "astronomical unit",
-    "ltyr": "light year", "ly": "light year",
-    "pc": "parsec",
+    "au": "jednostka astronomiczna", "AU": "jednostka astronomiczna",
+    "ltyr": "rok świetlny", "ly": "rok świetlny",
+    "pc": "parsek",
     "Å": "angstrom", "Å": "angstrom",           # U+00C5 and U+212B
     "fm": "fermi",
 
     # others
-    "ha": "hectare",
+    "ha": "hektar",
     # "B": "bel",    # "B" more commonly means bytes
     "dB": "decibel", # already logarithmic, so not used with SI prefixes
 
     "amu": "atomic mass unit",
-    "atm": "atmosphere",
+    "atm": "atmosferyczne",
     "bar": "bar",
-    "cal": "calorie",
+    "cal": "kaloria",
     "Ci": "curie",
     "grad": "gradian",
-    "M": "molar",
-    "R": "roentgen",
-    "rpm": "revolution per minute",
+    "M": "mol",
+    "R": "rentgen",
+    "rpm": "zmiana na minutę",
     "℧": "m-h-o",
-    "dyn": "dyne",
+    "dyn": "dyna",
     "erg": "erg",
 
     # powers of 2 used with bits and bytes
@@ -303,76 +303,76 @@
 
 # For English, a regular pattern starts at twenty
 - NumbersOnes: [
-        "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
-        "Dziesięć", "Eleven", "Dwanaście", "Thirteen", "Fourteen", "Piętnaście", "Sixteen",
-        "Siedemnaście", "Osiemnaście", "Dziewiętnaście"
+    "zero", "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć",
+    "dziesięć", "jedenaście", "dwanaście", "trzynaście", "czternaście", "piętnaście", "szesnaście",
+    "siedemnaście", "osiemnaście", "dziewiętnaście"
     ]
 
 - NumbersOrdinalOnes: [
-        "Zeroth", "First", "Second", "trzeci", "czwarty", "Fifth", "Sixth", "Siódma", "ósmy", "dziewiąty",
-        "Dziesiąty", "Eleven", "Twelfth", "Trzynasty", "czternasty", "Piętnasty", "szesnasty",
-        "Siedemnasty", "Osiemnasty", "Dziewiętnaste"
+      "zero", "pierwszy", "drugi", "trzeci", "czwarty", "piąty", "szósty", "siódmy", "ósmy", "dziewiąty",
+      "dziesiąty", "jedenasty", "dwunasty", "trzynasty", "czternasty", "piętnasty", "szesnasty",
+      "siedemnasty", "osiemnasty", "dziewiętnasty"
     ]
 
 - NumbersOrdinalPluralOnes: [
-        "Zeroth", "First", "Seconds", "trzeci", "czwarte", "Fifths", "Sixths", "Siódma", "ósma", "dziewiąte",
-        "Dziesiąty", "Eleventh", "Twelfths", "trzynaste", "czternaste", "Piętnaste", "szesnaste",
-        "Siedemnaste", "Osiemnaste", "Dziewiętnaste"
+      "zero", "pierwszy", "sekundy", "trzecie", "czwarte", "piąte", "szóste", "siódme", "ósemki", "dziewiąte",
+      "dziesiąte", "jedenaste", "dwunaste", "trzynaste", "czternaste", "piętnaste", "szesnaste",
+      "siedemnaste", "osiemnaste", "dziewiętnaste"
     ]
 
     # stop when regularity begins
 - NumbersOrdinalFractionalOnes: [
-        "Zero", "First", "pół"
+        "zero", "pierwszy", "połowa"
     ]
 
     # stop when regularity begins
 - NumbersOrdinalFractionalPluralOnes: [
-        "Zeros", "Firsts", "Półka"
+        "zera", "pierwsze", "połowy"
     ]
 
 
     # What to use for multiples of 10
 - NumbersTens: [
-        "", "Dziesięć", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "siedemdziesiąt", "Osiemdziesiąt", "Dziewięćdziesiąt"
+        "", "dziesięć", "dwadzieścia", "trzydzieści", "czterdzieści", "pięćdziesiąt", "siedemdziesiąt", "osiemdziesiąt", "dziewięćdziesiąt"
     ]
 
 - NumbersOrdinalTens: [
-        "", "Dziesiąty", "Twentieth", "Thirtieth", "Fortieth", "Fiftieth", "Sixtieth", "siedemdziesiąty", "Osiemdziesiąta", "dziewięćdziesiąta"
+        "", "dziesiąty", "dwudziesty", "trzydziesty", "czterdziesty", "pięćdziesiąty", "sześćdziesiąty", "siedemdziesiąty", "osiemdziesiąty", "dziewięćdziesiąty"
     ]
 
 - NumbersOrdinalPluralTens: [
-        "", "Dziesiąty", "Twentieths", "Trzy trzydziesty", "Fortieths", "Fiftieths", "Sixtieths", "siedemdziesiątych", "osiemdziesiątych", "dziewięćdziesiątych"
+        "", "dziesiąte", "dwudzieste", "trzydzieste", "czterdzieste", "pięćdziesiąte", "sześćdziesiąte", "siedemdziesiąte", "osiemdziesiąte", "dziewięćdziesiąte"
     ]
 
 
 - NumbersHundreds: [
-        "", "One Setka", "dwieście", "trzysta", "czterysta", "pięćset",
-        "Sixset", "Siedemset", "Ośmiuset", "Dziewięćset"
+        "", "sto", "dwieście", "trzysta", "czterysta", "pięćset",
+        "sześćset", "sześćset", "siedemset", "osiemset", "dziewięćset"
     ]
 
 - NumbersOrdinalHundreds: [
-        "", "One Seth", "dwie setne", "Trzastko", "czteret setne", "Pięć setnych",
-        "Six Seth", "Siedem setnych", "Eightseth", "Dziewięć setnych"
+        "", "jeden setna", "dwieście", "trzysetna", "czterysetna", "pięćsetna",
+        "sześćsetna", "siedemsetna", "osiemsetna", "dziewięćsetna"
     ]
 
 - NumbersOrdinalPluralHundreds: [
-        "", "One Seths", "Dwaj setne", "Trzastko", "Cztereth", "Pięć setnych",
-        "Sześć setnych", "Siedem setnych", "Osiem setnych", "Dziewięć setnych"
+        "", "jedna setna", "dwie setne", "trzy setne", "cztery setne", "pięć setnych",
+        "sześć setnych", "siedem setnych", "osiem setnych", "dziewięć setnych"
     ]
       
 
     # At this point, hopefully the language is regular. If not, code needs to be written
 - NumbersLarge: [
-        "", "Tysiąc", "milion", "miliard", "trylion", "Quadrillion",
-        "Quintillion", "Sextillion", "Septillion", "Octillion", "Nonillion",
+        "", "tysiąc", "milion", "miliard", "trylion", "kwadrylion",
+        "kwintylion", "sekstylion", "septillion", "oktylion", "nonilion",
     ]
       
 - NumbersOrdinalLarge: [
-        "", "Tysiąlny", "Million", "Billidh", "Tillionth", "Quadrillionth",
-        "Quintillionth", "Sextillionth", "Septillionth", "Octillionth", "Nonillionth"
+        "", "tysięczna", "milionowa", "miliardowa", "trylionowa", "kwadrylionowa",
+        "kwintylionowa", "sekstylionowa", "septillionowa", "oktylionowa", "nonilionowa"
     ]
       
 - NumbersOrdinalPluralLarge: [
-        "", "Tysiąc", "Millionts", "miliardów", "trylionami", "Quadrilionths",
-        "Quintillionths", "Sextillionths", "Septillionths", "Octillionths", "Nonillionths"
+        "", "tysięczne", "milionowe", "miliardowe", "trylionowe", "kwadrylionowe",
+        "kwintylionowe", "sekstylionowe", "septillionowe", "oktylionowe", "nonilionowe"
     ]
