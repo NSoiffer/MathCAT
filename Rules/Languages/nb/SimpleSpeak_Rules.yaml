@@ -1,5 +1,19 @@
 ---
-
+- name: pause
+  tag: "!*"
+  match: "not(self::m:math) and not($MatchingPause) and @data-intent-property[contains(., ':pause')]"
+  replace:
+   - with:
+      variables: [MatchingPause: "true()"]
+      replace:
+      - test:
+        - if: "contains(@data-intent-property, ':pause-long')"
+          then: [pause: long]
+        - else_if: "contains(@data-intent-property, ':pause-short')"
+          then: [pause: short]
+          else: [pause: medium]
+      - x: "."
+      
 - name: intent-literal-silent
   tag: [mi, mo, mn]
   match: "contains(@data-intent-property, ':silent:')"
@@ -77,15 +91,20 @@
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 # Units (e.g., meters per second)
-# NORWEGIAN: Added this rule from English version
+# NORWEGIAN: Added this rule from English version. Added rule for t="time"
 - name: per-fraction
   tag: fraction
-  match: "BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])] and
-          BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])]"
+  match: "$ClearSpeak_Fractions='Per' or
+          BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])] and
+          BaseNode(*[2])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit') or .='t'])]"   
   replace:
   - x: "*[1]"
   - T: "per"      # phrase('5 meters 'per' second)
-  - x: "*[2]"
+  - test: 
+      if: "*[2]='t'"
+      then: [T: "time"]
+      else: 
+       - x: "*[2]"
   
 - name: simple
   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
