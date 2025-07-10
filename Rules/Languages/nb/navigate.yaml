@@ -65,6 +65,7 @@
       else: [T: "rotindeksen"]         # phrase(the 'root index' of x is 3)
   - pause: "medium"
 
+#NORWEGIAN: For powers we say "grunntallet" for the base, but since this markup is used for other things than powers and subindexes, use the word "basen".
 - name: into-or-out-of
   tag: msub
   match: "$Move2D != ''"
@@ -72,7 +73,7 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [T: "grunntallet"]              # phrase(the 'base' of the power)
+      then: [T: "basen"]              # phrase(the 'base' of the power)
       else: [T: "nedre indeks"]         # phrase(x with 'subscript' 2)
   - pause: "medium"
 
@@ -83,7 +84,7 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [T: "grunntallet"]            # phrase(the 'base' of the power)
+      then: [T: "basen"]            # phrase(the 'base' of the power)
       else: [T: "øvre indeks"]     # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
@@ -94,13 +95,12 @@
   - x: "$Move2D"
   - test:
     - if: "count($Child2D/preceding-sibling::*)=0"
-      then: [T: "grunntallet"]             # phrase(the 'base' of the power)
+      then: [T: "basen"]             # phrase(the 'base' of the power)
     - else_if: "count($Child2D/preceding-sibling::*)=1"
       then: [T: "nedre indeks"]        # phrase(x with 'subscript' 2)
       else: [T: "øvre indeks"]      # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
-# NORWEGIAN: We say "grunntallet" for things like the "base" with lower index, but for munder and mover "basen" is a more appropriate word.
 - name: into-or-out-of
   tag: munder
   match: "$Move2D != ''"
@@ -150,7 +150,7 @@
           - x: "$Move2D"
           - test:
             - if: "$NumPrecedingSiblings=0"
-              then: [T: "grunntallet"]                 # phrase(the 'base' of the power)
+              then: [T: "basen"]                 # phrase(the 'base' of the power)
             - else_if: "$Child2D/preceding-sibling::*[self::m:mprescripts]" # are we before mprescripts and hence are postscripts
               then:
               - test:   # in postscripts -- base shifts by one
@@ -410,7 +410,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then: [T: "utzoomet hele veien", pause: "medium"]            # phrase('zoomed out all the the way')
   - with:
-      variables: [Move2D: "'ut av'", Child2D: "."]                 #Should it be "forlater"?
+      variables: [Move2D: "'ut av'", Child2D: "."]
       replace: [x: ".."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
@@ -505,7 +505,7 @@
           then: [x: ".."] # auto-zoom: move out a level and retry
           else:
           - with:
-              variables: [Move2D: "'ut av'", Child2D: "."]                   #Should it be "forlater"?
+              variables: [Move2D: "'ut av'", Child2D: "."]
               replace: [x: ".."]
           - test:
               if: "parent::m:mtd"
@@ -1207,7 +1207,7 @@
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'ut av'", Child2D: "."]             #Should it be "forlater"?
+              variables: [Move2D: "'ut av'", Child2D: "."]
               replace: [x: ".."]
       - test:
           if: "following-sibling::*"
@@ -1311,7 +1311,7 @@
       if: "preceding-sibling::* and following-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'ut av'", Child2D: "."]           #Should it be "forlater"?
+          variables: [Move2D: "'ut av'", Child2D: "."]
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
@@ -1449,7 +1449,7 @@
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'ut av'", Child2D: "."]         #Should it be "forlater"?
+              variables: [Move2D: "'ut av'", Child2D: "."]
               replace: [x: ".."]
       - test:
           if: "preceding-sibling::*"
@@ -1556,7 +1556,7 @@
       if: "count(preceding-sibling::*) > 2 and preceding-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'ut av'", Child2D: "."]           #Should it be "forlater"?
+          variables: [Move2D: "'ut av'", Child2D: "."]
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]

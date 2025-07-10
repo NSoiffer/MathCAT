@@ -21,7 +21,7 @@
     "absolute-value": "function= ; absoluttverdien; slutt absoluttverdi",
     "binomial": "infix=binomialkoeffisient; over; slutt binomialkoeffisient",
     #"greatest-common-divisor": "function=gcd: gcd: største felles divisor",              #NORWEGIAN: We say "største felles divisor til 8 og 4" (greatest common divisor to 8 and 4)
-    #"imaginary-part": "function=imaginærdelen, imaginærdelen, imaginærdelen",
+    #"imaginary-part": "function=den imaginære delen, den imaginære delen, den imaginære delen",
     #"least-common-multiple": "function=lcm: lcm: minste felles multiplum"                #NORWEGIAN: We say "minste felles multiplum til 2 og 6" (least common multiplum to 2 and 6)
     "limit": "prefix=grenseverdien når",
     "lim-sup": "prefix=den øvre grenseverdien når", 

@@ -130,9 +130,7 @@ fn equation_none() {
     </math>
    ";
    test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "None", expr,
-        "2 lines; \
-                x plus y, is equal to 7; \
-                2 x plus 3 y; is equal to 17");
+        "2; x pluss y er lik 7; 2 x pluss 3 y; er lik 17");
 }
 
 #[test]
