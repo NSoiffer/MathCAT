@@ -116,7 +116,7 @@
   tag: msqrt
   match: "."
   replace:
-  - T: "rottegn"
+  - T: "kvadratrot"
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: "av"]    # phrase("the root 'of' x")
@@ -124,7 +124,7 @@
   - pause: short
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [T: "slutt rottegn"] # phrase("root of x 'end root symbol'")
+      then: [T: "slutt kvadratrot"] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
 # NORWEGIAN: Changed to "med grad", and changed the order of the index and the variable/number in the root.
@@ -203,20 +203,20 @@
           - x: "*[last()]"
           # - t: "power"                    # phrase(5 raised to the second 'power' equals 25)
 
+#NORWEGIAN: Changed to English version. Think it sounds better when I tried navigation in character mode. 
 - name: default
   tag: munder
   match: "."
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "kommentert uttrykk"]      # phrase(phrase(x 'modified' with y above it)
+      then: [T: "uttrykk"]      # phrase(phrase(x 'modified' with y above it)   #NORWEGIAN: Can't find a way to trigger this statement. Not sure if the translation is correct. 
   - x: "*[1]"
   - pause: short
-  - T: "med kommentar under"      # phrase(x 'with' z below it)
-  - pause: short
+  - T: "med"      # phrase(x 'with' z below it)
   - x: "*[2]"
+  - T: "under"      # phrase(x with z 'below' it)
   - pause: short
-  - T: "slutt kommentar"      # phrase(x with z 'below' it)
 
 - name: diacriticals
   tag: mover
@@ -225,39 +225,36 @@
   - x: "*[1]"
   - x: "*[2]"
 
+#NORWEGIAN: Changed to English version. Think it sounds better when I tried navigation in character mode. 
 - name: default
   tag: mover
   match: "."
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "kommentert uttrykk"]      # phrase(phrase(x 'modified' with y above it)
+      then: [T: "uttrykk"]      # phrase(phrase(x 'modified' with y above it)    #NORWEGIAN: Can't find a way to trigger this statement. Not sure if the translation is correct. 
   - x: "*[1]"
   - pause: short
-  - T: "med kommentar over"         # phrase(x modified 'with' y above it)
-  - pause: short
+  - T: "med"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
+  - T: "over"        # phrase(x modified 'with' y above it)
   - pause: short
-  - T: "slutt kommentar"        # phrase(x modified 'with' y above it)
 
+#NORWEGIAN: Changed to English version. Think it sounds better when I tried navigation in character mode
 - name: default
   tag: munderover
   match: "."
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "kommentert uttrykk"]      # phrase(the equation has been 'modified')
+      then: [T: "uttrykk"]      # phrase(the equation has been 'modified')      #NORWEGIAN: Can't find a way to trigger this statement. Not sure if the translation is correct. 
   - x: "*[1]"
-  - pause: short
-  - T: "med kommentar under"         # phrase(x modified 'with' y above it)
-  - pause: short
+  - T: "med"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
-  - pause: short
-  - T: "og kommentar over"    # phrase(x modified with y 'below and' y above it)
-  - pause: short
+  - T: "under og"
   - x: "*[3]"
+  - T: "over"        # phrase(x modified with y 'above' it)
   - pause: short
-  - T: "slutt kommentar"        # phrase(x modified with y 'above' it)
 
 - name: default
   #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
