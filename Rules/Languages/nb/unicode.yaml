@@ -31,11 +31,11 @@
 
  - "0-9": [T: "."]                               #  (en: '.', google: 'A')
  
- - " ": [T: " "]                     # 0x20      #Added from English version. Not in Swedish version
+ - " ": [T: " "]                     # 0x20      #NORWEGIAN: Added from English version. Not in Swedish version.
 
  - "!":                                          #  0x21
     - test:
-        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"  #Norwegian: Changed from ":structure" to be equal to English translation
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"  #NORWEGIAN: Changed from ":structure" to be equal to English translation
         then_test:
             if: "$Verbosity = 'Terse'"
             then: [T: "utropstegn"]            #  0x21 (en: 'bang', google translation)
@@ -170,7 +170,7 @@
  - "~": [T: "tilde"]                             #  0x7e
  - " ":                                          #  0xa0
     - test:
-        if: "@data-empty-in-2D and not(ancestor::*[self::m:piecewise or self::m:system-of-equations or self::m:lines])"   #Changed to English version. Now it doesn't speak "tom tom" for continued_row
+        if: "@data-empty-in-2D and not(ancestor::*[self::m:piecewise or self::m:system-of-equations or self::m:lines])"   #NORWEGIAN: Changed to English version. Now it doesn't speak "tom tom" for continued_row
         then: [T: "tom"]                       #  want to say something for fraction (etc) with empty child (en: 'empty', google translation)
         else: [T: ""]                            
 

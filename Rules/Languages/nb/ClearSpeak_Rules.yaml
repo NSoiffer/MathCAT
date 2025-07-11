@@ -513,7 +513,7 @@
 #  # note that *[2] is an mrow with X, ",", Y, so getting X or Y is a double index
     # onto the [not] [including]... part
 
- # SWEDISH/NORWEGIAN: rewrote the intervals function to better deal with Swedish convention of speaking intervals
+ # SWEDISH/NORWEGIAN: rewrote the intervals function to better deal with Swedish/Norwegian convention of speaking intervals
  # NORWEGIAN: Removed test for verbosity, cause you should always say "det åpne" etc.
 - name: ClearSpeak-intervals # avoid overriding with default "intervals" name
   variables:

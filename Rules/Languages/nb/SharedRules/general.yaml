@@ -214,7 +214,7 @@
   #match: "."
   #replace:
   #- x: "*[1]"
-  #- t: "med repeterende siffer"      # phrase('with repeating digits')
+  #- T: "med repeterende siffer"      # phrase('with repeating digits')
   #- spell: "*[2]"
 
 - name: msubsup-skip-super

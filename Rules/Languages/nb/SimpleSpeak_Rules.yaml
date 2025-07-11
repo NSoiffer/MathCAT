@@ -187,7 +187,7 @@
 
 - name: simple-integer
   tag: power
-  match: "*[2][self::m:mn][not(contains(., '.'))]"
+  match: "*[2][self::m:mn][not(contains(., '.'))]"         #Norwegian: Here the decimal point should probably be comma
   replace:
   - x: "*[1]"
   - T: "opphøyd i"
@@ -198,7 +198,7 @@
   tag: power
   match:
   - "*[2][self::m:minus and count(*)=1 and"
-  - "     *[1][self::m:mn][not(contains(., '.'))]]"
+  - "     *[1][self::m:mn][not(contains(., '.'))]]"      #Norwegian: Here the decimal point should probably be comma
   replace:
   - x: "*[1]"
   - T: "opphøyd i"

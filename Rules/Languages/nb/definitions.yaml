@@ -29,7 +29,7 @@
     "logarithm-with-base": "prefix=log med grunntall: logaritmen med grunntall: logaritmen med grunntall",
     #"natural-logarithm": "function=l n: den naturlige logaritmen: den naturlige logaritmen",
     "minus": "infix=minus || prefix=minus",
-    "plus": "infix=pluss || prefix=positiv",
+    "plus": "infix=pluss || prefix=pluss",
     #"real-part": "function=realdelen",
 
     "transpose": "postfix=transponert || function=transponert",
@@ -139,7 +139,7 @@
     # time
     "″": "sekund", "\"": "sekund",
     "′": "minutt", "'": "minutt", "min": "minutt",
-    "h": "time", "hr": "time", "Hr": "time", "t": "time",     #t used often for hour in Norwegian, but t is officially the symbol for "tonn"
+    "h": "time", "hr": "time", "Hr": "time", "t": "time",     #NORWEGIAN: t is often used for hour, but t is officially the symbol for "tonn"
     "d": "dag", "dy": "dag",                                
     "w": "uke", "wk": "uke",                    
     "y": "år", "yr": "år",                                  
@@ -152,14 +152,14 @@
     "MOA": "bueminutt",                                    
     "arcsec": "buesekund",
     "asec": "buesekund",
-    "as": "buesekund",           #Also a used symbol in Norwegian
+    "as": "buesekund",           #NORWEGIAN: Also a used symbol
 
     # distance
     "au": "astronomisk enhet", "AU": "astronomisk enhet", "a.u.": "astronomisk enhet",
     "ltyr": "lysår", "ly": "lysår", "l.y.": "lysår",
     "pc": "parsec",
     "Å": "ångstrøm", "Å": "ångstrøm",           # U+00C5 and U+212B
-    "fm": "fermi",                              #Norwegian: F is the official symbol for "fermi", but this is also the symbol for Farad...
+    "fm": "fermi",                              #Norwegian: F is the official symbol for "fermi", but this is also the symbol for "Farad"...
 
     # others
     "ha": "hektar",

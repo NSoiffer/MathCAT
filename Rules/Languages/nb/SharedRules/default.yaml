@@ -203,14 +203,14 @@
           - x: "*[last()]"
           # - t: "power"                    # phrase(5 raised to the second 'power' equals 25)
 
-#NORWEGIAN: Changed to English version. Think it sounds better when I tried navigation in character mode. 
+#NORWEGIAN: Changed to English version. Sounds better when navigating in character mode. 
 - name: default
   tag: munder
   match: "."
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "uttrykk"]      # phrase(phrase(x 'modified' with y above it)   #NORWEGIAN: Can't find a way to trigger this statement. Not sure if the translation is correct. 
+      then: [T: "uttrykk"]      # phrase(phrase(x 'modified' with y above it)   #NORWEGIAN: Can't find a way to trigger this expression. Not sure if the translation is correct. 
   - x: "*[1]"
   - pause: short
   - T: "med"      # phrase(x 'with' z below it)
@@ -225,14 +225,14 @@
   - x: "*[1]"
   - x: "*[2]"
 
-#NORWEGIAN: Changed to English version. Think it sounds better when I tried navigation in character mode. 
+#NORWEGIAN: Changed to English version. Sounds better when navigating in character mode. 
 - name: default
   tag: mover
   match: "."
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "uttrykk"]      # phrase(phrase(x 'modified' with y above it)    #NORWEGIAN: Can't find a way to trigger this statement. Not sure if the translation is correct. 
+      then: [T: "uttrykk"]      # phrase(phrase(x 'modified' with y above it)    #NORWEGIAN: Can't find a way to trigger this expression. Not sure if the translation is correct. 
   - x: "*[1]"
   - pause: short
   - T: "med"         # phrase(x modified 'with' y above it)
@@ -240,14 +240,14 @@
   - T: "over"        # phrase(x modified 'with' y above it)
   - pause: short
 
-#NORWEGIAN: Changed to English version. Think it sounds better when I tried navigation in character mode
+#NORWEGIAN: Changed to English version. Sounds better when navigating in character mode
 - name: default
   tag: munderover
   match: "."
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "uttrykk"]      # phrase(the equation has been 'modified')      #NORWEGIAN: Can't find a way to trigger this statement. Not sure if the translation is correct. 
+      then: [T: "uttrykk"]      # phrase(the equation has been 'modified')      #NORWEGIAN: Can't find a way to trigger this expression. Not sure if the translation is correct. 
   - x: "*[1]"
   - T: "med"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
