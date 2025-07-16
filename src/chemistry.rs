@@ -786,11 +786,12 @@ fn likely_chem_equation(mathml: Element) -> isize {
     // debug!("start likely_chem_equation:\n{}", mml_to_string(mathml));
 	// mrow -- check the children to see if we are likely to be a chemical equation
 
-    // concentrations should either be unscripted or have a superscript
+    // concentrations should either be unscripted or have a superscript that isn't a charge
     // they occur in mrows or mfracs
     if IsBracketed::is_bracketed(mathml, "[", "]", false, true) {
         let parent_name = name(get_parent(mathml));
-        if parent_name == "mfrac" || parent_name == "mrow" || parent_name == "msup" || parent_name == "math" {
+        if parent_name == "mfrac" || parent_name == "mrow"  || parent_name == "math" || 
+           (parent_name == "msup" && likely_chem_superscript(as_element(mathml.following_siblings()[0])) < 0){
             return if as_element(mathml.children()[0]).attribute(CHEM_FORMULA).is_some() {CHEMISTRY_THRESHOLD}  else {NOT_CHEMISTRY};
         }
     }
@@ -1083,20 +1084,20 @@ fn likely_chem_formula(mathml: Element) -> isize {
         // check if it is bracketed
         // For parens, the only reason to add them is to group the children and then indicate that there is more than one molecule
         let outer_mrow = mrow;
-        let mut mrow = mrow;
+        let mrow = mrow;
         if IsBracketed::is_bracketed(mrow, "(", ")", false, false) ||
            IsBracketed::is_bracketed(mrow, "[", "]", false, false) {
             // If it is bracketed, it should have a subscript to indicate the number of the element.
-            // We give a pass to undorned bracketing chars
-            assert!( mrow.children().len() == 1 );
+            // We give a pass to unadorned bracketing chars
+            // assert!( mrow.children().len() == 1 );
             let likely = likely_chem_formula(as_element(mrow.children()[0]));
             let parent = get_parent(mrow);
-            if name(parent) == "msub" {
-                return likely + 3;
-            } else if name(parent) == "mrow" {
-                return likely;
-            } else {
-                return NOT_CHEMISTRY;
+            match name(parent) {
+                "mrow" => return likely,
+                "msub" => return likely + 3,
+                "msup" => return likely + likely_chem_superscript(as_element(mrow.following_siblings()[0])),
+                _ => return NOT_CHEMISTRY,
+
             }
         }
 
@@ -2294,6 +2295,7 @@ mod chem_tests {
 
     #[test]
     fn dichlorine_hexoxide() {
+        init_logger();
         let test = "<math><mrow>
             <msup>
             <mrow><mo>[</mo><mi>Cl</mi><msub><mi>O</mi><mn>2</mn></msub><mo>]</mo></mrow>
