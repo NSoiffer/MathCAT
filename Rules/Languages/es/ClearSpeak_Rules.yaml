@@ -117,10 +117,15 @@
 # Units (e.g., meters per second)
 - name: per-fraction
   tag: fraction
-  match: "$ClearSpeak_Fractions='Per'"
+  match:
+  - "$ClearSpeak_Fractions='Per' or"
+  - "(BaseNode(*[1])[contains(@data-intent-property, ':unit') or"
+  - "                ( self::m:mrow and count(*)=3 and"  # maybe a bit paranoid checking the structure...
+  - "                 *[1][self::m:mn] and *[2][.='\u2062'] and BaseNode(*[3])[contains(@data-intent-property, ':unit')] ) ] and"
+  - " BaseNode(*[2])[contains(@data-intent-property, ':unit')] )"
   replace:
   - x: "*[1]"
-  - T: "por"
+  - t: "por"      # phrase('5 meters 'per' second)
   - x: "*[2]"
 
 - name: common-fraction

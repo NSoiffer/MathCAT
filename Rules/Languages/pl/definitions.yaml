@@ -17,6 +17,7 @@
 
     "absolute-value": "function= ; wartość bezwzględna: wartość bezwzględna z: wartość bezwzględna z; koniec wartośći bezwzględnej",
     "binomial": "infix=dwumian; choose; koniec dwumianu",
+    "dimension-product": "infix=by",
     # "closed-interval": "other=closed-interval; from,to; end closed-interval",
     "greatest-common-divisor": "function=nwd: NWD: największy wspulny dzielnik",
     "imaginary-part": "function=imaginary part, the imaginary part, the imaginary part",
@@ -79,11 +80,6 @@
     # it's a hack to put them here, but at least they are grouped with the other navigation parts
     "in": "w",
     "out": "poza",
-  }
-
-- OperatorIntentRenaming: {
-    # These are the intents that are renamed to something else (probably most intents for non-English languages)
-    "dimension-product": "by"
   }
 
 - KnownWords: {

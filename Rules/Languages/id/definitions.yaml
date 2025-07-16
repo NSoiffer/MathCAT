@@ -15,6 +15,7 @@
 
     "absolute-value": "function= ; nilai mutlak: nilai mutlak dari: nilai mutlak dari; akhir nilai mutlak",
     "binomial": "infix=binomial; memilih; end binomial",
+    "dimension-product": "infix=kali",
     "limit": "prefix=raja-arvo: raja-arvo kun: raja-arvo kun",
     "lim-sup": "prefix=lim sup as: the limit superior as: the limit superior as",
     "lim-inf": "prefix=lim inf as: the limit inferior as : the limit inferior as",
@@ -62,9 +63,6 @@
     "out": "out of",
   }
 
-- OperatorIntentRenaming: {
-    "dimension-product": "kali"
-  }
 
 - SIPrefixes: {
     "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hekto", "da": "deka",
