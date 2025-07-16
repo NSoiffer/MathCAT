@@ -581,11 +581,10 @@
 
 # Pseudo-script characters are characters such as "degree sign" ('°') that are raised but in MathML should be in a superscript.
 # They are not spoken as if in a superscript (e.g "x degrees", not "x superscripts degrees")
-
 -
   name: skip-super
   tag: [msup, msubsup]
-  match: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
+  match: "*[last()][translate(., '′″‴⁗\"†‡°*', '')='' or .=\"'\"]"  # you can't have both ' and " in an xpath string
   replace:
   - intent:
       name: "skip-super"
