@@ -93,16 +93,17 @@
 # Rules for speaking what happens when moving into or out of a notation
 - name: into-or-out-of-intent
   tag: "*"
-  match: "$Move2D != '' and DEBUG(@data-from-mathml != name(.))"
+  match: "$NavMode!='Character' and $Move2D != '' and @data-from-mathml and @data-from-mathml != name(.) and
+          not(name(.)='power' or name(.)='fraction' or @data-from-mathml='mtable')"
   replace:
   - x: "$Move2D"
   - test:
-      if: "count($Child2D/preceding-sibling::*)=0 or count($Child2D/following-sibling::*)=0"
+      if: "count($Child2D/preceding-sibling::*)!=0 or count($Child2D/following-sibling::*)!=0"
       then:
-      - x: "SpeakIntentName(name(.), $Verbosity, 'function')"
-      else:
-      - t: "part"
-      - x: "count($Child2D/preceding-sibling::*)"
+      - t: "arg"
+      - x: "count($Child2D/preceding-sibling::*) + 1"
+      - t: "of"
+  - x: "GetIntentName(name(.), $Verbosity, 'function')"
   - pause: "medium"
 
 - name: into-or-out-of-mfrac
@@ -154,7 +155,11 @@
   - test:
       if: "not($Child2D/preceding-sibling::*)"
       then: [t: "base"]            # phrase(the 'base' of the power)
-      else: [t: "superscript"]     # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
+      else:
+      - test:
+          if: "self::m:power"
+          then: [t: "exponent"]        # phrase(the power has 'exponent' 2)
+          else: [t: "superscript"]     # phrase(x with 'superscript' 2)
   - pause: "medium"
 
 - name: into-or-out-of-msubsup
@@ -328,7 +333,7 @@
 - name: zoom-in-mrow-in-math
   # Moving to first or last is meaningless the 'math' has only an 'mrow' inside -- dig inside and do it again 
   tag: math
-  match: "count(*)=1 and DEBUG(name(*[1])) = 'mrow' and ($NavCommand = 'ZoomIn' or $NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom')"
+  match: "$NavCommand = 'ZoomIn' or $NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom'"
   replace:
   - test:
       if: "$NavCommand = 'MovePreviousZoom'"
@@ -375,7 +380,7 @@
           variables: [Move2D: "'in'", Child2D: "*[1]/*[1]"]   # phrase('in' the denominator)
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/*[1]/@id"] # skip mtd
-    - else_if: "*[1][self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]" # auto zoom
+    - else_if: "*[1][self::m:mrow and (IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false))]" # auto zoom
       then:
       - with:
           variables: [Move2D: "'in'", Child2D: "*[1]"]   # phrase('in' the denominator)
@@ -556,7 +561,7 @@
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
   - test:
-      if: "$NavMode='Enhanced' and parent::*[self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
+      if: "$NavMode='Enhanced' and parent::*[self::m:mrow and (IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false))]"
       then: [x: ".."] # auto-zoom: move out a level and retry
       else:
       - with:
@@ -1754,7 +1759,7 @@
   - t: "inside"                                           # phrase('inside' a big expression)
   - pause: medium
   - test:
-    - if: "$NavMode='Enhanced' and parent::*[self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
+    - if: "$NavMode='Enhanced' and parent::*[self::m:mrow and (IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false))]"
       then: [x: ".."] # auto-zoom up
     - else_if: "$NavCommand = 'WhereAmI'"
       then: [set_variables: [NavNode: "@id"]]
