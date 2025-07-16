@@ -150,7 +150,7 @@ pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &st
         "UEB" | "Nemeth" | _ => set_preference("Language".to_string(), "en".to_string()).unwrap(),
     }
 
-    set_preference("UEB_UseSpacesAroundAllOperators".to_string(), "false".to_string()).unwrap();         // makes testing simpler
+    set_preference("UseSpacesAroundAllOperators".to_string(), "false".to_string()).unwrap();         // makes testing simpler
     for (pref_name, pref_value) in test_prefs.clone() {
         set_preference(pref_name.to_string(), pref_value.to_string()).unwrap();
     };

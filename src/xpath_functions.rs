@@ -753,7 +753,7 @@ struct BaseNode;
     /// Recursively find the base node
     /// The base node of a non scripted element is the element itself
     fn base_node(node: Element) -> Element {
-        let name = name(node);
+        let name = node.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(node));
         if ["msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts"].contains(&name) {
             return BaseNode::base_node(as_element(node.children()[0]));
         } else {
@@ -1231,11 +1231,11 @@ impl Function for SpeakIntentName {
     }
 }
 
-pub struct SpeakBracketingIntentName;
-/// SpeakBracketingIntentName(name, verbosity, at_start_or_end)
+pub struct GetBracketingIntentName;
+/// GetBracketingIntentName(name, verbosity, at_start_or_end)
 ///   Returns a potentially empty string to use to bracket an intent expression (start foo... end foo)
 /// 
-impl SpeakBracketingIntentName {
+impl GetBracketingIntentName {
     fn bracketing_words(intent_name: &str, verbosity: &str, fixity: &str, at_start: bool) -> String {
         crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
@@ -1279,7 +1279,7 @@ impl SpeakBracketingIntentName {
     }
 }
 
-impl Function for SpeakBracketingIntentName {
+impl Function for GetBracketingIntentName {
     fn evaluate<'d>(&self,
                         _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
@@ -1289,12 +1289,49 @@ impl Function for SpeakBracketingIntentName {
         args.exactly(4)?;
         let start_or_end = args.pop_string()?;
         if start_or_end != "start" && start_or_end != "end" {
-            return Err( Error::Other("SpeakBracketingIntentName: first argument must be either 'start' or 'end'".to_string()) );
+            return Err( Error::Other("GetBracketingIntentName: first argument must be either 'start' or 'end'".to_string()) );
         }
         let fixity = args.pop_string()?;
         let verbosity = args.pop_string()?;
         let name = args.pop_string()?;
-        return Ok( Value::String(SpeakBracketingIntentName:: bracketing_words(&name, &verbosity, &fixity, start_or_end == "start")) );
+        return Ok( Value::String(GetBracketingIntentName:: bracketing_words(&name, &verbosity, &fixity, start_or_end == "start")) );
+    }
+}
+
+pub struct GetNavigationPartName;
+/// GetNavigationPartName(name, index)
+/// Returns the name to use to speak the part of a navigation expression (e.g., 'numerator', 'denominator', 'base', 'exponent', ...).
+/// If there is no match, an empty string is returned.
+/// 'index' is 0-based
+/// 
+impl GetNavigationPartName {
+    fn navigation_part_name(intent_name: &str, index: usize) -> String {
+        crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
+            let definitions = definitions.borrow();
+            if let Some(navigation_names) = definitions.get_hashmap("NavigationParts") {
+                if let Some(nav_part_names) = navigation_names.get(intent_name) {
+                    // Split the pattern is: part [; part]*
+                    if let Some(part_name) = nav_part_names.trim().split(";").nth(index) {
+                        return part_name.trim().to_string();
+                    }
+                }
+            }
+            return "".to_string();
+        })
+    }
+}
+
+impl Function for GetNavigationPartName {
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(2)?;
+        let index = args.pop_number()? as usize;
+        let name = args.pop_string()?;
+        return Ok( Value::String(GetNavigationPartName:: navigation_part_name(&name, index)) );
     }
 }
 
@@ -1396,7 +1433,8 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("DistanceFromLeaf", DistanceFromLeaf);
     context.set_function("EdgeNode", EdgeNode);
     context.set_function("SpeakIntentName", SpeakIntentName);
-    context.set_function("SpeakBracketingIntentName", SpeakBracketingIntentName);
+    context.set_function("GetBracketingIntentName", GetBracketingIntentName);
+    context.set_function("GetNavigationPartName", GetNavigationPartName);
     context.set_function("DEBUG", Debug);
 
     // Not used: remove??

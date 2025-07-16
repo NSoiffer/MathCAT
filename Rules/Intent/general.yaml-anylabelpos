@@ -501,7 +501,7 @@
 -
   name: chemistry-concentration
   tag: mrow
-  match: "ancestor-or-self::*[@data-chem-equation] and IsBracketed(., '[', ']')"
+  match: "ancestor-or-self::*[@data-chem-formula] and IsBracketed(., '[', ']')"
   replace:
   - intent:
       name: "chemistry-concentration"

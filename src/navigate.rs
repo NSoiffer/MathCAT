@@ -3,7 +3,8 @@
 #![allow(clippy::needless_return)]
 
 use std::cell::{Ref, RefCell, RefMut};
-use sxd_xpath::{Context, Factory, Value};
+use sxd_xpath::context::Evaluation;
+use sxd_xpath::{Context, Value};
 use sxd_document::dom::Element;
 use sxd_document::Package;
 
@@ -290,48 +291,46 @@ pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -
 pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<(Option<String>, Option<f64>)> {
     // First return tuple value is string-value (if string, bool, or single node) or None
     // Second return tuple value is f64 if variable is a number or None
-    // This is ridiculously complicated for what in the end is a hashmap lookup
-    // There isn't an API that lets us get at the value, so we have to setup/build/evaluate an xpath
-    // Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate() 
-    let factory = Factory::new();
-    match factory.build(&("$".to_string() + var_name)) {
-        Err(_) => bail!("Could not compile XPath for variable: {}", var_name),
-        Ok(xpath) => match xpath.unwrap().evaluate(context, mathml) {
-            Ok(val) => return Ok( match val {
-                Value::String(s) => (Some(s), None),
-                Value::Number(f) => (None, Some(f)),
-                Value::Boolean(b) => (Some(format!("{}", b)), None),
-                Value::Nodeset(nodes) => {
-                    if nodes.size() == 1 {
-                        if let Some(attr) = nodes.document_order_first().unwrap().attribute() {
-                            return Ok( (Some(attr.value().to_string()), None) );
-                        }
-                    };
-                    let mut error_message = format!("Variable '{}' set somewhere in navigate.yaml is nodeset and not an attribute: ", var_name);
-                    if nodes.size() == 0 {
-                        error_message += &format!("0 nodes (false) -- {} set to non-existent (following?/preceding?) node", var_name);
-                    } else {
-                        let singular = nodes.size()==1;
-                        error_message += &format!("{} node{}. {}:",
-                                nodes.size(),
-                                if singular {""} else {"s"},
-                                if singular {"Node is"} else {"Nodes are"});
-                        nodes.document_order()
-                            .iter()
-                            .enumerate()
-                            .for_each(|(i, node)| {
-                                match node {
-                                    sxd_xpath::nodeset::Node::Element(mathml) =>
-                                        error_message += &format!("#{}:\n{}",i, mml_to_string(*mathml)),
-                                    _ => error_message += &format!("'{:?}'", node),
-                                }   
-                            })    
-                    };
-                    bail!(error_message);
-                },
-            } ),
-            Err(_) => bail!("Could not find value for navigation variable '{}'", var_name),
-        }
+    // This is slightly roundabout because Context doesn't expose a way to get the values.
+    // Instead, we create an "Evaluation", which is just one level of indirection.
+    // Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate()
+    use sxd_xpath::nodeset::Node;
+    let evaluation = Evaluation::new(context, Node::Element(mathml));
+    return match evaluation.value_of(var_name.into()) {
+        Some(value) => match value {
+            Value::String(s) => Ok((Some(s.clone()), None)),
+            Value::Number(f) => Ok((None, Some(*f))),
+            Value::Boolean(b) => Ok((Some(format!("{}", b)), None)),
+            Value::Nodeset(nodes) => {
+                if nodes.size() == 1 {
+                    if let Some(attr) = nodes.document_order_first().unwrap().attribute() {
+                        return Ok( (Some(attr.value().to_string()), None) );
+                    }
+                };
+                let mut error_message = format!("Variable '{}' set somewhere in navigate.yaml is nodeset and not an attribute: ", var_name);
+                if nodes.size() == 0 {
+                    error_message += &format!("0 nodes (false) -- {} set to non-existent (following?/preceding?) node", var_name);
+                } else {
+                    let singular = nodes.size()==1;
+                    error_message += &format!("{} node{}. {}:",
+                            nodes.size(),
+                            if singular {""} else {"s"},
+                            if singular {"Node is"} else {"Nodes are"});
+                    nodes.document_order()
+                        .iter()
+                        .enumerate()
+                        .for_each(|(i, node)| {
+                            match node {
+                                sxd_xpath::nodeset::Node::Element(mathml) =>
+                                    error_message += &format!("#{}:\n{}",i, mml_to_string(*mathml)),
+                                _ => error_message += &format!("'{:?}'", node),
+                            }   
+                        })    
+                };
+                bail!(error_message);
+            },
+        },
+        None => bail!("Could not find value for navigation variable '{}'", var_name),
     }
 }
 
@@ -1842,7 +1841,11 @@ mod tests {
             assert_eq!(speech, "move right; row 2; 5, negative 6");
             let speech = test_command("ZoomIn", mathml, "id-13");
             assert_eq!(speech, "zoom in; column 1; 5");
-            return Ok( () );
+            let speech = test_command("ZoomOut", mathml, "row-2");
+            assert_eq!(speech, "zoom out; row 2; 5, negative 6");
+            let speech = test_command("ZoomOut", mathml, "table");
+            assert_eq!(speech, "zoom out; the 2 by 2 matrix; row 1; 9, negative 13; row 2; 5, negative 6");
+        return Ok( () );
         });
     }
 
@@ -1956,18 +1959,18 @@ mod tests {
     #[test]
     fn base_superscript() -> Result<()> {
         // bug #217 -- zoom into base of parenthesized script 
-        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
-            <msup data-changed='added' id='id-1' data-id-added='true'>
-                <mrow data-changed='added' id='id-2' data-id-added='true'>
-                    <mo stretchy='false' id='id-3' data-id-added='true'>(</mo>
-                    <mrow data-changed='added' id='id-4' data-id-added='true'>
-                        <mn id='id-5' data-id-added='true'>2</mn>
-                        <mo data-changed='added' id='id-6' data-id-added='true'>&#x2062;</mo>
-                        <mi id='id-7' data-id-added='true'>x</mi>
+        let mathml_str = "<math display='block' id='id-0'>
+            <msup id='id-1'>
+                <mrow id='id-2'>
+                    <mo stretchy='false' id='id-3'>(</mo>
+                    <mrow id='id-4'>
+                        <mn id='id-5'>2</mn>
+                        <mo id='id-6'>&#x2062;</mo>
+                        <mi id='id-7'>x</mi>
                     </mrow>
-                    <mo stretchy='false' id='id-8' data-id-added='true'>)</mo>
+                    <mo stretchy='false' id='id-8'>)</mo>
                 </mrow>
-                <mn id='id-9' data-id-added='true'>2</mn>
+                <mn id='id-9'>2</mn>
             </msup>
         </math>";
         init_default_prefs(mathml_str, "Enhanced");
@@ -1978,7 +1981,7 @@ mod tests {
             let speech = test_command("ZoomIn", mathml, "id-4");
             assert_eq!(speech, "zoom in; in base; 2 x");
             let speech = test_command("MoveNext", mathml, "id-9");
-            assert_eq!(speech, "move right; in superscript; 2");
+            assert_eq!(speech, "move right; in exponent; 2");
             return Ok( () );
         });
     }
@@ -2008,13 +2011,13 @@ mod tests {
             // let speech = test_command("ReadCurrent", mathml, "id-2");
             // assert_eq!(speech, "read current; n choose k");
             let speech = test_command("ZoomIn", mathml, "id-4");
-            assert_eq!(speech, "zoom in; n");
+            assert_eq!(speech, "zoom in; in part 1; n");
             let speech = test_command("MoveNext", mathml, "id-5");
-            assert_eq!(speech, "move right; k");
+            assert_eq!(speech, "move right; in part 2; k");
             let speech = test_command("MoveNext", mathml, "id-5");
             assert_eq!(speech, "cannot move right, end of math");
             let speech = test_command("ZoomOut", mathml, "id-1");
-            assert_eq!(speech, "zoom out; n choose k");
+            assert_eq!(speech, "zoom out; out of part 2; n choose k");
             return Ok( () );
         });
     }
