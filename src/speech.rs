@@ -662,23 +662,21 @@ impl Intent {
         /// "lift" up the children any "TEMP_NAME" child -- could short circuit when only one child
         fn lift_children(result: Element) -> Element {
             // debug!("lift_children:\n{}", mml_to_string(result));
-            result.replace_children(
-                result.children().iter()
-                    .map(|&child_of_element| {
-                        match child_of_element {
-                            ChildOfElement::Element(child) => {
-                                if name(child) == "TEMP_NAME" {
-                                    assert_eq!(child.children().len(), 1);
-                                    child.children()[0]
-                                } else {
-                                    child_of_element
-                                }
-                            },
-                            _ => child_of_element,      // text()
+            // most likely there will be the same number of new children as result has, but there could be more
+            let mut new_children = Vec::with_capacity(2*result.children().len());
+            for child_of_element in result.children() {
+                match child_of_element {
+                    ChildOfElement::Element(child) => {
+                        if name(child) == "TEMP_NAME" {
+                            new_children.append(&mut child.children());  // almost always just one
+                        } else {
+                            new_children.push(child_of_element);
                         }
-                    })
-                    .collect::<Vec<ChildOfElement>>()
-            );
+                    },
+                    _ => new_children.push(child_of_element),      // text()
+                }
+            }
+            result.replace_children(new_children);
             return result;
         }
     }    
