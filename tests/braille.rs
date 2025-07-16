@@ -20,10 +20,6 @@ mod braille {
         mod once;
     }
 
-    mod Finnish {
-        mod spec;
-    }
-
     mod Vietnam {
         mod vi;
     }
