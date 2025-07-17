@@ -1,9 +1,9 @@
 ---
-# UEB characters
+# Polish characters
 #
 # Some chars that originally came from an Excel spreadsheet, converted to csv, and the greatly expanded
 # 
-# The UEB translation makes use of some non-braille chars as flags
+# The Polish translation makes use of some non-braille chars as flags
 #    L -- what follows is a letter
 #    N -- what follows is a digit
 #    C -- precedes L for capital letters
@@ -54,25 +54,39 @@
  - "\ue01E": [T: "N⠨N⠑"]               # E 
  - "\ue01F": [T: "N⠨N⠋"]               # F 
 
- - "a": [T: "L⠁"]               # 0x61 
+ - "a": [T: "L⠁"]               # 0x61
+ - "ą": [T: "L⠡"]               # 0x0105 LATIN SMALL LETTER A WITH OGONEK
+ - "Ą": [T: "CL⠡"]              # 0x0104 LATIN CAPITAL LETTER A WITH OGONEK 
  - "b": [T: "L⠃"]               # 0x62 
- - "c": [T: "L⠉"]               # 0x63 
+ - "c": [T: "L⠉"]               # 0x63
+ - "ć": [T: "L⠩"]               # 0x0107 LATIN SMALL LETTER C WITH ACUTE
+ - "Ć": [T: "CL⠩"]              # 0x0106 LATIN CAPITAL LETTER C WITH ACUTE
  - "d": [T: "L⠙"]               # 0x64 
  - "e": [T: "L⠑"]               # 0x65 
+ - "ę": [T: "L⠱"]               # 0x0119 LATIN SMALL LETTER E WITH OGONEK
+ - "Ę": [T: "CL⠱"]              # 0x0118 LATIN CAPITAL LETTER E WITH OGONEK
  - "f": [T: "L⠋"]               # 0x66 
  - "g": [T: "L⠛"]               # 0x67 
  - "h": [T: "L⠓"]               # 0x68 
  - "i": [T: "L⠊"]               # 0x69 
  - "j": [T: "L⠚"]               # 0x6a 
  - "k": [T: "L⠅"]               # 0x6b 
- - "l": [T: "L⠇"]               # 0x6c 
+ - "l": [T: "L⠇"]               # 0x6c
+ - "ł": [T: "L⠣"]               # 0x0142 LATIN SMALL LETTER L WITH STROKE
+ - "Ł": [T: "CL⠣"]              # 0x0141 LATIN CAPITAL LETTER L WITH STROKE
  - "m": [T: "L⠍"]               # 0x6d 
  - "n": [T: "L⠝"]               # 0x6e 
- - "o": [T: "L⠕"]
+ - "ń": [T: "L⠹"]               # 0x0144 LATIN SMALL LETTER N WITH ACUTE
+ - "Ń": [T: "CL⠹"]              # 0x0143 LATIN CAPITAL LETTER N WITH ACUTE
+ - "o": [T: "L⠕"]               # 0x006F LATIN SMALL LETTER O
+ - "ó": [T: "L⠬"]               # 0x00F3 LATIN SMALL LETTER O WITH ACUTE
+ - "Ó": [T: "CL⠬"]              # 0x00D3 LATIN CAPITAL LETTER O WITH ACUTE
  - "p": [T: "L⠏"]               # 0x70 
  - "q": [T: "L⠟"]               # 0x71 
  - "r": [T: "L⠗"]               # 0x72 
- - "s": [T: "L⠎"]               # 0x73 
+ - "s": [T: "L⠎"]               # 0x73
+ - "ś": [T: "L⠪"]               # 0x015B LATIN SMALL LETTER S WITH ACUTE
+ - "Ś": [T: "CL⠪"]              # 0x015A LATIN CAPITAL LETTER S WITH ACUTE
  - "t": [T: "L⠞"]               # 0x74 
  - "u": [T: "L⠥"]               # 0x75 
  - "v": [T: "L⠧"]               # 0x76 
@@ -80,6 +94,10 @@
  - "x": [T: "L⠭"]               # 0x78 
  - "y": [T: "L⠽"]               # 0x79 
  - "z": [T: "L⠵"]               # 0x7a 
+ - "ż": [T: "L⠯"]               # 0x017C LATIN SMALL LETTER Z WITH DOT ABOVE 
+ - "Ż": [T: "CL⠯"]              # 0x017B LATIN CAPITAL LETTER Z WITH DOT ABOVE 
+ - "ź": [T: "L⠮"]               # 0x017A LATIN SMALL LETTER Z WITH ACUTE 
+ - "Ź": [T: "CL⠮"]              # 0x0179 LATIN CAPITAL LETTER Z WITH ACUTE
 
  - "A": [T: "CL⠁"]              # 0x41 
  - "B":                         # 0x42 
@@ -256,23 +274,35 @@
         then: [T: "W"]      # 
         else: [T: ""]
 
- - "!": [T: "⠫"]               # 0x21
+ - "!": [T: "⠖W"]               # 0x21
+# FIX:  - "!": [T: "⠫W"]              # 0x21 (when used as factorial)
+
  - "$": [T: "⠸⠈⠎"]            # 0x24
- - "%": [T: "⠸⠼⠚⠴"]           # 0x25
- - "(": [T: "⠣"]               # 0x0028 (Left parenthesis)
- - ")": [T: "⠜"]               # 0x0029 (Right parenthesis)
+ - "%": [T: "⠼⠚⠴"]           # 0x25 (percent)
+ - "‰": [T: "⠼⠚⠴⠴"]          # 0x2030 PER MILLE SIGN 
+ - "(": [T: "⠣"]               # 0x0028 (Math left parenthesis)
+# FIX: - "(": [T: "⠶"]               # 0x0028 (Left AND right parentheses in regular Polish texts)
+
+ - ")": [T: "⠜"]               # 0x0029 (Math right parenthesis)
+# FIX: - "(": [T: "⠶"]               # 0x0028 (Left AND right parentheses in regular Polish texts)
+
  - "[": [T: "⠷"]               # 0x005B (Left square bracket)
  - "]": [T: "⠾"]               # 0x005D (Right square bracket)
- - "}": [T: "⠛⠕"]                # 0x007D (cerrar llaves)
- - "{": [T: "⠶⠪"]                # 0x007B (abrir llaves)
- - "*": [T: "⠐⠦"]                           # 0x2a
-#  - "*": [T: "⠲"]                           # 0x2a
- - "+": [T: "W⠖"]                           # 0x2b
+ - "}": [T: "⠕"]                # 0x007D (RIGHT CURLY BRACKET)
+ - "{": [T: "⠪"]                # 0x007B (LEFT CURLY BRACKET)
+ - "*": [T: "⠔"]                # 0x2a (ASTERISK)
+# FIX: - "*": [T: "⠐⠦"]           # 0x2a (sometimes used as multiplication sign)
+
+# - "*": [T: ""]                           # 0x2a
+ - "„": [T: "W⠦"]                 # 0x201E LEFT DOUBLE LOW-9 QUOTATION MARK
+ - "”": [T: "⠴W"]                 # 0x201D RIGHT DOUBLE QUOTATION MARK
+ - "+": [T: "W⠖"]                           # 0x2b (PLUS sign± )
  - ",":                        # 0x2c (Comma)
      - test:
         if: "self::m:mn"
         then: [T: "N⠂"]
         else: [T: ","]
+ - ";": [T: "⠆"]                   # 0x003B SEMICOLON 
  - "-":                            # 0x2d
      - test:
         if: "preceding-sibling::*"
@@ -283,28 +313,38 @@
         if: "self::m:mn"
         then: [T: "N⠄"]
         else: [T: "."]
+# "⠄" may also serve as multiplication sign ("times"); see p. 10
+
  - ":": [T: "⠒"]                           # 0x3a
+# FIX: - ":" [T: "W⠲"]                # when ":" serves as a division sign; see p. 10
+
+ - "/": [T: "⠲"]                        # 0x002F SOLIDUS (Slash)
+ - "?": [T: "⠢W"]                        # 0x003F QUESTION MARK
+ - "'": [T: "⠄"]                        # 0x0027 APOSTROPHE
  - "<": [T: "W⠪⠄"]                        # 0x003C (Less than)
- - "=": [T: "W⠶"]                           # 0x3d
- - ">": [T: "W⠕⠂"]                          # 0x3e
+ - "=": [T: "W⠶"]                           # 0x3d (equals)
+ - ">": [T: "W⠕⠂"]                          # 0x3e (GREATER-THAN)
  - "|":                                  # 0x007C (vertical bar)
     - test:
         - if: "parent::*[self::m:mrow and count(*)=3 and *[1]='|'and *[3]='|'] and not(following-sibling::*[1])"
           then: [T: "⠸W"]               # closing vertical bar for absolute value
           else: [T: "⠈⠇"]               # absolute value -- opening bar of absolute value or standalone vertical bar
+# FIX: - "|":  may also mean "integral line" and than the Braille code is "W⠇"(see p. 57^ ^^ )
+
  - "±": [T: "W⠖⠤"]                      # 0xb1
  - "·": [T: "W⠄"]                       # 0x00B7 (Multiplication dot (times))
- - "×": [T: "W⠦"]                       # 0x00D7 (multiplication cross))
+ - "°": [T: "⠴"]                        # 0x00B0 DEGREE SIGN
+ - "×": [T: "W⠦"]                       # 0x00D7 (multiplication cross)
  - "…": [T: "⠠⠠⠠"]                     # 0x2d9
 
 
 ##### The following need translations
- - "̊ ": [t: "⠈⠴"]               # 0x0309 (Ring)
+ - "̊ ": [T: "⠈⠴"]               # 0x0309 (Ring)
  - "ˇ": [t: "⠰⠒"]               # 0x02C7 (Caron)
- - "⌢": [t: "⠈⠒"]             #  0x2322
- - "⌣": [t: "⠠⠒"]           	#  0x2323
- - "⏜": [t: "⠈⠒"]             #  0x232DC
- - "⏝": [t: "⠠⠒"]           	#  0x23DD
+ - "⌢": [T: "⠨⠣"]               #  0x2322
+ - "⌣": [t: "⠤⠣"]           	#  0x2323
+ - "⏜": [T: "⠨⠣"]             #  0x232DC (TOP PARENTHESIS)
+ - "⏝": [t: "⠤⠣"]           	#  0x23DD (BOTTOM PARENTHESIS)
 
  - "⦜": [t: "⠸⠤"]                # 0x299C (ángulo recto)
  - "⦝": [t: "⠸⠤"]                # 0x299D (ángulo recto)
@@ -343,12 +383,13 @@
  - "\"": [t: "⠄⠄"]              # 0x22
  - "@": [t: "⠈⠁"]               # 0x40
  - "\\": [t: "⠸⠡"]              # 0x5c
- - "^": [t: "⠸⠣"]               # 0x5e
+ - "^": [T: "⠬"]                # 0x5e (CIRCUMFLEX ACCENT)
  - "`": [t: "⠈"]                # 0x60
- - "~": [t: "⠈⠱"]               # 0x7e
+ - "~": [T: "W⠒⠔"]              # 0x7e (not true that...)
  - "¡": [t: "⠖"]                # 0xa1
  - "¢": [t: "⠈⠉"]               # 0xa2
  - "£": [t: "⠈⠇"]               # 0xa3
+ - "€": [T: "W⠈⠑"]              # 0x20AC EURO SIGN
  - "¤": [t: "⠈⠫"]               # 0xa4
  - "¥": [t: "⠈⠽"]               # 0xa5
  - "§": [t: "⠈⠠⠎"]              # 0xa7
@@ -366,30 +407,33 @@
  - "‐": [t: "⠤"]                # 0x2010
  - "‑": [t: "⠤"]                # 0x2011
  - "‒": [t: "⠤⠤"]               # 0x2012
- - "–": [t: "⠤⠤"]               # 0x2013
+ - "–": [T: "⠒"]                # 0x2013 (EN DASH)
  - "—": [t: "⠤⠤"]               # 0x2014
  - "‖": [t: "⠳⠳"]               # 0x2016
  - "†": [t: "⠸⠻"]               # 0x2020
  - "‡": [t: "⠸⠸⠻"]              # 0x2021
- - "•": [t: "⠡"]                # 0x2022
- - "․": [t: "⠄"]                # 0x2024
- - "‥": [t: "⠄⠄"]               # 0x2025
- - "′": [t: "⠄"]                # 0x2032
- - "″": [t: "⠄⠄"]               # 0x2033
- - "‴": [t: "⠄⠄."]              # 0x2034 (Triple prime)
- - "⁗": [t: "⠄⠄.."]             # 0x2057 (Quadruple prime)
+ - "•": [T: "⠆"]                # 0x2022 (BULLET)
+ - "․": [T: "⠆"]                # 0x2024
+ - "‥": [T: "⠆⠆"]               # 0x2025 (TWO DOT LEADER, p. 34)
+ - "′": [T: "⠔"]                # 0x2032 (PRIME)
+ - "″": [T: "⠔⠔"]               # 0x2033 (DOUBLE PRIME)
+ - "‴": [T: "⠔⠔⠔"]              # 0x2034 (Triple prime)
+ - "⁗": [t: "⠔⠔⠔⠔"]            # 0x2057 (Quadruple prime)
  - "‼": [t: "⠖⠖"]               # 0x203c
  - "‾": [t: "⠱"]                # 0x203e
  - "⁇": [t: "⠹⠹"]               # 0x2047
  - "⁈": [t: "⠹⠖"]               # 0x2048
  - "⁉": [t: "⠖⠹"]               # 0x2049
- - "∀": [t: "⠈⠯"]               # 0x2200
- - "∃": [t: "⠈⠿"]               # 0x2203
+ - "→": [T: "⠒⠂"]               # 0x2192 RIGHTWARDS ARROW
+ - "←": [T: "⠂⠒"]               # 0x2190 LEFTWARDS ARROW
+ - "∀": [T: "⠯⠂"]               # 0x2200
+ - "∂": [T: "⠹"]                 # 0x2202 PARTIAL DIFFERENTIAL
+ - "∃": [T: "⠯⠢"]               # 0x2203 (THERE EXISTS)
  - "∄": [t: "⠌⠈⠿"]              # 0x2204
- - "∅": [t: "⠸⠴"]               # 0x2205
- - "∈": [t: "⠈⠑"]               # 0x2208
- - "∉": [t: "⠌⠈⠑"]              # 0x2209
- - "∊": [t: "⠈⠑"]               # 0x220a
+ - "∅": [T: "⠯⠕"]               # 0x2205 (EMPTY SET)
+ - "∈": [T: "⠈⠑"]               # 0x2208 (ELEMENT OF)
+ - "∉": [T: "⠔⠈⠑"]              # 0x2209 (NOT AN ELEMENT OF)
+ - "∊": [T: "⠈⠑"]               # 0x220a
  - "∋": [t: "⠈⠢"]               # 0x220b
  - "∌": [t: "⠌⠈⠢"]              # 0x220c
  - "∍": [t: "⠈⠢"]               # 0x220d
@@ -397,25 +441,25 @@
  - "∏": [t: "CGL⠏"]              # 0x220F (N-ary product)
  - "∑": [t: "CGL⠎"]              # 0x2211
  - "−": [t: "⠤"]                # 0x2212
- - "∓": [t: "⠤⠬"]               # 0x2213
+ - "∓": [T: "W⠤⠖"]               # 0x2213 MINUS-OR-PLUS SIGN
  - "∕": [t: "⠸⠌"]               # 0x2215
- - "∖": [t: "⠸⠡"]               # 0x2216
- - "∗": [t: "⠈⠼"]               # 0x2217
- - "∘": [t: "⠨⠡"]               # 0x2218
+ - "∖": [T: "W⠡⠄"]               # 0x2216 (SET MINUS)
+ - "∗": [T: "⠲"]               # 0x2217 (ASTERISK OPERATOR)
+ - "∘": [T: "⠴"]               # 0x2218 (RING OPERATOR)
  - "∝": [t: "⠸⠿"]               # 0x221d
- - "∞": [t: "⠠⠿"]               # 0x221e
- - "∟": [t: "⠻⠦"]               # 0x221f
+ - "∞": [T: "N⠿"]               # 0x221e (INFINITY)
+ - "∟": [T: "⠻⠦"]               # 0x221f (RIGHT ANGLE)
  - "∠": [t: "⠫⠪"]               # 0x2220
- - "∢": [t: "⠫⠪⠸⠫⠫⠁⠻"]          # 0x2222
- - "∣": [t: "⠳"]                # 0x2223
- - "∤": [t: "⠌⠳"]               # 0x2224
- - "∥": [t: "⠫⠇"]               # 0x2225
- - "∦": [t: "⠌⠫⠇"]              # 0x2226
- - "∧": [t: "⠈⠩"]               # 0x2227
- - "∨": [t: "⠈⠬"]               # 0x2228
- - "∩": [t: "⠨⠩"]               # 0x2229
- - "∪": [t: "⠨⠬"]               # 0x222a
- - "∫": [t: "⠮"]                # 0x222b
+ - "∢": [T: "⠻⠪"]               # 0x2222 (SPHERICAL ANGLE)
+ - "∣": [T: "⠈⠇"]                # 0x2223 (DIVIDES; Polish Braille symbol the same as for modulo; p. 12)
+ - "∤": [T: "⠔⠈⠇"]               # 0x2224 (DOES NOT DIVIDE)
+ - "∥": [T: "⠈⠇⠇"]               # 0x2225 (PARALLEL TO)
+ - "∦": [T: "W⠔⠈⠇⠇"]             # 0x2226 (NOT PARALLEL TO)
+ - "∧": [T: "W⠬⠂"]              # 0x2227 (LOGICAL AND)
+ - "∨": [T: "W⠩⠂"]              # 0x2228 (LOGICAL OR)
+ - "∩": [T: "W⠬⠄"]              # 0x2229 (SET INTERSECTION)
+ - "∪": [T: "W⠩⠄"]              # 0x222a (UNION of SETS)
+ - "∫": [T: "⠮"]                # 0x222b (INTEGRAL)
  - "∬": [t: "⠮⠮"]               # 0x222c
  - "∭": [t: "⠮⠮⠮"]              # 0x222d
  - "∮": [t: "⠮⠈⠫⠉⠻"]            # 0x222e
@@ -426,21 +470,22 @@
  - "∶": [t: "⠐⠂"]               # 0x2236
  - "∷": [t: "⠰⠆"]               # 0x2237
  - "∸": [t: "⠨⠤"]               # 0x2238
- - "∼": [t: "⠈⠱"]               # 0x223c
- - "≁": [t: "⠌⠈⠱"]              # 0x2241
+ - "∼": [T: "W⠔"]               # 0x223c (TILDE OPERATOR, not, proportional to)
+ - "≁": [T: "W⠔⠢"]              # 0x2241
  - "≂": [t: "⠱⠈⠱"]              # 0x2242
  - "≃": [t: "⠈⠱⠱"]              # 0x2243
  - "≄": [t: "⠌⠈⠱⠱"]             # 0x2244
  - "≅": [t: "⠈⠱⠨⠅"]             # 0x2245
  - "≆": [t: "⠈⠱⠌⠨⠅"]            # 0x2246
  - "≇": [t: "⠌⠈⠱⠨⠅"]            # 0x2247
- - "≈": [t: "⠈⠱⠈⠱"]             # 0x2248
+ - "≈": [T: "W⠢⠢"]              # 0x2248 (ALMOST EQUAL TO)
  - "≉": [t: "⠌⠈⠱⠈⠱"]            # 0x2249
  - "≊": [t: "⠈⠱⠈⠱⠱"]            # 0x224a
  - "≍": [t: "⠈⠣⠠⠣"]             # 0x224d
  - "≎": [t: "⠈⠣⠠⠣"]             # 0x224e
  - "≐": [t: "⠐⠨⠅⠣⠡⠻"]           # 0x2250
  - "≑": [t: "⠐⠨⠅⠩⠡⠣⠡⠻"]         # 0x2251
+ - "≔": [T: "W⠒⠶"]              # 0x2254 (COLON EQUALS; equals by definition, p. 11)
  - "≗": [t: "⠐⠨⠅⠣⠨⠡⠻"]          # 0x2257
  - "≘": [t: "⠐⠨⠅⠣⠫⠁⠻"]          # 0x2258
  - "≙": [t: "⠐⠨⠅⠣⠸⠣⠻"]          # 0x2259
@@ -450,20 +495,20 @@
  - "≝": [t: "⠐⠨⠅⠣⠙⠑⠋⠻"]         # 0x225d
  - "≞": [t: "⠐⠨⠅⠣⠍⠻"]           # 0x225e
  - "≟": [t: "⠐⠨⠅⠣⠸⠦⠻"]          # 0x225f
- - "≠": [t: "⠌⠨⠅"]              # 0x2260
- - "≡": [t: "⠸⠇"]               # 0x2261
- - "≢": [t: "⠌⠸⠇"]              # 0x2262
- - "≤": [t: "⠐⠅⠱"]              # 0x2264
- - "≥": [t: "⠨⠂⠱"]              # 0x2265
+ - "≠": [T: "W⠔⠶"]              # 0x2260 (NOT EQUAL TO)
+ - "≡": [T: "W⠶⠶"]              # 0x2261 (IDENTICAL TO, p. 48)
+ - "≢": [T: "W⠔⠶⠶"]             # 0x2262 (NOT IDENTICAL TO)
+ - "≤": [T: "W⠪⠶"]              # 0x2264 (LESS-THAN OR EQUAL TO)
+ - "≥": [T: "W⠕⠶"]              # 0x2265 (GREATER-THAN OR EQUAL TO)
  - "≦": [t: "⠐⠅⠨⠅"]             # 0x2266
  - "≧": [t: "⠨⠂⠨⠅"]             # 0x2267
  - "≨": [t: "⠐⠅⠌⠨⠅"]            # 0x2268
  - "≩": [t: "⠨⠂⠌⠨⠅"]            # 0x2269
- - "≪": [t: "⠐⠅⠈⠐⠅⠻"]           # 0x226a
- - "≫": [t: "⠨⠂⠈⠨⠂⠻"]           # 0x226b
+ - "≪": [T: "W⠪⠪⠄"]              # 0x226a (MUCH LESS-THAN)
+ - "≫": [T: "W⠕⠕⠂"]              # 0x226b (MUCH GREATER-THAN)
  - "≭": [t: "⠌⠈⠣⠠⠣"]            # 0x226d
- - "≮": [t: "⠌⠐⠅"]              # 0x226e
- - "≯": [t: "⠌⠨⠂"]              # 0x226f
+ - "≮": [T: "W⠔⠪⠄"]              # 0x226e (NOT LESS-THAN)
+ - "≯": [T: "W⠔⠕⠂"]              # 0x226f (NOT GREATER-THAN)
  - "≰": [t: "⠌⠐⠅⠱"]             # 0x2270
  - "≱": [t: "⠌⠨⠂⠱"]             # 0x2271
  - "≲": [t: "⠐⠅⠈⠱"]             # 0x2272
@@ -482,24 +527,25 @@
  - "≿": [t: "⠨⠨⠂⠈⠱"]            # 0x227f
  - "⊀": [t: "⠌⠨⠐⠅"]             # 0x2280
  - "⊁": [t: "⠌⠨⠐⠅"]             # 0x2281
- - "⊂": [t: "⠸⠐⠅"]              # 0x2282
- - "⊃": [t: "⠸⠨⠂"]              # 0x2283
- - "⊄": [t: "⠌⠸⠐⠅"]             # 0x2284
- - "⊅": [t: "⠌⠸⠨⠂"]             # 0x2285
+ - "⊂": [T: "W⠣⠄"]              # 0x2282 (SUBSET OF)
+ - "⊃": [T: "⠜⠂"]               # 0x2283 (SUPERSET OF)
+ - "⊄": [T: "W⠔⠣⠄"]             # 0x2284 (NOT A SUBSET OF)
+ - "⊅": [T: "⠔⠜⠂"]              # 0x2285 (NOT A SUPERSET OF)
  - "⊆": [t: "⠸⠐⠅⠱"]             # 0x2286
  - "⊇": [t: "⠸⠨⠂⠱"]             # 0x2287
  - "⊈": [t: "⠌⠸⠐⠅⠱"]            # 0x2288
  - "⊉": [t: "⠌⠸⠨⠂⠱"]            # 0x2289
  - "⊊": [t: "⠸⠐⠅⠌⠨⠅"]           # 0x228a
  - "⊋": [t: "⠸⠨⠂⠌⠨⠅"]           # 0x228b
- - "⊥": [t: "⠫⠏"]               # 0x22a5
- - "⋀": [t: "⠈⠩"]               # 0x22c0
- - "⋁": [t: "⠈⠬"]               # 0x22c1
- - "⋂": [t: "⠨⠩"]               # 0x22c2
- - "⋃": [t: "⠨⠬"]               # 0x22c3
+ - "⊥": [t: "⠫⠏"]               # 0x22a5 (UP TACK)
+ - "⋀": [T: "⠯⠂"]               # 0x22c0 (N-ARY LOGICAL AND)
+ - "⋁": [T: "⠯⠢"]               # 0x22c1 (N-ARY LOGICAL OR)
+ - "⋂": [T: "⠯⠬"]               # 0x22c2 (N-ARY INTERSECTION, p. 17)
+ - "⋃": [T: "⠯⠩"]               # 0x22c3 (N-ARY UNION, p. 17)
  - "⋜": [t: "⠱⠐⠅"]              # 0x22dc
  - "⋝": [t: "⠱⠨⠂"]              # 0x22dd
- - "⟂": [t: "⠫⠏"]               # 0x27c2
+ - "⟂": [T: "⠼⠄"]               #  0x27c2 (PERPENDICULAR)
+# - "⟂̷": [T: "⠔⠼⠄"]            # (NOT PERPENDICULAR)
  - "⦀": [t: "⠳⠳⠳"]              # 0x2980
  - "⦶": [t: "⠫⠉⠸⠫⠳⠻"]           # 0x29b6
  - "⦷": [t: "⠫⠉⠸⠫⠫⠇⠻"]          # 0x29b7
@@ -555,7 +601,6 @@
  - "ï": [t: "⠈⠊"]               # 0xef
  - "ñ": [t: "⠈⠝"]               # 0xf1
  - "ò": [t: "⠈⠕"]               # 0xf2
- - "ó": [t: "⠈⠕"]               # 0xf3
  - "ô": [t: "⠈⠕"]               # 0xf4
  - "õ": [t: "⠈⠕"]               # 0xf5
  - "ö": [t: "⠈⠕"]               # 0xf6
@@ -570,7 +615,7 @@
  - "Â": [t: "⠠⠈⠁"]              # 0xc2
  - "Ã": [t: "⠠⠈⠁"]              # 0xc3
  - "Ä": [t: "⠠⠈⠁"]              # 0xc4
- - "Å": [t: "⠠⠈⠁"]              # 0xc5
+ - "Å": [T: "⠻⠷"]               # 0xc5 (LATIN CAPITAL LETTER A WITH RING ABOVE)
  - "Ç": [t: "⠠⠈⠉"]              # 0xc7
  - "È": [t: "⠠⠈⠑"]              # 0xc8
  - "É": [t: "⠠⠈⠑"]              # 0xc9
@@ -582,7 +627,6 @@
  - "Ï": [t: "⠠⠈⠊"]              # 0xcf
  - "Ñ": [t: "⠠⠈⠝"]              # 0xd1
  - "Ò": [t: "⠠⠈⠕"]              # 0xd2
- - "Ó": [t: "⠠⠈⠕"]              # 0xd3
  - "Ô": [t: "⠠⠈⠕"]              # 0xd4
  - "Ö": [t: "⠠⠈⠕"]              # 0xd6
  - "Ù": [t: "⠠⠈⠥"]              # 0xd9
@@ -590,18 +634,21 @@
  - "Û": [t: "⠠⠈⠥"]              # 0xdb
  - "Ü": [t: "⠠⠈⠥"]              # 0xdc
  - "Ý": [t: "⠠⠈⠽"]              # 0xdd
- - "←": [t: "⠫⠪⠒⠒"]             # 0x2190
  - "↑":                          # 0x2191
     - test:
         if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
-        then: [t: "⠫⠣"]
+        then: [T: "⠸⠒⠁"]
         else: [t: "⠫⠣⠒⠒⠕"]
+# FIX: Polish specs use up arrow only in the context of chemical reactions; p. 79
+
  - "↓":                          # 0x2193
     - test:
         if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
-        then: [t: "⠫⠩"]
+        then: [T: "⠸⠒⠄"]
         else: [t: "⠫⠩⠒⠒⠕"]
- - "↔": [t: "⠫⠪⠒⠒⠕"]            # 0x2194
+# FIX: Polish specs use down arrow only in the context of chemical reactions; p. 79
+
+ - "↔": [T: "⠐⠒⠂"]              # 0x2194 (LEFT RIGHT ARROW)
  - "↕": [t: "⠫⠣⠩⠪⠒⠒⠕"]          # 0x2195
  - "↖": [t: "⠫⠘⠪⠒⠒"]            # 0x2196
  - "↗": [t: "⠫⠘⠒⠒⠕"]            # 0x2197
@@ -647,16 +694,16 @@
  - "⇏": [t: "⠳⠈⠫⠒⠒⠕⠕"]          # 0x21cf
  - "⇐": [t: "⠫⠪⠶⠶"]             # 0x21d0
  - "⇑": [t: "⠫⠣⠶⠶⠕"]           # 0x21d1
- - "⇒": [t: "⠫⠶⠶⠕"]            # 0x21d2
+ - "⇒": [T: "W⠶⠂"]            # 0x21d2 (RIGHTWARDS DOUBLE ARROW)
  - "⇓": [t: "⠫⠣⠶⠶⠕"]           # 0x21d3
- - "⇔": [t: "⠫⠪⠶⠶⠕"]          # 0x21d4
+ - "⇔": [T: "W⠐⠶⠂"]            # 0x21d4 (LEFT RIGHT DOUBLE ARROW)
  - "⇕": [t: "⠫⠣⠪⠶⠶⠕"]         # 0x21d5
  - "⇖": [t: "⠫⠘⠪⠶⠶"]           # 0x21d6
  - "⇗": [t: "⠫⠘⠶⠶⠕"]           # 0x21d7
  - "⇘": [t: "⠫⠰⠶⠶⠕"]           # 0x21d8
  - "⇙": [t: "⠫⠰⠪⠪⠒⠒"]           # 0x21d9
- - "⇚": [t: "⠫⠪⠪⠶⠶"]           # 0x21da  FIX: how to represent triple shafts?
- - "⇛": [t: "⠫⠶⠶⠕⠕"]           # 0x21db  FIX: how to represent triple shafts?
+ - "⇚": [t: "⠫⠪⠪⠶⠶"]           # 0x21da  # FIX: how to represent triple shafts?
+ - "⇛": [t: "⠫⠶⠶⠕⠕"]           # 0x21db  # FIX: how to represent triple shafts?
  - "⇜": [t: "⠫⠪⠢⠤⠔⠒⠢"]          # 0x21dc
  - "⇝": [t: "⠫⠢⠤⠔⠒⠢⠕"]          # 0x21dd
  - "⇞": [t: "⠳⠳⠈⠫⠣⠒⠒⠕⠻"]        # 0x21de
@@ -693,14 +740,14 @@
  - "⌟": [t: "⠈⠰⠾"]              # 0x231f
  - "〈": [t: "⠨⠨⠷"]              # 0x2329
  - "〉": [t: "⠨⠨⠾"]              # 0x232a
- - "⏞": [t: "⠨⠷"]              # 0x23de
- - "⏟": [t: "⠨⠾"]              # 0x23df
+ - "⏞": [T: "⠨⠪"]              # 0x23de (TOP CURLY BRACKET)
+ - "⏟": [T: "⠸⠪"]              # 0x23df (BOTTOM CURLY BRACKET)
  - "⎴": [t: "⠈⠷"]              # 0x23b4
  - "⎵": [t: "⠈⠾"]              # 0x23b5
  - "⟪": [t: "⠨⠨⠨⠷"]             # 0x27ea
  - "⟫": [t: "⠨⠨⠨⠾"]             # 0x27eb
- - "〈": [t: "⠨⠨⠷"]              # 0x3008
- - "〉": [t: "⠨⠨⠾"]              # 0x3009
+ - "〈": [T: "⠷⠄"]              # 0x3008 (LEFT ANGLE BRACKET)
+ - "〉": [T: "⠠⠾"]              # 0x3009 (RIGHT ANGLE BRACKET)
  - "《": [t: "⠨⠨⠨⠷"]             # 0x300a
  - "》": [t: "⠨⠨⠨⠾"]             # 0x300b
  - "「": [t: "⠈⠘⠷"]              # 0x300c
@@ -726,7 +773,7 @@
 
  - "℔": [t: "⠳"]                # 0x2114
  - "™": [t: "⠘⠞"]               # 0x2122
- - "Å": [t: "⠈⠠⠁"]              # 0x212b
+ - "Å": [T: "⠻⠷"]               # 0x212b (ANGSTROM SIGN)
  - "ℭ": [t: "⠸⠕"]               # 0x212D
  - "­": [t: "⠤"]                # 0xad   (soft hyphen)
  - " ": [t: "W"]                # 0x2000
@@ -758,19 +805,18 @@
  - "㉏": [t: "⠫⠸⠲⠸⠫⠫⠉⠸⠫⠼⠦⠴⠻⠻"]   # 0x324f
 
 
- - "¬": [t: ""]                 # 0x00AC (Not sign)
+ - "¬": [T: "⠹W"]                 # 0x00AC (Not sign, p. 34)
 
 
  - "‘": [t: "P⠠⠦"]               # 0x2018 (Left single quotation mark)
  - "’": [t: "P⠴⠠"]               # 0x2019 (Right single quotation mark)
- - "“": [t: "P⠦"]                # 0x201C (Left double quotation mark)
- - "”": [t: "P⠴"]                # 0x201D (Right double quotation mark)
- - "‰": [t: "`00"]
+#  - "“": [t: "P⠦"]                # 0x201C (Left double quotation mark)
+#  - "”": [t: "P⠴"]                # 0x201D (Right double quotation mark)
  - "ℏ": [t: "⠈⠓"]               # 0x210F (Planck constant over two pi)
  - "ℓ": [t: "TE⠇"]               # 0x2113 (Script small l (differs from 1d4c1: 4-56-123))
  - "ℝ": [t: ""]                 # 0x211D (Double-struck capital R (no nemeth double struck))
  - "∔": [t: "⠐⠬⠣⠡⠻"]            # 0x2214 (Dot plus)
- - "√": [t: "⠜"]                # 0x221A (Square root)
+ - "√": [T: "⠩"]                # 0x221A (Square root)
  - "∛": [t: "⠣⠒⠜"]              # 0x221B (Cube root)
  - "∜": [t: "⠣⠲⠜"]              # 0x221C (Fourth root)
  - "∡": [t: "⠫⠪⠸⠫⠫⠁⠻"]           # 0x2221 (Measured angle)
@@ -781,7 +827,6 @@
  - "≋": [t: "⠈⠱⠈⠱⠈⠱"]         # 0x224B (Triple tilde)
  - "≌": [t: "⠠⠱⠨⠅"]           # 0x224C (All equal to)
  - "≏": [t: "⠈⠣⠱"]            # 0x224F (Difference between)
- - "≔": [t: "⠐⠂⠨⠅"]           # 0x2254 (Colon equals)
  - "≕": [t: "⠨⠅⠐⠂"]           # 0x2255 (Equals colon)
  - "≖": [t: "⠀⠨⠡⠈⠨⠅⠻⠀"]         # 0x2256 (Ring in equal to)
  - "⊌": [t: "⠨⠬⠈⠫⠪⠒⠻"]          # 0x228C (Multiset)
@@ -814,7 +859,7 @@
  - "⊷": [t: "⠫⠡⠒⠨⠡"]          # 0x22B7 (Image of)
  - "⊸": [t: "⠫⠒⠨⠡"]           # 0x22B8 (Multimap)
 #  - "⊾": [t: ""]                 # 0x22BE (Right angle w arc)
- - "⊿": [t: "⠫⠞⠨⠗⠻"]            # 0x22BF (Right triangle)
+ - "⊿": [T: "⠻⠲⠲"]            # 0x22BF (Right triangle)
  - "⋅": [t: "⠡"]                # 0x22C5 (Dot operator)
  - "∙": [t: "⠡"]                # 0x2219   -- similar looking to 0x22c5, so using the same braille
  - "⋆": [t: "⠫⠎"]               # 0x22C6 (Star operator)
@@ -833,15 +878,15 @@
  - "⌊": [t: "⠈⠰⠷"]              # 0x230A (Left floor)
  - "⌋": [t: "⠈⠰⠾"]              # 0x230B (Right floor)
  - "■": [t: "⠫⠸⠲"]              # 0x25A0 (Filled square)
- - "▫": [t: "⠫⠲"]               # 0x25AB (Small white Square)
- - "□": [t: "⠫⠲"]               # 0x25A1 (Square)
- - "◻": [t: "⠫⠲"]               # 0x25FB (Square)
+ - "▫": [T: "⠻⠶"]               # 0x25AB (Small white Square)
+ - "□": [T: "⠻⠶"]               # 0x25A1 (Square)
+ - "◻": [T: "⠻⠶"]               # 0x25FB (Square)
  - "▬": [t: "⠫⠸⠗"]              # 0x25AC (Filled rectangle)
- - "▭": [t: "⠫⠗"]               # 0x25AD (Rectangle)
+ - "▭": [T: "⠻⠿"]               # 0x25AD (Rectangle)
  - "▲": [t: "⠫⠸⠞"]              # 0x25B2 (Black up-pointing triangle)
- - "△": [t: "⠫⠞"]               # 0x25B3 (White up-pointing triangle)
+ - "△": [T: "⠻⠲"]               # 0x25B3 (White up-pointing triangle)
  - "▼": [t: "⠸⠨⠫"]              # 0x25BC (Black down-pointing triangle)
- - "○": [t: "⠫⠉"]               # 0x25CB (White circle)
+ - "○": [T: "⠻⠴"]               # 0x25CB (White circle)
  - "●": [t: "⠫⠸⠉"]              # 0x25CF (Black circle)
  - "◫": [t: "⠫⠲⠸⠫⠳⠻"]           # 0x25EB (White square w vertical bisecting line)
 #  - "⊥": [t: "⠫⠏"]             # 0x27C2 (Perpendicular)
