@@ -983,7 +983,7 @@ pub struct MyXPath {
 
 impl fmt::Display for MyXPath {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "x: \"{}\"", self.rc.string);
+        return write!(f, "\"{}\"", self.rc.string);
     }
 }
 
@@ -1195,6 +1195,7 @@ impl MyXPath {
         return match result {
             Ok(val) => Ok( val ),
             Err(e) => {
+                debug!("MyXPath::trying to evaluate:\n  '{}'\n caused the error\n'{}'", self, e.to_string().replace("OwnedPrefixedName { prefix: None, local_part:", "").replace(" }", ""));
                 bail!( "{}\n\n",
                      // remove confusing parts of error message from xpath
                     e.to_string().replace("OwnedPrefixedName { prefix: None, local_part:", "").replace(" }", "") );
@@ -2706,7 +2707,7 @@ mod tests {
         assert_eq!(speech_pattern.tag_name, "math", "\ntag name failure");
         assert_eq!(speech_pattern.pattern.rc.string, ".", "\npattern failure");
         assert_eq!(speech_pattern.replacements.replacements.len(), 1, "\nreplacement failure");
-        assert_eq!(speech_pattern.replacements.replacements[0].to_string(), r#"x: "./*""#, "\nreplacement failure");
+        assert_eq!(speech_pattern.replacements.replacements[0].to_string(), r#""./*""#, "\nreplacement failure");
     }
 
     #[test]
