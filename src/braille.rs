@@ -46,6 +46,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
             "UEB" => ueb_cleanup(pref_manager, braille_string),
             "Vietnam" => vietnam_cleanup(pref_manager, braille_string),
             "CMU" => cmu_cleanup(pref_manager, braille_string), 
+            "Polish" => polish_cleanup(pref_manager, braille_string), 
             "Finnish" => finnish_cleanup(pref_manager, braille_string),
             "Swedish" => swedish_cleanup(pref_manager, braille_string),
             "LaTeX" => LaTeX_cleanup(pref_manager, braille_string),
@@ -1829,7 +1830,7 @@ static VIETNAM_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "c" => "",     // flag that what follows is an close indicator (used for standing alone rule)
     "b" => "",       // flag that what follows is an open or close indicator (used for standing alone rule)
     "," => "⠂",     // comma
-    "." => "⠲",     // period
+    "." => "⠠",     // period
     "-" => "-",     // hyphen
     "—" => "⠠⠤",   // normal dash (2014) -- assume all normal dashes are unified here [RUEB appendix 3]
     "―" => "⠐⠠⠤",  // long dash (2015) -- assume all long dashes are unified here [RUEB appendix 3]
@@ -1997,6 +1998,96 @@ fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> St
         // Unicode braille is set up so dot 1 is 2^0, dot 2 is 2^1, etc
         return ( (ch as u32 - 0x2800) >> 4 ) > 0;
     }
+}
+
+
+static MARBURG_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
+    // "S" => "XXX",    // sans-serif -- from prefs
+    "B" => "⠔",     // bold
+    "𝔹" => "⠬",     // blackboard -- from prefs
+    // "T" => "⠈",     // script
+    "I" => "⠔",     // italic -- same as bold
+    // "R" => "",      // roman
+    // "E" => "⠰",     // English
+    "1" => "⠐",     // Grade 1 symbol -- used here for a-j after number
+    "L" => "⠠",     // Lower case letter left in to assist in locating letters
+    "D" => "⠠",     // German (Gothic)
+    "G" => "⠈",     // Greek
+    "V" => "⠈⠬",    // Greek Variants
+    // "H" => "⠠⠠",    // Hebrew
+    // "U" => "⠈⠈",    // Russian
+    "C" => "⠨",      // capital
+    "𝐶" => "⠨",      // capital that never should get word indicator (from chemical element)
+    "N" => "⠼",      // number indicator
+    "n" => "",       // drop number follows -- no need for indicator
+    "𝑁" => "",       // continue number
+    // "t" => "⠱",     // shape terminator
+    "W" => "⠀",     // whitespace"
+    "𝐖"=> "⠀",     // whitespace
+    // "𝘄" => "⠀",    // add whitespace if char to the left has dots 1, 2, or 3 -- special rule handled separately, so commented out
+    "s" => "",     // typeface single char indicator
+    // "w" => "⠂",     // typeface word indicator
+    // "e" => "⠄",     // typeface & capital terminator 
+    // "o" => "",       // flag that what follows is an open indicator (used for standing alone rule)
+    // "c" => "",       // flag that what follows is an close indicator (used for standing alone rule)
+    // "b" => "",       // flag that what follows is an open or close indicator (used for standing alone rule)
+    "," => "⠂",     // comma
+    "." => "⠄",     // period
+    "-" => "⠤",     // hyphen
+    "—" => "⠤⠤",   // normal dash (2014) -- assume all normal dashes are unified here [RUEB appendix 3]
+    // "―" => "⠐⠤⠤",  // long dash (2015) -- assume all long dashes are unified here [RUEB appendix 3]
+    "#" => "⠼",      // signals to end/restart of numeric mode (mixed fractions)
+};
+
+
+fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
+    // lazy_static! {
+    //     static ref ADD_WHITE_SPACE: Regex = Regex::new(r"𝘄(.)|𝘄$").unwrap();
+    // }
+
+    debug!("polish_cleanup: start={}", raw_braille);
+    // let result = typeface_to_word_mode(&raw_braille);
+
+    // let result = result.replace("tW", "W");
+    let result = raw_braille.replace("CG", "⠘")
+                                .replace("𝔹C", "⠩")
+                                .replace("DC", "⠰");
+    // let result = result.replace("CC", "⠸");
+
+    // these typeforms need to get pulled from user-prefs as they are transcriber-defined
+    // let double_struck = pref_manager.pref_to_string("MARBURG_DoubleStruck");
+    // let sans_serif = pref_manager.pref_to_string("MARBURG_SansSerif");
+    // let fraktur = pref_manager.pref_to_string("MARBURG_Fraktur");
+
+    debug!("Before remove mode changes: '{}'", &result);
+    // This reuses the code just for getting rid of unnecessary "L"s and "N"s
+    let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
+    let result = result.replace("nN", "");
+    let result = result.replace("CL", "C");
+    debug!(" After remove mode changes: '{}'", &result);
+
+    let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
+        match MARBURG_INDICATOR_REPLACEMENTS.get(&cap[0]) {
+            None => {error!("REPLACE_INDICATORS and MARBURG_INDICATOR_REPLACEMENTS are not in sync"); ""},
+            Some(&ch) => ch,
+        }
+    });
+    // let result = ADD_WHITE_SPACE.replace_all(&result, |cap: &Captures| {
+    //     if cap.get(1).is_none() {
+    //         return "⠀".to_string();
+    //     } else {
+    //         // debug!("ADD_WHITE_SPACE match='{}', has left dots = {}", &cap[1], has_left_dots(cap[1].chars().next().unwrap()));
+    //         let mut next_chars = cap[1].chars();
+    //         let next_char = next_chars.next().unwrap();
+    //         assert!(next_chars.next().is_none());
+    //         return (if has_left_dots(next_char) {"⠀"} else {""}).to_string() + &cap[1];
+    //     }
+    // });
+    
+    // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces
+    let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
+    let result = result.trim_matches('⠀');
+    return result.to_string();
 }
 
 
@@ -2357,6 +2448,7 @@ impl BrailleChars {
             "Nemeth" => BrailleChars::get_braille_nemeth_chars(node, text_range),
             "UEB" => BrailleChars:: get_braille_ueb_chars(node, text_range),
             "CMU" => BrailleChars:: get_braille_cmu_chars(node, text_range),
+            "Polish" => BrailleChars:: get_braille_cmu_chars(node, text_range),
             "Vietnam" => BrailleChars:: get_braille_vietnam_chars(node, text_range),
             "Swedish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
             "Finnish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
@@ -3051,6 +3143,7 @@ impl Function for NeedsToBeGrouped {
         if let Node::Element(e) = node {
             let answer = match braille_code.as_str() {
                 "CMU" => NeedsToBeGrouped::needs_grouping_for_cmu(e, is_base),
+                "Polish" => NeedsToBeGrouped::needs_grouping_for_cmu(e, is_base),
                 "UEB" => NeedsToBeGrouped::needs_grouping_for_ueb(e, is_base),
                 "Finnish" => NeedsToBeGrouped::needs_grouping_for_finnish(e, is_base),
                 "Swedish" => NeedsToBeGrouped::needs_grouping_for_swedish(e, is_base),

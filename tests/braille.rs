@@ -33,5 +33,9 @@ mod braille {
         mod augenbit;
         mod other;
     }
+
+    mod Polish {
+        mod spec;
+    }
 }
 
