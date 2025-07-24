@@ -661,23 +661,21 @@ impl Intent {
         /// "lift" up the children any "TEMP_NAME" child -- could short circuit when only one child
         fn lift_children(result: Element) -> Element {
             // debug!("lift_children:\n{}", mml_to_string(result));
-            result.replace_children(
-                result.children().iter()
-                    .map(|&child_of_element| {
-                        match child_of_element {
-                            ChildOfElement::Element(child) => {
-                                if name(child) == "TEMP_NAME" {
-                                    assert_eq!(child.children().len(), 1);
-                                    child.children()[0]
-                                } else {
-                                    child_of_element
-                                }
-                            },
-                            _ => child_of_element,      // text()
+            // most likely there will be the same number of new children as result has, but there could be more
+            let mut new_children = Vec::with_capacity(2*result.children().len());
+            for child_of_element in result.children() {
+                match child_of_element {
+                    ChildOfElement::Element(child) => {
+                        if name(child) == "TEMP_NAME" {
+                            new_children.append(&mut child.children());  // almost always just one
+                        } else {
+                            new_children.push(child_of_element);
                         }
-                    })
-                    .collect::<Vec<ChildOfElement>>()
-            );
+                    },
+                    _ => new_children.push(child_of_element),      // text()
+                }
+            }
+            result.replace_children(new_children);
             return result;
         }
     }    
@@ -983,7 +981,7 @@ pub struct MyXPath {
 
 impl fmt::Display for MyXPath {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "x: \"{}\"", self.rc.string);
+        return write!(f, "\"{}\"", self.rc.string);
     }
 }
 
@@ -1195,6 +1193,7 @@ impl MyXPath {
         return match result {
             Ok(val) => Ok( val ),
             Err(e) => {
+                debug!("MyXPath::trying to evaluate:\n  '{}'\n caused the error\n'{}'", self, e.to_string().replace("OwnedPrefixedName { prefix: None, local_part:", "").replace(" }", ""));
                 bail!( "{}\n\n",
                      // remove confusing parts of error message from xpath
                     e.to_string().replace("OwnedPrefixedName { prefix: None, local_part:", "").replace(" }", "") );
@@ -2706,7 +2705,7 @@ mod tests {
         assert_eq!(speech_pattern.tag_name, "math", "\ntag name failure");
         assert_eq!(speech_pattern.pattern.rc.string, ".", "\npattern failure");
         assert_eq!(speech_pattern.replacements.replacements.len(), 1, "\nreplacement failure");
-        assert_eq!(speech_pattern.replacements.replacements[0].to_string(), r#"x: "./*""#, "\nreplacement failure");
+        assert_eq!(speech_pattern.replacements.replacements[0].to_string(), r#""./*""#, "\nreplacement failure");
     }
 
     #[test]

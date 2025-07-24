@@ -789,11 +789,12 @@ fn likely_chem_equation(mathml: Element) -> isize {
     // debug!("start likely_chem_equation:\n{}", mml_to_string(mathml));
 	// mrow -- check the children to see if we are likely to be a chemical equation
 
-    // concentrations should either be unscripted or have a superscript
+    // concentrations should either be unscripted or have a superscript that isn't a charge
     // they occur in mrows or mfracs
     if IsBracketed::is_bracketed(mathml, "[", "]", false, true) {
         let parent_name = name(get_parent(mathml));
-        if parent_name == "mfrac" || parent_name == "mrow" || parent_name == "msup" || parent_name == "math" {
+        if parent_name == "mfrac" || parent_name == "mrow"  || parent_name == "math" || 
+           (parent_name == "msup" && likely_chem_superscript(as_element(mathml.following_siblings()[0])) < 0){
             return if as_element(mathml.children()[0]).attribute(CHEM_FORMULA).is_some() {CHEMISTRY_THRESHOLD}  else {NOT_CHEMISTRY};
         }
     }
@@ -2294,6 +2295,7 @@ mod chem_tests {
 
     #[test]
     fn dichlorine_hexoxide() {
+        init_logger();
         let test = "<math><mrow>
             <msup>
             <mrow><mo>[</mo><mi>Cl</mi><msub><mi>O</mi><mn>2</mn></msub><mo>]</mo></mrow>
