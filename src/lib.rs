@@ -46,6 +46,9 @@ extern crate cfg_if;
 
 
 pub mod interface;
+#[cfg(feature = "include-zip")]
+pub use shim_filesystem::ZIPPED_RULE_FILES;
+
 mod canonicalize;
 mod infer_intent;
 pub mod speech;
@@ -55,11 +58,10 @@ mod prefs;
 mod tts;
 mod xpath_functions;
 mod definitions;
-mod pretty_print;
+pub mod pretty_print;
 mod chemistry;
 
 pub mod shim_filesystem; // really just for override_file_for_debugging_rules, but the config seems to throw it off
-pub use shim_filesystem::ZIPPED_RULE_FILES;
 pub use interface::*;
 
 #[cfg(test)]
@@ -79,31 +81,45 @@ pub fn abs_rules_dir_path() -> String {
     return std::env::current_exe().unwrap().parent().unwrap()
                 .join("../../../Rules")
                 .to_str().unwrap().to_string();
+    // use std::path::PathBuf;
+    // let out_dir = std::env::var_os("OUT_DIR").unwrap();
+    // println!("abs_rules_dir_path: out_dir={:?}", out_dir);
+    // let out_dir = PathBuf::from(&out_dir);
+    // return PathBuf::from(&out_dir).join("Rules").to_string_lossy().to_string();
 }
 
 #[cfg(test)]
-pub fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
-    use crate::interface::*;
+pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, block_separators: &str, decimal_separators: &str) -> bool {
+    use crate::{interface::*, pretty_print::mml_to_string};
     use sxd_document::parser;
     use crate::canonicalize::canonicalize;
     // this forces initialization
     crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
-    crate::speech::SPEECH_RULES.with(|_| true);
+    crate::speech::SPEECH_RULES.with(|rules|  rules.borrow_mut().read_files().unwrap());
+    set_preference("Language".to_string(), "en".to_string()).unwrap();
+    set_preference("BlockSeparators".to_string(), block_separators.to_string()).unwrap();
+    set_preference("DecimalSeparators".to_string(), decimal_separators.to_string()).unwrap();
     
     let package1 = &parser::parse(test).expect("Failed to parse test input");
     let mathml = get_element(package1);
-    trim_element(&mathml);
-    // debug!("test:\n{}", mml_to_string(&mathml));
+    trim_element(mathml, false);
+    // debug!("test:\n{}", mml_to_string(mathml));
     let mathml_test = canonicalize(mathml).unwrap();
    
     let package2 = &parser::parse(target).expect("Failed to parse target input");
     let mathml_target = get_element(package2);
-    trim_element(&mathml_target);
-    // debug!("target:\n{}", mml_to_string(&mathml_target));
+    trim_element(mathml_target, false);
+    // debug!("target:\n{}", mml_to_string(mathml_target));
 
-    match is_same_element(&mathml_test, &mathml_target) {
+    match is_same_element(mathml_test, mathml_target) {
         Ok(_) => return true,
-        Err(e) => panic!("{}", e),
+        Err(e) => panic!("{}\nResult:\n{}\nTarget:\n{}", e, mml_to_string(mathml_test), mml_to_string(mathml_target)),
     }
+}
+
+#[cfg(test)]
+// sets locale to be US standard
+pub fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
+    return are_strs_canonically_equal_with_locale(test, target, ", \u{00A0}\u{202F}", ".");
 }
 

@@ -15,21 +15,6 @@ fn letter_number_1_0_2() {
 }
 
 #[test]
-#[ignore]
-fn letter_number_1_1_1() {
-    // 5x=40b
-    let expr = "<math><mn>5</mn><mi>x</mi><mo>=</mo><mn>40</mn><mi>b</mi></math>";
-    test_braille("CMU", expr, "⠼⠑⠭⠶⠼⠙⠚⠐⠃");
-}
-
-#[test]
-#[ignore]
-fn dot_1_1_2() {
-    let expr = "<math><mover><mi>p</mi><mo>&#x2D9;</mo></mover></math>";
-    test_braille("CMU", expr, "⠈⠐⠏");
-}
-
-#[test]
 fn greek_1_2_1() {
     let expr = "<math><mi>π</mi></math>";
     test_braille("CMU", expr, "⠈⠏");
@@ -54,7 +39,7 @@ fn gothic_1_3_1() {
 }
 
 #[test]
-#[ignore]   // need to add a pref that 
+#[ignore]   // need to add a transcriber note pref for different fonts 
 fn double_struck_1_3_2() {
     let expr = "<math><mi>𝕔𝕎</mi></math>";
     test_braille("CMU", expr, "⠬⠉⠩⠺");
@@ -70,13 +55,13 @@ fn number_3_1_1() {
 #[test]
 fn number_2_2_1() {
     let expr = "<math><mn>31.720</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠁⠄⠛⠃⠚");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "."), ("BlockSeparators", ", ")], expr, "⠼⠉⠁⠄⠛⠃⠚");
 }
 
 #[test]
 fn number_2_2_2() {
     let expr = "<math><mn>3 802 197</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠄⠓⠚⠃⠄⠁⠊⠛");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "."), ("BlockSeparators", ", ")], expr, "⠼⠉⠄⠓⠚⠃⠄⠁⠊⠛");
 }
 
 #[test]
@@ -100,30 +85,32 @@ fn number_2_2_5() {
 #[test]
 fn number_2_2_6() {
     let expr = "<math><mo>-</mo><mn>25 347</mn></math>";
-    test_braille("CMU", expr, "⠤⠼⠃⠑⠄⠉⠙⠛");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "."), ("BlockSeparators", ", ")], expr, "⠤⠼⠃⠑⠄⠉⠙⠛");
 }
 
 #[test]
 fn number_2_3_1() {
     let expr = "<math><mn>3.2</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠂⠃");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "."), ("BlockSeparators", ", ")], expr, "⠼⠉⠂⠃");
+
 }
 
 #[test]
 fn number_2_3_2() {
     let expr = "<math><mn>3,2</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠂⠃");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠉⠂⠃");
 }
 
 #[test]
 fn number_2_3_3() {
     let expr = "<math><mn>3’2</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠂⠃");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "’,"), ("BlockSeparators", ". ")], expr, "⠼⠉⠂⠃");
 }
 
 #[test]
+#[ignore]
 fn number_2_3_3_wiris() {
-    let expr = "<math><mn>3</mn><mo>'</mo><mn>2</mn></math>";
+    let expr = "<math><mn>3</mn><mo>’</mo><mn>2</mn></math>";
     test_braille("CMU", expr, "⠼⠉⠂⠃");
 }
 
@@ -168,6 +155,13 @@ fn numeric_fraction_2_4_3() {
 fn letter_number_2_5_b_1() {
     let expr = "<math><mn>1B4D</mn></math>";
     test_braille("CMU", expr, "⠼⠁⠨⠃⠙⠨⠙");
+}
+
+#[test]
+#[ignore]  // really requires a transcriber's note
+fn color_2_5_c_2() {
+    let expr = "<math><mn>3</mn><mn mathcolor='#FF0000'>4</mn><mn>2</mn><mn mathcolor='#00FF00'>9</mn></math>";
+    test_braille("CMU", expr, "⠼⠉⠩⠙⠃⠰⠊");
 }
 
 
@@ -266,7 +260,7 @@ fn script_4_2_1_11() {
 fn script_4_2_1_12() {
     // z^{-1/2}
     let expr = "<math><msup><mi>z</mi><mrow><mo>-</mo><mn>1</mn><mo>/</mo><mn>2</mn></mrow></msup></math>";
-    test_braille("CMU", expr, "⠵⠡⠤⠼⠁⠆");
+    test_braille("CMU", expr, "⠵⠡⠤⠼⠁⠆⠀");
 }
 
 #[test]
@@ -274,21 +268,6 @@ fn script_4_2_1_13() {
     // z_i_0
     let expr = "<math><msub><mi>z</mi><msub><mi>i</mi><mn>0</mn></msub></msub></math>";
     test_braille("CMU", expr, "⠵⠌⠊⠌⠼⠚");
-}
-
-#[test]
-fn script_4_2_2_1() {
-    // just first entry because 2D not supported yet
-    let expr = "<math><msub><mi>a</mi><mn>11</mn></msub></math>";
-    test_braille("CMU", expr, "⠁⠂⠂");
-}
-
-#[test]
-#[ignore] // this appears to be optional -- implementation seems subjective especially when not in a table
-fn script_4_2_2_2() {
-    // just first entry because 2D not supported yet
-    let expr = "<math><msub><mi>a</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow></msub></math>";
-    test_braille("CMU", expr, "⠁⠂⠂");
 }
 
 #[test]
@@ -340,7 +319,7 @@ fn sup_4_3_1_8() {
 
 #[test]
 fn sup_4_3_1_9() {
-    // z^{****}
+    // z^{****} -- need to convert to 4*
     let expr = "<math><msup><mi>z</mi><mrow><mo>*</mo><mo>*</mo><mo>*</mo><mo>*</mo></mrow></msup></math>";
     test_braille("CMU", expr, "⠵⠡⠼⠙⠲⠄");
 }
@@ -482,39 +461,17 @@ fn scripts_4_3_4_2() {
 #[test]
 fn scripts_4_3_4_3() {
     let expr = "<math>
-        <msub><mrow/><mrow><mo>+</mo><mo>+</mo></mrow></msub>
-        <msup>
-        <mi>z</mi>
-        <msup><mi/><mo>&#x2033;</mo></msup>
-        </msup>
+        <mmultiscripts>
+            <mi>z</mi>
+            <none/>
+            <mo>″</mo>
+            <mprescripts/>
+            <mrow><mo>+</mo><mo>+</mo></mrow>
+            <none/>
+        </mmultiscripts>
     </math>";
-    test_braille("CMU", expr, "⠵⠳⠳⠂⠌⠖⠖⠄");
+    test_braille("CMU", expr, "⠵⠳⠳⠠⠌⠖⠖⠄");
 }
-
-#[test]
-fn scripts_4_4_2_1() {
-    let expr = "<math><msup><msub><mi>T</mi><mi>r</mi></msub><mi>s</mi></msup></math>";
-    test_braille("CMU", expr, "⠨⠞⠌⠗⠘⠡⠎");
-}
-
-#[test]
-fn mmultiscripts_4_4_2_1() {
-    let expr = "<math><mmultiscripts><mi>T</mi><mi>r</mi><none/><none/><mi>s</mi></mmultiscripts></math>";
-    test_braille("CMU", expr, "⠨⠞⠌⠗⠘⠡⠎");
-}
-
-#[test]
-fn scripts_4_4_2_2() {
-    let expr = "<math><msub><msup><mi>T</mi><mi>r</mi></msup><mi>s</mi></msub></math>";
-    test_braille("CMU", expr, "⠨⠞⠡⠗⠰⠌⠎");
-}
-
-#[test]
-fn mmultiscripts_4_4_2_2() {
-    let expr = "<math><mmultiscripts><mi>T</mi><none/><mi>r</mi><mi>s</mi><none/></mmultiscripts></math>";
-    test_braille("CMU", expr, "⠨⠞⠡⠗⠰⠌⠎");
-}
-
 
 #[test]
 fn both_scripts_4_4_1_1() {
@@ -548,7 +505,7 @@ fn both_scripts_4_4_1_3() {
 
 #[test]
 fn both_scripts_4_4_1_4() {
-    let expr = "<math><msup><mi>z</mi><msup><mo>'</mo><mn>3</mn></msup></msup></math>";
+    let expr = "<math><msup><mrow><mi>z</mi><mo>'</mo></mrow><mn>3</mn></msup></math>";
     test_braille("CMU", expr, "⠵⠳⠡⠼⠉");
 }
 
@@ -573,7 +530,7 @@ fn both_scripts_4_4_1_6() {
         <mn>2</mn>
         </msup>
     </math>";
-    test_braille("CMU", expr, "⠈⠉⠷⠵⠳⠌⠼⠚⠾⠡⠼⠃");
+    test_braille("CMU", expr, "⠈⠉⠣⠵⠳⠌⠼⠚⠜⠡⠼⠃");
 }
 
 #[test]
@@ -582,13 +539,38 @@ fn both_scripts_4_4_1_7() {
             <mover><msubsup><mi>z</mi><mn>0</mn><mi>&#x2032;</mi></msubsup><mo>&#x2015;</mo></mover>
             <mn>2</mn>
         </msup></math>";
-    test_braille("CMU", expr, "⠈⠉⠢⠵⠌⠼⠚⠔");
+    test_braille("CMU", expr, "⠈⠉⠢⠵⠳⠌⠼⠚⠔⠡⠼⠃");
 }
+
+#[test]
+fn scripts_4_4_2_1() {
+    let expr = "<math><msup><msub><mi>T</mi><mi>r</mi></msub><mi>s</mi></msup></math>";
+    test_braille("CMU", expr, "⠨⠞⠌⠗⠘⠡⠎");
+}
+
+#[test]
+fn mmultiscripts_4_4_2_1() {
+    let expr = "<math><mmultiscripts><mi>T</mi><mi>r</mi><none/><none/><mi>s</mi></mmultiscripts></math>";
+    test_braille("CMU", expr, "⠨⠞⠌⠗⠘⠡⠎");
+}
+
+#[test]
+fn scripts_4_4_2_2() {
+    let expr = "<math><msub><msup><mi>T</mi><mi>r</mi></msup><mi>s</mi></msub></math>";
+    test_braille("CMU", expr, "⠨⠞⠡⠗⠰⠌⠎");
+}
+
+#[test]
+fn mmultiscripts_4_4_2_2() {
+    let expr = "<math><mmultiscripts><mi>T</mi><none/><mi>r</mi><mi>s</mi><none/></mmultiscripts></math>";
+    test_braille("CMU", expr, "⠨⠞⠡⠗⠰⠌⠎");
+}
+
 
 #[test]
 fn scripts_4_4_2_3() {
     let expr = "<math><msubsup><mi>T</mi><mi>s</mi><mi>r</mi></msubsup></math>";
-    test_braille("CMU", expr, "⠈⠉⠢⠵⠳⠌⠼⠚⠔⠡⠼⠃");
+    test_braille("CMU", expr, "⠨⠞⠌⠎⠡⠗");
 }
 
 #[test]
@@ -988,6 +970,12 @@ fn logic_8_2_2() {
 }
 
 #[test]
+fn inverse_9_1_1() {
+    let expr = "<math><mover><mo>⟶</mo><mi>f</mi></mover></math>";
+    test_braille("CMU", expr, "⠒⠋⠒⠂");
+}
+
+#[test]
 fn list_9_1_2() {
     let expr = "<math><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>)</mo></math>";
     test_braille("CMU", expr, "⠣⠭⠌⠼⠁⠀⠂⠭⠌⠼⠃⠜");
@@ -999,122 +987,45 @@ fn list_9_1_3() {
     test_braille("CMU", expr, "⠣⠼⠁⠆⠀⠂⠼⠉⠆⠀⠜");
 }
 
-
-
-// *********************************************************
-
 #[test]
-#[ignore]
-fn greek_dot_1_1_4() {
-    let expr = "<math><mover><mi>π</mi><mo>&#x2D9;</mo></mover></math>";
-    test_braille("CMU", expr, "⠈⠈⠏");
+fn function_map_9_1_4() {
+    let expr = "<math><mi>f</mi><mo>:</mo><mi>A</mi><mo>⟶</mo><mi>B</mi></math>";
+    test_braille("CMU", expr, "⠋⠐⠂⠨⠁⠒⠒⠂⠨⠃");
 }
 
 #[test]
-#[ignore]
-fn strike_1_1_5() {
-    let expr = "<math><menclose notation=\"horizontalstrike\"><mi>p</mi></menclose></math>";
-    test_braille("CMU", expr, "⠘⠐⠏");
-}
-#[test]
-fn strike_1_1_7() {
-    let expr = "<math><menclose notation=\"horizontalstrike\"><mi>Ω</mi></menclose></math>";
-    test_braille("CMU", expr, "⠘⠘⠺");
-}
-#[test]
-#[ignore]
-fn strike_1_1_8() {
-    let expr = "<math><menclose notation=\"horizontalstrike\"><mi>β</mi></menclose></math>";
-    test_braille("CMU", expr, "⠘⠈⠃");
+fn arrow_inverse_9_1_6() {
+    // note: there appears to be an abbreviated form for x^{-1}, maybe for 'x' being a single letter? Not explained in the spec.
+    let expr = "<math><mi>B</mi><mover><mo>⟶</mo><msup><mi>f</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup></mover><mi>A</mi></math>";
+    test_braille("CMU", expr, "⠨⠃⠒⠋⠡⠤⠼⠁⠒⠂⠨⠁");
 }
 
 #[test]
-#[ignore]
-fn greater_o_1_1_9() {
-    let expr = "<math><mi>a</mi><mo>≫</mo><mi>o</mi></math>";
-    test_braille("CMU", expr, "⠁⠕⠕⠐⠕");
-}
-
-
-#[test]
-#[ignore]
-fn grouping_1_3_3() {
-    let expr = "<math><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mrow><mi>c</mi><mo>+</mo><mi>d</mi></mrow></mfrac></math>";
-    test_braille("CMU", expr, "⠢⠁⠖⠃⠔⠲⠢⠉⠖⠙⠔");
+fn arrow_9_1_8() {
+    let expr = "<math><mi>A</mi><mo>⟷</mo><mi>B</mi></math>";
+    test_braille("CMU", expr, "⠨⠁⠐⠒⠒⠂⠨⠃");
 }
 
 #[test]
-#[ignore]
-fn grouping_1_3_4() {
-    let expr = "<math><mfrac>
-            <mfenced><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></mfenced>
-            <mfenced><mrow><mi>c</mi><mo>+</mo><mi>d</mi></mrow></mfenced>
-        </mfrac></math>";
-    test_braille("CMU", expr, "⠣⠁⠖⠃⠜⠲⠣⠉⠖⠙⠜");
+fn congruence_9_1_10() {
+    let expr = "<math><mi>f</mi><mo>&#x2261;</mo><mn>0</mn></math>";
+    test_braille("CMU", expr, "⠋⠶⠶⠼⠚");
 }
 
 #[test]
-#[ignore]
-fn grouping_1_3_5() {
-    let expr = "<math><mfrac>
-            <mrow><mi>a</mi><mo>+</mo>
-                <mfrac><mi>b</mi><mrow><mi>c</mi><mo>+</mo><mi>d</mi></mrow></mfrac>
-            </mrow>
-            <mi>e</mi>
-        </mfrac></math>";
-    test_braille("CMU", expr, "⠢⠁⠖⠃⠲⠢⠉⠖⠙⠔⠔⠲⠑");
-}
-
-
-
-// FIX: add tests for 2.4.2 (Special cases for scripts)
-
-// FIX: add 2.6 (Chemistry)
-
-// FIX: add 3.2.1 (repeating numbers)
-
-//  FIX: add 3.4 math variants
-
-
-// FIX: add 3.6 ordinals (drop numbers)
-
-// FIX: ad 3.7 Roman numerals
-
-#[test]
-fn units_3_8_1() {
-    let expr = "<math><mn>8</mn><mi mathvariant='normal'>m</mi></math>";
-    test_braille("CMU", expr, "⠼⠓⠍");
+fn composition_9_1_11() {
+    let expr = "<math><mi>f</mi><mo>&#x2218;</mo><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo>
+                        <mi>f</mi><mo>(</mo><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>)</mo></math>";
+    test_braille("CMU", expr, "⠋⠠⠆⠛⠣⠭⠜⠶⠋⠣⠛⠣⠭⠜⠜");
 }
 
 #[test]
-fn units_3_8_3() {
-    let expr = "<math><mn>12</mn><mi>cm</mi></math>";
-    test_braille("CMU", expr, "⠼⠁⠃⠐⠉⠍");
+fn interval_9_1_12() {
+    // note: there appears to be an abbreviated form for x^{-1}, maybe for 'x' being a single letter? Not explained in the spec.
+    let expr = "<math><mo>]</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>[</mo></math>";
+    test_braille("CMU", expr, "⠾⠁⠀⠂⠃⠷");
 }
 
-#[test]
-fn units_3_8_6() {
-    let expr = "<math><mn>1</mn><msup><mtext>km</mtext><mn>2</mn></msup></math>";
-    test_braille("CMU", expr, "⠼⠁⠅⠍⠡⠼⠃");
-}
-
-#[test]
-fn units_3_8_14() {
-    let expr = "<math><mn>17</mn><mo>&#xB0;</mo></math>";
-    test_braille("CMU", expr, "⠼⠁⠛⠴");
-}
-
-#[test]
-fn units_3_8_15() {
-    let expr = "<math><mn>2</mn><mo>&#xB0;</mo><mn>4</mn><mo>'</mo></math>";
-    test_braille("CMU", expr, "⠼⠃⠴⠼⠙⠳");
-}
-
-#[test]
-fn units_3_8_19() {
-    let expr = "<math><mtext>h</mtext><mo>.</mo><mn>5</mn><mo>.</mo><mn>30</mn></math>";
-    test_braille("CMU", expr, "⠓⠄⠼⠑⠄⠼⠉⠚");
-}
 
 #[test]
 fn limit_line_over_9_2_0() {
@@ -1142,7 +1053,7 @@ fn limit_9_2_4() {
 
 #[test]
 fn limit_9_2_5() {
-    let expr = "<math><munder><mi>lim</mi><mrow><mi>x</mi><mo>&#x2192;</mo><msup><mn>0</mn><mo>-</mo></msup></mrow></munder></math>";
+    let expr = "<math><munder><mi>lim</mi><mrow><mi>x</mi><mo>⟶</mo><msup><mn>0</mn><mo>-</mo></msup></mrow></munder></math>";
     test_braille("CMU", expr, "⠇⠊⠍⠄⠭⠒⠂⠼⠚⠤⠄⠱");
 }
 
@@ -1153,28 +1064,34 @@ fn limit_9_2_6() {
 }
 
 #[test]
-fn deriv_7_3_1() {
-    let expr = "<math><mfrac><mi>d</mi><mrow><mi>d</mi><mi>x</mi></mrow></mfrac></math>";
-    test_braille("CMU", expr, "⠙⠲⠢⠙⠭⠔");
+fn limit_9_2_8() {
+    let expr = "<math>
+    <munder><mo>lim</mo><mrow><mi>x</mi><mo>⟶</mo><mi>c</mi></mrow></munder>
+    <mo>(</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>)</mo>
+    <mo>=</mo>
+    <munder><mo>lim</mo><mrow><mi>x</mi><mo>⟶</mo><mi>c</mi></mrow></munder>
+    <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo>
+    <munder><mo>lim</mo><mrow><mi>x</mi><mo>⟶</mo><mi>c</mi></mrow></munder>
+    <mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo>
+  </math>";
+    test_braille("CMU", expr, "⠇⠊⠍⠄⠭⠒⠂⠉⠱⠣⠋⠣⠭⠜⠖⠛⠣⠭⠜⠜⠶⠇⠊⠍⠄⠭⠒⠂⠉⠱⠋⠣⠭⠜⠖⠇⠊⠍⠄⠭⠒⠂⠉⠱⠛⠣⠭⠜");
 }
 
 #[test]
-fn deriv_7_3_2() {
+fn deriv_9_3_1() {
     let expr = "<math><mfrac><mrow><mi>d</mi><mi>f</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac></math>";
     test_braille("CMU", expr, "⠢⠙⠋⠔⠲⠢⠙⠭⠔");
 }
 
+
 #[test]
-fn deriv_7_3_3() {
-    let expr = "<math><mfrac>
-            <msup><mi>d</mi><mi>n</mi></msup>
-            <mrow><mi>d</mi><msup><mi>x</mi><mi>n</mi></msup></mrow>
-        </mfrac></math>";
-    test_braille("CMU", expr, "⠙⠡⠝⠲⠢⠙⠭⠡⠝⠔");
+fn deriv_9_3_2() {
+    let expr = "<math><mfrac><mi>d</mi><mrow><mi>d</mi><mi>x</mi></mrow></mfrac><mi>f</mi></math>";
+    test_braille("CMU", expr, "⠙⠲⠢⠙⠭⠔⠋");
 }
 
 #[test]
-fn deriv_7_3_4() {
+fn deriv_9_3_5() {
     let expr = "<math><mfrac>
             <mrow><msup><mi>d</mi><mi>n</mi></msup><mi>f</mi></mrow>
             <mrow><mi>d</mi><msup><mi>x</mi><mi>n</mi></msup></mrow>
@@ -1183,39 +1100,47 @@ fn deriv_7_3_4() {
 }
 
 #[test]
-fn partial_7_3_9() {
-    // Note: fixed apparent bug with division symbol in manual
+fn deriv_9_3_6() {
     let expr = "<math><mfrac>
-            <msup><mo>&#x2202;</mo><mn>2</mn></msup>
-            <mrow><mo>&#x2202;</mo><mi>x</mi><mo>&#x2202;</mo><mi>y</mi></mrow>
+        <msup><mi>d</mi><mi>n</mi></msup>
+        <mrow><mi>d</mi><msup><mi>x</mi><mi>n</mi></msup></mrow>
+    </mfrac><mi>f</mi></math>";
+    test_braille("CMU", expr, "⠙⠡⠝⠲⠢⠙⠭⠡⠝⠔⠋");
+}
+
+
+#[test]
+fn partial_9_3_15() {
+    let expr = "<math><mfrac>
+            <msup><mo>∂</mo><mn>2</mn></msup>
+            <mrow><mo>∂</mo><mi>x</mi><mo>∂</mo><mi>y</mi></mrow>
         </mfrac></math>";
     test_braille("CMU", expr, "⠸⠙⠡⠼⠃⠲⠢⠸⠙⠭⠸⠙⠽⠔");
 }
 
 #[test]
-fn partial_7_3_10() {
-    // Note: fixed apparent bug with division symbol in manual
+fn partial_9_3_16() {
     let expr = "<math><mfrac>
-            <mrow><msup><mo>&#x2202;</mo><mn>2</mn></msup><mi>f</mi></mrow>
-            <mrow><mo>&#x2202;</mo><mi>x</mi><mo>&#x2202;</mo><mi>y</mi></mrow>
+            <mrow><msup><mo>∂</mo><mn>2</mn></msup><mi>f</mi></mrow>
+            <mrow><mo>∂</mo><mi>x</mi><mo>∂</mo><mi>y</mi></mrow>
         </mfrac></math>";
     test_braille("CMU", expr, "⠢⠸⠙⠡⠼⠃⠐⠋⠔⠲⠢⠸⠙⠭⠸⠙⠽⠔");
 }
 
 #[test]
-fn partial_7_3_11() {
+fn partial_9_3_17() {
     let expr = "<math><mfrac>
-            <msup><mo>&#x2202;</mo><mrow><mi>m</mi><mo>+</mo><mi>n</mi></mrow></msup>
-            <mrow><mo>&#x2202;</mo><msup><mi>x</mi><mi>m</mi></msup><mo>&#x2202;</mo><msup><mi>y</mi><mi>n</mi></msup></mrow>
+            <msup><mo>∂</mo><mrow><mi>m</mi><mo>+</mo><mi>n</mi></mrow></msup>
+            <mrow><mo>∂</mo><msup><mi>x</mi><mi>m</mi></msup><mo>∂</mo><msup><mi>y</mi><mi>n</mi></msup></mrow>
         </mfrac></math>";
     test_braille("CMU", expr, "⠸⠙⠡⠢⠍⠖⠝⠔⠲⠢⠸⠙⠭⠡⠍⠸⠙⠽⠡⠝⠔");
 }
 
 #[test]
-fn partial_7_3_12() {
+fn partial_9_3_18() {
     let expr = "<math><mfrac>
-            <mrow><msup><mo>&#x2202;</mo><mrow><mi>m</mi><mo>+</mo><mi>n</mi></mrow></msup><mi>f</mi></mrow>
-            <mrow><mo>&#x2202;</mo><msup><mi>x</mi><mi>m</mi></msup><mo>&#x2202;</mo><msup><mi>y</mi><mi>n</mi></msup></mrow>
+            <mrow><msup><mo>∂</mo><mrow><mi>m</mi><mo>+</mo><mi>n</mi></mrow></msup><mi>f</mi></mrow>
+            <mrow><mo>∂</mo><msup><mi>x</mi><mi>m</mi></msup><mo>∂</mo><msup><mi>y</mi><mi>n</mi></msup></mrow>
         </mfrac></math>";
     test_braille("CMU", expr, "⠢⠸⠙⠡⠢⠍⠖⠝⠔⠋⠔⠲⠢⠸⠙⠭⠡⠍⠸⠙⠽⠡⠝⠔");
 }
@@ -1255,130 +1180,317 @@ fn integral_9_4_2() {
 }
 
 #[test]
-fn succession_7_5_1_2() {
+fn succession_10_1_1_1() {
     let expr = "<math><mo>(</mo><msub><mi>s</mi><mi>n</mi></msub><mo>)</mo></math>";
     test_braille("CMU", expr, "⠣⠎⠌⠝⠜");
 }
 
 #[test]
-fn lim_7_5_1_3() {
-    let expr = "<math><munder><mi>lim</mi><mrow><mi>n</mi><mo>&#x2192;</mo><mo>&#x221E;</mo></mrow></munder>
-                        <msub><mi>s</mi><mi>n</mi></msub></math>";
-    test_braille("CMU", expr, "⠇⠊⠍⠄⠝⠒⠂⠼⠳⠱⠎⠌⠝");
+fn lim_10_1_1_6() {
+    let expr = "<math><munder><mi>lim</mi><mrow><mi>n</mi><mo>⟶</mo><mo>&#x221E;</mo></mrow></munder>
+                        <msub><mi>S</mi><mi>n</mi></msub></math>";
+    test_braille("CMU", expr, "⠇⠊⠍⠄⠝⠒⠂⠼⠳⠱⠨⠎⠌⠝");
 }
 
 #[test]
-fn log_7_5_2_1() {
-    let expr = "<math><mi>log</mi><mi>x</mi></math>";
-    test_braille("CMU", expr, "⠇⠕⠛⠄⠭");
+fn series_10_1_3_1() {
+    let expr = "<math>
+            <munderover><mo>&#x2211;</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mo>&#x221E;</mo></munderover>
+            <mfrac><mn>1</mn><msup><mi>n</mi><mn>2</mn></msup></mfrac><mo>=</mo>
+            <munder><mi>lim</mi><mrow><mi>k</mi><mo>⟶</mo><mo>&#x221E;</mo></mrow></munder>
+            <munderover><mo>&#x2211;</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>k</mi></munderover>
+            <mfrac><mn>1</mn><msup><mi>n</mi><mn>2</mn></msup></mfrac><mo>=</mo>
+            <mn>1</mn><mo>+</mo>
+            <mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo>
+            <mfrac><mn>1</mn><mn>9</mn></mfrac><mo>+</mo>
+            <mfrac><mn>1</mn><mn>16</mn></mfrac><mo>+</mo>
+        <mo>&#x22EF;</mo></math>";
+    // it looks like the spec is wrong -- correct to add "⠀⠖" near the end
+    test_braille("CMU", expr, "⠘⠎⠝⠶⠼⠁⠒⠼⠳⠱⠼⠁⠲⠝⠡⠼⠃⠶⠇⠊⠍⠄⠅⠒⠂⠼⠳⠱⠘⠎⠝⠶⠼⠁⠒⠅⠱⠼⠁⠲⠝⠡⠼⠃⠶⠼⠁⠖⠼⠁⠲⠀⠖⠼⠁⠔⠀⠖⠼⠁⠂⠖⠀⠖⠄⠄⠄");
 }
 
-#[test]
-fn log_7_5_2_2() {
-    let expr = "<math><mi>antilog</mi><mi>x</mi></math>";
-    test_braille("CMU", expr, "⠁⠝⠞⠊⠇⠕⠛⠄⠭");
-}
 
 #[test]
-fn log_7_5_2_3() {
-    let expr = "<math><mi>alog</mi><mi>x</mi></math>";
-    test_braille("CMU", expr, "⠁⠇⠕⠛⠄⠭");
-}
-
-#[test]
-fn log_7_5_2_5() {
-    let expr = "<math><mi>ln</mi><mi>x</mi></math>";
-    test_braille("CMU", expr, "⠇⠝⠄⠭");
-}
-
-#[test]
-fn log_7_5_2_8() {
+fn log_10_2_2() {
     let expr = "<math><msub><mi>log</mi><mi>b</mi></msub><mi>x</mi></math>";
     test_braille("CMU", expr, "⠇⠕⠛⠄⠃⠱⠭");
 }
 
 #[test]
-fn log_7_5_2_10() {
-    let expr = "<math><mi>log</mi><mfrac><mi>x</mi><mi>y</mi></mfrac></math>";
-    test_braille("CMU", expr, "⠇⠕⠛⠄⠢⠭⠲⠽⠔");
+fn log_10_2_4() {
+    let expr = "<math><mi>Ln</mi><mi>x</mi></math>";
+    test_braille("CMU", expr, "⠇⠝⠄⠭");
 }
 
 #[test]
-fn log_7_5_2_11() {
-    let expr = "<math><mi>log</mi><mfrac><mn>1</mn><mn>100</mn></mfrac><mo>=</mo><mo>-</mo><mn>2</mn></math>";
-    test_braille("CMU", expr, "⠇⠕⠛⠄⠼⠂⠁⠚⠚⠶⠤⠼⠃");
+fn log_10_2_5() {
+    let expr = "<math><mi>ln</mi><mi>x</mi></math>";
+    test_braille("CMU", expr, "⠇⠝⠄⠭");
 }
 
 #[test]
-fn log_7_5_2_12() {
-    let expr = "<math><msub><mi>log</mi><mn>4</mn></msub><mn>64</mn></math>";
-    test_braille("CMU", expr, "⠇⠕⠛⠄⠼⠙⠱⠼⠋⠙");
+fn log_10_2_6() {
+    let expr = "<math><mi>alog</mi><mi>x</mi></math>";
+    test_braille("CMU", expr, "⠁⠇⠕⠛⠄⠭");
 }
 
 #[test]
-fn trig_7_5_3_1() {
-    let expr = "<math><mi>sen</mi><mo>(</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo>)</mo></math>";
-    test_braille("CMU", expr, "⠎⠑⠝⠄⠣⠁⠖⠃⠜");
-}
-
-#[test]
-fn trig_7_5_3_3() {
-    let expr = "<math><mi>tan</mi><mo>(</mo><mi>α</mi><mo>)</mo><mo>=</mo><mfrac>
-                <mrow><mi>sin</mi><mo>(</mo><mi>α</mi><mo>)</mo></mrow>
-                <mrow><mi>cos</mi><mo>(</mo><mi>α</mi><mo>)</mo></mrow>
-                </mfrac></math>";
-    test_braille("CMU", expr, "⠞⠁⠝⠄⠣⠈⠁⠜⠶⠎⠊⠝⠄⠣⠈⠁⠜⠲⠉⠕⠎⠄⠣⠈⠁⠜");
-}
-
-#[test]
-fn example_7_7_1() {
-    let expr = "<math>
-        <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo>
-        <mfrac>
-            <mrow><mi>sen</mi><mi>x</mi></mrow>
-            <mrow><msup><mi>sen</mi><mn>2</mn></msup><mi>x</mi><mo>+</mo><mn>1</mn></mrow>
-        </mfrac>
-    </math>";
-    test_braille("CMU", expr, "⠋⠣⠭⠜⠶⠎⠑⠝⠄⠭⠲⠢⠎⠑⠝⠄⠡⠼⠃⠭⠖⠼⠁⠔");
-}
-
-#[test]
-fn log_7_7_2() {
-    let expr = "<math><mi>log</mi><mfrac>
-            <mrow><mi>r</mi><mo>+</mo><mn>1</mn></mrow>
-            <mrow><mi>r</mi><mo>-</mo><mn>1</mn></mrow>
-        </mfrac></math>";
-    test_braille("CMU", expr, "⠇⠕⠛⠄⠢⠢⠗⠖⠼⠁⠔⠲⠢⠗⠤⠼⠁⠔⠔");
-}
-
-#[test]
-fn log_7_7_3() {
-    let expr = "<math><mi>log</mi><mfenced><mfrac>
-            <mrow><mi>r</mi><mo>+</mo><mn>1</mn></mrow>
-            <mrow><mi>r</mi><mo>-</mo><mn>1</mn></mrow>
-        </mfrac></mfenced></math>";
-    test_braille("CMU", expr, "⠇⠕⠛⠄⠣⠢⠗⠖⠼⠁⠔⠲⠢⠗⠤⠼⠁⠔⠜");
+fn log_10_2_7() {
+    let expr = "<math><mi>antilog</mi><mi>x</mi></math>";
+    test_braille("CMU", expr, "⠁⠝⠞⠊⠇⠕⠛⠄⠭");
 }
 
 #[test]
 #[ignore]
-fn sum_7_7_5() {
+fn log_10_2_10() {
+    let expr = "<math><mi>log</mi><mn>0,2</mn><mo>=</mo><mover><mn>1</mn><mo>&#xAF;</mo></mover><mo>,</mo><mn>30103</mn></math>";
+    test_braille("CMU", expr, "⠇⠕⠛⠄⠼⠚⠂⠃⠶⠼⠥⠂⠉⠚⠁⠚⠉");
+}
+
+#[test]
+fn ray_11_1_1() {
+    let expr = "<math><mover><mi>r</mi><mo>⟷</mo></mover></math>";
+    test_braille("CMU", expr, "⠐⠒⠂⠗");
+}
+
+#[test]
+fn ray_11_1_2() {
+    let expr = "<math><mover><mrow><mi>P</mi><mi>Q</mi></mrow><mo>⟷</mo></mover></math>";
+    test_braille("CMU", expr, "⠐⠒⠂⠢⠨⠏⠨⠟⠔");
+}
+
+#[test]
+fn ray_11_1_3() {
+    let expr = "<math><mover><mi>z</mi><mo>→</mo></mover></math>";
+    test_braille("CMU", expr, "⠒⠂⠵");
+}
+
+#[test]
+fn ray_11_1_4() {
+    let expr = "<math><mover><mi>z</mi><mo>⟵</mo></mover></math>";
+    test_braille("CMU", expr, "⠐⠒⠵");
+}
+
+#[test]
+fn angle_11_1_7() {
+    let expr = "<math><mover><mi>A</mi><mo>^</mo></mover></math>";
+    test_braille("CMU", expr, "⠘⠒⠨⠁");
+}
+
+#[test]
+fn angle_11_1_8() {
+    let expr = "<math><mover><mrow><mi>a</mi><mi>o</mi><mi>b</mi></mrow><mo>^</mo></mover></math>";
+    test_braille("CMU", expr, "⠘⠒⠢⠁⠕⠃⠔");
+}
+
+#[test]
+fn vector_11_2_3() {
+    let expr = "<math><mfenced open='|' close='|'><mover><mi>v</mi><mo>⟶</mo></mover></mfenced></math>";
+    test_braille("CMU", expr, "⠸⠀⠒⠂⠧⠸⠀");
+}
+
+#[test]
+fn vector_11_2_4() {
+    let expr = "<math><mfenced open='‖' close='‖'><mover><mi>v</mi><mo>⟶</mo></mover></mfenced></math>";
+    test_braille("CMU", expr, "⠸⠇⠒⠂⠧⠸⠇");
+}
+
+#[test]
+fn vector_11_2_5() {
+    let expr = "<math><mfenced open='|' close='|'><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⟶</mo></mover></mfenced></math>";
+    // modified to include space at end as in vector_11_2_3
+    test_braille("CMU", expr, "⠸⠀⠒⠂⠢⠨⠁⠨⠃⠔⠸⠀");
+}
+
+#[test]
+fn vector_11_2_6() {
+    let expr = "<math><mfenced open='‖' close='‖'><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⟶</mo></mover></mfenced></math>";
+    test_braille("CMU", expr, "⠸⠇⠒⠂⠢⠨⠁⠨⠃⠔⠸⠇");
+}
+
+#[test]
+fn vector_11_2_9() {
+    let expr = "<math><mfenced open='[' close=']'><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⟶</mo></mover></mfenced></math>";
+    test_braille("CMU", expr, "⠷⠒⠂⠢⠨⠁⠨⠃⠔⠾");
+}
+
+#[test]
+fn parallel_11_3_1() {
+    let expr = "<math><mover><mi>l</mi><mo>&#x2194;</mo></mover><mo>&#x2225;</mo><menclose notation='top'><mi>M</mi><mi>N</mi></menclose></math>";
+    test_braille("CMU", expr, "⠐⠒⠂⠇⠸⠇⠈⠉⠢⠨⠍⠨⠝⠔");
+}
+
+#[test]
+fn perpendicular_11_3_2() {
+    let expr = "<math><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>&#x2194;</mo></mover><mo>&#x22A5;</mo><mover><mrow><mi>O</mi><mi>X</mi></mrow><mo>&#x2192;</mo></mover></math>";
+    test_braille("CMU", expr, "⠐⠒⠂⠢⠨⠁⠨⠃⠔⠼⠄⠒⠂⠢⠨⠕⠨⠭⠔");
+}
+
+#[test]
+fn vector_11_4_1() {
+    let expr = "<math><mover><mi>v</mi><mo>&#x2192;</mo></mover><mo>&#xB7;</mo><mover><mi>w</mi><mo>&#x2192;</mo></mover></math>";
+    test_braille("CMU", expr, "⠒⠂⠧⠠⠀⠒⠂⠺");
+}
+
+#[test]
+fn vector_11_4_2() {
+    let expr = "<math><mfenced open='&lt;' close='&gt;'><mrow><mover><mi>v</mi><mo>&#x2192;</mo></mover><mo>,</mo><mover><mi>w</mi><mo>&#x2192;</mo></mover></mrow></mfenced></math>";
+    test_braille("CMU", expr, "⠐⠅⠒⠂⠧⠀⠂⠒⠂⠺⠨⠂");
+}
+
+
+#[test]
+fn vector_11_4_3() {
+    let expr = "<math><mover><mi>v</mi><mo>&#x2192;</mo></mover><mo>×</mo><mover><mi>w</mi><mo>&#x2192;</mo></mover></math>";
+    test_braille("CMU", expr, "⠒⠂⠧⠈⠦⠒⠂⠺");
+}
+
+#[test]
+fn vector_11_4_4() {
+    let expr = "<math><mover><mi>v</mi><mo>&#x2192;</mo></mover><mo>+</mo><mover><mi>w</mi><mo>&#x2192;</mo></mover></math>";
+    test_braille("CMU", expr, "⠒⠂⠧⠖⠒⠂⠺");
+}
+
+#[test]
+fn degrees_11_5_1() {
+    let expr = "<math><mn>90</mn><mo>&#xB0;</mo></math>";
+    test_braille("CMU", expr, "⠼⠊⠚⠴");
+}
+
+#[test]
+fn degrees_11_5_2() {
+    let expr = "<math><mn>37</mn><mo>&#xB0;</mo><mn>22</mn><mo>'</mo><mn>49</mn><mo>''</mo></math>";
+    test_braille("CMU", expr, "⠼⠉⠛⠴⠼⠃⠃⠳⠼⠙⠊⠳⠳");
+}
+
+#[test]
+fn triangle_11_6() {
+    let expr = "<math><mo>&#x25B3;</mo><mi>a</mi><mi>b</mi><mi>c</mi></math>";
+    test_braille("CMU", expr, "⠠⠾⠁⠃⠉");
+}
+
+#[test]
+fn cancellation_14_3_3() {
+    // this uses various forms of crossouts to make the test better -- the original only has horizontal crossouts. All should have the same braille.
     let expr = "<math>
-        <mrow>
-        <munder>
-        <mo>&#x2211;</mo>
-        <mtable columnalign='left'>
-            <mtr><mtd><mrow><mn>1</mn><mo>&#x2264;</mo><mi>i</mi><mo>&#x2264;</mo><mn>4</mn></mrow></mtd></mtr>
-            <mtr><mtd><mrow><mi>i</mi><mo>&#x2260;</mo><mn>3</mn></mrow></mtd></mtr>
-        </mtable>
-        </munder>
-        <mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>4</mn><mo>=</mo><mn>7</mn></mrow>
-   </math>";
-    test_braille("CMU", expr, "⠘⠎⠼⠁⠪⠶⠊⠣⠶⠼⠙⠒⠊⠘⠶⠼⠉⠱⠊⠶⠼⠁⠖⠼⠃⠖⠼⠙⠶⠼⠛");
+        <mfrac>
+            <mrow>
+                <menclose notation='downdiagonalstrike updiagonalstrike'><mn>2</mn><mi>x</mi></menclose>
+                <mo>(</mo><mi>x</mi><mo>-</mo><mn>2</mn><mo>)</mo>
+                <menclose notation='updiagonalstrike'>
+                    <msup> <mrow><mo>(</mo><mi>x</mi><mo>-</mo><mn>1</mn><mo>)</mo></mrow> <mn>3</mn> </msup>
+                </menclose>
+            </mrow>
+            <mrow>
+                <menclose notation='downdiagonalstrike updiagonalstrike'><mn>2</mn><mi>x</mi></menclose>
+                <mo>(</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo>)</mo>
+                <menclose notation='horizontalstrike'>
+                    <mo>(</mo><mi>x</mi><mo>-</mo><mn>1</mn><mo>)</mo>
+                </menclose>
+            </mrow>
+        </mfrac>
+    </math>";
+    test_braille("CMU", expr, "⠢⠻⠢⠼⠃⠭⠔⠣⠭⠤⠼⠃⠜⠻⠢⠣⠭⠤⠼⠁⠜⠡⠼⠉⠔⠔⠲⠢⠻⠢⠼⠃⠭⠔⠣⠭⠖⠼⠁⠜⠻⠣⠭⠤⠼⠁⠜⠔");
+}
+
+// FIX: add tests for color
+
+
+#[test]
+fn omission_14_5_1() {
+    // Single and double '_' are used (from WIRIS) for a more robust test -- example seems to use two "_"s for a blank (added 'intent')
+    let expr = "<math><mn>5</mn><mi intent=':blank'>_</mi><mn>4</mn><mi intent=':blank'>_</mi><mi intent=':blank'>_</mi><mn>2</mn><mo>=</mo><mn>10</mn></math>";
+    test_braille("CMU", expr, "⠼⠑⠰⠼⠙⠰⠼⠃⠶⠼⠁⠚");
+}
+
+#[test]
+fn omission_14_5_2() {
+    // copied from example and pasted into WIRIS
+    let expr = "<math><mn>12</mn><mo>+</mo><mn>13</mn><mo>=</mo><mi intent=':blank'>_</mi><mo>&#xA0;</mo><mi intent=':blank'>_</mi></math>";
+    test_braille("CMU", expr, "⠼⠁⠃⠖⠼⠁⠉⠶⠼⠰⠰");
+}
+
+#[test]
+fn omission_14_5_3() {
+    // copied from example and pasted into WIRIS
+    let expr = "<math><mn>23</mn><mo>+</mo><mn>145</mn><mo>=</mo><mn>1</mn><mi intent=':blank'>_</mi><mo>&#xA0;</mo><mi intent=':blank'>_</mi></math>";
+    test_braille("CMU", expr, "⠼⠃⠉⠖⠼⠁⠙⠑⠶⠼⠁⠰⠰");
+}
+
+#[test]
+fn omission_14_5_4() {
+    // copied from example and pasted into WIRIS
+    let expr = "<math><mn>719</mn><mo>+</mo><mn>83</mn><mo>=</mo><mi intent=':blank'>_</mi><mi intent=':blank'>_</mi></math>";
+    test_braille("CMU", expr, "⠼⠛⠁⠊⠖⠼⠓⠉⠶⠰⠤⠆");
+}
+
+#[test]
+fn omission_14_5_5() {
+    let expr = "<math><mn>3</mn><mo>&#xF7;</mo><mn>12</mn><mo>=</mo><mn>18</mn><mo>&#xF7;</mo><menclose notation='box'><mo>&#xA0;</mo><mo>&#xA0;</mo><mo>&#xA0;</mo></menclose></math>";
+    test_braille("CMU", expr, "⠼⠉⠂⠆⠀⠶⠼⠁⠓⠲⠰⠤⠆");
+}
+
+#[test]
+fn units_appendix_1_2_1() {
+    let expr = "<math>
+        <mi mathvariant='normal' intent=':unit'>J</mi>
+        <mo>=</mo>
+        <mi intent=':unit'>kg</mi>
+        <mo>&#xA0;</mo>
+        <msup><mi mathvariant='normal' intent=':unit'>m</mi><mn>2</mn></msup>
+        <mo>&#xA0;</mo>
+        <msup><mi mathvariant='normal' intent=':unit'>s</mi><mrow><mo>-</mo><mn>2</mn></mrow></msup>
+    </math>";
+    test_braille("CMU", expr, "⠨⠚⠶⠅⠛⠀⠍⠡⠼⠃⠀⠎⠡⠤⠼⠃");
+}
+
+#[test]
+fn units_appendix_1_3_1() {
+    // manually added "intent" -- should have another test
+    let expr = "<math><mn>1</mn><mo>&#xA0;</mo><mi mathvariant='normal' intent=':unit'>m</mi><mo>=</mo><mn>100</mn><mo>&#xA0;</mo><mi intent=':unit'>cm</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>&#xA0;</mo><mi intent=':unit'>km</mi></math>";
+    test_braille_prefs("CMU", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠀⠍⠶⠼⠁⠚⠚⠀⠉⠍⠶⠼⠚⠂⠁⠀⠅⠍");
+
+}
+#[test]
+#[ignore]  // remove 'ignore' once MathCAT adds code to deal with Units/inferring units
+fn units_appendix_1_3_1_auto_intent() {
+    // manually added "intent" -- should have another test
+    let expr = "<math><mn>1</mn><mo>&#xA0;</mo><mi mathvariant='normal' >m</mi><mo>=</mo><mn>100</mn><mo>&#xA0;</mo><mi >cm</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>&#xA0;</mo><mi >km</mi></math>";
+    test_braille_prefs("CMU", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠀⠍⠶⠼⠁⠚⠚⠀⠉⠍⠶⠼⠚⠂⠁⠀⠅⠍");
+
 }
 
 
 
+// *********************************************************
+
+
+
+// FIX: add 2.6 (Chemistry)
+
+//  FIX: add 3.4 math variants
+
+
+// FIX: add 3.6 ordinals (drop numbers)
+
+
+#[test]
+fn roman_numerals_simple() {
+    // not in spec, but the spec example is very complicated. Here's a simpler test that tests for a single cap indicator
+    let expr = "<math><mi>XVI</mi></math>";
+    test_braille("CMU", expr, "⠨⠭⠧⠊");
+}
+
+#[test]
+#[ignore]
+fn roman_numerals_appendix_2_2_1() {
+    let expr = "<math>
+        <menclose notation='top'><menclose notation='top'><mi>VI</mi></menclose></menclose>
+        <menclose notation='top'><mi>XL</mi></menclose>
+        <mi>DXXI</mi>
+    </math>";
+    test_braille("CMU", expr, "⠨⠧⠊⠒⠒⠭⠇⠒⠙⠭⠭⠊");
+}
 
 #[test]
 fn money_appendix_2_3_1() {

@@ -1,12 +1,236 @@
 ---
-[
+- include: "../../definitions.yaml"
+
 # Lines starting with "#" are a comment
 # Each definition in this file is of the form
-#   name: [ "...", "..." "..." ],
+# - name: { "...", "..." "..." }
+# For numbers, 
+# - name: [] "...", "..." "..." ]
 
-  Units: [
-    "cm", "km", "hm", "dam", "dm", "mm", "tấn", "tạ", "yến", "kg", "hg", "dag", "lít", "ml", "ft", "in"
-  ],
+
+# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
+# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
+# If no ":"s are used, the same speech is used for all forms
+# If bracketing words make sense, they are separated with ";"s
+# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
+# If there are multiple fixities (e.g., see transpose), they are separated with "||
+#   for readability, spaces can be used around any of the delimiter characters
+# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+- IntentMappings: {
+    "indexed-by": "infix= ; chỉ số dưới là; hết chỉ số dưới",
+    "modified-variable": "silent= ",
+    "say-super": "infix=chỉ số trên",   # used with 'mo' for superscripts (e.g, "<")
+    "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
+
+    "absolute-value": "function= ; trị tuyệt đối: trị tuyệt đối của: trị tuyệt đối của; hết trị tuyệt đối",
+    "binomial": "infix=nhị thức; chọn; hết nhị thức",
+    "limit": "prefix=giới hạn",
+    "lim-sup": "prefix=giới hạn trên khi",
+    "lim-inf": "prefix=giới hạn dưới khi",
+    "logarithm-with-base": "prefix=lóc cơ số; lóc của",
+    "minus": "infix=trừ || prefix=âm",
+    "plus": "infix=cộng || prefix=dương",
+
+    "transpose": "postfix=ma trận chuyển vị || function=ma trận chuyển vị",
+    "norm": "function=; định mức: định mức: định mức của; end norm",
+    "trace": "function=;vết : vết: vết của; hết vết",
+    "dimension": "function=; kích thước : kích thước: kích thước của; hết kích thước",
+    "homomorphism": "function= ; đồng cấu : đồng cấu: đồng cấu của; hết đồng cấu",
+    "kernel": "function= ; hạch tâm : hạch tâm: hạch tâm của; hết hạch tâm",
+    "vector": "function=véc tơ || prefix=véc tơ",
+    "cross-product": "infix=hướng: tích có hướng: tích có hướng",
+    "dot-product": "infix=chấm: tích vô hướng: dot:tích vô hướng",
+
+    "divergence": "function= ; phân kì: độ phân kì: độ phân kì; hết độ phân kì",
+    "curl": "function= ; vòng xoáy; hết vòng xoáy",
+    "gradient": "function= ; đạo hàm: đạo hàm: đạo hàm; hết đạo hàm",
+    "laplacian": "function=láp-la-xe",   # speech engines don't do a good job with "laplacian"
+}
+
+- NavigationParts: {
+    "large-op": "cơ sở; giới hạn dưới; giới hạn trên",
+    "mfrac": "tử số;mẫu số",
+    "fraction": "tử số;mẫu số",
+    "msqrt": "căn",
+    "square-root": "căn",
+    "mroot": "căn;căn bậc",
+    "root": "căn;căn bậc",
+    "msub": "cơ;chỉ số dưới",
+    "sub": "cơ;chỉ số dưới",
+    "msup": "cơ;chỉ số trên",
+    "say-super": "cơ;chỉ số trên",
+    "skip-super": "cơ;chỉ số trên",
+    "power": "cơ;mũ",
+    "msubsup": "cơ;chỉ số dưới;superscript",
+    "munder": "cơ;giới hạn dưới",
+    "mover": "cơ;giới hạn trên",
+    "munderover": "cơ;giới hạn dưới;giới hạn trên",
+
+    # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
+    # it's a hack to put them here, but at least they are grouped with the other navigation parts
+    "in": "trong",
+    "out": "ra khỏi",
+  }
+
+
+- SIPrefixes: {
+    "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hecto", "da": "decka",
+    "d": "deci", "c": "centi", "m": "milli", "µ": "micro", "n": "nano", "p": "pico", "f": "femto", "a": "atto", "z": "zepto", "y": "yocto", "r": "ronto", "q": "quecto"
+  }
+
+# this is a list of all units that accept SIPrefixes
+# from www.bipm.org/documents/20126/41483022/SI-Brochure-9-EN.pdf
+#   Prefixes may be used with any of the 29 SI units with special names
+#   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
+- SIUnits: {
+    # base units
+    "A": "amp",
+    "cd": "candela",
+    "K": "kelvin", "K": "kelvin", # U+212A
+    "g": "ram",
+    "m": "mét",     # British spelling works for US also
+    "mol": "mol",
+    "s": "giây", "″": "giây", "\"": "giây", "sec": "giây",  # "sec" not actually legal
+
+    # derived units
+    "Bq": "becquerel",
+    "C": "coulomb",
+    "°C": "độ c", "℃": "degree celsius",
+    "F": "độ f",
+    "Gy": "gray",
+    "H": "henry",
+    "Hz": "hẹt",
+    "J": "joule",
+    "kat": "kattel",
+    "lm": "lumen",
+    "lx": "lux",
+    "N": "newton",
+    "Ω": "ohm", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN
+    "Pa": "pascal",
+    "rad": "ra-đi-ăng",
+    "S": "siemens",
+    "Sv": "sievert",
+    "sr": "sterradion",
+    "T": "tesla",
+    "V": "volt",
+    "W": "watt",
+    "Wb": "weber",
+
+    # accepted (plus a few variants) that take SI prefixes
+    "l": "lít", "L": "litre", "ℓ": "litre",               # British spelling works for US also
+    "t": "metric ton",
+    "Da": "dalton",
+    "amu": "atomic mass unit", "u": "atomic mass unit",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
+    "au": "astronomical unit", "AU": "astronomical unit",
+    "eV": "electronvolt",
+  }
+
+
+- UnitsWithoutPrefixes: {
+    # time
+    "′": "phút", "'": "phút","min": "phút",
+    "h": "giờ", "hr": "giờ", "Hr": "giờ",
+    "d": "ngày", "dy": "ngày",
+    "w": "tuần", "wk": "tuần",
+    "y": "năm", "yr": "năm",    
+
+    # angles (could be temperature)
+    "°": "độ", "deg": "degree",
+    "arcmin": "arcminute",
+    "amin": "arcminute",
+    "am": "arcminute",
+    "MOA": "arcminute",
+    "arcsec": "arcsecond",
+    "asec": "arcsecond",
+    "as": "arcsecond",
+
+    # other accepted units that don't take SI prefixes
+    "ha": "héc-ta",
+    "Np": "neper",
+    "B": "bel",
+    "dB": "đề-xi-ben",
+
+    # distance
+    "ltyr": "năm ánh sáng", "ly": "light year",
+    "pc": "parsec",
+    "Å": "angstrom", "Å": "angstrom",           # U+00C5 and U+212B
+    "fm": "fermi",
+
+    # others
+    "atm": "atmosphere",
+    "bar": "bar",
+    "cal": "ca-lo-ri",
+    "Ci": "curie",
+    "grad": "gradian",
+    "M": "molar",
+    "R": "roentgen",
+    "rpm": "revolution per minute",
+    "℧": "mho",
+    "dyn": "dyne",
+    "erg": "erg",
+
+  }
+
+  # this will only be used if the language is English, so it can be empty for other countries
+- EnglishUnits: {
+    # length
+    "in": "inh",
+    "ft": "bộ",
+    "mi": "dặm",
+    "rd": "sào",
+    "li": "link",
+    "ch": "xích",
+
+    # area
+    "sq in": "inh vuông", "sq. in": "square inch", "sq. in.": "square inch",
+    "sq ft": "bộ vuông", "sq. ft": "square foot", "sq. ft.": "square foot",
+    "sq yd": "thước vuông Anh", "sq. yd": "thước vuông Anh", "sq. yd.": "thước vuông Anh",
+    "sq mi": "dặm vuông", "sq. mi": "dặm vuông", "sq. mi.": "dặm vuông",
+    "ac": "mẫu Anh",
+    "FBM": "bộ ván",
+
+    # volume
+    "cu in": "cubic inch", "cu. in": "cubic inch", "cu. in.": "cubic inch",
+    "cu ft": "cubic foot", "cu. ft": "cubic foot", "cu. ft.": "cubic foot",
+    "cu yd": "cubic yard", "cu. yd": "cubic yard", "cu. yd.": "cubic yard",
+    "bbl": "barrel", "BBL": "barrel",
+    "pk": "peck",
+    "bu": "bushel",
+    "tsp": "teaspoon",
+    "tbl": "tablespoon",
+
+    # liquid
+    "fl dr": "fluid drams",
+    "fl oz": "fluid ounce",
+    "gi": "gill",
+    "cp": "cup", "cup": "cup",
+    "pt": "pint",
+    "qt": "quart",
+    "gal": "ga-lông",
+
+    # weight
+    "gr": "grain",
+    "dr": "dram",
+    "oz": "ounce", "℥": "ounce",
+    "lb": "pound",
+    "cwt": "hundredweight",
+    "dwt": "pennyweight",
+    "oz t": "troy ounce",
+    "lb t": "troy pound",
+
+    # energy
+    "hp": "mã lực",
+    "BTU": "BTU",
+    "°F": "độ f", "℉": "độ f",
+
+    # other
+    "mph": "dặm trên giờ",
+    "mpg": "dặm trên ga-lông",
+  }
+
+- KnownWords: {
+    "tạ", "yến", "và"
+  }
 
 # ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words
@@ -27,84 +251,82 @@
 #   The minimum length is 10.
 
 # For English, a regular pattern starts at twenty
-  NumbersOnes: [
+- NumbersOnes: [
       "không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín",
       "mười", "mười một", "mười hai", "mười ba", "mười bốn", "mười lăm", "mười sáu",
       "mười bảy", "mười tám", "mười chín"
-  ],
+  ]
 
-  NumbersOrdinalOnes: [
+- NumbersOrdinalOnes: [
       "không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín",
       "mười", "mười một", "mười hai", "mười ba", "mười bốn", "mười lăm", "mười sáu",
       "mười bảy", "mười tám", "mười chín"
-  ],
+  ]
 
-  NumbersOrdinalPluralOnes: [
+- NumbersOrdinalPluralOnes: [
       "không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín",
       "mười", "mười một", "mười hai", "mười ba", "mười bốn", "mười lăm", "mười sáu",
       "mười bảy", "mười tám", "mười chín"
-  ],
+  ]
 
   # stop when regularity begins
-  NumbersOrdinalFractionalOnes: [
+- NumbersOrdinalFractionalOnes: [
 #        "zero", "first", "half"
       "phân không", "phần một", "phần hai", "phần ba", "phần tư", "phần năm", "phần sáu", "phần bảy", "phần tám", "phần chín",
       "phần mười", "phần mười một", "phần mười hai", "phần mười ba", "phần mười bốn", "phần mười lăm", "phần mười sáu",
       "phần mười bảy", "phần mười tám", "phần mười chín"
 
-  ],
+  ]
 
   # stop when regularity begins
-  NumbersOrdinalFractionalPluralOnes: [
+- NumbersOrdinalFractionalPluralOnes: [
 #        "zeros", "firsts", "halves"
       "phân không", "phần một", "phần hai", "phần ba", "phần tư", "phần năm", "phần sáu", "phần bảy", "phần tám", "phần chín",
       "phần mười", "phần mười một", "phần mười hai", "phần mười ba", "phần mười bốn", "phần mười lăm", "phần mười sáu",
       "phần mười bảy", "phần mười tám", "phần mười chín"
 
-  ],
+  ]
 
 
   # What to use for multiples of 10
-  NumbersTens: [
+- NumbersTens: [
       "", "mười", "hai mươi", "ba mươi", "bốn mươi", "năm mươi", "sáu mươi", "bảy mươi", "tám mươi", "chín mươi"
-  ],
+  ]
 
-  NumbersOrdinalTens: [
+- NumbersOrdinalTens: [
       "", "mười", "hai mươi", "ba mươi", "bốn mươi", "năm mươi", "sáu mươi", "bảy mươi", "tám mươi", "chín mươi"
-  ],
+  ]
 
-  NumbersOrdinalPluralTens: [
+- NumbersOrdinalPluralTens: [
       "", "mười", "hai mươi", "ba mươi", "bốn mươi", "năm mươi", "sáu mươi", "bảy mươi", "tám mươi", "chín mươi"
-  ],
+  ]
 
 
-  NumbersHundreds: ["", "một trăm", "hai trăm", "ba trăm", "bốn trăm", "năm trăm",
+- NumbersHundreds: ["", "một trăm", "hai trăm", "ba trăm", "bốn trăm", "năm trăm",
       "sáu trăm", "bảy trăm", "tám trăm", "chín trăm"
-  ],
+  ]
 
-  NumbersOrdinalHundreds: ["", "một trăm", "hai trăm", "ba trăm", "bốn trăm", "năm trăm",
+- NumbersOrdinalHundreds: ["", "một trăm", "hai trăm", "ba trăm", "bốn trăm", "năm trăm",
       "sáu trăm", "bảy trăm", "tám trăm", "chín trăm"
-  ],
+  ]
 
-  NumbersOrdinalPluralHundreds: ["", "một trăm", "hai trăm", "ba trăm", "bốn trăm", "năm trăm",
+- NumbersOrdinalPluralHundreds: ["", "một trăm", "hai trăm", "ba trăm", "bốn trăm", "năm trăm",
       "sáu trăm", "bảy trăm", "tám trăm", "chín trăm"
-  ],
+  ]
     
 
   # At this point, hopefully the language is regular. If not, code needs to be written
-  NumbersLarge: [
+- NumbersLarge: [
       "", "ngàn", "triệu", "tỉ", "ngàn tỉ", "triệu tỷ",
       "quintillion", "sextillion", "septillion", "octillion", "nonillion",
-  ],
+  ]
     
-  NumbersOrdinalLarge: [
+- NumbersOrdinalLarge: [
       "", "ngàn", "triệu", "tỉ", "ngàn tỉ", "quadrillionth",
       "quintillionth", "sextillionth", "septillionth", "octillionth", "nonillionth"
-  ],
+  ]
     
-  NumbersOrdinalPluralLarge: [
+- NumbersOrdinalPluralLarge: [
       "", "ngàn", "triệu", "tỉ", "ngàn tỉ", "quadrillionths",
       "quintillionths", "sextillionths", "septillionths", "octillionths", "nonillionths"
   ]
-
-]

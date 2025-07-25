@@ -1,0 +1,121 @@
+---
+# Provide an overview/outline/description of the math
+# MathPlayer just tried to shorten things like "mfrac" by just saying "fraction"
+#   For mrow, it say up to 5 operands and just say "and n more things" for the rest
+# This results in strings of varying length. Given human memory is about 7 words long,
+#   it would be better to aim for 7 words (maybe aim for a range of 6-10 words).
+# Idea:
+#   Start by generating a terse form of the speech
+#   At every step when the strings are being joined
+#     a) if the #words <= 7, return the joined string
+#     b) otherwise, set verbosity to 'overview' and regenerate the expression and use that
+# There is a balance that you want to maximize the info given, so 10 words is likely better then 3.
+#   That might mean that at the top level, we may want to allow the first few children to expand
+
+- include: "SimpleSpeak_Rules.yaml"
+
+- name: overview-default
+  tag: mfrac
+  match: "."
+  replace:
+  - test:
+      if: "IsNode(*[1], 'simple') and IsNode(*[2], 'simple')"
+      then:
+      - x: "*[2]"
+      - T: "分之"
+      - x: "*[1]"
+      else:
+      - T: "分數"
+
+- name: overview-default
+  tag: msqrt
+  match: "."
+  replace:
+  - T: "根號"
+  - test:
+      if: "IsNode(*[1], 'simple')"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {T: ""}
+      - x: "*[1]"
+
+- name: overview-default
+  tag: mroot
+  match: "."
+  replace:
+  - T: "根號"
+  - x: "*[1]"
+  - test:
+      if: "IsNode(*[1], 'simple')"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {T: "的"}
+  - test:
+      if: "*[2][self::m:mn]"
+      then_test:
+      - if: "*[2][.='2']"
+        then: {T: "平方根"}
+      - else_if: "*[2][.='3']"
+        then: {T: "立方根"}
+      - else_if: "*[2][not(contains(., '.'))]"
+        then: [{x: "*[2]"}, {T: "次方根"}]
+      - else: [{x: "*[2]"}, {T: "次方根"}]
+      else:
+      - test:
+          if: "*[2][self::m:mi][string-length(.)=1]"
+          then:
+          - x: "*[2]"
+          #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+          else: {x: "*[2]"}
+      - T: "次方根"
+
+- name: matrix-override
+  tag: mrow
+  match:
+  - "*[2][self::m:mtable] and"
+  - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
+  replace:
+  - T: ""
+  - x: count(*[2]/*)
+  - T: "乘"
+  - x: count(*[2]/*[self::m:mtr][1]/*)
+  - test:
+      if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
+      then: {T: "行列式"}
+      else: {T: "矩陣"}
+
+- name: overview-default
+  tag: mtable
+  match: "."
+  replace:
+  - T: ""
+  - x: count(*[2]/*)
+  - T: "乘"
+  - x: count(*[2]/*[self::m:mtr][1]/*)
+  - T: "表"
+
+- name: short-mrow
+  tag: mrow
+  match: "count(*)<6"
+  replace:
+  - insert:
+      nodes: "*"
+      replace: [{pause: auto}]
+
+- name: long-mrow
+  tag: mrow
+  match: "."
+  replace:
+  - x: "*[1]"
+  - pause: auto
+  - x: "*[2]"
+  - pause: auto
+  - x: "*[3]"
+  - pause: auto
+  - x: "*[4]"
+  - pause: auto
+  - x: "*[5]"
+  - pause: auto
+  - T: "等等"

@@ -1,0 +1,431 @@
+---
+- include: "../../definitions.yaml"
+
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ],
+
+
+# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
+# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
+# If no ":"s are used, the same speech is used for all forms
+# If bracketing words make sense, they are separated with ";"s
+# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
+# If there are multiple fixities (e.g., see transpose), they are separated with "||
+#   for readability, spaces can be used around any of the delimiter characters
+# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+- IntentMappings: {
+    "indexed-by": "infix= ; ala; loppu ala",
+    "modified-variable": "silent= ",
+    "say-super": "infix=ylä: yläindeksi: yläindeksi",   # used with 'mo' for superscripts (e.g, "<")
+    "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
+ 
+    "absolute-value": "function= ; itseisarvo; loppu itseisarvo",
+    "binomial": "infix=binomi; yli; loppu binomi",
+    "limit": "prefix=raja-arvo: raja-arvo kun: raja-arvo kun",
+    "lim-sup": "prefix=supremum: supremum: supremum",
+    "lim-inf": "prefix=infimum: infimum : infimum",
+    "logarithm-with-base": "prefix=log kanta",
+    "minus": "infix=miinus || prefix=negatiivinen",
+    "plus": "infix=plus || prefix=positiivinen",
+ 
+    "transpose": "postfix=transpoosi || function=transpoosi",
+    "norm": "function=; normi; loppu normi",
+    "trace": "function=;jälki; loppu jälki",
+    "dimension": "function=; dimensio; loppu dimensio",
+    "homomorphism": "function= ; homomorfismi; loppu homomorfismi",
+    "kernel": "function= ; ydin; loppu ydin",
+    "vector": "function= ; vektori || prefix=vektori",
+    "cross-product": "infix=risti: ristitulo: ristitulo",
+    "dot-product": "infix=piste: pistetulo: piste:pistetulo",
+ 
+    "divergence": "function= ; div: divergenssi: divergenssi; loppu divergenssi",
+    "curl": "function= ; roottori; loppu roottori",
+    "gradient": "function= ; grad: gradientti: gradientti; loppu gradientti",
+    "laplacian": "function=laplasen",   # speech engines don't do a good job with "laplacian"
+  }
+ 
+- NavigationParts: {
+    "large-op": "kanta; alaraja; yläraja",
+    "mfrac": "osoittaja;nimittäjä",
+    "fraction": "osoittaja;nimittäjä",
+    "msqrt": "juuri",
+    "square-root": "juuri",
+    "mroot": "juuri;juuren indeksi",
+    "root": "juuri;juuren indeksi",
+    "msub": "kanta;alaindeksi",
+    "sub": "kanta;alaindeksi",
+    "msup": "kanta;yläindeksi",
+    "say-super": "kanta;yläindeksi",
+    "skip-super": "kanta;yläindeksi",
+    "power": "kanta;eksponentti",
+    "msubsup": "kanta;alaindeksi;yläindeksi",
+    "munder": "kanta;alla",
+    "mover": "kanta;yllä",
+    "munderover": "kanta;alla;yllä",
+ 
+    # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
+    # it's a hack to put them here, but at least they are grouped with the other navigation parts
+    "in": "sisään",
+    "out": "ulos",
+  }
+
+- SIPrefixes: {
+    "Q": "kvetta", "R": "ronna", "Y": "jotta", "Z": "tsetta", "E": "eksa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hehto", "da": "deka",
+    "d": "desi", "c": "sentti", "m": "milli", "µ": "mikro", "n": "nano", "p": "piko", "f": "femto", "a": "atto", "z": "zepto", "y": "jokto", "r": "ronto", "q": "kvekto"
+  }
+
+# this is a list of all units that accept SIPrefixes
+# from www.bipm.org/documents/20126/41483022/SI-Brochure-9-EN.pdf
+#   Prefixes may be used with any of the 29 SI units with special names
+#   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
+
+# FI: For Finnish the default plural form is for the units to have the ending "a". PluralForms has all the other exceptions.
+- SIUnits: {
+    # base units
+    # FI: plurals in comments
+    "A": "ampeeri", # ampeeria
+    "cd": "kandela", # kandelaa
+    "K": "kelvin", "K": "kelvin", # U+212A # kelviniä
+    "g": "gramma", # grammaa
+    "m": "metri",     # metriä
+    "mol": "mooli",  # moolia
+    "s": "sekunti", "″": "sekunti", "\"": "sekunti", "sec": "sekunti",  # sekuntia
+
+    # derived units
+    "Bq": "bekrel", # bekreliä
+    "C": "kulombi", # kulombia
+    "°C": "aste celsiusta", "℃": "aste celsiusta", # astetta celsiusta
+    "F": "faradi", # faradia
+    "Gy": "grei", # greitä
+    "H": "henry", # henryä
+    "Hz": "hertsi", # hertsiä
+    "J": "joule", # joulea
+    "kat": "kattel", # kattelia
+    "lm": "lumen", # lumenia
+    "lx": "luks", # luksia
+    "N": "newton", # newtonia
+    "Ω": "ohm", "Ω": "ohm",  # ohmia     # Greek Cap letter, U+2126 OHM SIGN 
+    "Pa": "pascal", # pascalia
+    "S": "siemens", # siemensiä
+    "Sv": "sievert", # sievertiä
+    "T": "tesla", # teslaa
+    "V": "volt", # volttia
+    "W": "watti", # wattia
+    "Wb": "weber", # weberiä"
+
+    # accepted (plus a few variants) that take SI prefixes
+    "l": "litra", "L": "litra", "ℓ": "litra", # litraa
+    "t": "tonni", # tonnia
+    "Da": "dalton", # daltonia
+    "Np": "neper", # neperiä
+    "u": "atomimassayksikkö", # atomimassayksikköä
+    "eV": "elektronivoltti", # elektronivolttia
+    "rad": "radiaani", # radiaania
+    "sr": "steradiaani", # steradiaania
+  
+    # others that take a prefix
+    "a": "annum", # annumia               # should only take positive powers
+    "as": "kaarisekunti", # kaarisekuntia
+
+    # technically wrong, but used in practice with SI Units
+    "b": "bitti",  # bittiä              # should only take positive powers
+    "B": "tavu",   # tavua           # should only take positive powers
+    "Bd": "baudi", # baudia            # should only take positive powers
+  }
+
+
+- UnitsWithoutPrefixes: {
+    # time
+    "′": "minuutti", "'": "minuutti","min": "minuutti", # minuuttia
+    "h": "tunti", "hr": "tunti", "Hr": "tunti", # tuntia
+    "d": "vuorokausi", "dy": "vuorokausi", # vuorokautta
+    "w": "viikko", "wk": "viikko", # viikkoa
+    "y": "vuosi", "yr": "vuosi", # vuotta    
+
+    # angles (could be temperature)
+    "°": "aste", "deg": "aste", # astetta
+    "arcmin": "kaariminuutti", #kaariminuuttia
+    "amin": "kaariminuutti", # kaariminuuttia
+    "am": "kaariminuutti", # kaariminuuttia
+    "MOA": "kaariminuutti", # kaariminuuttia
+    "arcsec": "kaarisekunti", # kaarisekuntia
+    "asec": "kaarisekunti", # kaarisekuntia
+
+    # distance
+    "au": "astronominen yksikkö", "AU": "astronominen yksikkö", # astronomista yksikköä
+    "ltyr": "valovuosi", "ly": "valovuosi", # valovuotta
+    "pc": "parsek", # parsekia
+    "Å": "ångström", "Å": "ångström",  # ångströmiä # U+00C5 and U+212B
+    "fm": "fermi", # fermiä
+
+    # others
+    "ha": "hehtaari", # hehtaaria
+    # "B": "beli", # beliä        # "B" more commonly means bytes
+    "dB": "desibeli", # desibeliä
+
+    "amu": "atomimassayksikkö",
+    "atm": "normaali-ilmakehä", # normaali-ilmakehää
+    "bar": "baari", # baaria
+    "cal": "kalori", # kaloria
+    "Ci": "curie", # curieta
+    "grad": "gooni", # goonia # FI: other possible names are graadi or uusaste
+    "M": "molaarinen", # FI: Has no plural form!
+    "R": "röntgen", # röntgeniä
+    "rpm": "kierros minuutissa", # kierrosta minuutissa
+    "℧": "mho", # mhota
+    "dyn": "dyne", # dyneä
+    "erg": "ergi", # ergiä
+
+    # powers of 2 used with bits and bytes
+    "Kib": "kibi-bitti", # kibibittiä
+    "Mib": "mebi-bitti", # mebibittiä
+    "Gib": "gibi-bitti", # gibibittiä
+    "Tib": "tebi-bitti", # tebibittiä
+    "Pib": "pebi-bitti", # pebibittiä
+    "Eib": "eksbi-bitti", # eksbibittiä
+    "Zib": "tsebi-bitti", # tsebibittiä
+    "Yib": "jobi-bitti", # jobibittiä
+    "KiB": "kibi-tavu", # kibi-tavua
+    "MiB": "mebi-tavu", # mebitavua
+    "GiB": "gibi-tavu", # gibitavua
+    "TiB": "tebi-tavu", # tebitavua
+    "PiB": "pebi-tavu", # eksbitavua
+    "EiB": "eksbi-tavu", # eksbitavua
+    "ZiB": "tsebi-tavu", # tsebitavua
+    "YiB": "jobi-tavu", # jobitavua
+  }
+
+  # this will only be used if the language is English, so it can be empty for other countries
+- EnglishUnits: {
+    # length
+    "in": "tuuma", # tuumaa
+    "ft": "jalka", # jalkaa
+    "mi": "maili", # mailia
+
+    # area
+    "sq in": "neliötuuma", "sq. in": "neliötuuma", "sq. in.": "neliötuuma", # neliötuumaa
+    "sq ft": "neliöjalka", "sq. ft": "neliöjalka", "sq. ft.": "neliöjalka", # neliöjalkaa
+    "sq yd": "neliöjaardi", "sq. yd": "neliöjaardi", "sq. yd.": "neliöjaardi", # neliöjaardia
+    "sq mi": "neliömaili", "sq. mi": "neliömaili", "sq. mi.": "neliömaili", # neliömailia
+    "ac": "eekkeri", # eekkeriä
+    "FBM": "lautajalka", # lautajalkaa
+
+    # volume
+    "cu in": "kuutiotuuma", "cu. in": "kuutiotuuma", "cu. in.": "kuutiotuuma", # kuutiotuumaa
+    "cu ft": "kuutiojalka", "cu. ft": "kuutiojalka", "cu. ft.": "kuutiojalka", # kuutiojalkaa
+    "cu yd": "kuutiojaardi", "cu. yd": "kuutiojaardi", "cu. yd.": "kuutiojaardi", # kuutiojaardia
+    "bbl": "barreli", "BBL": "barreli", # barrelia
+    "tsp": "teelusikka", # teelusikallista 
+    "tbl": "ruokalusikka", # ruokalusikallista
+
+    # liquid
+    "fl dr": "nestedrami", # nestedramia
+    "fl oz": "nesteunssi", # nesteunssia
+    "cp": "kuppi", "kuppi": "kuppi", # kuppia
+    "pt": "tuoppi", # tuoppia
+    "qt": "neljännesgallona", # neljännesgallonaa
+    "gal": "gallona", # gallonaa
+
+    # weight
+    "oz": "unssi", "℥": "unssi", # unssia
+    "lb": "pauna", # paunaa
+
+    # energy
+    "hp": "hevosvoima", # hevosvoimaa
+    "°F": "aste fahrenheitia", "℉": "aste fahrenheitia", # astetta fahrenheitia
+
+    # other
+    "mph": "maili tunnissa", # mailia tunnissa
+    "mpg": "maili gallonalla", # mailia gallonalla
+  }
+
+# FI: PluralForms has the exceptions to the rule that plural forms end in the letter "a". This is checked for exceptions before the default.
+- PluralForms: {
+  # FIX: this needs to be flushed out
+    "aste celsiusta": "astetta celsiusta",
+    "aste fahrenheitia": "astetta fahrenheitia",
+    "bitti": "bittiä",
+    "kelvin": "kelviniä",
+    "metri": "metriä",
+    "bekrel": "bekreliä",
+    "grei": "greitä",
+    "henry": "henryä",
+    "hertsi": "hertsiä",
+    "kattel": "kattelia",
+    "lumen": "lumenia",
+    "luks": "luksia",
+    "newton": "newtonia",
+    "ohm": "ohmia",
+    "pascal": "pascalia",
+    "siemens": "siemensiä",
+    "sievert": "sievertiä",
+    "volt": "volttia",
+    "watti": "wattia",
+    "weber": "weberiä",
+    "dalton": "daltonia",
+    "atomimassayksikkö": "atomimassayksikköä",
+    "astronominen yksikkö": "astronomista yksikköä",
+    "vuorokausi": "vuorokautta",
+    "vuosi": "vuotta",
+    "aste": "astetta",
+    "neper": "neperiä",
+    "beli": "beliä",
+    "desibeli": "desibeliä",
+    "valovuosi": "valovuotta",
+    "parsek": "parsekia",
+    "ångström": "ångströmiä",
+    "fermi": "fermiä",
+    "normaali-ilmakehä": "normaali-ilmakehää",
+    "röntgen": "röntgeniä",
+    "kierros minuutissa": "kierrosta minuutissa",
+    "molaarinen": "molaarinen",
+    "mho": "mhota",
+    "dyne": "dyneä",
+    "ergi": "ergiä",
+    "eekkeri": "eekkeriä",
+    "teelusikka": "teelusikallista",
+    "ruokalusikka": "ruokalusikallista",
+    "maili tunnissa": "mailia tunnissa",
+    "maili gallonalla": "mailia gallonalla",
+    "kibi-bitti": "kibi-bittiä",
+    "mebi-bitti": "mebi-bittiä", 
+    "gibi-bitti": "gibi-bittiä", 
+    "tebi-bitti": "tebi-bittiä", 
+    "pebi-bitti": "pebi-bittiä", 
+    "eksbi-bitti": "eksbi-bittiä", 
+    "tsebi-bitti": "tsebi-bittiä",
+    "jobi-bitti": "jobi-bittiä",
+    "annum": "annumia",
+    "curie": "curieta"
+  }
+
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+- NumbersOnes: [
+      "nolla", "yksi", "kaksi", "kolme", "neljä", "viisi", "kuusi", "seitsemän", "kahdeksan", "yhdeksän",
+      "kymmenen", "yksitoista", "kaksitoista", "kolmetoista", "neljätoista", "viisitoista", "kuusitoista",
+      "seitsemäntoista", "kahdeksantoista", "yhdeksäntoista"
+  ]
+
+- NumbersOrdinalOnes: [
+      "nollannes", "ensimmäinen", "toinen", "kolmas", "neljäs", "viides", "kuudes", "seitsemäs", "kahdeksas", "yhdeksäs",
+      "kymmenes", "yhdestoista", "kahdestoista", "kolmastoista", "neljästoista", "viidestoista", "kuudestoista",
+      "seitsemästoista", "kahdeksastoista", "yhdeksästoista"
+  ]
+
+# FI: not used in Finnish in the way implemented in MathCAT
+# - NumbersOrdinalPluralOnes: [
+#          "nolla", "ensimmäiset", "toiset", "kolmannet", "neljännet", "viidennet", "kuudennet", "seitsemännet", "kahdeksannet", "yhdeksännet",
+#          "kymmenennet", "yhdennettoista", "kahdennettoista", "kolmannettoista", "neljännettoista", "viidennettoista", "kuudennettoista",
+#          "seitsemännettoista", "kahdeksannettoista", "yhdeksännettoista"
+#   ]
+
+# FI: these are used for the denominator of a fraction when the numerator is larger than 1
+# FI: not ordinals in Finnish. For example: 'tuhannesosaa', means 'thousandth part' in partitive form.
+- NumbersOrdinalPluralOnes: [
+      "nollannes", "ensimmäinen", "kahdesosaa", "kolmasosaa", "neljäsosaa", "viidesosaa", "kuudesosaa", "seitsemäsosaa", "kahdeksasosaa", "yhdeksäsosaa",
+      "kymmenesosaa", "yhdestoistaosaa", "kahdestoistaosaa", "kolmastoistaosaa", "neljästoistaosaa", "viidestoistaosaa", "kuudestoistaosaa",
+      "seitsemästoistaosaa", "kahdeksastoistaosaa", "yhdeksästoistaosaa"
+  ]
+
+# stop when regularity begins
+# FI: not ordinals in Finnish. For example: 'kahdesosa', means 'second part'.
+# FI: says "one whole" in Finnish when it's 1/1
+- NumbersOrdinalFractionalOnes: [
+      "nollasosa", "kokonainen", "kahdesosa", "kolmasosa", "neljäsosa", "viidesosa", "kuudesosa", "seitsemäsosa", "kahdeksasosa", "yhdeksäsosa",
+      "kymmenesosa", "yhdestoistaosa", "kahdestoistaosa", "kolmastoistaosa", "neljästoistaosa", "viidestoistaosa", "kuudestoistaosa",
+      "seitsemästoistaosa", "kahdeksastoistaosa", "yhdeksästoistaosa"
+  ]
+
+# stop when regularity begins
+# FI: not ordinals in Finnish. For example: 'kahdesosaa', means 'second part' in partitive form.
+- NumbersOrdinalFractionalPluralOnes: [
+      "nollannesosaa", "kokonainen", "kahdesosaa", "kolmasosaa", "neljäsosaa", "viidesosaa", "kuudesosaa", "seitsemäsosaa", "kahdeksasosaa", "yhdeksäsosaa",
+      "kymmenesosaa", "yhdestoistaosaa", "kahdestoistaosaa", "kolmastoistaosaa", "neljästoistaosaa", "viidestoistaosaa", "kuudestoistaosaa",
+      "seitsemästoistaosaa", "kahdeksastoistaosaa", "yhdeksästoistaosaa"
+  ]
+
+- NumbersTens: [
+      "", "kymmenen", "kaksikymmentä", "kolmekymmentä", "neljäkymmentä", "viisikymmentä", "kuusikymmentä", "seitsemänkymmentä", "kahdeksankymmentä", "yhdeksänkymmentä"
+  ]
+
+- NumbersOrdinalTens: [
+    "", "kymmenes", "kahdeskymmenes", "kolmaskymmenes", "neljäskymmenes", "viideskymmenes", "kuudeskymmenes", "seitsemäskymmenes", "kahdeksaskymmenes", "yhdeksäskymmenes"
+  ]
+
+# FI: not used in Finnish in the way implemented in MathCAT
+# - NumbersOrdinalPluralTens: [
+#          "", "kymmenennet", "kahdetkymmenennet", "kolmetkymmenennet", "neljätkymmenennet", "viidetkymmenennet", "kuudetkymmenennet", "seitsemätkymmenennet", "kahdeksatkymmenennet", "yhdeksätkymmenennet"
+#   ]
+
+# FI: these are used for the denominator of a fraction when the numerator is larger than 1
+# FI: not ordinals in Finnish. For example: 'tuhannesosaa', means 'thousandth part' in partitive form.
+- NumbersOrdinalPluralTens: [
+    "", "kymmenesosaa", "kahdeskymmenesosaa", "kolmaskymmenesosaa", "neljäskymmenesosaa", "viideskymmenesosaa", "kuudeskymmenesosaa", "seitsemäskymmenesosaa", "kahdesaskymmenesosaa", "yhdeksäskymmenesosaa"
+  ]
+
+
+- NumbersHundreds: [
+    "", "sata", "kaksisataa", "kolmesataa", "neljäsataa", "viisisataa",
+      "kuusisataa", "seitsemänsataa", "kahdeksansataa", "yhdeksänsataa"
+  ]
+
+- NumbersOrdinalHundreds: [
+    "", "sadas", "kahdessadas", "kolmassadas", "neljäsadas", "viidessadas",
+      "kuudessadas", "seitsemässadas", "kahdeksassadas", "yhdeksässadas"
+  ]
+
+# FI: not used in Finnish in the way implemented in MathCAT
+# - NumbersOrdinalPluralHundreds: [
+#        "", "sadannet", "kahdet sadannet", "kolmet sadannet", "neljät sadannet", "viidet sadannet",
+#          "kuudet sadannet", "seitsemät sadannet", "kahdeksat sadannet", "yhdeksät sadannet"
+#   ]
+
+# FI: these are used for the denominator of a fraction when the numerator is larger than 1.
+# FI: not ordinals in Finnish. For example: 'tuhannesosaa', means 'thousandth part' in partitive form.
+- NumbersOrdinalPluralHundreds: [
+    "", "sadasosaa", "kahdessadasosaa", "kolmassadasosaa", "neljässadasosaa", "viidessadasosaa",
+      "kuudessadasosaa", "seitsemässadasosaa", "kahdeksassadasosaa", "yhdeksässadasosaa"
+  ]
+
+# FI: the long scale is used in Finnish.
+- NumbersLarge: [
+    "", "tuhat", "miljoona", "miljardi", "biljoona", "tuhat biljoonaa",
+    "triljoona", "tuhat triljoonaa", "kvadriljoona", "tuhat kvadriljoonaa", "kvintiljoona",
+  ]
+
+- NumbersOrdinalLarge: [
+    "", "tuhannes", "miljoonas", "miljardis", "biljoonas", "tuhannes biljoonas",
+    "triljoonas", "tuhannes triljoonas", "kvadriljoonas", "tuhannes kvadriljoonas", "kvintiljoonas"
+  ]
+      
+# FI: not used in Finnish in the way implemented in MathCAT
+# - NumbersOrdinalPluralLarge: [
+#          "", "tuhannet", "miljoonannet", "miljardinnet", "tuhannet biljoonannet", "kvadriljoonasosat",
+#          "miljoonasosat", "kuusimiljoonasosat", "septimiljardisosat", "oktilliososat", "ei-miljoonasosat"
+#     ]
+
+# FI: these are used for the denominator of a fraction when the numerator is larger than 1.
+# FI: not ordinals in Finnish. For example: 'tuhannesosaa', means 'thousandth part' in partitive form.
+- NumbersOrdinalPluralLarge: [
+    "", "tuhannesosaa", "miljoonasosaa", "miljardisosaa", "biljoonasosaa", "tuhannes biljoonasosaa",
+    "triljoonasosaa", "tuhannes triljoonasosaa", "kvadriljoonasosaa", "tuhannes kvadriljoonasosaa", "kvintiljoonasosaa"
+    ]

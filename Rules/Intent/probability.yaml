@@ -2,17 +2,19 @@
 -
   name: probability
   tag: mi
-  match: "(text()='P'" 
+  match: "(.='P'" 
   replace:
   - intent:
       name: "probability"
+      attrs: "id='@id'"
       children: [x: "text()"]
 
 -
   name: given
   tag: mo
-  match: "(text()='|' and parent::preceding-sibling::*[last()][text()='P']" 
+  match: "(.='|' and count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and parent::preceding-sibling::*[last()][.='P']" 
   replace:
   - intent:
       name: "given"
+      attrs: "id='@id'"
       children: [x: "text()"]

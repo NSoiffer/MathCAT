@@ -1,0 +1,746 @@
+---
+-
+  name: unicode-override
+  tag: "*"
+  match: "@data-unicode"
+  replace: 
+  - x: "@data-unicode"
+
+-
+  name: default
+  tag: msqrt
+  match: "."
+  replace: 
+  # example show use of {}s even when not needed, so no testing
+  - test:
+      if: "$LaTeX_UseShortName"
+      then: [t: "\\s{"]
+      else: [t: "\\sqrt{"]
+  - x: "*[1]"
+  - t: "}"
+
+
+-
+  name: default
+  tag: mroot
+  match: "."
+  replace: 
+  # example show use of {}s even when not needed, so no testing
+  - test:
+      if: "$LaTeX_UseShortName"
+      then: [t: "\\s["]
+      else: [t: "\\sqrt["]
+  - x: "*[2]"
+  - t: "]{"
+  - x: "*[1]"
+  - t: "}"
+
+-
+  name: default
+  tag: mfrac
+  match: "."
+  replace: 
+  # example show use of {}s even when not needed, so no testing
+  - test:
+      if: "$LaTeX_UseShortName"
+      then: [t: "\\f{"]
+      else: [t: "\\frac{"]
+  - x: "*[1]"
+  - t: "}{"
+  - x: "*[2]"
+  - t: "}"
+
+-
+  name: binomial-frac
+  tag: mrow
+  match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
+  replace: 
+  - t: "\\binom{"
+  - x: "*[2]/*[1]"
+  - t: "}{"
+  - x: "*[2]/*[2]"
+  - t: "}"
+
+
+- name: binomial-table
+  tag: mrow
+  match: "IsBracketed(., '(', ')') and *[2][self::m:mtable][count(*)=2 and count(*[1])=1] and contains(@intent, 'binomial(')"
+  replace:
+  - t: "\\binom{"
+  - x: "*[2]/*[1]/*[1]/*[1]"
+  - t: "}{"
+  - x: "*[2]/*[2]/*[1]/*[1]"
+  - t: "}"
+
+# Matrix/Determinant rules
+# matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
+# we don't do spatial layout, instead the beginning/ending of each row uses the enlarged bracketing chars
+-
+  name: default-matrix
+  tag: mrow
+  variables:
+  - MatrixType: "IfThenElse(*[1][.='('], 'pmatrix', 
+                 IfThenElse(*[1][.='['], 'bmatrix',
+                 IfThenElse(*[1][.='|'], 'vmatrix',
+                 IfThenElse(*[1][.='‖'], 'Vmatrix','Bmatrix')
+                )))"
+  - ShortMatrixType: "IfThenElse(*[1][.='('], 'bpm', 
+                 IfThenElse(*[1][.='['], 'bbm',
+                 IfThenElse(*[1][.='|'], 'bvm',
+                 IfThenElse(*[1][.='‖'], 'bVm','bBm')
+                )))"
+  match:
+  - "*[2][self::m:mtable] and"
+  - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or"
+  - " IsBracketed(., '|', '|') or IsBracketed(., '‖', '‖') or IsBracketed(., '{', '}') )"
+  replace:
+  - t: "𝐖\\begin{"
+  - x: "string($MatrixType)"     # need to get $MatrixType eval'd so that it is converted to braille (doesn't work if I do it in 'variables') 
+  - t: "}𝐖"
+  - x: "*[2]"
+  - t: "𝐖\\end{"
+  - x: "string($MatrixType)"     # need to get $MatrixType eval'd so that it is converted to braille (doesn't work if I do it in 'variables') 
+  - t: "}𝐖"
+
+-
+  name: default-mtable
+  tag: mtable
+  match: "."
+  replace: [x: "*"]
+-
+  name: default
+  tag: [mtr, mlabeledtr]
+  match: "."
+  replace:
+  #  - test:
+  #     if: .[self::m:mlabeledtr]
+  #     then:
+  #        - t: "⠗⠕⠺W⠇⠁⠃⠑⠇⠸⠒"  # "row label:"
+  #        - x: "*[1]/*"           # contents of row label
+  #  - test:
+  #     if: .[self::m:mlabeledtr]
+  #     then: [x: "*[position()>1]"]
+  #     else: {x: "*"}
+  - x: "*"
+  - test: 
+      if: "following-sibling::*"
+      then: [t: "𝐖\\\\𝐖"]
+
+-
+  name: default
+  tag: mtd
+  match: "."
+  replace:
+  - x: "*"
+  - test:
+      if: "following-sibling::*"
+      then: [t: "𝐖&𝐖"]
+
+-
+  name: no-content
+  tag: math
+  match: "not(*)"      # empty
+  replace: [t: "𝐖"]    # not sure that is right, but this shouldn't happen
+
+-
+  name: default
+  tag: math
+  match: "."
+  variables:
+  - MatchingWhitespace: "false()"
+  replace: [x: "*"]
+
+-
+  name: empty-mrow
+  tag: mrow
+  match: "not(*)"
+  replace: [t: "𝐖"] # not sure what is correct -- if in a fraction, probably something is better than nothing
+
+-
+  name: default
+  tag: mrow
+  match: "."
+  replace: [x: "*"]
+
+
+# FIX: need to deal with ~ ^ \
+#  they have macros \textasciitilde, \textasciicircum, and \textbackslash
+#  these probably aren't appropriate for EuroBraille
+-
+  # it seems that if a matching vertical bar is the start char, then it has a space after it
+  name: vertical-bar
+  tag: mo
+  match: ".='|'"
+  replace:
+  - x: "text()"
+  - test:
+      if: "not(preceding-sibling::*)"
+      then: [t: "𝐖"]
+
+-
+  name: default
+  tag: mo
+    # add spaces around comparison operators unless they are in a script position,
+  match: "."
+  replace:
+  - test:
+      # if: "parent::m:mrow and not(IsInDefinition(., 'Braille', 'NoSpacesBefore'))"
+      # then: [t: "𝐖"]
+      if: "parent::m:mrow"
+      then_test:
+          if: "not(IsInDefinition(., 'Braille', 'NoSpacesBefore'))"
+          then: [t: "𝐖"]
+  - x: "text()"
+  - test:
+      if: "parent::m:mrow and (.=',' or .=';')"     # are there others???
+      then: [t: "𝐖"]
+
+
+-
+  name: default
+  tag: mn
+  match: "."
+  replace:
+  - x: "text()" 
+    
+-
+  # FIX: need to deal with all caps
+  name: named-functions
+  tag: [mi, mtext]
+  match: "IsInDefinition(., 'Braille', 'LateXFunctionNames') and not($LaTeX_UseShortName)"
+  replace:
+  - t: "\\"
+  - x: "text()"
+  - t: "𝐖"
+    
+-
+  # FIX: need to deal with all caps
+  name: default
+  tag: [mi, mtext]
+  match: "."
+  replace:
+  - x: "text()" 
+
+-
+  name: default
+  tag: mstyle
+  match: "."
+  replace:
+  - test:
+      if: "*"
+      then: [x: "*"]
+      # else do nothing -- no content
+
+-
+  # FIX: what should be output
+  name: mhchem-hack
+  # this captures the output for the mhchem's "<=>", "<<=>", and "<=>>" output (there are no Unicode arrows for them)
+  # this isn't a perfect match, but should be good enough and allows merging all three (see github.com/NSoiffer/MathCAT/issues/60)
+  tag: mover
+  match:
+  -    "*[1][substring(., 1, 1)='↽'] and"
+  -    "*[2][substring(., string-length(), 1)='⇀']"
+  replace:
+  - t: "𝐖"
+  - test:
+      if: "*[1][self::m:mrow]"
+      then_test:
+          if: "*[2][self::m:mrow]"
+          then: [t: "🣒"]    # this is currently unassigned and may get used by UTC at some point (<=>)
+          else: [t: "🣔"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
+      else: [t: "🣓"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
+  - t: "𝐖"
+
+-
+  name: "hat"
+  tag: "mover"
+  match: "*[2][.='^']"
+  replace:
+  - t: "𝐖\\hat{"
+  - x: "*[1]"
+  - t: "}𝐖"
+
+-
+  name: "bar"
+  tag: "mover"
+  match: "*[2][.='_' or .='¯']"
+  replace:
+  - test:
+      if: "$LaTeX_UseShortName"
+      then: [t: "\\ol{"]
+      else: [t: "\\overline{"]
+  - x: "*[1]"
+  - t: "}"
+
+-
+  name: "vector"
+  tag: "mover"
+  match: "*[2][.='→']"
+  replace:
+  - t: "\\vec{"
+  - x: "*[1]"
+  - t: "}"
+
+-
+  name: pseudo-scripts
+  tag: "msup"
+  match: "*[2][translate(., \"'′″‴⁗°\", '')='']"
+  replace:
+  - x: "*[1]"
+  - x: "*[2]"
+
+
+-
+  name: "default"
+  tag: [msub, msup, msubsup]
+  match: "."
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "self::m:msup"
+      then: [t: "^"]
+      else: [t: "_"]
+  - test:
+      if: "*[2][IsNode(., 'leaf') and string-length(.) = 1]"
+      then: [x: "*[2]"]
+      else:
+      - t: "{"
+      - x: "*[2]"
+      - t: "}"
+  - test:
+      if: "self::m:msubsup"
+      then:
+      - t: "^"
+      - test:
+          if: "*[3][IsNode(., 'leaf') and string-length(.) = 1]"
+          then: [x: "*[3]"]
+          else:
+          - t: "{"
+          - x: "*[3]"
+          - t: "}"
+  - t: "𝐖"    # need to separate script from what follows
+
+-
+  name: "movable-limits"
+  tag: [munder, mover, munderover]
+  match: "*[1][IsInDefinition(., 'Braille', 'MovableLimitsLargeOps') or @movablelimits='true']"
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "self::m:mover"
+      then: [t: "^"]
+      else: [t: "_"]
+  - test:
+      if: "*[2][IsNode(., 'leaf') and string-length(.) = 1]"
+      then: [x: "*[2]"]
+      else:
+      - t: "{"
+      - x: "*[2]"
+      - t: "}"
+  - test:
+      if: "self::m:munderover"
+      then:
+      - t: "^"
+      - test:
+          if: "*[3][IsNode(., 'leaf') and string-length(.) = 1]"
+          then: [x: "*[3]"]
+          else:
+          - t: "{"
+          - x: "*[3]"
+          - t: "}"
+  - t: "𝐖"    # need to separate script from what follows
+
+-
+  name: "default"
+  tag: [munder, mover, munderover]
+  match: "."
+  replace:
+  - test:
+      if: "self::m:munderover"
+      then: [t: "\\overset{"]
+  - test:
+      if: "self::m:munder or self::m:undermover"
+      then: [t: "\\underset{"]
+      else: [t: "\\overset{"]
+  - x: "*[2]"
+  - t: "}{"
+  - x: "*[1]"
+  - t: "}"
+  - test:
+      if: "self::m:munderover"
+      then: [t: "}"]
+
+-
+  name: default
+  tag: mmultiscripts
+  match: "."
+  variables:
+  # computing the number of postscripts is messy because of <mprescripts> being optionally present -- we use "mod" to get the count right
+  - Prescripts: "m:mprescripts/following-sibling::*"
+  - NumChildren: "count(*)"       # need to stash this since the count is wrong inside '*[...]' below
+  - Postscripts: "*[position()>1 and position() < (last() + ($NumChildren mod 2) -count($Prescripts))]"
+  replace:
+  - test:
+      if: "$Prescripts"
+      then:
+      - test:
+          if: "preceding-sibling::*"
+          then: [t: "{}"]         # empty base not needed if this is the only expr
+      - test:
+          if: "not($Prescripts[1][self::m:none])"
+          then_test:
+              if: "$Prescripts[1][IsNode(., 'leaf') and string-length(.) = 1]"
+              then: [x: "$Prescripts[1]"]
+              else:
+              - t: "_{"
+              - x: "$Prescripts[1]"
+              - t: "}"
+      - test:
+          if: "not($Prescripts[2][self::m:none])"
+          then_test:
+              if: "$Prescripts[2][IsNode(., 'leaf') and string-length(.) = 1]"
+              then: [x: "$Prescripts[2]"]
+              else:
+              - t: "^{"
+              - x: "$Prescripts[2]"
+              - t: "}"
+      - test:
+          if: "count($Prescripts)>2"
+          then:
+          - test:
+              if: "not($Prescripts[3][self::m:none])"
+              then_test:
+                  if: "$Prescripts[3][IsNode(., 'leaf') and string-length(.) = 1]"
+                  then: [x: "$Prescripts[3]"]
+                  else:
+                  - t: "_{"
+                  - x: "$Prescripts[3]"
+                  - t: "}"
+          - test:
+              if: "not($Prescripts[4][self::m:none])"
+              then_test:
+                  if: "$Prescripts[4][IsNode(., 'leaf') and string-length(.) = 1]"
+                  then: [x: "$Prescripts[4]"]
+                  else:
+                  - t: "^{"
+                  - x: "$Prescripts[4]"
+                  - t: "}"
+          - test:
+              if: "count($Prescripts) > 4"   # give up and just dump them out so at least the content is there
+              then: [x: "$Prescripts[position() > 4]"]
+
+  - x: "*[1]"
+  - test:
+      if: "$Postscripts"
+      then:
+      - test:
+          if: "not($Postscripts[1][self::m:none])"
+          then_test:
+              if: "$Postscripts[1][IsNode(., 'leaf') and string-length(.) = 1]"
+              then: [x: "$Postscripts[1]"]
+              else:
+              - t: "_{"
+              - x: "$Postscripts[1]"
+              - t: "}"
+      - test:
+          if: "not($Postscripts[2][self::m:none])"
+          then_test:
+              if: "$Postscripts[2][IsNode(., 'leaf') and string-length(.) = 1]"
+              then: [x: "$Postscripts[2]"]
+              else:
+              - t: "^{"
+              - x: "$Postscripts[2]"
+              - t: "}"
+      - test:
+          if: "count($Postscripts)>2"
+          then:
+          - test:
+              if: "not($Postscripts[3][self::m:none])"
+              then_test:
+                  if: "$Postscripts[3][IsNode(., 'leaf') and string-length(.) = 1]"
+                  then: [x: "$Postscripts[3]"]
+                  else:
+                  - t: "_{"
+                  - x: "$Postscripts[3]"
+                  - t: "}"
+          - test:
+              if: "not($Postscripts[4][self::m:none])"
+              then_test:
+                  if: "$Postscripts[4][IsNode(., 'leaf') and string-length(.) = 1]"
+                  then: [x: "$Postscripts[4]"]
+                  else:
+                  - t: "^{"
+                  - x: "$Postscripts[4]"
+                  - t: "}"
+          - test:
+              if: "count($Postscripts)>4"
+              then:
+              - test:
+                  if: "not($Postscripts[5][self::m:none])"
+                  then_test:
+                      if: "$Postscripts[5][IsNode(., 'leaf') and string-length(.) = 1]"
+                      then: [x: "$Postscripts[5]"]
+                      else:
+                      - t: "_{"
+                      - x: "$Postscripts[5]"
+                      - t: "}"
+              - test:
+                  if: "not($Postscripts[6][self::m:none])"
+                  then_test:
+                      if: "$Postscripts[6][IsNode(., 'leaf') and string-length(.) = 1]"
+                      then: [x: "$Postscripts[6]"]
+                      else:
+                      - t: "^{"
+                      - x: "$Postscripts[6]"
+                      - t: "}"
+              - test:
+                  if: "count($Postscripts)>6"
+                  then:
+                  - test:
+                      if: "not($Postscripts[7][self::m:none])"
+                      then_test:
+                          if: "$Postscripts[7][IsNode(., 'leaf') and string-length(.) = 1]"
+                          then: [x: "$Postscripts[7]"]
+                          else:
+                          - t: "_{"
+                          - x: "$Postscripts[7]"
+                          - t: "}"
+                  - test:
+                      if: "not($Postscripts[8][self::m:none])"
+                      then_test:
+                          if: "$Postscripts[8][IsNode(., 'leaf') and string-length(.) = 1]"
+                          then: [x: "$Postscripts[8]"]
+                          else:
+                          - t: "^{"
+                          - x: "$Postscripts[8]"
+                          - t: "}"
+                  - test:
+                      if: "count($Postscripts) > 8"   # give up and just dump them out so at least the content is there
+                      then:
+                      - x: "$Postscripts[position() > 8]"
+  - t: "𝐖"    # need to separate script from what follows
+                
+
+-
+  # Note: @notation can contain more than one value
+  # LateX doesn't have a way to deal with most of these, so I've made up something that is probably readable.
+  # Because notation can have multiple values, there is a match to open the construct and another to close it.
+  # The MathCAT rules don't have a way to loop through the values, so they all have to be listed out.
+  #
+  # We place left and right outside of other notations because that doesn't require anything special in LaTeX
+  # The order of the matches potentially might matter for display, but for comprehension, it shouldn't matter
+  name: default
+  tag: menclose
+  match: "."
+  variables:
+  - IsBox: "contains(concat(' ', normalize-space(@notation), ' '), ' left ') and
+            contains(@notation,'top') and contains(@notation,'bottom') and
+            contains(concat(' ', normalize-space(@notation), ' '), ' right ')"                     # avoid 'leftarrow' and'rightarrow'
+
+  replace:
+  - test:
+      if: "not($IsBox) and contains(concat(' ', normalize-space(@notation), ' '), ' left ')"                  # avoid 'leftarrow'
+      then: [t: "|"]
+  - test:
+      if: "contains(@notation,'box') or $IsBox"                  # box and roundedbox
+      then:
+      - t: "\\boxed{"                                  # square 
+  - test:
+      if: "contains(@notation,'circle')"
+      then:
+      - t: "\\circle{"                                  # circle
+  - test:
+      if: "contains(@notation,'updiagonalstrike')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'downdiagonalstrike')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'verticalstrike')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'horizontalstrike')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'leftarrow')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')"  # avoid "leftrightarrow" match
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'northeastarrow')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'uparrow')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'northwestarrow')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'updownarrow')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'leftrightarrow')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'northeastsouthwestarrow')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'northwestsoutheastarrow')"
+      then: [t: "\\overwrite{"]
+#  - test:
+#      if: ".[contains(@notation,'actuarial')]"
+#      then: [t: actuarial symbol, pause: short]
+#  - test:
+#      if: ".[contains(@notation,'madrub')]"
+#      then: [t: arabic factorial symbol, pause: short]
+#  - test:
+#      if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']"      # default
+#      then: [t: long division symbol, pause: short]
+#  - test:
+#      if: ".[contains(@notation,'radical')]"
+#      then: [t: square root, pause: short]
+  - test:
+      if: "not($IsBox) and contains(@notation,'top')"
+      then: [t: "\\overline{"]                                                                
+  - test:
+      if: "not($IsBox) and contains(@notation,'bottom')"
+      then: [t: "\\underline{"]                                                                
+
+  - x: "*[1]"
+
+  - test:
+      if: "$IsBox or contains(@notation,'box')"                  # box and roundedbox
+      then:
+      - t: "}"                                  # square 
+  - test:
+      if: "contains(@notation,'circle')"
+      then:
+      - t: "}"                                  # circle
+  - test:
+      if: "contains(@notation,'updiagonalstrike')"
+      then: [t: "}{\\senwline}"]
+  - test:
+      if: "contains(@notation,'downdiagonalstrike')"
+      then: [t: "}{\\neswline}"]
+  - test:
+      if: "contains(@notation,'verticalstrike')"
+      then: [t: "}{\\vline}"]
+  - test:
+      if: "contains(@notation,'horizontalstrike')"
+      then: [t: "}{\\hline}"]
+  - test:
+      if: "contains(@notation,'leftarrow')"
+      then: [t: "}{\\longleftarrow}"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')"  # avoid "leftrightarrow" match
+      then: [t: "}{\\longrightarrow}"]
+  - test:
+      if: "contains(@notation,'northeastarrow')"
+      then: [t: "}{\\nearrow}"]
+  - test:
+      if: "contains(@notation,'uparrow')"
+      then: [t: "}{\\uparrow}"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')"
+      then: [t: "}{\\searrow}"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')"
+      then: [t: "}{\\downarrow}"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')"
+      then: [t: "}{\\swarrow}"]
+  - test:
+      if: "contains(@notation,'northwestarrow')"
+      then: [t: "}{\\nwarrow}"]
+  - test:
+      if: "contains(@notation,'updownarrow')"
+      then: [t: "}{\\updownarrow}"]
+  - test:
+      if: "contains(@notation,'leftrightarrow')"
+      then: [t: "}{\\longleftrightarrow}"]
+  - test:
+      if: "contains(@notation,'northeastsouthwestarrow')"
+      then: [t: "}{\\neswarrow}"]
+  - test:
+      if: "contains(@notation,'northwestsoutheastarrow')"
+      then: [t: "}{\\nwsearrow}"]
+#  - test:
+#      if: ".[contains(@notation,'actuarial')]"
+#      then: [t: actuarial symbol, pause: short]
+#  - test:
+#      if: ".[contains(@notation,'madrub')]"
+#      then: [t: arabic factorial symbol, pause: short]
+#  - test:
+#      if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']"      # default
+#      then: [t: long division symbol, pause: short]
+#  - test:
+#      if: ".[contains(@notation,'radical')]"
+#      then: [t: square root, pause: short]
+  - test:
+      if: "not($IsBox) and contains(@notation,'top')"
+      then: [t: "}"]                                                                
+  - test:
+      if: "not($IsBox) and contains(@notation,'bottom')"
+      then: [t: "}"]                                                                
+  - test:
+      if: "not($IsBox) and contains(concat(' ', normalize-space(@notation), ' '), ' right ')"                  #avoid 'rightarrow'
+      then: [t: "|"]
+
+-
+  name: default
+  tag: ms
+  match: "."
+  replace:
+    - test:
+        if: "string(@lquote)!=''"
+        then: [x: "@lquote"]
+        else: [t: "\""]
+    - x: "text()"
+    - test:
+        if: "string(@rquote)!=''"
+        then: [x: "@rquote"]
+        else: [t: "\""]
+
+-
+  name: default
+  tag: semantics
+  match: "."
+  replace: 
+    - x: "*[1]"             #/ FIX: should prioritize @encoding="MathML-Presentation" and @encoding="application/mathml-presentation+xml"
+
+-
+  name: default-children
+  tag: "*"
+  match: "*"    # make sure there are children
+  replace: 
+  - t: "unknown math m l element"
+  - x: "name(.)"
+  - x: "*"
+
+-
+  # at this point, we know there are no children -- might be no text
+  name: default-no-children
+  tag: "*"
+  match: "text()"
+  replace: 
+  - t: unknown math m l element
+  - x: "name(.)"
+  - x: "text()"
+
+-
+  name: default-no-text
+  tag: "*"
+  match: "."
+  replace: 
+  - t: "empty unknown math m l element"
+  - x: "name(.)"

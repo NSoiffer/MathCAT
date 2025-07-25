@@ -19,7 +19,7 @@
                # speak "comma" when not adjacent to '…'
             - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
                # except if expression starts with '…'
-            - " ../*[1][text()='…'] "
+            - " ../*[1][.='…'] "
         then: [t: "dấu phẩy"]                       #   (en: 'comma')
         # else silent
 
@@ -58,8 +58,8 @@
  - "{":                                             #  0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "mở nẹp"]                         #   (en: 'open brace')
-        else: [t: "đùi trái"]                       #   (en: 'left brace')
+        then: [t: "mở ngoặc nhọn"]                         #   (en: 'open brace')
+        else: [t: "mở ngoặc nhọn"]                       #   (en: 'left brace')
  - "|":                                             #  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
      - test:
@@ -74,10 +74,10 @@
  - "}":                                             #  0x7d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "đóng nẹp"]                       #   (en: 'close brace')
-        else: [t: "đúng nẹp"]                       #   (en: 'right brace')
+        then: [T: "đóng ngoặc nhọn"]                       #   (en: 'close brace')
+        else: [T: "đóng ngoặc nhọn"]                       #   (en: 'right brace')
 
- - "~": [t: "tilde"]                                #  0x7e
+ - "~": [T: "dấu ngã"]                                #  0x7e
  - " ": [t: ""]                                     #  0xa0
  - "¢": [t: "xu"]                                   #  0xa2 (en: 'cents')
  - "£": [t: "bảng"]                                 #  0xa3 (en: 'pounds')
@@ -353,7 +353,7 @@
             - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
-            - "../*[1][text()='…']"
+            - "../*[1][.='…']"
         then: [t: "chấm chấm chấm"]                 #   (en: 'dot dot dot')
         else_test:                                  #  must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"
@@ -737,11 +737,6 @@
          if: "$Verbosity!='Terse'"
          then: [t: "các"]                           #   (en: 'the')
      - t: "laplacian của"                           #   (en: 'laplacian of')
- - "∇":                                             #  0x2207
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "các"]                           #   (en: 'the')
-     - t: "độ dốc của"                              #   (en: 'gradient of')
  - "∈":                                             #  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
@@ -1232,7 +1227,7 @@
  - "⋄": [t: "người vận hành kim cương"]             #  0x22c4   (en: 'diamond operator')
  - "⋅": [T: "nhân"]                                 #  0x22c5
  - "⋆": [T: "nhân"]                                 #  0x22c6
- - "⋇": [t: "thời gian phân chia"]                  #  0x22c7   (en: 'division times')
+ - "⋇": [T: "nhân chia"]                  #  0x22c7   (en: 'division times')
  - "⋈": [t: "bowtie"]                               #  0x22c8
  - "⋉":                                             #  0x22c9
      - test: 
@@ -1433,6 +1428,7 @@
  - "⌵": [t: "cấm"]                                  #  0x2335   (en: 'countersink')
  - "⍰": [t: "hộp không xác định"]                   #  0x2370   (en: 'unknown box')
  - "⎕": [t: "hộp"]                                  #  0x2395   (en: 'box')
+ - "⏜": [t: "cung"]                        #  0x23DC   (en: 'top paren')
  - "⏞": [t: "nẹp trên cùng"]                        #  0x23DE   (en: 'top brace')
  - "⏟": [t: "niềng răng dưới cùng"]                 #  0x23DF   (en: 'bottom brace')
  - "①-⑨":                                           #  0x2460 - 0x2469

@@ -9,6 +9,9 @@
       - ClearSpeak_Fractions: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Fractions='Auto', 'EndFrac', $ClearSpeak_Fractions)"
       - ClearSpeak_AbsoluteValue: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
       - ClearSpeak_Roots: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
+      - ClearSpeak_Matrix: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Matrix='Auto', 'EndMatrix', $ClearSpeak_Matrix)"
+      # should be set at mtable level, but unknown intents make that impossible to know
+      - IsColumnSilent: false()
       replace:
       - test:
           if: "$MathRate = 100"
@@ -37,8 +40,22 @@
   match: "."
   replace:
   - bookmark: "@id"
-  # FIX: removing the digit block separators is likely locale dependent
-  - x: "translate(., ' `', '')"   # remove digit block separators
+  - test:
+      if: "@data-roman-numeral"
+      then:
+      - test:
+          if: "parent::*[1][self::m:chemical-formula]"
+          then:
+          - t: "hóa trị"
+          - x: "@data-number"
+          else:
+          - x: "@data-number"
+      - test:
+          if: "$Verbosity = 'Verbose'"
+          then: [t: "la mã"]
+      else:
+      # FIX: removing the digit block separators is likely locale dependent
+      - x: "translate(., ' `', '')"   # remove digit block separators
 
 - name: default
   tag: [mo, mtext]
@@ -55,7 +72,7 @@
   - test:
       if: "string-length(.) = 1"       # need unicode.tdl to kick in for single letter tokens
       then: [x: "text()"]
-      else: [x: "translate(., '-_', '  ')" ]   # from intent literals
+      else: [x: "translate(., '-_\u00A0', '  ')" ]   # from intent literals
 
 - name: default
   tag: ms
@@ -70,10 +87,94 @@
   match: "."
   replace: [{x: "*"}]
 
+
+- name: literal-simple
+  # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
+  # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
+  # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
+  tag: mfrac
+  match:
+  - "(IsNode(*[1],'leaf') and IsNode(*[2],'leaf')) and"
+  - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
+  replace:
+  - x: "*[1]"
+  - T: "phần"               # phrase("the fraction x 'over' y")
+  - x: "*[2]"
+  - pause: short
+
+- name: literal-default
+  tag: mfrac
+  match: "."
+  replace:
+  - T: "bắt đầu"              # phrase("'start'  fraction x over y end of fraction")
+  - pause: short
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1],'leaf'))"
+      then: [{pause: short}]
+  - T: "trên"               # phrase("the fraction x 'over' y")
+  - test:
+      if: "not(IsNode(*[2],'leaf'))"
+      then: [{pause: short}]
+  - x: "*[2]"
+  - pause: short
+  - T: "hết phân số"          # phrase("start of fraction x over y 'end over'")
+  - pause: medium
+
+
+# not sure what really should be said for these since we should not assume they are square roots
+- name: literal-default
+  tag: msqrt
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [T: ""]    # phrase("'the' root of x")
+  - T: "căn"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [T: "của"]    # phrase("the root 'of' x")
+  - x: "*[1]"
+  - pause: short
+  - test:
+      if: "not(IsNode(*[1],'leaf'))"
+      then: [T: "hết căn"] # phrase("root of x 'end root symbol'")
+
+# not sure what really should be said for these since we should not assume they are square roots
+- name: literal-default
+  tag: mroot
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [T: ""]   # phrase("'the' root of x")
+  - T: "căn"
+  - T: "bậc"      # phrase("the root of x 'with index' 5")
+  - x: "*[1]"
+  - pause: short
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [T: "của"]   # phrase("the root 'of' x")
+  - x: "*[2]"
+  - pause: short
+  - test:
+      if: "not(IsNode(*[2],'leaf'))"
+      then: [T: "hết căn"] # phrase("root of x 'end root symbol'")
+
+
 - name: simple-sub
-  tag: particular-value-of
-  # invisible comma -- want "x sub 1 1" without "end sub"
-  match: "IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']]"
+  tag: indexed-by
+  # invisible comma -- want "x 1 when subscript is an integer"
+  match: "count(*)=2 and $Verbosity='Terse' and *[2][self::m:mn and translate(., '.,', '')=.]"
+  replace:
+  - x: "*[1]"
+  - x: "*[2]"
+  - pause: short
+
+- name: no-end-sub
+  tag: indexed-by
+  # invisible comma -- want "x 1 when subscript is an integer"
+  match: "IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][.='⁣']]"
   replace:
   - x: "*[1]"
   - x: "*[2]"
@@ -81,28 +182,41 @@
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
       then: [{T: " "}]
 
-- name: default
-  tag: particular-value-of
+- name: literal
+  tag: msub
   match: "."
   replace:
   - x: "*[1]"
-  - T: "chỉ số dưới là"
   - x: "*[2]"
-  - T: "hết chỉ số dưới"
-  - pause: short
+  - T: "dưới"              # phrase(x 'sub' 2)
+
+- name: literal
+  tag: [msup, msubsup]
+  match: "."
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "name(.)='msubsup'"
+      then:
+      - x: "*[2]"
+      - T: "dưới"          # phrase(x 'sub' 2)
+  - test:
+      if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
+      then:  [x: "*[last()]"]
+      else_test:
+          if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"  # FIX: is this test necessary?
+          then:
+          - x: "*[last()]"
+          - T: "trên"      # phrase(x 'super' 2)
+          - test:
+              if: "not(IsNode(*[last()], 'simple'))"
+              then: [T: "hết chỉ số trên"]      # phrase(x super 2 'end of super')
+          else:
+          #- t: "raised to the"            # phrase(5 'raised to the' second power equals 25)
+          - T: "mũ"                    # phrase(5 raised to the second 'power' equals 25)
+          - x: "*[last()]"
 
 - name: default
-  tag: msubsup
-  match: "."
-  replace:
-  - x: "*[1]"
-  #- T: chỉ số dưới là
-  - x: "*[2]"
-  - T: "mũ"
-  - x: "*[3]"
-  
-- name: default
-  #    - T: power
   tag: munder
   match: "."
   replace:
@@ -113,6 +227,21 @@
   #- T: "với"
   #- x: "*[2]"
   - T: đáy
+
+-
+  name: overparen
+  tag: mover
+  match: "*[2][.='⏜']"
+  replace:
+  - x: "*[2]"     # shape indicator, overparen
+  - x: "*[1]"
+
+- name: diacriticals
+  tag: mover
+  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~→¯_', '')='']"
+  replace:
+  - x: "*[1]"
+  - x: "*[2]"
 
 - name: default
   tag: mover
@@ -139,6 +268,7 @@
   - T: "đáy và"
   - x: "*[3]"
   - T: "ngang"
+
 - name: default
   #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
   #   If there are more, we just dump them out without regard to sup/super :-(
@@ -292,7 +422,9 @@
 
 - name: default
   tag: mtable
-  variables: [{IsColumnSilent: false()}]
+  variables:
+  - IsColumnSilent: "false()"
+  - NumColumns: "count(*[1]/*) - IfThenElse(*/self::m:mlabeledtr, 1, 0)"
   match: "."
   replace:
   - T: "bảng gồm"
@@ -302,9 +434,9 @@
       then: {T: "dòng"}
       else: {T: "dòng"}
   - T: và
-  - x: "count(*[1]/*)"
+  - x: "$NumColumns"
   - test:
-      if: "count(*[1]/*)=1"
+      if: "$NumColumns"
       then: {T: "cột"}
       else: {T: "cột"}
   - pause: long
@@ -313,24 +445,57 @@
 - name: default
   # callers/context should do that.
   # this may get called from navigation -- in that case, there is no context to speak the row #, so don't do it
-  tag: mtr
+  tag: [mtr, mlabeledtr]
   match: "."
   replace:
-  - x: "*"
+  - pause: medium
+  - T: "dòng"      # phrase(the first 'row' of a matrix)
+  - x: "count(preceding-sibling::*)+1"
+  - test:
+      if: self::m:mlabeledtr
+      then:
+      - T: "có nhãn"      # phrase(the line 'with label' first equation)
+      - x: "*[1]/*"
+      - pause: short
+  - pause: medium
+  - test:
+      if: self::m:mlabeledtr
+      then: [{x: "*[position()>1]"}]
+      else: {x: "*"}
 
 - name: default
   tag: mtd
   match: "."
   replace:
-  - T: "cột"
-  - x: "count(preceding-sibling::*)+1"
-  - pause: medium
-  - x: "*" # speak the entry
-  - pause: long
+  - test:
+      #  ClearSpeak normally speaks "column 1" even though it says the row number, which is a waste...
+      #  The following is commented out but the count(...)!=0 probably belongs in other rule sets
+      #   if: not($IsColumnSilent) and ($ClearSpeak_Matrix = 'SpeakColNum' or count(preceding-sibling::*) != 0)
+      if: "not($IsColumnSilent)"
+      then:
+      - T: "cột"      # phrase(the first 'column' of the matrix)
+      - x: "count(preceding-sibling::*)+IfThenElse(parent::m:mlabeledtr, 0, 1)"
+      - pause: medium
+  - x: "*"
+  - test:
+    # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
+    - if: count(following-sibling::*) > 0
+      then: {pause: short}
+    - else_if: count(../following-sibling::*) > 0
+      then: {pause: medium}
+      else: {pause: long}
 
-- # The ordering below is the order in which words come out when there is more than one value
-  # 
-  name: default
+
+- name: empty-box
+  # The ordering below is the order in which words come out when there is more than one value
+  # Note: @notation can contain more than one value
+  tag: menclose
+  match: "@notation='box' and *[self::m:mtext and .=' ']"
+  replace:
+  - T: "ô rỗng"      # phrase(the 'empty box' contains no values)
+
+- name: default
+  # The ordering below is the order in which words come out when there is more than one value
   # Note: @notation can contain more than one value
   tag: menclose
   match: "."
@@ -347,7 +512,7 @@
   - test:
       if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or contains(concat(' ', normalize-space(@notation), ' '), ' right ') or contains(@notation,'top') or contains(@notation,'bottom') ]"
       then:
-      - T: đường nối
+      - T: đường trên
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
           then: [{T: trái}, {pause: short}]
@@ -435,8 +600,8 @@
       then: [{T: căn bậc hai}, {pause: short}]
   - T: bọc
   - test:
-      if: "*[self::m:mtext and text()=' ']"
-      then: [t: "một số không gian"]     # (en: "some space") otherwise there is complete silence
+      if: "*[self::m:mtext and .=' ']"
+      then: [T: "khoảng cách"]     # (en: "some space") otherwise there is complete silence
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
@@ -455,53 +620,107 @@
   replace:
   - x: "*[1]"
 
+- name: apply-function
+  tag: "apply-function"
+  match: .
+  replace:
+  - x: "*[1]"
+  - T: "ứng với"      # phrase(the function sine 'applied to' x plus y)
+  - x: "*[2]"
+
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':silent:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':silent:')"
   replace:
   - x: "*"
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: prefix-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':prefix:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':prefix:')"
   replace:
-  - x: "translate(name(.), '-_', '  ')"
+  - x: "SpeakIntentName(name(.), $Verbosity, 'prefix')"
   - x: "*"
-  - pause: short
+  - test:
+      if: "not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: postfix-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':postfix:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':postfix:')"
   replace:
-  - pause: short
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
   - x: "*"
-  - x: "translate(name(.), '-_', '  ')"
-
+  - x: "SpeakIntentName(name(.), $Verbosity, 'postfix')"
 
 - name: infix-intent
-  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':infix:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':infix:')"
   replace:
-  - pause: short
-  - insert:
-      nodes: "*"
-      replace: [x: "translate(name(.), '-_', '  ')", pause: auto]
-  - pause: short
-
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
+  - test:
+      if: "count(*) = 1"  # in cases such as continued-row, plus/minus might have just one child
+      then:
+      - x: "SpeakIntentName(name(.), $Verbosity, 'infix')"
+      - pause: auto
+      - x: "*[1]"
+      else:
+      - insert:
+          nodes: "*"
+          replace: [x: "SpeakIntentName(name(.), $Verbosity, 'infix')", pause: auto]
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"   # add (probably) a slightly longer pause if this came from a 2D node
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: function-intent
-  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  # uncaught intent -- speak as foo of arg1 comma arg2 .... The MathML spec requires arguments to functions
   tag: "*"
-  match: count(*)>0
+  match: "count(*)>0"
   replace:
-  - x: "translate(name(.), '-_', '  ')"
-  - t: "của"
-  - pause: short
+  - x: "SpeakIntentName(name(.), $Verbosity, 'function')"
+  - test:
+      if: "not(contains(@data-intent-property, ':literal:')) and
+           not(count(*)=2 and (IsInDefinition(*[1], 'TrigFunctionNames') or IsInDefinition(name(.), 'TerseFunctionNames')) and IsNode(*[2], 'simple'))"
+      then: [T: "của", pause: auto]      # phrase(sine 'of' 5)
   - insert:
       nodes: "*"
-      replace: [{t: "phẩy"}, {pause: auto}]
+      replace:
+      - test:
+          if: "not(contains(@data-intent-property, ':literal:'))"
+          then: [x: "','"]
+      - pause: auto
+  - test:
+      if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
+
+
+- name: default-text
+  # unknown leaf -- just speak the text -- could be a literal intent
+  tag: "*"
+  match: "."
+  replace:
+  - x: "translate(name(), '-_', ' ')"
