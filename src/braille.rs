@@ -2573,12 +2573,7 @@ impl BrailleChars {
             lower_case_roman_numerals(node);
             switch_if_english_style_number(node);
         }
-        let mut result = BrailleChars::get_braille_ueb_chars(node, text_range)?;
-        if let Some(value) = node.attribute_value("data-chem-element") {
-            if value != "1" {
-                result = result.replace("CL", "𝐶L");
-            }
-        }
+        let result = BrailleChars::get_braille_ueb_chars(node, text_range)?;
         return Ok(result);
 
         fn lower_case_roman_numerals(mn_node: Element) {
