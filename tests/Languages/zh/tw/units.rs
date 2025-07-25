@@ -90,8 +90,8 @@ fn si_base() {
                 1 米 逗號 2 米 逗號 \
                 1 莫耳, 逗號 2 莫耳, 逗號 \
                 1 秒 逗號 2 秒 逗號 \
-                1 秒, 逗號 2 秒, 逗號 \
-                1 秒, 逗號 2 秒, 逗號 \
+                1 秒 逗號 2 秒 逗號 \
+                1 秒 逗號 2 秒 逗號 \
                 1 秒 逗號 2 秒");
 }
 
@@ -331,10 +331,10 @@ fn without_prefix_time() {
         <mn>1</mn><mi intent=":unit">yr</mi><mo>,</mo><mn>2</mn><mi intent=":unit">yr</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 秒, 逗號 2 秒, 逗號 \
-                1 秒, 逗號 2 秒, 逗號 \
-                1 分, 逗號 2 分, 逗號 \
-                1 分, 逗號 2 分, 逗號 \
+        "1 秒 逗號 2 秒 逗號 \
+                1 秒 逗號 2 秒 逗號 \
+                1 分 逗號 2 分 逗號 \
+                1 分 逗號 2 分 逗號 \
                 1 分 逗號 2 分 逗號 \
                 1 時 逗號 2 時 逗號 \
                 1 時 逗號 2 時 逗號 \
@@ -360,7 +360,7 @@ fn without_prefix_angles() {
         <mn>1</mn><mi intent=":unit">asec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">asec</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 度, 逗號 2 度, 逗號 \
+        "1 度 逗號 2 度 逗號 \
                 1 度 逗號 2 度 逗號 \
                 1 弧分, 逗號 2 弧分, 逗號 \
                 1 弧分, 逗號 2 弧分, 逗號 \
