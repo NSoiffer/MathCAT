@@ -10,6 +10,10 @@
       - ClearSpeak_AbsoluteValue: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
       - ClearSpeak_Roots: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
       - ClearSpeak_Matrix: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Matrix='Auto', 'EndMatrix', $ClearSpeak_Matrix)"
+
+      - MatchingPause: false()
+      # should be set at mtable level, but unknown intents make that impossible to know
+      - IsColumnSilent: false()
       replace:
       - test:
           if: "$MathRate = 100"
@@ -23,7 +27,7 @@
   tag: mrow
   match: "not(*)"
   replace:
-  - t: " " # say nothing -- placeholder
+  - t: "" # say nothing -- placeholder
 
 - name: default
   tag: mrow
@@ -38,8 +42,7 @@
   match: "."
   replace:
   - bookmark: "@id"
-  # FIX: removing the digit block separators is likely locale dependent
-  - x: "translate(., ' ,`', '')"   # remove digit block separators
+  - x: "translate(., $BlockSeparators, '')"   # remove digit block separators
 
 - name: default
   tag: [mo, mtext]
@@ -54,9 +57,11 @@
   replace:
   - bookmark: "@id"
   - test:
-      if: "string-length(.) = 1 and text() != '_'"       # need unicode.tdl to kick in for single letter tokens
+    - if: "string-length(.) = 1 and text() != '_'"       # need unicode.tdl to kick in for single letter tokens
       then: [x: "text()"]
-      else: [x: "translate(., '-_', '  ')" ]   # from intent literals
+    - else_if: "@data-chem-element"                      # NavMode=Character needs this
+      then: [spell: "text()", pause: "short"]
+      else: [x: "translate(., '-_\u00A0', '  ')"]   # from intent literals or from extra spaces added (which get deleted)
 
 - name: default
   tag: ms
@@ -72,7 +77,7 @@
   replace: [x: "*"]
 
 
-- name: structure-simple
+- name: literal-simple
   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
   # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
   # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
@@ -86,7 +91,7 @@
   - x: "*[2]"
   - pause: short
 
-- name: structure-default
+- name: literal-default
   tag: mfrac
   match: "."
   replace:
@@ -95,50 +100,49 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - t: "die fraktion x "               # phrase("the fraction x 'over' y")
   - test:
       if: "not(IsNode(*[2],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - x: "*[2]"
   - pause: short
-  - t: "beginn des fraktion x über y "          # phrase("start of fraction x over y 'end over'")
+  - test:
+      if: "$Impairment = 'Blindness'"
+      then: [t: "beginn des fraktion x über y "]          # phrase("start of fraction x over y 'end over'")
   - pause: medium
 
 
 # not sure what really should be said for these since we should not assume they are square roots
-- name: structure-default
+- name: literal-default
   tag: msqrt
   match: "."
   replace:
   - test:
       if: "$Verbosity!='Terse'"
       then: [t: "die"]    # phrase("'the' root of x")
-  - t: "root symbol"
+  - t: "wurzel"
   - test:
       if: "$Verbosity!='Terse'"
       then: [t: "die wurzel "]    # phrase("the root 'of' x")
   - x: "*[1]"
   - pause: short
   - test:
-      if: "not(IsNode(*[1],'leaf'))"
+      if: "not(IsNode(*[1],'leaf')) or $Impairment = 'Blindness'"
       then: [t: "wurzel von x "] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
-- name: structure-default
+- name: literal-default
   tag: mroot
   match: "."
   replace:
   - test:
       if: "$Verbosity!='Terse'"
       then: [t: "die"]   # phrase("'the' root of x")
-  - t: "root symbol"
-  - t: "die wurzel von x "      # phrase("the root of x 'with index' 5")
+  - t: "die wurzel mit index " # phrase("the 'root with index' 3 of 5")
   - x: "*[1]"
   - pause: short
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [t: "die wurzel "]   # phrase("the root 'of' x")
+  - t: "die wurzel "              # phrase("the root 'of' x")
   - x: "*[2]"
   - pause: short
   - test:
@@ -147,36 +151,37 @@
 
 
 - name: simple-sub
-  tag: particular-value-of
-  # invisible comma -- want "x sub 1 1" without "end sub"
-  match: "count(*)=2 and (IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']])"
+  tag: indexed-by
+  # invisible comma -- want "x 1 when subscript is an integer"
+  match: "count(*)=2 and $Verbosity='Terse' and *[2][self::m:mn and translate(., '.,', '')=.]"
   replace:
   - x: "*[1]"
-  - test:
-      if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-      then: [t: "sub"]      # phrase(x 'sub' 2)
   - x: "*[2]"
+  - pause: short
 
-- name: default
-  tag: particular-value-of
-  match: "count(*)=2"
+- name: no-end-sub
+  tag: indexed-by
+  match: "count(*)=2 and *[2][self::m:mrow and *[2][.='⁣']]"
   replace:
   - x: "*[1]"
   - t: "sub"               # phrase(x 'sub' 2)
   - x: "*[2]"
-  - t: "ende von sub"           # phrase(x sub 2 'end of sub')
   - pause: short
 
+# otherwise let definitions/default infix handle it
 
-- name: structure
+- name: literal
   tag: msub
   match: "."
   replace:
   - x: "*[1]"
-  - t: "sub"              # phrase(x 'sub' 2)
+  - test:
+      if: "not($Verbosity='Terse' and *[2][self::m:mn and not(translate(., '.,', '')!=.)])"  # just say "x 1" for terse vs "x sub 1"
+      then: [t: "sub"]      # phrase(x 'sub' 2)
   - x: "*[2]"
 
-- name: structure
+
+- name: literal
   tag: [msup, msubsup]
   match: "."
   replace:
@@ -190,17 +195,23 @@
       if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
       then:  [x: "*[last()]"]
       else_test:
-          if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
+          if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"  # FIX: is this test necessary?
           then:
           - t: "super"      # phrase(x 'super' 2)
           - x: "*[last()]"
           - test:
-              if: "not(IsNode(*[last()], 'simple'))"
+              if: "not(IsNode(*[last()], 'simple')) or $Impairment = 'Blindness'"
               then: [t: "ende von super"]      # phrase(x super 2 'end of super')
           else:
-          - t: "raised to the"            # phrase(5 'raised to the' second power equals 25)
+          - test:
+              if: "$Verbosity='Verbose'"
+              then: [t: "superscript"]
+              else: [t: "super"]
           - x: "*[last()]"
-          - t: "power"                    # phrase(5 raised to the second 'power' equals 25)
+          - test:
+              if: "$Verbosity='Verbose'"
+              then: [t: "end -superscript"]
+              else: [t: "ende super"]
 
 - name: default
   tag: munder
@@ -208,7 +219,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modifiziert"]      # phrase(phrase(x 'modified' with y above it)
+      then: [t: "menge"]      # phrase(phrase(x 'quantity' with y above it)
   - x: "*[1]"
   - t: "mit"      # phrase(x 'with' z below it)
   - x: "*[2]"
@@ -216,7 +227,7 @@
 
 - name: diacriticals
   tag: mover
-  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~→¯_', '')='']"
+  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^ˇ~→¯_', '')='']"
   replace:
   - x: "*[1]"
   - x: "*[2]"
@@ -227,7 +238,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modifiziert"]      # phrase(phrase(x 'modified' with y above it)
+      then: [t: "menge"]      # phrase(phrase(the 'quantity' x plus 1 with y above it)
   - x: "*[1]"
   - t: "mit"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
@@ -239,7 +250,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modifiziert"]      # phrase(the equation has been 'modified')
+      then: [t: "menge"]      # phrase(the 'quantity' x plus 1 with y above it)
   - x: "*[1]"
   - t: "mit"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
@@ -309,7 +320,7 @@
               - test:
                   if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
                   then:
-                  - t: "and alternating prescripts"      # phrase(in this case there are values 'and alternating prescripts')
+                  - t: "und abwechselnde vorkripte"      # phrase(in this case there are values 'and alternating prescripts')
                   - x: "$Prescripts[position() > 4]"
                   - t: "end prescripts"      # phrase(This is where 'end prescripts' occurs)
   - test:
@@ -400,7 +411,9 @@
 
 - name: default
   tag: mtable
-  variables: [IsColumnSilent: false()]
+  variables:
+  - IsColumnSilent: "false()"
+  - NumColumns: "count(*[1]/*) - IfThenElse(*/self::m:mlabeledtr, 1, 0)"
   match: "."
   replace:
   - t: "tabelle mit"      # phrase(the 'table with' 3 rows)
@@ -409,10 +422,10 @@
       if: count(*)=1
       then: [t: "zeile"]      # phrase(the table with 1 'row')
       else: [t: "zeilen"]      # phrase(the table with 3 'rows')
-  - t: "and"      # phrase(the table with 3 rows 'and' 4 columns)
-  - x: "count(*[1]/*)"
+  - t: "und"      # phrase(the table with 3 rows 'and' 4 columns)
+  - x: "$NumColumns"
   - test:
-      if: "count(*[1]/*)=1"
+      if: "NumColumns=1"
       then: [t: "spalte"]      # phrase(the table with 3 rows and 1 'column')
       else: [t: "spalten"]      # phrase(the table with 3 rows and 4 'columns')
   - pause: long
@@ -424,18 +437,19 @@
   tag: [mtr, mlabeledtr]
   match: "."
   replace:
+  - pause: medium
   - t: "reihe"      # phrase(the first 'row' of a matrix)
   - x: "count(preceding-sibling::*)+1"
   - test:
-      if: .[self::m:mlabeledtr]
+      if: "self::m:mlabeledtr"
       then:
       - t: "mit der etikett"      # phrase(the line 'with label' first equation)
       - x: "*[1]/*"
       - pause: short
   - pause: medium
   - test:
-      if: .[self::m:mlabeledtr]
-      then: [{x: "*[position()>1]"}]
+      if: "self::m:mlabeledtr"
+      then: [x: "*[position()>1]"]
       else: {x: "*"}
 
 - name: default
@@ -449,23 +463,23 @@
       if: "not($IsColumnSilent)"
       then:
       - t: "spalte"      # phrase(the first 'column' of the matrix)
-      - x: "count(preceding-sibling::*)+1"
+      - x: "count(preceding-sibling::*)+IfThenElse(parent::m:mlabeledtr, 0, 1)"
       - pause: medium
   - x: "*"
   - test:
     # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
     - if: count(following-sibling::*) > 0
-      then: {pause: short}
+      then: [pause: short]
     - else_if: count(../following-sibling::*) > 0
-      then: {pause: medium}
-      else: {pause: long}
+      then: [pause: medium]
+      else: [pause: long]
 
 
 - name: empty-box
   # The ordering below is the order in which words come out when there is more than one value
   # Note: @notation can contain more than one value
   tag: menclose
-  match: "@notation='box' and *[self::m:mtext and text()=' ']"
+  match: "@notation='box' and *[self::m:mtext and .=' ']"
   replace:
   - t: "leere box"      # phrase(the 'empty box' contains no values)
 
@@ -499,7 +513,7 @@
           then: [t: "top", pause: short]      # phrase(line on 'top' of the expression)
       - test:
           if: ".[contains(@notation,'bottom')]"
-          then: [t: "bottom", pause: short]      # phrase(line on the 'bottom' of the expression)
+          then: [t: "unten", pause: short]      # phrase(line on the 'bottom' of the expression)
   - test:
       if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
       then:
@@ -553,7 +567,7 @@
       then: [t: "doppelt beendeten horizontalen pfeil", pause: short]      # phrase(progress is indicated by the 'double ended horizontal arrow')
   - test:
       if: ".[contains(@notation,'northeastsouthwestarrow')]"
-      then: [t: "double ended up diagonal arrow", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
+      then: [t: "doppelter diagonaler pfeil", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
   - test:
       if: ".[contains(@notation,'northwestsoutheastarrow')]"
       then: [t: "doppelt geendeten diagonalen pfeil", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
@@ -572,9 +586,9 @@
   - test:
       if: ".[contains(@notation,'radical')]"
       then: [t: "quadratwurzel", pause: short]      # phrase(5 is the 'square root' of 25)
-  - t: "enclosing"      # phrase(parentheses are 'enclosing' part of the equation)
+  - t: "einschließen"      # phrase(parentheses are 'enclosing' part of the equation)
   - test:
-      if: "*[self::m:mtext and text()=' ']"
+      if: "*[self::m:mtext and .=' ']"
       then: [t: "raum"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
       else: [x: "*"]
   - test:
@@ -605,54 +619,94 @@
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':silent:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':silent:')"
   replace:
   - x: "*"
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: prefix-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':prefix:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':prefix:')"
   replace:
-  - x: "translate(name(.), '-_', '  ')"
+  - x: "SpeakIntentName(name(.), $Verbosity, 'prefix')"
   - x: "*"
-  - pause: short
+  - test:
+      if: "not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: postfix-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':postfix:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':postfix:')"
   replace:
-  - pause: short
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
   - x: "*"
-  - x: "translate(name(.), '-_', '  ')"
-
+  - x: "SpeakIntentName(name(.), $Verbosity, 'postfix')"
 
 - name: infix-intent
-  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':infix:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':infix:')"
   replace:
-  - pause: short
-  - insert:
-      nodes: "*"
-      replace: [x: "translate(name(.), '-_', '  ')", pause: auto]
-  - pause: short
-
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
+  - test:
+      if: "count(*) = 1"  # in cases such as continued-row, plus/minus might have just one child
+      then:
+      - x: "SpeakIntentName(name(.), $Verbosity, 'infix')"
+      - pause: auto
+      - x: "*[1]"
+      else:
+      - insert:
+          nodes: "*"
+          replace: [x: "SpeakIntentName(name(.), $Verbosity, 'infix')", pause: auto]
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"   # add (probably) a slightly longer pause if this came from a 2D node
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: function-intent
-  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  # uncaught intent -- speak as foo of arg1 comma arg2 .... The MathML spec requires arguments to functions
   tag: "*"
-  match: count(*)>0
+  match: "count(*)>0"
   replace:
-  - x: "translate(name(.), '-_', '  ')"
-  - t: "of"      # phrase(sine 'of' 5)
-  - pause: short
+  - x: "SpeakIntentName(name(.), $Verbosity, 'function')"
+  - test:
+      if: "$Verbosity != 'Terse' and not(contains(@data-intent-property, ':literal:')) and
+           not(count(*)=2 and (IsInDefinition(*[1], 'TrigFunctionNames') or IsInDefinition(name(.), 'TerseFunctionNames')) and IsNode(*[2], 'simple'))"
+      then: [t: "von", pause: auto]      # phrase(sine 'of' 5)
   - insert:
       nodes: "*"
-      replace: [t: "comma", pause: auto]      # phrase(f of x 'comma' y)
+      replace:
+      - test:
+          if: "not(contains(@data-intent-property, ':literal:'))"
+          then: [x: "','"]
+      - pause: auto
+  - test:
+      # speak "end ..." if not bracketed or last child is not simple and not last node
+      if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
+
 
 - name: default-text
   # unknown leaf -- just speak the text -- could be a literal intent

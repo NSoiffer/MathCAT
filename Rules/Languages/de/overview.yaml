@@ -12,55 +12,46 @@
 # There is a balance that you want to maximize the info given, so 10 words is likely better then 3.
 #   That might mean that at the top level, we may want to allow the first few children to expand
 
-- name: default
-  tag: math
-  match: "."
-  replace: [{x: "*[1]"}]
 
-- name: default
-  tag: [mi, mn, mo, mtext]
-  match: "."
-  replace: [{x: text()}]
-
-- name: default
-  tag: mfrac
+- name: overview-default
+  tag: [mfrac, fraction]
   match: "."
   replace:
   - test:
       if: "IsNode(*[1], 'simple') and IsNode(*[2], 'simple')"
       then:
       - x: "*[1]"
-      - t: "over"
+      - t: "über"
       - x: "*[2]"
       else:
-      - t: "fraction"
+      - t: "fraktion"
 
-- name: default
-  tag: msqrt
+- name: overview-default
+  tag: [msqrt, "square-root"]
   match: "."
   replace:
-  - t: "square root"
+  - t: "quadratwurzel"
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "of"}
+          then: [t: "von"]
       - x: "*[1]"
 
-- name: default
-  tag: mroot
+- name: overview-default
+  tag: [mroot, root]
   match: "."
   replace:
   - test:
       if: "*[2][self::m:mn]"
       then_test:
-      - if: "*[2][text()='2']"
-        then: {t: "square root"}
-      - else_if: "*[2][text()='3']"
-        then: {t: "cube root"}
+      - if: "*[2][.='2']"
+        then: [t: "quadratwurzel"]
+      - else_if: "*[2][.='3']"
+        then: [t: "würfelwurzel"]
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {t: "root"}]
+        then: [x: "ToOrdinal(*[2])", t: "wurzel"]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -68,39 +59,39 @@
           - x: "*[2]"
           - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: {x: "*[2]"}
-      - t: "root"
+      - t: "wurzel"
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "of"}
+          then: [t: "von"]
       - x: "*[1]"
 
-- name: default
-  tag: mtable
+- name: matrix-override
+  tag: mrow
   match:
   - "*[2][self::m:mtable] and"
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
   replace:
-  - t: "the"
+  - t: "die"
   - x: count(*[2]/*)
-  - t: "by"
+  - t: "von"
   - x: count(*[2]/*[self::m:mtr][1]/*)
   - test:
-      if: "*[1][text()='|']" # just need to check the first bracket since we know it must be (, [, or |
-      then: {t: "determinant"}
-      else: {t: "matrix"}
+      if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
+      then: [t: "bestimmend"]
+      else: [t: "matrix"]
 
-- name: default
+- name: overview-default
   tag: mtable
   match: "."
   replace:
-  - t: "the"
+  - t: "die"
   - x: count(*[2]/*)
-  - t: "by"
+  - t: "von"
   - x: count(*[2]/*[self::m:mtr][1]/*)
-  - t: "table"
+  - t: "tisch"
 
 - name: short-mrow
   tag: mrow
@@ -108,7 +99,7 @@
   replace:
   - insert:
       nodes: "*"
-      replace: [{pause: auto}]
+      replace: [pause: auto]
 
 - name: long-mrow
   tag: mrow
@@ -124,6 +115,6 @@
   - pause: auto
   - x: "*[5]"
   - pause: auto
-  - t: "and so on"
+  - t: "und so weiter"
 
 - include: "SimpleSpeak_Rules.yaml"

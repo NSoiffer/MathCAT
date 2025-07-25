@@ -9,7 +9,7 @@
       then:
       - t: "das liniensegment von"      # phrase('the line segment from' A to B)
       - x: "*[1]"
-      - t: "to"                         # phrase(the line segment from A 'to' B)
+      - t: "zu"                         # phrase(the line segment from A 'to' B)
       - x: "*[2]"
       else:
       - t: "liniensegment"               # phrase(the 'line segment' A  B)
@@ -25,7 +25,7 @@
       then:
       - t: "der strahl von"             # phrase('the ray from' A to B)
       - x: "*[1]"
-      - t: "to"                       # phrase(the ray from A 'to' B)
+      - t: "zu"                       # phrase(the ray from A 'to' B)
       - x: "*[2]"
       else:
       - t: "ray"                      # phrase(the 'ray'A  B)
@@ -38,7 +38,7 @@
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "das"}]            # phrase('the' arc A B C)
+      then: [t: "das"]            # phrase('the' arc A B C)
   - t: "bogen"                        # phrase(the 'arc' A B C)
   - x: "*[1]"
   - x: "*[2]"
@@ -57,3 +57,23 @@
   - x: "*[2]"
   - x: "*[3]"
 
+
+- name: coordinate
+  tag: coordinate
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [t: "der"]      # phrase('the' point at 1, 2)
+  - t: "punkt"      # phrase(the 'point' at 1, 2)
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [t: "der"]      # phrase('the' point at 1, 2)
+  - pause: short
+  - insert:
+      nodes: "*"
+      replace: [t: "comma", pause: auto]      # phrase(f of x 'comma' y)
+  - pause: short
+  - test:
+      if: "($SpeechStyle='ClearSpeak' and $Verbosity='Verbose') or not(IsNode(*[last()],'leaf'))"
+      then: [t: "endpunkt"]      # phrase(start point, 'end point')
