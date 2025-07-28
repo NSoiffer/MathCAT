@@ -605,7 +605,7 @@ fn speak(mathml: Element, intent: Element, nav_node_id: String, full_read: bool)
                 Ok(speech) => return Ok(speech),
                 Err(e) => {
                     if e.to_string() != crate::speech::NAV_NODE_SPEECH_NOT_FOUND {
-                        return Err(e);
+                        return Err(format!("NAV_NODE_NOT_FOUND ('id' is missing) in\n{}", mml_to_string(mathml)).into());
                     }
                     // else could be something like '3' in 'x^3' ("cubed")
                 },
