@@ -421,7 +421,7 @@
  - "√":                                         	#  0x221a
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T "die"]                       	# 	(en: 'the', google translation)
+         then: [T: "die"]                       	# 	(en: 'the', google translation)
      - T: "quadratwurzel"                       	# 	(en: 'square root of', MathPlayer: 'radical', google: 'quadratwurzel von')
  - "∝":                                         	#  0x221d
      - test: 
