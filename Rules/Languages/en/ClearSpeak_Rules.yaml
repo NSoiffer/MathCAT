@@ -36,11 +36,11 @@
       if: "$Verbosity!='Terse'"
       then: [t: "the"]      # phrase('the' square root of 25)
   - test:
-      if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+      if: "$ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
       then:
       - bookmark: "*[1]/@id"
       - test:
-          if: parent::*[self::m:minus and count(*)=1]
+          if: "parent::*[self::m:minus and count(*)=1]"
           then: [t: "negative"]      # phrase(minus 4 is a 'negative' number)
           else: [t: "positive"]      # phrase(10 is a 'positive' number)
   - t: "square root"      # phrase(8 is the 'square root' of 64)
@@ -67,13 +67,13 @@
       if: "$Verbosity!='Terse'"
       then: [t: "the"]      # phrase(6 is 'the' square root of 36)
   - test:
-      if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+      if: "$ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
       then:
       - test:
           if: "parent::*[(self::m:minus or self::m:plus) and count(*)=1]"
           then: [bookmark: "parent/@id"]
       - test:
-          if: parent::m:minus
+          if: "parent::m:minus"
           then: [t: "negative"]      # phrase(minus 6 is a 'negative' number)
           else: [t: "positive"]      # phrase(10 is a 'positive' number)
   - test:
@@ -89,21 +89,21 @@
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-          else: {x: "*[2]"}
+          - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
+          else: [x: "*[2]"]
       - t: "root"      # phrase(the square 'root' of 36)
   - test:
       if: "$Verbosity!='Terse'"
       then: [t: "of"]      # phrase(the square root 'of' 36)
   - x: "*[1]"
   - test:
-      if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+      if: "$ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
       then:
       - pause: short
       - t: "end root"      # phrase(start the fifth root of x 'end root')
       - pause: medium
       else_test:
-        if: IsNode(*[1], 'simple')
+        if: "IsNode(*[1], 'simple')"
         then: [pause: short]
         else: [pause: long]
 
@@ -116,7 +116,7 @@
       if:
       - "*[1][self::m:square-root or self::m:root] and"
       - "($ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd')"
-      then: {t: ""}
+      then: [t: ""]
       else:
       - bookmark: "@id"
       - test:
@@ -146,8 +146,8 @@
   tag: fraction
   match:
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
-  - "*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
-  - "*[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
+  - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
+  - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
   variables: [IsPlural: "*[1]!=1"]
   replace:
   - x: "*[1]"
@@ -226,7 +226,7 @@
   - ot: "the"      # phrase(5 is 'the' square toot of 25)
   - t: "fraction with numerator"      # phrase(the 'fraction with numerator' 6)
   - test:
-      if: not(IsNode(*[1], 'simple'))
+      if: "not(IsNode(*[1], 'simple'))"
       then: [pause: medium]
   - x: "*[1]"
   - pause: medium
@@ -248,10 +248,10 @@
   match: "."
   replace:
   - test:
-      if: $ClearSpeak_Trig = 'TrigInverse'
-      then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, t: "inverse"]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
+      if: "$ClearSpeak_Trig = 'TrigInverse'"
+      then: [x: "*[1]", bookmark: "*[2]/@id", t: "inverse"]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
       else_test:
-        if: $ClearSpeak_Trig = 'ArcTrig'
+        if: "$ClearSpeak_Trig = 'ArcTrig'"
         then: [bookmark: "*[2]/@id", t: "arc", x: "*[1]"]      # phrase(the 'arc' of a circle)
         else: [bookmark: "*[2]/@id", t: "inverse", x: "*[1]"] # default/Auto      # phrase(8 over 5 is the 'inverse' of 5 over 8)
 
@@ -331,8 +331,8 @@
   - t: "to the"      # phrase(2 raised 'to the' power 7)
   - test:
       if: "*[2][.>0]"
-      then: {x: "ToOrdinal(*[2])"}
-      else: {x: "*[2]"}
+      then: [x: "ToOrdinal(*[2])"]
+      else: [x: "*[2]"]
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
       then: [t: "power"]      # phrase(2 raised to the 'power' 7)
@@ -358,7 +358,7 @@
   - x: "*[1]"
   - t: "to the"      # phrase(3 raised 'to the' power 7)
   - x: "*[2]"
-  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
       then: [t: "power"]      # phrase(2 raised to the 'power' 7)
@@ -523,14 +523,14 @@
           then: [t: "the"]      # phrase('the' set of all integers)
       - t: "set of"      # phrase(this is a 'set of' numbers)
       - test:
-          if: $ClearSpeak_Sets != 'woAll'
+          if: "$ClearSpeak_Sets != 'woAll'"
           then: [t: "all"]      # phrase(the set of 'all' integers)
       - x: "*[1]/*[1]"
       - t: "such that"      # phrase(the set S 'such that' x is less than y)
       - x: "*[1]/*[3]"
       else:
       - test:
-          if: $ClearSpeak_Sets != 'SilentBracket'
+          if: "$ClearSpeak_Sets != 'SilentBracket'"
           then:
           - test:
               if: "$Verbosity!='Terse'"
@@ -573,11 +573,11 @@
         else: [t: "but"]      # phrase(the interval including a 'but' not b)
     # some ugly logic dealing with connectives: or, but, but, and (cleaner to be part of next clause?)
   - test:
-      if: not($is_intervals_end_infinity)
+      if: "not($is_intervals_end_infinity)"
       then:
       - test:
           # there is some asymmetry to the test because of the and/or/but logic above
-          if: not( name(.)='open-interval' or name(.)='closed-interval' ) or $is_intervals_start_infinity
+          if: "not( name(.)='open-interval' or name(.)='closed-interval' ) or $is_intervals_start_infinity"
           then:
           - test:
               if: "name(.) = 'open-interval' or name(.) = 'closed-open-interval'"
@@ -605,21 +605,21 @@
   - t: "row"      # phrase(the first 'row' of a matrix)
   - x: "count(preceding-sibling::*)+1"
   - test:
-      if: .[self::m:mlabeledtr]
+      if: ".[self::m:mlabeledtr]"
       then:
       - t: "with label"      # phrase(the line 'with label' first equation)
       - x: "*[1]/*"
       - pause: short
   - pause: medium
   - test:
-      if: .[self::m:mlabeledtr]
+      if: ".[self::m:mlabeledtr]"
       then: [x: "*[position()>1]"]
-      else: {x: "*"}
+      else: [x: "*"]
 
 - # handle both log and ln
   name: ClearSpeak-log
   tag: mrow
-  variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
+  variables: [log_is_simple: "IsNode(*[3],'simple')"]
   match:
   - "count(*)=3 and"
   - "*[1][self::m:mi][.='log' or .='ln'] and"
@@ -630,7 +630,7 @@
       then_test:
       - if: "*[1][.='log']"
         then: [t: "log"]      # phrase(the 'log' of x)
-      - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
+      - else_if: "$ClearSpeak_Log = 'LnAsNaturalLog'"
         then: [t: "natural log"]      # phrase(the 'natural log' of the product of 2 numbers)
         else: [spell: "'ln'"]
       else:
@@ -640,7 +640,7 @@
       - test:
         - if: "*[1][.='log']"
           then: [t: "log"]
-        - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
+        - else_if: "$ClearSpeak_Log = 'LnAsNaturalLog'"
           then: [t: "natural log"]      # phrase(the 'natural log' of x)
           else: [spell: "'ln'"]
       - t: "of"      # phrase(the natural log 'of' x)
@@ -657,7 +657,7 @@
   - IsColumnSilent: true()
   replace:
   - test:
-    - if: $ClearSpeak_MultiLineOverview = 'Auto'
+    - if: "$ClearSpeak_MultiLineOverview = 'Auto'"
       then:
       - x: "$LineCount"
       - test:
