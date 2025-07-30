@@ -5,12 +5,12 @@
  - "a": 
     - test: 
         if: "$TTS='none'"
-        then: [t: "a"]                          	#  long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,	(en: 'eigh', google translation)
+        then: [T: "a"]                          	#  long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,	(en: 'eigh', google translation)
         else: [spell: "'a'"]                    	#     AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
  - "b-z": 
     - test: 
         if: "$TTS='none'"
-        then: [t: "a"]                          	# 	(en: '.', google translation)
+        then: [T: "a"]                          	# 	(en: '.', google translation)
         else: [spell: "'.'"]                       
 
  # Capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
@@ -127,18 +127,18 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "ist"]                       	# 	(en: 'is', google translation)
-     - t: "kleiner als"                         	# 	(en: 'less than')
+     - T: "kleiner als"                         	# 	(en: 'less than')
  - "=":                                         	#  0x3d
     - test: 
         if: "$Verbosity!='Terse'"
-        then: [t: "ist gleich"]                 	# 	(en: 'is equal to', google translation)
-        else: [t: "ist gleich"]                 	# 	(en: 'equals')
+        then: [T: "ist gleich"]                 	# 	(en: 'is equal to', google translation)
+        else: [T: "ist gleich"]                 	# 	(en: 'equals')
 
  - ">":                                         	#  0x3e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "ist"]                       	# 	(en: 'is', google translation)
-     - t: "größer als"                          	# 	(en: 'greater than')
+         then: [T: "ist"]                       	# 	(en: 'is', google translation)
+     - T: "größer als"                          	# 	(en: 'greater than')
  - "?": [T: "fragezeichen"]                     	#  0x3f	(en: 'question mark', MathPlayer: 'Frgezeichen', google: 'fragezeichen')
  - "@": [T: "ät-zeichen"]                      	#  0x40	(en: 'at sign')
  - "[":                                         	#  0x5b
@@ -146,7 +146,7 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: "offene eckige klammer"]             	# 	(en: 'open bracket', google translation)  #unklar
         else: [T: "eckige klammer auf"]         	# 	(en: 'left bracket', MathPlayer: 'eckig Klammer auf', google: 'linke klammer')
- - "\\": [t: "eckige klammer auf"]              	#  0x5c	(en: 'back slash', MathPlayer: 'eckig Klammer auf', google: 'rückenstrich')
+ - "\\": [T: "eckige klammer auf"]              	#  0x5c	(en: 'back slash', MathPlayer: 'eckig Klammer auf', google: 'rückenstrich')
  - "]":                                         	#  0x5d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
@@ -177,7 +177,7 @@
         then: [T: "schließende geschweifte klammer"]             	# 	(en: 'close brace', google translation)
         else: [T: "geschweifte klammer zu"]    	# 	(en: 'right brace')
 
- - "~": [t: "tilde"]                            	#  0x7e
+ - "~": [T: "tilde"]                            	#  0x7e
  - " ":                                         	#  0xa0
     - test:
         if: "@data-empty-in-2D and ../../../../*[name(.)!='equations']"
@@ -205,11 +205,11 @@
  - "̀": [T: "gravis akzent verzierung"]              	#  0x300	(en: 'grave accent embellishment', google: 'grabakzentverzierung')
  - "́": [T: "akut akzent verzierung"]           	#  0x301	(en: 'acute accent embellishment', google: 'akute akzentverzierung')
  - "̂": [T: "zirkumflex verzierung"]                	#  0x302	(en: 'circumflex accent embellishment', google: 'zirma akzentverzierung')
- - "̃": [t: "tilde verzierung"]              	#  0x303	(google: 'tilde verzierung')
- - "̄": [t: "makron akzent verzierung"]                 	#  0x304	(en: 'macron embellishment', google: 'makron -verzierung')
- - "̅": [t: "überstrich verzierung"]            	#  0x305	(google: 'überbärerverzierung')
- - "̆": [t: "brevis akzent verzierung"]                  	#  0x306	(en: 'breve', google: 'breve')
- - "̇": [t: "punkt darüber verzierung"]          	#  0x307	(google: 'punkt über verzierung')
+ - "̃": [T: "tilde verzierung"]              	#  0x303	(google: 'tilde verzierung')
+ - "̄": [T: "makron akzent verzierung"]                 	#  0x304	(en: 'macron embellishment', google: 'makron -verzierung')
+ - "̅": [T: "überstrich verzierung"]            	#  0x305	(google: 'überbärerverzierung')
+ - "̆": [T: "brevis akzent verzierung"]                  	#  0x306	(en: 'breve', google: 'breve')
+ - "̇": [T: "punkt darüber verzierung"]          	#  0x307	(google: 'punkt über verzierung')
 
    # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
  - "Α-Ω": 
@@ -419,9 +419,6 @@
  - "∗": [T: "mal"]                    	#  0x2217	(en: 'times', MathPlayer: 'asterisk operator', google: 'mal')
  - "∘": [T: "verknüpft mit"]                    	#  0x2218	(en: 'composed with')
  - "√":                                         	#  0x221a
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [T "die"]                       	# 	(en: 'the', google translation)
      - T: "quadratwurzel"                       	# 	(en: 'square root of', MathPlayer: 'radical', google: 'quadratwurzel von')
  - "∝":                                         	#  0x221d
      - test: 
@@ -519,4 +516,4 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "ist eine"]                   	# 	(en: 'is a', google translation)
-     - t: "obermenge oder gleich"               	# 	(en: 'superset of or equal to', MathPlayer: 'Obermenge von oder gleich', google: 'superset von oder gleich')
+     - T: "obermenge oder gleich"               	# 	(en: 'superset of or equal to', MathPlayer: 'Obermenge von oder gleich', google: 'superset von oder gleich')
