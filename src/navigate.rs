@@ -2098,7 +2098,6 @@ mod tests {
 
     #[test]
     fn binomial_intent() -> Result<()> {
-        init_logger();
         let mathml_str = "<math display='block' id='id-0'>
                     <mrow intent='binomial($n,$k)' id='id-1'>
                         <mo id='id-2'>(</mo>
