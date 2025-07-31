@@ -161,6 +161,33 @@ fn singular_frac_with_units() {
     test("nb", "SimpleSpeak", expr, "1 gallon per mile");
 }
 
+#[test]
+fn number_in_numerator_with_units() {
+    let expr = "
+    <math>
+        <mfrac>
+            <mrow>
+                <mn>3</mn>
+                <mi intent=':unit'>gal</mi>
+            </mrow>
+            <mi intent=':unit'>mi</mi>
+        </mfrac>
+    </math>";
+    test("nb", "SimpleSpeak", expr, "3 gallon per mile");
+}
+
+#[test]
+fn units_with_powers() {
+    let expr = "
+    <math>
+        <mfrac>
+            <mrow> <mn>3</mn> <mi intent=':unit'>m</mi> </mrow>
+            <msup> <mi intent=':unit'>s</mi><mn>2</mn> </msup>
+        </mfrac>
+    </math>";
+    test("nb", "SimpleSpeak", expr, "3 meter per sekund i andre");
+}
+
 
 #[test]
 fn mixed_number() {

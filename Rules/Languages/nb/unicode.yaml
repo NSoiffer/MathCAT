@@ -461,13 +461,13 @@
          then: [T: "er"]
      - T: "større enn eller lik"
     
- - "≦": # [t: "mindre än över lika med"]           #  0x2266 (en: 'less than over equal to')
+ - "≦":                                    #  0x2266 (en: 'less than over equal to')
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "er"] 
      - T: "mindre enn eller lik"
      
- - "≧": # [t: "större än över lika med"]           #  0x2267 (en: 'greater than over equal to')
+ - "≧":                                    #  0x2267 (en: 'greater than over equal to')
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "er"]

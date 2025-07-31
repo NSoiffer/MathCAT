@@ -47,7 +47,7 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - T: "størrelsen på vinkel"      # phrase('the measure of the angle' ABC)
+      - T: "størrelsen på vinkelen"      # phrase('the measure of the angle' ABC)
       else:
       - T: "vinkel"      # phrase('measure of angle' ABC)
   - x: "*[1]"
