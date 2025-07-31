@@ -45,14 +45,13 @@
   match: "."
   replace:
   - test:
-      if: "*[2][self::m:mn]"
+      if: "*[2][self::m:mn and not(contains(., $DecimalSeparators))]"     #NORWEGIAN: Changed decimal point to $DecimalSeparators
       then_test:
       - if: "*[2][.='2']"
         then: [T: "kvadratroten"]        # phrase(the 'square root' of x)
       - else_if: "*[2][.='3']"
         then: [T: "kubikkroten"]        # phrase(the 'cube root' of x)
-      - else_if: "*[2][not(contains(., ','))]"
-        then: [x: "ToOrdinal(*[2])", T: "roten"]        # phrase(the square 'root' of x)
+      - else: [x: "ToOrdinal(*[2])", T: "roten"]        # phrase(the square 'root' of x)
       else:
       - T: "roten av grad"      # phrase(the square 'root' of 36)
       - x: "*[2]"
@@ -67,36 +66,36 @@
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
-# NORWEGIAN: Changed decimal point to comma.
 - name: common-fraction
   tag: fraction
   match:
-  - "*[1][self::m:mn][not(contains(., ',')) and text()<20]   and"
-  - "*[2][self::m:mn][not(contains(., ',')) and 2<= text() and text()<=10]"
+  - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and text()<20]   and"                               #NORWEGIAN: Changed decimal point to $DecimalSeparators
+  - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and 2<= text() and text()<=10]"
   variables: [IsPlural: "*[1]!=1"]
   replace:
   - x: "*[1]"
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
-# NORWEGIAN: Changed decimal point to comma.
 - name: common-fraction-mixed-number
   tag: fraction
   match:
   - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
-  - "*[1][self::m:mn][not(contains(., ','))]   and"
-  - "*[2][self::m:mn][not(contains(., ',')) and text()<=10]"
+  - "*[1][self::m:mn][not(contains(., $DecimalSeparators))]   and"    #NORWEGIAN: Changed decimal point to $DecimalSeparators
+  - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and text()<=10]"
   variables: [IsPlural: "*[1]!=1"]
   replace:
   - x: "*[1]"
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
-# Units (e.g., meters per second)
-# NORWEGIAN: Added this rule from English version. Added rule for t="time"
+# Units (e.g., meters per second, m^2/s^2, (3m^2)/s)
+#NORWEGIAN: Added rule for t="time"
 - name: per-fraction
   tag: fraction
-  match: "$ClearSpeak_Fractions='Per' or
-          BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])] and
-          BaseNode(*[2])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit') or .='t'])]"   
+  match:
+  - "BaseNode(*[1])[contains(@data-intent-property, ':unit') or"
+  - "               ( self::m:mrow and count(*)=3 and"  # maybe a bit paranoid checking the structure...
+  - "                 *[1][self::m:mn] and *[2][.='\u2062'] and BaseNode(*[3])[contains(@data-intent-property, ':unit')] ) ] and"
+  - "BaseNode(*[2])[contains(@data-intent-property, ':unit') or (contains(@data-intent-property, ':unit') and .='t')] "
   replace:
   - x: "*[1]"
   - T: "per"      # phrase('5 meters 'per' second)
@@ -187,7 +186,7 @@
 
 - name: simple-integer
   tag: power
-  match: "*[2][self::m:mn][not(contains(., '.'))]"         #Norwegian: Here the decimal point should probably be comma
+  match: "*[2][self::m:mn][not(contains(., $DecimalSeparators))]" #NORWEGIAN: Changed decimal point to $DecimalSeparators
   replace:
   - x: "*[1]"
   - T: "opphøyd i"
@@ -198,7 +197,7 @@
   tag: power
   match:
   - "*[2][self::m:minus and count(*)=1 and"
-  - "     *[1][self::m:mn][not(contains(., '.'))]]"      #Norwegian: Here the decimal point should probably be comma
+  - "     *[1][self::m:mn][not(contains(., $DecimalSeparators))]]" #NORWEGIAN: Changed decimal point to $DecimalSeparators
   replace:
   - x: "*[1]"
   - T: "opphøyd i"
@@ -269,7 +268,7 @@
       - T: "mengden"      # phrase(here is a 'set' of numbers)
       - x: "*[1]"
 
-# NORWEGIAN: Added sqrt, so it for examples says "sqrt a times sqrt b"
+# NORWEGIAN: Added sqrt, so it, for example, says "sqrt a times sqrt b"
 - name: times
   tag: mo
   match:
@@ -305,7 +304,7 @@
   - "          not(self::m:math) ] and "       # rule out [x] standing alone
   - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
   - "( IsNode(*[2], 'simple')  ) and"
-  - "not(preceding-sibling::*[1][.='\u2062' and @data-function-guess]) and"                                                                          
+  - "not(preceding-sibling::*[1][.='\u2062' and @data-function-guess]) and"
   - "not(ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
   # missing clause: 'a positive fraction that is spoken as an ordinal
   #   (either by the Ordinal preference or by the default rules_'
