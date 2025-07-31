@@ -448,7 +448,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         context.set_variable("MatchCounter", loop_count as f64);
         context.set_variable("SpeechStyle",
                              Value::String(
-                                if nav_state.mode == "Character" {
+                                if nav_state.mode != "Enhanced" {
                                     "LiteralSpeak".to_string()
                                 } else {
                                     rules.pref_manager.borrow().pref_to_string("SpeechStyle")
@@ -604,7 +604,7 @@ fn speak(mathml: Element, intent: Element, nav_node_id: String, literal_speak: b
         //  but the node to speak is almost certainly trivial.
         // By speaking the non-intent tree, we are certain to speak on the next try
         if !literal_speak && get_node_by_id(intent, &nav_node_id).is_some() {
-            // debug!("speak: intent=\n{}", mml_to_string(intent));
+            // debug!("speak: nav_node_id={}, intent=\n{}", nav_node_id, mml_to_string(intent));
             match crate::speech::speak_mathml(intent, &nav_node_id) {
                 Ok(speech) => return Ok(speech),
                 Err(e) => {
@@ -1477,6 +1477,22 @@ mod tests {
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
+            do_commands(mathml)?;
+            set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
+            test_command("ZoomIn", mathml, "id-2");  // zooms to the first parenthesis
+            do_commands(mathml)?;
+            set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
+            test_command("ZoomIn", mathml, "id-4");
+            test_command("MoveNext", mathml, "id-6");
+            test_command("MoveNext", mathml, "id-9");
+            test_command("MovePrevious", mathml, "id-6");
+            test_command("MovePrevious", mathml, "id-4");
+
+            return Ok( () );
+        });
+
+        /// Simple and Character mode should behave the same
+        fn do_commands(mathml: Element) -> Result<()> {
             test_command("ZoomIn", mathml, "id-3");
             test_command("MoveNext", mathml, "id-4");
             test_command("MoveNext", mathml, "id-5");
@@ -1486,9 +1502,9 @@ mod tests {
             test_command("MovePrevious", mathml, "id-9");
             test_command("MovePrevious", mathml, "id-8");
             test_command("MovePrevious", mathml, "id-5");
-
+            test_command("ZoomOutAll", mathml, "id-1");
             return Ok( () );
-        });
+        }
     }
 
     #[test]
@@ -1508,6 +1524,20 @@ mod tests {
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
+            do_commands(mathml)?;
+            set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
+            do_commands(mathml)?;
+            set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
+            test_command("ZoomIn", mathml, "id-2");
+            test_command("MoveNext", mathml, "id-6");
+            test_command("MovePrevious", mathml, "id-2");
+
+            return Ok( () );
+        });
+
+        
+        /// Simple and Character mode should behave the same
+        fn do_commands(mathml: Element) -> Result<()> {
             test_command("ZoomIn", mathml, "id-2");
             test_command("MoveNext", mathml, "id-5");
             test_command("MoveNext", mathml, "id-6");
@@ -1515,9 +1545,8 @@ mod tests {
             test_command("MovePrevious", mathml, "id-6");
             test_command("MovePrevious", mathml, "id-5");
             test_command("MovePrevious", mathml, "id-2");
-
             return Ok( () );
-        });
+        }
     }
     
     #[test]
@@ -2069,28 +2098,51 @@ mod tests {
 
     #[test]
     fn binomial_intent() -> Result<()> {
-        let mathml_str = "   <math display='block' id='id-0'>
-                <mrow intent='binomial($n,$k)' id='id-1'>
-                    <mo id='id-2'>(</mo>
-                    <mfrac linethickness='0pt' id='id-3'>
-                        <mi arg='n' id='id-4'>n</mi>
-                        <mi arg='k' id='id-5'>k</mi>
-                    </mfrac>
-                <mo id='id-6'>)</mo>
-                </mrow>
-            </math>";
+        init_logger();
+        let mathml_str = "<math display='block' id='id-0'>
+                    <mrow intent='binomial($n,$k)' id='id-1'>
+                        <mo id='id-2'>(</mo>
+                        <mfrac linethickness='0pt' id='id-3'>
+                            <mi arg='n' id='id-4'>n</mi>
+                            <mi arg='k' id='id-5'>k</mi>
+                        </mfrac>
+                    <mo id='id-6'>)</mo>
+                    </mrow>
+                </math>";
         init_default_prefs(mathml_str, "Character");
         set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
+            debug!("Character mode");
             let speech = test_command("MoveStart", mathml, "id-2");
             assert_eq!(speech, "move to start of math; open paren");
+            let speech = test_command("MoveNext", mathml, "id-4");
+            // I'm not keen on the use of numerator/denominator here, but character mode turns off intent
+            assert_eq!(speech, "move right; in numerator; n");
+            let speech = test_command("MoveNext", mathml, "id-5");
+            assert_eq!(speech, "move right; in denominator; k");
+            debug!("before zoom out");
+            let speech = test_command("ZoomOut", mathml, "id-3");
+            assert_eq!(speech, "zoom out; out of denominator; n over k");
+            // let speech = test_command("ZoomOut", mathml, "id-1");
+            // assert_eq!(speech, "zoom out; open paren n over k, close paren");
 
-            // was on char not on intent tree
             set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
-            // let speech = test_command("ReadCurrent", mathml, "id-2");
-            // assert_eq!(speech, "read current; n choose k");
+            debug!("Simple mode");
+            let speech = test_command("ZoomIn", mathml, "id-4");
+            assert_eq!(speech, "zoom in; in part 1; n");
+            let speech = test_command("MoveNext", mathml, "id-5");
+            assert_eq!(speech, "move right; in part 2; k");
+            let speech = test_command("MoveNext", mathml, "id-5");
+            assert_eq!(speech, "cannot move right, end of math");
+            let speech = test_command("ZoomOut", mathml, "id-1");
+            assert_eq!(speech, "zoom out; out of part 2; open paren n over k, close paren");
+            let speech = test_command("ZoomOut", mathml, "id-1");
+            assert_eq!(speech, "zoomed out all the way; open paren n over k, close paren");
+
+            set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
+            debug!("Enhanced mode");
             let speech = test_command("ZoomIn", mathml, "id-4");
             assert_eq!(speech, "zoom in; in part 1; n");
             let speech = test_command("MoveNext", mathml, "id-5");
@@ -2099,6 +2151,7 @@ mod tests {
             assert_eq!(speech, "cannot move right, end of math");
             let speech = test_command("ZoomOut", mathml, "id-1");
             assert_eq!(speech, "zoom out; out of part 2; n choose k");
+
             return Ok( () );
         });
     }
