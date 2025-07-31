@@ -6,10 +6,10 @@
   replace:
   - with:
       variables:
-      - ClearSpeak_Fractions: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Fractions='Auto', 'EndFrac', $ClearSpeak_Fractions)"
-      - ClearSpeak_AbsoluteValue: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
-      - ClearSpeak_Roots: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
-      - ClearSpeak_Matrix: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Matrix='Auto', 'EndMatrix', $ClearSpeak_Matrix)"
+      - ClearSpeak_Fractions: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_Fractions='Auto', 'EndFrac', $ClearSpeak_Fractions)"
+      - ClearSpeak_AbsoluteValue: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
+      - ClearSpeak_Roots: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
+      - ClearSpeak_Matrix: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_Matrix='Auto', 'EndMatrix', $ClearSpeak_Matrix)"
 
       - MatchingPause: false()
       # should be set at mtable level, but unknown intents make that impossible to know
@@ -112,22 +112,20 @@
 
 
 # not sure what really should be said for these since we should not assume they are square roots
+#NORWEGIAN: Removed test for verbosity
 - name: literal-default
   tag: msqrt
   match: "."
   replace:
-  - T: "kvadratrot"
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [T: "av"]    # phrase("the root 'of' x")
+  - T: "roten av"
   - x: "*[1]"
   - pause: short
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [T: "slutt kvadratrot"] # phrase("root of x 'end root symbol'")
+      then: [T: "slutt rot"] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
-# NORWEGIAN: Changed to "med grad", and changed the order of the index and the variable/number in the root.
+# NORWEGIAN: Changed to "med grad", and changed the order of the index and the variable/number in the root. Removed test for verbosity. 
 - name: literal-default
   tag: mroot
   match: "."
@@ -136,9 +134,10 @@
   - T: "med grad"      # phrase("the root of x 'with index' 5")
   - x: "*[2]"
   - pause: short
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [T: "av"]   # phrase("the root 'of' x")
+  - T: "av"
+  #- test:
+      #if: "$Verbosity!='Terse'"
+      #then: [T: "av"]   # phrase("the root 'of' x")
   - x: "*[1]"
   - pause: short
   - test:
@@ -155,12 +154,12 @@
   - x: "*[2]"
   - pause: short
 
-# NORWEGIAN: Removed the following test: #if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1" 
+# NORWEGIAN: Removed the following test: if: "$Verbosity!='Terse' or not(*[2][self::m:mn])", which is in the Swedish translation. 
 # NORWEGIAN: Added "pause: short" before "senket"
 - name: no-end-sub
   tag: indexed-by
   # invisible comma -- want "x 1 when subscript is an integer"
-  match: "count(*)=2 and (IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][.='⁣']])"
+  match: "count(*)=2 and (IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][.='⁣']])"           #NORWEGIAN: Don't change this to English version. Then the rule "indexed-by" in definitions.yaml kicks in instead. Want to keep the pause before "senket". 
   replace:
   - x: "*[1]"
   - pause: short
@@ -168,13 +167,14 @@
   - x: "*[2]"
   - pause: short
 
-
 - name: literal
   tag: msub
   match: "."
   replace:
   - x: "*[1]"
-  - T: "senket"              # phrase(x 'sub' 2)
+  - test:
+      if: "not($Verbosity='Terse' and *[2][self::m:mn and not(translate(., '.,', '')!=.)])"  # say "x 1" for terse vs "x sub 1". Say "x sub 1,2"
+      then: [T: "senket"]      # phrase(x 'sub' 2)
   - x: "*[2]"
 
 - name: literal
@@ -203,14 +203,14 @@
           - x: "*[last()]"
           # - t: "power"                    # phrase(5 raised to the second 'power' equals 25)
 
-#NORWEGIAN: Changed to English version. Sounds better when navigating in character mode. 
+#NORWEGIAN: Changed to English version. 
 - name: default
   tag: munder
   match: "."
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "uttrykk"]      # phrase(phrase(x 'modified' with y above it)   #NORWEGIAN: Can't find a way to trigger this expression. Not sure if the translation is correct. 
+      then: [T: "uttrykk"]      # phrase(phrase(x 'modified' with y above it) 
   - x: "*[1]"
   - pause: short
   - T: "med"      # phrase(x 'with' z below it)
@@ -225,14 +225,14 @@
   - x: "*[1]"
   - x: "*[2]"
 
-#NORWEGIAN: Changed to English version. Sounds better when navigating in character mode. 
+#NORWEGIAN: Changed to English version.
 - name: default
   tag: mover
   match: "."
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "uttrykk"]      # phrase(phrase(x 'modified' with y above it)    #NORWEGIAN: Can't find a way to trigger this expression. Not sure if the translation is correct. 
+      then: [T: "uttrykk"]      # phrase(phrase(x 'modified' with y above it) 
   - x: "*[1]"
   - pause: short
   - T: "med"         # phrase(x modified 'with' y above it)
@@ -240,14 +240,14 @@
   - T: "over"        # phrase(x modified 'with' y above it)
   - pause: short
 
-#NORWEGIAN: Changed to English version. Sounds better when navigating in character mode
+#NORWEGIAN: Changed to English version.
 - name: default
   tag: munderover
   match: "."
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "uttrykk"]      # phrase(the equation has been 'modified')      #NORWEGIAN: Can't find a way to trigger this expression. Not sure if the translation is correct. 
+      then: [T: "uttrykk"]      # phrase(the equation has been 'modified')
   - x: "*[1]"
   - T: "med"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
@@ -275,8 +275,8 @@
       then:
       - with:
           variables:
-          - PreSubscript: "IfThenElse($Verbosity='Verbose', 'senket', 'senket')"
-          - PreSuperscript: "IfThenElse($Verbosity='Verbose', 'hevet', 'hevet')"
+          - PreSubscript: "IFTHENELSE($Verbosity='Verbose', 'senket', 'senket')"
+          - PreSuperscript: "IFTHENELSE($Verbosity='Verbose', 'hevet', 'hevet')"
           replace:
           - test: # only bother announcing if there is more than one prescript
               if: "count($Prescripts) > 2"
@@ -329,8 +329,8 @@
       then:
       - with:
           variables:
-          - PostSubscript: "IfThenElse($Verbosity='Verbose', 'senket', 'senket')"
-          - PostSuperscript: "IfThenElse($Verbosity='Verbose', 'hevet', 'hevet')"
+          - PostSubscript: "IFTHENELSE($Verbosity='Verbose', 'senket', 'senket')"
+          - PostSuperscript: "IFTHENELSE($Verbosity='Verbose', 'hevet', 'hevet')"
           replace:
           - test: # only bother announcing if there is more than one postscript
               if: "count($Postscripts) > 2"
@@ -703,9 +703,9 @@
   - insert:
       nodes: "*"
       replace: [T: "", pause: short]
-      # - test:
-      #     if: "not(contains(@data-intent-property, ':literal:'))"
-      #     then: [x: "','"]
+       #- test:
+           #if: "not(contains(@data-intent-property, ':literal:'))"
+           #then: [x: "','"]
       # SWEDISH/NORWEGIAN: After correspondence with a mathematician we have decided to not have any punctuation between variables, but a short pause. Length of pause needs to be tested.
   - test:
                                                                                       
