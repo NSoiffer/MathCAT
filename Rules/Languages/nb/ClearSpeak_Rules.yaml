@@ -70,14 +70,13 @@
           then: [T: "den negative"]      # phrase(minus 6 is a 'negative' number)
           else: [T: "den positive"]      # phrase(10 is a 'positive' number)
   - test:
-      if: "*[2][self::m:mn]"
+      if: "*[2][self::m:mn and not(contains(., $DecimalSeparators))]" #NORWEGIAN: Changed decimal point to $DecimalSeparators
       then_test:
       - if: "*[2][.='2']"
         then: [T: "kvadratroten"]      # phrase(5 is the 'square root' of 25)
       - else_if: "*[2][.='3']"
         then: [T: "kubikkroten"]        # phrase(5 is the 'cube root' of 625)
-      - else_if: "*[2][not(contains(., ','))]"   # SWEDISH/NORWEGIAN: Changed decimal point to comma.
-        then: [x: "ToOrdinal(*[2])", T: "roten"]      # phrase(the square 'root' of 25)
+      - else: [x: "ToOrdinal(*[2])", T: "roten"]      # phrase(the square 'root' of 25)
       else:
       - T: "roten av grad"      # phrase(the square 'root' of 36)
       - x: "*[2]"
@@ -116,14 +115,17 @@
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
-
+       
 # Units (e.g., meters per second)
-#NORWEGIAN: Changed to the English version. Added rule for t="time"
+#NORWEGIAN: Added rule for t="time"
 - name: per-fraction
   tag: fraction
-  match: "$ClearSpeak_Fractions='Per' or
-          BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])] and
-          BaseNode(*[2])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit') or .='t'])]"   
+  match:
+  - "$ClearSpeak_Fractions='Per' or"
+  - "(BaseNode(*[1])[contains(@data-intent-property, ':unit') or"
+  - "                ( self::m:mrow and count(*)=3 and"  # maybe a bit paranoid checking the structure...
+  - "                 *[1][self::m:mn] and *[2][.='\u2062'] and BaseNode(*[3])[contains(@data-intent-property, ':unit')] ) ] and"
+  - " BaseNode(*[2])[contains(@data-intent-property, ':unit') or (contains(@data-intent-property, ':unit') and .='t')] )"
   replace:
   - x: "*[1]"
   - T: "per"      # phrase('5 meters 'per' second)
@@ -137,11 +139,11 @@
   tag: fraction
   match:
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
-  - "*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
-  - "*[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
+  - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"              #NORWEGIAN: Changed decimal point to $DecimalSeparators
+  - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]"                                       #NORWEGIAN: Removed $ClearSpeak_Fractions='Ordinal', cause the pattern for ordinal fractions is not right. 
   variables: [IsPlural: "*[1]!=1"]
   replace:
-  - x: "*[1]"
+  - x: "*[1]" 
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 - name: common-fraction-mixed-number
@@ -149,14 +151,14 @@
   match:
   - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
-  - "*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
-  - "*[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
+  - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"                    #NORWEGIAN: Changed decimal point to $DecimalSeparators
+  - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]"                                             #NORWEGIAN: Removed $ClearSpeak_Fractions='Ordinal', cause the pattern for ordinal fractions is not right.
   variables: [IsPlural: "*[1]!=1"]
   replace:
   - x: "*[1]"
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
-#NORWEGIAN: Changed to English version
+#NORWEGIAN: Changed to English version, but changed decimal point to $DecimalSeparators 
 - name: fraction-over-simple
   tag: fraction
   match:
@@ -176,7 +178,7 @@
   - x: "*[2]"
   - test:
       # very ugly!!! -- replicate nested ordinal fraction as they are an exception
-      if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
+      if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
       then:
       - pause: short
       - T: "slutt brøk"      # phrase(7 over 8 'end fraction')
@@ -312,7 +314,7 @@
 
 - name: simple-integer
   tag: power
-  match: "*[2][self::m:mn][not(contains(., ','))]"
+  match: "*[2][self::m:mn][not(contains(., $DecimalSeparators))]"           #NORWEGIAN: Changed decimal point to $DecimalSeparators 
   replace:
   - x: "*[1]"
   - T: "opphøyd i"                 
@@ -324,7 +326,7 @@
   tag: power
   match:
   - "*[2][self::m:minus and count(*)=1 and"
-  - "     *[1][self::m:mn][not(contains(., ','))]"
+  - "     *[1][self::m:mn][not(contains(., $DecimalSeparators))]"       #NORWEGIAN: Changed decimal point to $DecimalSeparators 
   - "    ]"
   replace:
   - x: "*[1]"
@@ -352,6 +354,7 @@
 #   but the test cases all fall back to "raised to the exponent" when not "Auto"
 #   If these are allowed for non-Auto values, then you end up with "...power power...".
 - # [xxx]^n
+
   name: nested-squared-or-cubed
   tag: power
   match:
@@ -360,8 +363,8 @@
   - "     *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3
   # base is mn, mi, common fraction ([xxx] case)
   - "     *[1][self::m:mn or self::m:mi or "
-  - "          self::m:fraction[*[1][self::m:mn][not(contains(., ',')) and text()<20]   and"
-  - "                        *[2][self::m:mn][not(contains(., ',')) and 2<= text() and text()<=10]]"
+  - "          self::m:fraction[*[1][self::m:mn][not(contains(., $DecimalSeparators)) and text()<20]   and"                   #NORWEGIAN: Changed decimal point to $DecimalSeparators 
+  - "                        *[2][self::m:mn][not(contains(., $DecimalSeparators)) and 2<= text() and text()<=10]]"
   - "         ]"
   - "    ]"
   replace:
@@ -379,8 +382,8 @@
   - "                *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3"
   # base is mn, mi, common fraction ([xxx] case)
   - "                *[1][self::m:mn or self::m:mi or "
-  - "                     self::m:fraction[*[1][self::m:mn][not(contains(., ',')) and text()<20]   and"
-  - "                                   *[2][self::m:mn][not(contains(., ',')) and 2<= text() and text()<=10]]"
+  - "                     self::m:fraction[*[1][self::m:mn][not(contains(., $DecimalSeparators)) and text()<20]   and"                      #NORWEGIAN: Changed decimal point to $DecimalSeparators 
+  - "                                   *[2][self::m:mn][not(contains(., $DecimalSeparators)) and 2<= text() and text()<=10]]"
   - "               ]"
   - "          ]"
   - "     ]"
@@ -402,8 +405,8 @@
   - "       *[2][self::m:mo][.='⁢'] and " # invisible times
   # base is mn, or common fraction ([xxx] case)
   - "       *[1][self::m:mn or "
-  - "            self::m:fraction[*[1][self::m:mn][not(contains(., ',')) and text()<20]   and"
-  - "                          *[2][self::m:mn][not(contains(., ',')) and 2<= text() and text()<=10]]"
+  - "            self::m:fraction[*[1][self::m:mn][not(contains(., $DecimalSeparators)) and text()<20]   and"                         #NORWEGIAN: Changed decimal point to $DecimalSeparators 
+  - "                          *[2][self::m:mn][not(contains(., $DecimalSeparators)) and 2<= text() and text()<=10]]"
   - "           ]"
   - "      ]"
   replace:
@@ -425,8 +428,8 @@
   - "       *[1][self::m:minus and count(*)=1 and "
   # base is mn, or common fraction ([xxx] case)
   - "            *[1][self::m:mn or "
-  - "                 self::m:fraction[*[1][self::m:mn][not(contains(., ',')) and text()<20]   and"
-  - "                                  *[2][self::m:mn][not(contains(., ',')) and 2<= text() and text()<=10]]"
+  - "                 self::m:fraction[*[1][self::m:mn][not(contains(., $DecimalSeparators)) and text()<20]   and"                     #NORWEGIAN: Changed decimal point to $DecimalSeparators 
+  - "                                  *[2][self::m:mn][not(contains(., $DecimalSeparators)) and 2<= text() and text()<=10]]"
   - "                ]"
   - "           ]"
   - "      ]"
@@ -465,8 +468,8 @@
   # SWEDISH/NORWEGIAN: Differentiate between the initial and ending declaration of the terms.
   # NORWEGIAN: Say "kardinaliteten til", but "absoluttverdien av"
   variables:
-  - WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinaliteten til', 'absoluttverdien av')"
-  - EndToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinalitet', 'absoluttverdi')"
+  - WordToSay: "IFTHENELSE($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinaliteten til', 'absoluttverdien av')"
+  - EndToSay: "IFTHENELSE($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinalitet', 'absoluttverdi')"
   replace:
   - x: "$WordToSay"
   - x: "*[1]"
