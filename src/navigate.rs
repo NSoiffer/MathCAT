@@ -937,6 +937,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate::init_logger;
     use crate::interface::*;
+    use crate::element_util::*;
 
     #[cfg(test)]
     /// Assert if result_id != '' and it doesn't match the id of the result of the move

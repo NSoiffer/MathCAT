@@ -1822,7 +1822,7 @@ mod chem_tests {
     fn parse_mathml_string<F>(test: &str, test_mathml: F) -> bool
             where F: Fn(Element) -> bool {
         use sxd_document::parser;
-        use crate::interface::{get_element, trim_element};
+        use crate::element_util::{get_element, trim_element};
 
         let new_package = parser::parse(&test);
         if let Err(e) = new_package {
