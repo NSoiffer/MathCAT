@@ -552,7 +552,8 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         let nav_mathml = get_node_by_id(intent, &nav_position.current_node);
         if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", intent)?.0.unwrap() == "true" {
             // Speak/Overview of where we landed (if we are supposed to speak it) -- use intent, not nav_intent
-            let node_speech = speak(mathml, intent, nav_position.current_node, use_read_rules)?;
+            let literal_speak = context_get_variable(context, "SpeechStyle", intent)?.0.unwrap() == "LiteralSpeak";
+            let node_speech = speak(mathml, intent, nav_position.current_node, literal_speak, use_read_rules)?;
             // debug!("node_speech: '{}'", node_speech);
             if node_speech.is_empty() {
                 // try again in loop
@@ -592,14 +593,17 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
     }
 }
 
-fn speak(mathml: Element, intent: Element, nav_node_id: String, full_read: bool) -> Result<String> {
+/// Speak the intent tree at the nav_node_id if that id exists in the intent tree; otherwise use the mathml tree.
+/// If full_read is true, we speak the tree, otherwise we use the overview rules.
+/// If literal_speak is true, we use the literal speak rules (and use the mathml tree).
+fn speak(mathml: Element, intent: Element, nav_node_id: String, literal_speak: bool, full_read: bool) -> Result<String> {
     if full_read {
         // In something like x^3, we might be looking for the '3', but it will be "cubed", so we don't find it.
         // Or we might be on a "(" surrounding a matrix and that isn't part of the intent
         // We are probably safer in terms of getting the same speech if we retry intent starting at the nav node,
         //  but the node to speak is almost certainly trivial.
         // By speaking the non-intent tree, we are certain to speak on the next try
-        if get_node_by_id(intent, &nav_node_id).is_some() {
+        if !literal_speak && get_node_by_id(intent, &nav_node_id).is_some() {
             // debug!("speak: intent=\n{}", mml_to_string(intent));
             match crate::speech::speak_mathml(intent, &nav_node_id) {
                 Ok(speech) => return Ok(speech),
@@ -611,7 +615,20 @@ fn speak(mathml: Element, intent: Element, nav_node_id: String, full_read: bool)
                 },
             }
         }
-        return crate::speech::speak_mathml(mathml, &nav_node_id);
+        let properties  = mathml.attribute_value("data-intent-property").unwrap_or_default();
+        let add_literal = literal_speak && !properties.contains(":literal:");
+        if add_literal {
+            mathml.set_attribute_value("data-intent-property", (":literal:".to_string() + properties).as_str());
+        }
+        let speech = crate::speech::speak_mathml(mathml, &nav_node_id);
+        if add_literal {
+            if properties.is_empty() {
+                mathml.remove_attribute("data-intent-property");
+            } else {
+                mathml.set_attribute_value("data-intent-property", properties);
+            }
+        }
+        return speech;
     } else {
         return crate::speech::overview_mathml(mathml, &nav_node_id);
     }
@@ -1434,6 +1451,70 @@ mod tests {
             test_command("MoveNext", mathml, "id-13");
             test_command("MoveNext", mathml, "id-15");
             test_command("MoveNext", mathml, "id-15");
+
+            return Ok( () );
+        });
+    }
+
+    #[test]
+    fn char_mode_paren_test() -> Result<()> {
+        let mathml_str = "<math display='block' id='id-0'>
+            <mrow displaystyle='true' id='id-1'>
+                <mrow id='id-2'>
+                <mo id='id-3'>(</mo>
+                <mi id='id-4'>a</mi>
+                <mo id='id-5'>)</mo>
+                </mrow>
+                <mo id='id-6'>&#x2062;</mo>
+                <mrow id='id-7'>
+                <mo id='id-8'>(</mo>
+                <mi id='id-9'>b</mi>
+                <mo id='id-10'>)</mo>
+                </mrow>
+            </mrow>
+        </math>";
+        init_default_prefs(mathml_str, "Character");
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "id-3");
+            test_command("MoveNext", mathml, "id-4");
+            test_command("MoveNext", mathml, "id-5");
+            test_command("MoveNext", mathml, "id-8");
+            test_command("MoveNext", mathml, "id-9");
+            test_command("MoveNext", mathml, "id-10");
+            test_command("MovePrevious", mathml, "id-9");
+            test_command("MovePrevious", mathml, "id-8");
+            test_command("MovePrevious", mathml, "id-5");
+
+            return Ok( () );
+        });
+    }
+
+    #[test]
+    fn char_mode_trig_test() -> Result<()> {
+        let mathml_str = "<math id='id-0'>
+            <mrow id='id-1'>
+            <mi id='id-2'>sin</mi>
+            <mo id='id-3'>&#x2061;</mo>
+            <mrow id='id-4'>
+                <mo id='id-5'>(</mo>
+                <mi id='id-6'>x</mi>
+                <mo id='id-7'>)</mo>
+            </mrow>
+            </mrow>
+        </math>";
+        init_default_prefs(mathml_str, "Character");
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "id-2");
+            test_command("MoveNext", mathml, "id-5");
+            test_command("MoveNext", mathml, "id-6");
+            test_command("MoveNext", mathml, "id-7");
+            test_command("MovePrevious", mathml, "id-6");
+            test_command("MovePrevious", mathml, "id-5");
+            test_command("MovePrevious", mathml, "id-2");
 
             return Ok( () );
         });
