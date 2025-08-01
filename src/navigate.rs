@@ -553,7 +553,19 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", intent)?.0.unwrap() == "true" {
             // Speak/Overview of where we landed (if we are supposed to speak it) -- use intent, not nav_intent
             let literal_speak = context_get_variable(context, "SpeechStyle", intent)?.0.unwrap() == "LiteralSpeak";
-            let node_speech = speak(mathml, intent, nav_position.current_node, literal_speak, use_read_rules)?;
+            let node_speech = match speak(mathml, intent, &nav_position.current_node, literal_speak, use_read_rules) {
+                Ok(speech) => speech,
+                Err(e) => {
+                    if e.to_string() == crate::speech::NAV_NODE_SPEECH_NOT_FOUND {
+                        bail!("Internal error: With {}/{} in {} mode, can't {} to expression with id '{}' inside:\n{}",
+                              rules.pref_manager.as_ref().borrow().pref_to_string("Language"),
+                              rules.pref_manager.as_ref().borrow().pref_to_string("SpeechStyle"),
+                              &nav_state.mode, nav_command, &nav_position.current_node, mml_to_string(if literal_speak {mathml} else {intent}));
+                    } else {
+                        return Err(e);
+                    }
+                },
+            };
             // debug!("node_speech: '{}'", node_speech);
             if node_speech.is_empty() {
                 // try again in loop
@@ -596,7 +608,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
 /// Speak the intent tree at the nav_node_id if that id exists in the intent tree; otherwise use the mathml tree.
 /// If full_read is true, we speak the tree, otherwise we use the overview rules.
 /// If literal_speak is true, we use the literal speak rules (and use the mathml tree).
-fn speak(mathml: Element, intent: Element, nav_node_id: String, literal_speak: bool, full_read: bool) -> Result<String> {
+fn speak(mathml: Element, intent: Element, nav_node_id: &str, literal_speak: bool, full_read: bool) -> Result<String> {
     if full_read {
         // In something like x^3, we might be looking for the '3', but it will be "cubed", so we don't find it.
         // Or we might be on a "(" surrounding a matrix and that isn't part of the intent
@@ -609,7 +621,7 @@ fn speak(mathml: Element, intent: Element, nav_node_id: String, literal_speak: b
                 Ok(speech) => return Ok(speech),
                 Err(e) => {
                     if e.to_string() != crate::speech::NAV_NODE_SPEECH_NOT_FOUND {
-                        return Err(format!("NAV_NODE_NOT_FOUND ('id' is missing) in\n{}", mml_to_string(mathml)).into());
+                        return Err(e);
                     }
                     // else could be something like '3' in 'x^3' ("cubed")
                 },
