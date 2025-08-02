@@ -424,7 +424,6 @@
   - test:
     - if: "$Verbosity!='Terse'"
       then: [T: "el"]      # phrase('the' logarithm function is used in mathematics)
-
   - test:
     - if: ".= 'log'"
       then: [T: "log"]      # phrase(the 'log' function is used in mathematics)
