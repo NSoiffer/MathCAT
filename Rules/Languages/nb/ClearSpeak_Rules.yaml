@@ -75,7 +75,7 @@
       - if: "*[2][.='2']"
         then: [T: "kvadratroten"]      # phrase(5 is the 'square root' of 25)
       - else_if: "*[2][.='3']"
-        then: [T: "kubikkroten"]        # phrase(5 is the 'cube root' of 625)
+        then: [T: "kubikkroten"]      # phrase(5 is the 'cube root' of 625)
       - else: [x: "ToOrdinal(*[2])", T: "roten"]      # phrase(the square 'root' of 25)
       else:
       - T: "roten av grad"      # phrase(the square 'root' of 36)
@@ -117,7 +117,7 @@
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
        
 # Units (e.g., meters per second)
-#NORWEGIAN: Added rule for t="time"
+# NORWEGIAN: Added rule for t="time"
 - name: per-fraction
   tag: fraction
   match:
@@ -139,11 +139,11 @@
   tag: fraction
   match:
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
-  - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"              #NORWEGIAN: Changed decimal point to $DecimalSeparators
-  - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]"                                       #NORWEGIAN: Removed $ClearSpeak_Fractions='Ordinal', cause the pattern for ordinal fractions is not right. 
+  - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"    #NORWEGIAN: Changed decimal point to $DecimalSeparators
+  - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]"                             #NORWEGIAN: Removed $ClearSpeak_Fractions='Ordinal', cause the pattern for ordinal fractions is not right. 
   variables: [IsPlural: "*[1]!=1"]
   replace:
-  - x: "*[1]" 
+  - x: "*[1]"
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 - name: common-fraction-mixed-number
@@ -151,8 +151,8 @@
   match:
   - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
-  - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"                    #NORWEGIAN: Changed decimal point to $DecimalSeparators
-  - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]"                                             #NORWEGIAN: Removed $ClearSpeak_Fractions='Ordinal', cause the pattern for ordinal fractions is not right.
+  - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"     #NORWEGIAN: Changed decimal point to $DecimalSeparators
+  - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]"                              #NORWEGIAN: Removed $ClearSpeak_Fractions='Ordinal', cause the pattern for ordinal fractions is not right.
   variables: [IsPlural: "*[1]!=1"]
   replace:
   - x: "*[1]"
@@ -354,7 +354,6 @@
 #   but the test cases all fall back to "raised to the exponent" when not "Auto"
 #   If these are allowed for non-Auto values, then you end up with "...power power...".
 - # [xxx]^n
-
   name: nested-squared-or-cubed
   tag: power
   match:
@@ -770,7 +769,7 @@
   - "not( $ClearSpeak_ImpliedTimes = 'None' and "
   - "     (preceding-sibling::*[1][.='⁢'] or following-sibling::*[1][.='⁢']) ) and "
   - "IsNode(*[2], 'simple') and"
-  - "not(preceding-sibling::*[1][.='\u2062' and @data-function-guess]) and"                                   
+  - "not(preceding-sibling::*[1][.='\u2062' and @data-function-guess]) and"
   - "not(ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
   # missing clause: 'a positive fraction that is spoken as an ordinal
   #   (either by the Ordinal preference or by the default rules)'

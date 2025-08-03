@@ -49,7 +49,7 @@
  - "ʴ": [T: "med liten rotert r etter"]               #  0x2b4    (en: 'modifier small turned r', google translation)
  - "ʵ": [T: "med liten rotert r med krok etter"]    #  0x2b5    (en: 'modifier small turned r with hook', google translation)
  - "ʶ":                                             #  0x2b6
-    - T: "med liten rotert R etter"             #     (en: 'modifier small inverted', google translation)
+    - T: "med liten rotert"             #     (en: 'modifier small inverted', google translation)
     - spell: "translate('R', 'R', 'R')"
  - "ʷ": [T: "med liten w etter"]                  #  0x2b7    (en: 'modifier small w', google translation)
  - "ʸ": [T: "med liten y etter"]                  #  0x2b8    (en: 'modifier small y', google translation)
@@ -1200,7 +1200,7 @@
  # SWEDISH: misspelled to fix pronunciation
  - "⋂": [T: "snitt"]                                #  0x22c2    (en: 'intersection')
  - "⋃": [T: "union"]                                #  0x22c3
- - "⋄": [T: "diamant-operatør"]                     #  0x22c4
+ - "⋄": [T: "diamant-operator"]                     #  0x22c4
  - "⋅":                                             #  0x22c5
     - test: 
         if: "@data-chem-formula-op"
@@ -1760,7 +1760,7 @@
  - "⤍": [T: "stiplet høyrepil"]       #  0x290d    (en: 'rightwards double dash arrow')
  - "⤎": [T: "stiplet venstrepil"]    #  0x290e    (en: 'leftwards triple dash arrow')
  - "⤏": [T: "stiplet høyrepil"]      #  0x290f    (en: 'rightwards triple dash arrow')
- - "⤐": [T: "stiplet høyrepil med tre pisser"]    #  0x2910    (en: 'rightwards two headed triple dash arrow')
+ - "⤐": [T: "stiplet høyrepil med to spisser"]    #  0x2910    (en: 'rightwards two headed triple dash arrow')
  - "⤑": [T: "prikket høyrepil"]        #  0x2911    (en: 'rightwards arrow with dotted stem')
  - "⤒": [T: "oppoverpil mot strek"]                 #  0x2912
  - "⤓": [T: "nedoverpil mot strek"]               #  0x2913
@@ -2026,7 +2026,7 @@
  - "⨒": [T: "linjeintegral med rektangulær vei rundt pol"]    #  0x2a12    (en: 'line integration with rectangular path around pole')
  - "⨓": [T: "linjeintegral med halvsirkel-vei rundt pol"]    #  0x2a13    (en: 'line integration with semicircular path around pole')
  - "⨔": [T: "linjeintegral eksklusiv polen"]         #  0x2a14    (en: 'line integration not including the pole', MathPlayer: 'line integration not including the pole', google: 'linjeintegration inkluderar inte polen')
- - "⨕": [T: "integral rundt punkt-operator"]     #  0x2a15
+ - "⨕": [T: "integral rund punkt-operator"]     #  0x2a15
  - "⨖": [T: "integral med firkant"]         #  0x2a16
  - "⨗": [T: "integral med venstrepil med krok"]    #  0x2a17    (en: 'integral with leftwards arrow with hook')
  - "⨘": [T: "integral med multiplikasjonstegn"]    #  0x2a18    (en: 'integral with times sign', google: 'integrerad med times sign')
@@ -2476,34 +2476,34 @@
  - "㍸": [T: "kvadratdesimeter"]                   #  0x3378    (en: 'decimeters squared', google translation)
  - "㍹": [T: "kubikkdesimeter"]                  #  0x3379    (en: 'decimeters cubed', google translation)
  - "㍺": [T: "kvadratisk I U"]               #  0x337a    (en: 'instrumental units', google translation)
- - "㎀": [T: "piko-ampere"]                             #  0x3380    (google translation) #More likely to be pronounced correctly with a hyphen
+ - "㎀": [T: "piko-ampere"]                             #  0x3380    (google translation) #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㎁": [T: "nanoampere"]                             #  0x3381    (google translation)
  - "㎂": [T: "mikroampere"]                            #  0x3382    (google translation)
  - "㎃": [T: "milliampere"]                            #  0x3383    (google translation)
  - "㎄": [T: "kiloampere"]                             #  0x3384    (google translation)
  - "㎅": [T: "kilobyte"]                            #  0x3385    (google translation)
- - "㎆": [T: "mega-byte"]                             #  0x3386    (en: 'megabytes', google translation) #More likely to be pronounced correctly with a hyphen
+ - "㎆": [T: "mega-byte"]                             #  0x3386    (en: 'megabytes', google translation) #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㎇": [T: "gigabyte"]                             #  0x3387    (en: 'gigabytes', google translation)
  - "㎈": [T: "kalorier"]                             #  0x3388    (en: 'calories', google translation)
  - "㎉": [T: "kilokalorier"]                         #  0x3389    (en: 'kilocalories', google translation)
- - "㎊": [T: "piko-farad"]                           #  0x338a    (google translation) #More likely to be pronounced correctly with a hyphen
- - "㎋": [T: "nano-farad"]                           #  0x338b    (google translation) #More likely to be pronounced correctly with a hyphen
+ - "㎊": [T: "piko-farad"]                           #  0x338a    (google translation) #NORWEGIAN: More likely to be pronounced correctly with a hyphen
+ - "㎋": [T: "nano-farad"]                           #  0x338b    (google translation) #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㎌": [T: "mikrofarad"]                          #  0x338c    (google translation)
- - "㎍": [T: "mikro-gram"]                            #  0x338d    (en: 'micrograms', google translation) #More likely to be pronounced correctly with a hyphen
+ - "㎍": [T: "mikro-gram"]                            #  0x338d    (en: 'micrograms', google translation) #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㎎": [T: "milligram"]                           #  0x338e    (google translation)
  - "㎏": [T: "kilogram"]                             #  0x338f    (en: 'kilograms', google translation)
  - "㎐": [T: "hertz"]                                #  0x3390    (google translation)
  - "㎑": [T: "kilohertz"]                            #  0x3391    (google translation)
  - "㎒": [T: "megahertz"]                            #  0x3392    (google translation)
  - "㎓": [T: "gigahertz"]                            #  0x3393    (google translation)
- - "㎔": [T: "tera-hertz"]                            #  0x3394    (google translation) #More likely to be pronounced correctly with a hyphen
+ - "㎔": [T: "tera-hertz"]                            #  0x3394    (google translation) #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㎕": [T: "mikroliter"]                          #  0x3395    (google translation)
  - "㎖": [T: "milliliter"]                          #  0x3396    (google translation)
  - "㎗": [T: "desiliter"]                           #  0x3397    (google translation)
  - "㎘": [T: "kiloliter"]                            #  0x3398    (en: 'kiloliters', google translation)
- - "㎙": [T: "femto-meter"]                          #  0x3399    (en: 'femtometers', google translation)          #More likely to be pronounced correctly with a hyphen
+ - "㎙": [T: "femto-meter"]                          #  0x3399    (en: 'femtometers', google translation)          #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㎚": [T: "nanometer"]                           #  0x339a    (en: 'nanometers', google translation)
- - "㎛": [T: "mikro-meter"]                          #  0x339b    (en: 'micrometers', google translation)          #More likely to be pronounced correctly with a hyphen
+ - "㎛": [T: "mikro-meter"]                          #  0x339b    (en: 'micrometers', google translation)          #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㎜": [T: "millimeter"]                           #  0x339c    (en: 'millimeters', google translation)
  - "㎝": [T: "centimeter"]                           #  0x339d    (en: 'centimeters', google translation)
  - "㎞": [T: "kilometer"]                            #  0x339e    (en: 'kilometers', google translation)
@@ -2520,29 +2520,29 @@
  - "㎩": [T: "pascal"]                              #  0x33a9    (google translation)
  - "㎪": [T: "kilopascal"]                          #  0x33aa    (google translation)
  - "㎫": [T: "megapascal"]                          #  0x33ab    (google translation)
- - "㎬": [T: "giga-pascal"]                          #  0x33ac    (google translation)   #More likely to be pronounced correctly with a hyphen
+ - "㎬": [T: "giga-pascal"]                          #  0x33ac    (google translation)   #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㎭": [T: "radianer"]                                 #  0x33ad    (google translation)
  - "㎮": [T: "radianer per sekund"]                     #  0x33ae    (en: 'rads per second', google translation)
  - "㎯": [T: "radianer per sekund i andre"]              #  0x33af    (en: 'rads per second squared', google translation)
- - "㎰": [T: "piko-sekunder"]                         #  0x33b0    (en: 'picoseconds', google translation)   #More likely to be pronounced correctly with a hyphen
+ - "㎰": [T: "piko-sekunder"]                         #  0x33b0    (en: 'picoseconds', google translation)   #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㎱": [T: "nanosekunder"]                         #  0x33b1    (en: 'nanoseconds', google translation)
  - "㎲": [T: "mikrosekunder"]                        #  0x33b2    (en: 'microseconds', google translation)
  - "㎳": [T: "millisekunder"]                        #  0x33b3    (en: 'milliseconds', google translation)
- - "㎴": [T: "piko-volt"]                            #  0x33b4    (google translation)  #More likely to be pronounced correctly with a hyphen
+ - "㎴": [T: "piko-volt"]                            #  0x33b4    (google translation)  #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㎵": [T: "nanovolt"]                            #  0x33b5    (google translation)
  - "㎶": [T: "mikrovolt"]                           #  0x33b6    (google translation)
  - "㎷": [T: "millivolt"]                           #  0x33b7    (google translation)
  - "㎸": [T: "kilovolt"]                            #  0x33b8    (google translation)
  - "㎹": [T: "megavolt"]                            #  0x33b9    (google translation)
- - "㎺": [T: "piko-watt"]                            #  0x33ba    (google translation)  #More likely to be pronounced correctly with a hyphen
- - "㎻": [T: "nano-watt"]                            #  0x33bb    (google translation)  #More likely to be pronounced correctly with a hyphen
+ - "㎺": [T: "piko-watt"]                            #  0x33ba    (google translation)  #NORWEGIAN: More likely to be pronounced correctly with a hyphen
+ - "㎻": [T: "nano-watt"]                            #  0x33bb    (google translation)  #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㎼": [T: "mikrowatt"]                         #  0x33bc    (en: 'microwatts', google translation)
  - "㎽": [T: "milliwatt"]                           #  0x33bd    (google translation)
  - "㎾": [T: "kilowatt"]                            #  0x33be    (google translation)
- - "㎿": [T: "mega-watt"]                            #  0x33bf    (google translation) #More likely to be pronounced correctly with a hyphen
+ - "㎿": [T: "mega-watt"]                            #  0x33bf    (google translation) #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㏀": [T: "kiloohm"]                            #  0x33c0    (google translation)
  - "㏁": [T: "megaohm"]                             #  0x33c1    (google translation)
- - "㏂": [T: "atto-meter"]                           #  0x33c2    (en: 'attometers', google translation) #More likely to be pronounced correctly with a hyphen
+ - "㏂": [T: "atto-meter"]                           #  0x33c2    (en: 'attometers', google translation) #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㏃": [T: "becquerel"]                           #  0x33c3    (google translation)
  - "㏄": [T: "kubikkcentimeter"]                      #  0x33c4    (en: 'cubic centimeters', google translation)
  - "㏅": [T: "candela"]                             #  0x33c5    (google translation)
@@ -2564,7 +2564,7 @@
  - "㏕": [T: "mill"]                                #  0x33d5    (google translation)
  - "㏖": [T: "mol"]                            #  0x33d6    (en: 'moles', google translation)
  - "㏗": [T: "p h"]                                  #  0x33d7    (google translation)
- - "㏘": [T: "piko-meter"]                           #  0x33d8    (en: 'picometers', google translation) #More likely to be pronounced correctly with a hyphen
+ - "㏘": [T: "piko-meter"]                           #  0x33d8    (en: 'picometers', google translation) #NORWEGIAN: More likely to be pronounced correctly with a hyphen
  - "㏙": [T: "milliondeler"]                     #  0x33d9    (en: 'parts per million', google translation)
  - "㏚": [T: "petarøntgen"]                        #  0x33da    (google translation)
  - "㏛": [T: "steradianer"]                           #  0x33db    (google translation)
