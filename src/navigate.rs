@@ -287,6 +287,18 @@ pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -
 
 }
 
+/// Get's the Nav Node from the context, with some exceptions such as Toggle commands where it isn't set.
+pub fn get_nav_node<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>, start_node: Element<'c>, command: &str, nav_mode: &str) -> Result<(Option<String>, Option<f64>)> {
+    let start_id = start_node.attribute_value("id").unwrap_or_default();
+    if command.starts_with("Toggle") {
+        return Ok( (Some(start_id.to_string()), None) );
+    } else {
+        return context_get_variable(context, var_name, mathml)
+                .chain_err(|| format!("When trying to {} starting at id={} in {} mode",
+                                                command, start_node.attribute_value("id").unwrap_or_default(), nav_mode));
+    }
+}
+
 // FIX: think of a better place to put this, and maybe a better interface
 pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<(Option<String>, Option<f64>)> {
     // First return tuple value is string-value (if string, bool, or single node) or None
@@ -309,7 +321,8 @@ pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: E
                 };
                 let mut error_message = format!("Variable '{}' set somewhere in navigate.yaml is nodeset and not an attribute: ", var_name);
                 if nodes.size() == 0 {
-                    error_message += &format!("0 nodes (false) -- {} set to non-existent (following?/preceding?) node", var_name);
+                    error_message += &format!("0 nodes (false) -- {} set to non-existent node in\n{}",
+                                              var_name, mml_to_string(mathml));
                 } else {
                     let singular = nodes.size()==1;
                     error_message += &format!("{} node{}. {}:",
@@ -513,7 +526,8 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         nav_state.mode = context_get_variable(context, "NavMode", intent)?.0.unwrap();
         rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode)?;
 
-        let nav_position = match context_get_variable(context, "NavNode", intent)?.0 {
+        let nav_position = match get_nav_node(
+                        context, "NavNode", intent, start_node, nav_command, &nav_state.mode)?.0 {
             None => NavigationPosition::default(),
             Some(node) => NavigationPosition {
                 current_node: node,
@@ -543,7 +557,8 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         }
 
         if nav_command.starts_with("SetPlacemarker") {
-            if let Some(new_node_id) = context_get_variable(context, "NavNode", intent)?.0 {
+            if let Some(new_node_id) = get_nav_node(
+                            context, "NavNode", intent, start_node, nav_command, &nav_state.mode)?.0 {
                 let offset = context_get_variable(context, "NavNodeOffset", intent)?.1.unwrap() as usize;
                 nav_state.place_markers[convert_last_char_to_number(nav_command)] = NavigationPosition{ current_node: new_node_id, current_node_offset: offset};
             }
@@ -632,6 +647,7 @@ fn speak(mathml: Element, intent: Element, nav_node_id: &str, literal_speak: boo
         if add_literal {
             mathml.set_attribute_value("data-intent-property", (":literal:".to_string() + properties).as_str());
         }
+        // debug!("speak (literal): nav_node_id={}, mathml=\n{}", nav_node_id, mml_to_string(mathml));
         let speech = crate::speech::speak_mathml(mathml, &nav_node_id);
         if add_literal {
             if properties.is_empty() {
