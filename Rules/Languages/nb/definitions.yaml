@@ -324,6 +324,11 @@
     "bbl", "BBL", "lb",
   }
 
+    # stop when regularity begins
+- OrdinalFractionalDenominatorsForUnits: {
+         "0": "", "1": "", "2": "todels", "3": "tredjedels", "4": "fjerdedels", "5": "femtedels",
+         "6": "sjettedels", "7": "sjudels", "8": "åttedels", "9": "nidels", "10": "tidels",
+    }
 
 # ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words
@@ -383,11 +388,6 @@
          "nulldeler", "hele", "halve", "tredjedeler", "fjerdedeler", "femtedeler", "sjettedeler", "sjudeler", "åttedeler", "nideler",
          "tideler", "ellevedeler", "tolvdeler", "trettendeler", "fjortendeler", "femtendeler", "sekstendeler",
          "syttendeler", "attendeler", "nittendeler"
-    ]
-
-    # stop when regularity begins
-- NumbersOrdinalFractionalDenominatorsForUnits: [
-         "", "", "todels", "tredjedels", "fjerdedels", "femtedels", "sjettedels"
     ]
     
     # What to use for multiples of 10

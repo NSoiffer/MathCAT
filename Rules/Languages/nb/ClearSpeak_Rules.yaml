@@ -167,17 +167,9 @@
           - if: "$NeuterUnitFollows"
             then: [T: "halvt"]
             else: [T: "halv"]
-        - else_if: "*[2]=2"
-          then: [T: "todels"]
-        - else_if: "*[2]=3"
-          then: [T: "tredjedels"]
-        - else_if: "*[2]=4"
-          then: [T: "fjerdedels"]
-        - else_if: "*[2]=5"
-          then: [T: "femtedels"]
-        - else_if: "*[2]=6"
-          then: [T: "sjettedels"]
-          else: [x: "*[2]", CT: "dels"]   # this is wrong -- need to write a function to compute cardinal numbers as words
+        - else_if: "*[2] <= 10"
+          then: [x: "DefinitionValue(*[2], 'Speech', 'OrdinalFractionalDenominatorsForUnits')"]
+          else: [x: "*[2]", CT: "dels"]   # this is wrong but shouldn't occur normally -- need to write a function to compute cardinal numbers as words
 
 
 # - name: common-fraction-mixed-number
