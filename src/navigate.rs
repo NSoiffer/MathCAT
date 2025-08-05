@@ -433,7 +433,9 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                     }
                 }
             }
-            bail!("Internal error: Navigation exceeded limit of number of times no speech generated.");
+            bail!("Internal error: Navigation exceeded limit of number of times no speech generated
+                   when attempting to {} in {} mode start at id={} in this MathML:\n{}.",
+                   nav_command, nav_state.mode, nav_state.top().unwrap().0.current_node, mml_to_string(mathml));
         });
     });
 
