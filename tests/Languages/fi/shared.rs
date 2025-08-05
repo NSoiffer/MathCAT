@@ -109,8 +109,8 @@ fn prime() {
 #[test]
 fn given() {
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
-    test("fi", "SimpleSpeak", expr, "iso p; auki sulku, iso a pystysuora viiva iso b; kiinni sulku");
-    test("fi", "ClearSpeak", expr,  "iso p, auki sulku, iso a jakaa iso b, kiinni sulku");  // not good, but follows the spec
+    test("fi", "SimpleSpeak", expr, "iso p, auki sulku, iso a ehdolla iso b, kiinni sulku");
+    test("fi", "ClearSpeak", expr,  "iso p, auki sulku, iso a ehdolla iso b, kiinni sulku");
 }
 
 #[test]
@@ -844,14 +844,13 @@ fn FinME_secant_algorithm() {
 
 #[test]
 fn Fin_ME_law_of_sines() {
+  init_logger();
     let expr = "<math>
     <mfrac>
       <mi>a</mi>
       <mrow>
-        <mrow>
-          <mi>sin</mi>
-          <mo>⁡</mo>
-        </mrow>
+        <mi>sin</mi>
+        <mo>⁡</mo>
         <mi>α</mi>
       </mrow>
     </mfrac>
@@ -859,10 +858,8 @@ fn Fin_ME_law_of_sines() {
     <mfrac>
       <mi>b</mi>
       <mrow>
-        <mrow>
-          <mi>sin</mi>
-          <mo>⁡</mo>
-        </mrow>
+        <mi>sin</mi>
+        <mo>⁡</mo>
         <mi>β</mi>
       </mrow>
     </mfrac>
@@ -870,15 +867,13 @@ fn Fin_ME_law_of_sines() {
     <mfrac>
       <mi>c</mi>
       <mrow>
-        <mrow>
-          <mi>sin</mi>
-          <mo>⁡</mo>
-        </mrow>
+        <mi>sin</mi>
+        <mo>⁡</mo>
         <mi>γ</mi>
       </mrow>
     </mfrac>
   </math>";
-  test("fi", "ClearSpeak", expr, "murtoluku osoittaja a; ja nimittäjä sini arvolla alfa; on yhtä suuri kuin; murtoluku osoittaja b; ja nimittäjä sini arvolla beeta; on yhtä suuri kuin; murtoluku osoittaja c; ja nimittäjä sini arvolla gamma");
+  test("fi", "ClearSpeak", expr, "a per sini alfa, on yhtä suuri kuin, b per sini beeta, on yhtä suuri kuin, c per sini gamma");
   test("fi", "SimpleSpeak", expr, "murtoluku, a per, sini arvolla alfa, loppu murtoluku; on yhtä suuri kuin; murtoluku, b per, sini arvolla beeta, loppu murtoluku; on yhtä suuri kuin; murtoluku, c per, sini arvolla gamma, loppu murtoluku");
 }
 

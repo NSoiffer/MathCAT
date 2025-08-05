@@ -178,8 +178,11 @@
         - test:
             - if: "$SpeechStyle != 'ClearSpeak'"
               then_test:
-                  if: "$DefaultToGiven"
+                - if: "$DefaultToGiven"
                   then: [t: "given"]
+                - else_if: "preceding-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))] and 
+                            following-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))]"
+                  then: [t: "divides"]
                   else: [t: "vertical line"]
             - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
               then: [t: "vertical line"]
@@ -301,8 +304,15 @@
  - "⁡":                                          # 0x2061
     - test:
         # skip saying "of" when Terse and a trig function, when it is a shape (does this happen?), or we are in :literal mode
-        if: "not($Verbosity='Terse' and preceding-sibling::*[1][IsInDefinition(., 'TrigFunctionNames')]) and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
-             not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
+        if: "not(
+              ( $Verbosity='Terse' or ($SpeechStyle = 'ClearSpeak' and IsNode(following-sibling::*[1],'simple')) and
+                preceding-sibling::*[1][IfThenElse($SpeechStyle='ClearSpeak',
+                                                   IsInDefinition(., 'ClearSpeakTrigFunctionNames'),
+                                                   IsInDefinition(., 'TrigFunctionNames') )]
+              ) or
+              preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')] or
+              (@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])
+            )"
         then: [t: "of"]
  - "⁢": [t: ""]                                   # 0x2062
  - "⁣": [t: ""]                                   # 0x2063

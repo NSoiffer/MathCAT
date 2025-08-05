@@ -589,45 +589,37 @@
 
 - # handle both log and ln
   name: ClearSpeak-log
-  tag: mrow
-  variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
-  match:
-  - "count(*)=3 and"
-  - "*[1][self::m:mi][.='log' or .='ln' or .='lg'] and"
-  - "*[2][self::m:mo][.='⁡']"
+  tag: mi
+  match: ".='log' or .='lg' or .='ln'"
+  variables: [log_is_simple: "IsNode(following-sibling::*[2],'simple')"]
   replace:
   - test:
       if: "$log_is_simple"
       then_test:
-      - if: "*[1][.='log']"
-        then: [{T: "logg"}]      # phrase(the 'log' of x)
-      - else_if: "*[1][.='lg']"
-        then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
+      - if: ".='log'"
+        then: [T: "logg"]      # phrase(the 'log' of x)
+      - else_if: ".='lg'"
+        then: [spell: "'lg'"]      # phrase(the 'lg' of x)
       - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
-        then: [{T: "naturliga logaritmen"}]      # phrase(the 'natural log' of the product of 2 numbers)
-        else: [{spell: "'ln'"}]
+        then: [T: "naturliga logaritmen"]      # phrase(the 'natural log' of the product of 2 numbers)
+        else: [spell: "'ln'"]
       else:
       - test:
-        - if: "*[1][.='log']"
+        - if: ".='log'"
           then:
           - test:
             - if: "$Verbosity='Verbose'"
-              then: [{T: "logaritmen"}]
-              else: [{T: "logg"}]
-        - else_if: "*[1][.='lg']"
+              then: [T: "logaritmen"]
+              else: [T: "logg"]
+        - else_if: ".='lg'"
           then:
           - test:
             - if: "$Verbosity='Verbose'"
-              then: [{T: "tio-logaritmen"}]
-              else: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
+              then: [T: "tio-logaritmen"]
+              else: [spell: "'lg'"]      # phrase(the 'lg' of x)
         - else_if: $ClearSpeak_Log = 'LnAsNaturalLog' or $Verbosity='Verbose'
-          then: [{T: "naturliga logaritmen"}]      # phrase(the 'natural log' of x)
-          else: [{spell: "'ln'"}]
-      - test:
-        - if: "$Verbosity='Verbose'"
-          then: [{T: "av"}]      # phrase(the natural log 'of' x)
-      - pause: short
-  - x: "*[3]"
+          then: [T: "naturliga logaritmen"]      # phrase(the 'natural log' of x)
+          else: [spell: "'ln'"]
 
 - name: ClearSpeak-multi-line
   tag: [piecewise, system-of-equations, lines] # these are ignored in favor of the ClearSpeak prefs

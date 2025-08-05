@@ -15,7 +15,7 @@ fn trig_names() {
     <mi>csc</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>cot</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("sv", "ClearSpeak", expr, "sinus av x plus cosinus av y plus tangens av z plus sekans av alfa, plus cosekans av fi, plus cotangens av fi");
+    test("sv", "ClearSpeak", expr, "sinus x plus cosinus y plus tangens z plus sekans alfa, plus cosekans fi, plus cotangens fi");
 }
 
 #[test]
@@ -118,7 +118,7 @@ fn normal_ln() {
 fn simple_natural_log() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
     test_ClearSpeak("sv", "ClearSpeak_Log", "LnAsNaturalLog",expr,
-        "naturliga logaritmen x");
+        "naturliga logaritmen, x");
 }
 
     
@@ -126,7 +126,7 @@ fn simple_natural_log() {
 fn natural_log() {
     let expr = "<math><mi>ln</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></math>";
     test_ClearSpeak("sv", "ClearSpeak_Log", "LnAsNaturalLog",expr,
-    "naturliga logaritmen, vänster-parentes; x plus y; höger-parentes");
+    "naturliga logaritmen; vänster-parentes; x plus y; höger-parentes");
 }
 
 

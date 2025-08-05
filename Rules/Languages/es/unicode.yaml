@@ -246,9 +246,18 @@
             then: [T: "etcétera"]               	# 	(en: 'and so on', google translation)
             else: [T: "puntos suspensivos"]     	# 	(en: 'and so on up to', MathPlayer: 'punto punteado punteado', google: 'y así sucesivamente')
 
- - "⁡":                                         	#  0x2061
+ - "⁡":                                          # 0x2061
     - test:
-        if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
+        # skip saying "of" when Terse and a trig function, when it is a shape (does this happen?), or we are in :literal mode
+        if: "not(
+              ( $Verbosity='Terse' or ($SpeechStyle = 'ClearSpeak' and IsNode(following-sibling::*[1],'simple')) and
+                preceding-sibling::*[1][IfThenElse($SpeechStyle='ClearSpeak',
+                                                   IsInDefinition(., 'ClearSpeakTrigFunctionNames'),
+                                                   IsInDefinition(., 'TrigFunctionNames') )]
+              ) or
+              preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')] or
+              (@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])
+            )"
         then: [T: "de"]                         	# 	(en: 'of', google translation)
  - "⁢": [T: ""]                                 	#  0x2062
  - "⁣": [T: ""]                                 	#  0x2063

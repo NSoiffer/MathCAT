@@ -234,7 +234,7 @@
 # Due to this order, some things like "ft" and "cd" mean "feet" vs "femto-tonnes" and "pints" vs "pico-tonnes"
 - name: unit
   tag: unit
-  match: "$Verbosity != 'Terse' and contains(@data-intent-property, ':unit')"
+  match: "."
   variables:
     # If the coefficient is singular, we don't add the plural ending. Finding the coefficient is tricky
     # Normal case (A) "3m" (parents is mrow), but could also be (B) "3 m^2" (etc.) (parent is power/mrow)

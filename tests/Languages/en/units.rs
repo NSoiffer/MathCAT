@@ -473,9 +473,15 @@ fn si_other_numbers() {
                             <mn>1235</mn><mi intent=":unit">daN</mi><mo>,</mo>
                             <mn>2.5</mn><mi intent=":unit">&#xB5;sec</mi><mo>,</mo>
                             <mn>32.34</mn><mi intent=":unit">mol</mi></math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1.0 litre, comma; 2.0 metres, comma; x milli-seconds, comma; y micro-seconds, comma, \
-                deka-grams, comma; 1235 deka-newtons; comma; 2.5 micro-seconds; comma; 32.34 moles");
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr,
+            "1.0 l comma, 2.0 m comma; x milli-seconds, comma; y micro-seconds, comma, \
+                    deka-grams, comma; 1235 deka-newtons; comma; 2.5 micro-seconds; comma; 32.34 moles");
+    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
+            "1.0 litre, comma; 2.0 metres, comma; x milli-seconds, comma; y micro-seconds, comma, \
+                    deka-grams, comma; 1235 deka-newtons; comma; 2.5 micro-seconds; comma; 32.34 moles");
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+            "1.0 litre, comma; 2.0 metres, comma; x milli-seconds, comma; y micro-seconds, comma, \
+                    deka-grams, comma; 1235 deka-newtons; comma; 2.5 micro-seconds; comma; 32.34 moles");
 }
 
 

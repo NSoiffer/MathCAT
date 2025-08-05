@@ -252,7 +252,7 @@
 # Due to this order, some things like "ft" and "cd" mean "feet" vs "femto-tonnes" and "pints" vs "pico-tonnes"
 - name: unit
   tag: unit
-  match: "$Verbosity != 'Terse' and contains(@data-intent-property, ':unit')"
+  match: "."
   variables:
     # If the coefficient is singular, we don't add the plural ending. Finding the coefficient is tricky
     # Normal case (A) "3m" (parents is mrow), but could also be (B) "3 m^2" (etc.) (parent is power/mrow)
@@ -266,7 +266,7 @@
                          IfThenElse(parent::m:power, ancestor::*[2][self::m:mrow],
                          IfThenElse(parent::m:fraction and not(preceding-sibling::*), ancestor::*[2][self::m:mrow],
                          IfThenElse(parent::m:power[parent::m:fraction and not(preceding-sibling::*)], ancestor::*[3][self::m:mrow], false()) ) ) )"
-  - IsSingular: "(not(DEBUG($MRowForCoefficient)) and parent::*[name(.)!='skip-super' or *[1][.=1]]) or
+  - IsSingular: "(not($MRowForCoefficient) and parent::*[name(.)!='skip-super' or *[1][.=1]]) or
                  ($MRowForCoefficient and $MRowForCoefficient[(count(*) = 3 and *[1][self::m:mn and .=1] and *[2]='\u2062')])"
 
   - Prefix: "''"
@@ -454,40 +454,34 @@
 
 - # handle both log and ln
   name: log
-  tag: mrow
-  variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
-  match:
-  - "count(*)=3 and"
-  - "*[1][self::m:mi][.='log' or .='ln' or .='lg'] and"
-  - "*[2][self::m:mo][.='⁡']"
+  tag: mi
+  match: ".='log' or .='ln' or .='lg'"      # FI: added 'lg'
+  variables: [log_is_simple: "IsNode(following-sibling::*[2],'simple')"]
   replace:
-  - bookmark: "*[1]/@id"
+  - bookmark: "@id"
   - test:
       if: "$log_is_simple"
       then_test:
-      - if: "*[1][.='log']"
-        then: [{T: "logg"}]      # phrase(the 'log' function is used in mathematics)
-      - else_if: "*[1][.='lg']"
+      - if: ".='log'"
+        then: [T: "logg"]      # phrase(the 'log' function is used in mathematics)
+      - else_if: ".='lg'"
         then_test:
-        - if: "$Verbosity!='Verbose'"
-          then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
-          else: [{T: "tio-logaritmen"}]
+          if: "$Verbosity!='Verbose'"
+          then: [spell: "'lg'"]      # phrase(the 'lg' of x)
+          else: [T: "tio-logaritmen"]
       # SWEDISH: We have added the term "lg" for the logarithm with base 10. Also added a verbosity test for long and short form.
       - else_if: "$Verbosity!='Verbose'"
-        then: [{spell: "'ln'"}]
-        else: [{T: "naturliga logaritmen"}]      # phrase(the 'natural log' function is used in mathematics)
+        then: [spell: "'ln'"]
+        else: [T: "naturliga logaritmen"]      # phrase(the 'natural log' function is used in mathematics)
       else:
       - test:
-        - if: "*[1][.='log']"
-          then: [{T: "logg"}]      # phrase(the 'log' function is used in mathematics)
-        - else_if: "*[1][.='lg']"
-          then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
+        - if: ".='log'"
+          then: [T: "logg"]      # phrase(the 'log' function is used in mathematics)
+        - else_if: ".='lg'"
+          then: [spell: "'lg'"]      # phrase(the 'lg' of x)
         - else_if: "$Verbosity='Terse'"
-          then: [{spell: "'ln'"}]
-          else: [{T: "naturliga logaritmen"}]      # phrase(the 'natural log' function is used in mathematics)
-      - T: "av"      # phrase(5 is the square root 'of' 25)
-      - pause: short
-  - x: "*[3]"
+          then: [spell: "'ln'"]
+          else: [T: "naturliga logaritmen"]      # phrase(the 'natural log' function is used in mathematics)
 
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
