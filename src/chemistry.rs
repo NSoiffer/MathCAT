@@ -2295,7 +2295,7 @@ mod chem_tests {
 
     #[test]
     fn dichlorine_hexoxide() {
-        init_logger();
+        // init_logger();
         let test = "<math><mrow>
             <msup>
             <mrow><mo>[</mo><mi>Cl</mi><msub><mi>O</mi><mn>2</mn></msub><mo>]</mo></mrow>
