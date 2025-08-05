@@ -149,15 +149,18 @@
         - test:
             - if: "$SpeechStyle != 'ClearSpeak'"
               then_test:
-                  if: "$DefaultToGiven"
-                  then: [{pause: short}, {T: "gitt"}]
+                - if: "$DefaultToGiven"
+                  then: [pause: short, T: "gitt"]
+                - else_if: "preceding-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))] and 
+                            following-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))]"
+                  then: [T: "deler"]
                   else: [T: "vertikal strek"]
             - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
               then: [T: "vertikal strek"]
             - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
               then: [T: "slik at"]
             - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
-              then: [{pause: short}, {T: "gitt"}] 
+              then: [pause: short, T: "gitt"] 
             - else: [T: "deler"]
 
  - "}":                                          #  0x7d
@@ -271,9 +274,18 @@
 
  - "⁡":                                          #  0x2061 #NORWEGIAN: Changed to literal. Didn't add the test with "TrigFunctionName, cause want to say "sinus hyperbolicus av"
     - test:
-        if: "not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
-             not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
+        if: "preceding-sibling::*[1][.='log' or .='ln' or .='lg' or .='exp'] or
+             not(
+              ( $Verbosity='Terse' or ($SpeechStyle = 'ClearSpeak' and IsNode(following-sibling::*[1],'simple')) and
+                preceding-sibling::*[1][IfThenElse($SpeechStyle='ClearSpeak',
+                                                   IsInDefinition(., 'ClearSpeakTrigFunctionNames'),
+                                                   IsInDefinition(., 'TrigFunctionNames') )]
+              ) or
+              preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')] or
+              (@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])
+            )"
         then: [T: "av"]                          #  (en: 'of', google translation)
+
  - "⁢": [T: ""]                                  #  0x2062
  - "⁣": [T: ""]                                  #  0x2063
  - "⁤": [T: "og"]                              #  0x2064 (en: 'and', google: 'og')

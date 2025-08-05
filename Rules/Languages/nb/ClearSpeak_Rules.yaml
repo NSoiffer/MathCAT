@@ -104,7 +104,7 @@
       if:
       - "*[1][self::m:square-root or self::m:root] and"
       - "($ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd')"
-      then: {T: ""}
+      then: [T: ""]
       else:
       - bookmark: "@id"
       - test:
@@ -135,28 +135,62 @@
       else: 
        - x: "*[2]"
 
+# Note: if the bounds change for what is a common fraction, change them in general.yaml for units
 - name: common-fraction
   tag: fraction
   match:
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
   - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"    #NORWEGIAN: Changed decimal point to $DecimalSeparators
   - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]"                             #NORWEGIAN: Removed $ClearSpeak_Fractions='Ordinal', cause the pattern for ordinal fractions is not right. 
-  variables: [IsPlural: "*[1]!=1"]
+  variables:
+  - IsPlural: "*[1]!=1"
+  - UnitFollows: "following-sibling::*[2][self::m:unit]"   # assumes invisible times is *[1] -- 
+  - NeuterUnitFollows: "$UnitFollows and IsInDefinition(following-sibling::*[2], 'NeuterUnits')"
   replace:
-  - x: "*[1]"
-  - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
+  - test:
+    - if: "not($UnitFollows)"
+      then:
+      - x: "*[1]"
+      - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
+    # unit follows the fraction -- special cases
+    - else:
+      - test:
+          if: "*[1]=1"
+          then_test:
+          - if: "$NeuterUnitFollows"
+            then: [T: "ett"]
+            else: [T: "én"]
+          else: [x: "*[1]"]
+      - test:
+        - if: "*[1]=1 and *[2]=2"
+          then_test:
+          - if: "$NeuterUnitFollows"
+            then: [T: "halvt"]
+            else: [T: "halv"]
+        - else_if: "*[2]=2"
+          then: [T: "todels"]
+        - else_if: "*[2]=3"
+          then: [T: "tredjedels"]
+        - else_if: "*[2]=4"
+          then: [T: "fjerdedels"]
+        - else_if: "*[2]=5"
+          then: [T: "femtedels"]
+        - else_if: "*[2]=6"
+          then: [T: "sjettedels"]
+          else: [x: "*[2]", CT: "dels"]   # this is wrong -- need to write a function to compute cardinal numbers as words
 
-- name: common-fraction-mixed-number
-  tag: fraction
-  match:
-  - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
-  - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
-  - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"     #NORWEGIAN: Changed decimal point to $DecimalSeparators
-  - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]"                              #NORWEGIAN: Removed $ClearSpeak_Fractions='Ordinal', cause the pattern for ordinal fractions is not right.
-  variables: [IsPlural: "*[1]!=1"]
-  replace:
-  - x: "*[1]"
-  - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
+
+# - name: common-fraction-mixed-number
+#   tag: fraction
+#   match:
+#   - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
+#   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
+#   - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"     #NORWEGIAN: Changed decimal point to $DecimalSeparators
+#   - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]"                              #NORWEGIAN: Removed $ClearSpeak_Fractions='Ordinal', cause the pattern for ordinal fractions is not right.
+#   variables: [IsPlural: "*[1]!=1"]
+#   replace:
+#   - x: "*[1]"
+#   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 #NORWEGIAN: Changed to English version, but changed decimal point to $DecimalSeparators 
 - name: fraction-over-simple
@@ -243,7 +277,7 @@
   replace:
   - test:
       if: $ClearSpeak_Trig = 'TrigInverse'
-      then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, T: "invers"]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
+      then: [x: "*[1]", bookmark: "*[2]/@id", T: "invers"]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
       else_test:
         if: $ClearSpeak_Trig = 'ArcTrig'
         then: [bookmark: "*[2]/@id", T: "arcus", x: "*[1]"]      # phrase(the 'buelenge' of a circle)
@@ -570,36 +604,35 @@
   - test:
       if: .[self::m:mlabeledtr]
       then: [x: "*[position()>1]"]
-      else: {x: "*"}
+      else: [x: "*"]
 
 - # handle both log and ln
   name: ClearSpeak-log
-  tag: mrow
-  variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
-  match:
-  - "count(*)=3 and"
-  - "*[1][self::m:mi][.='log' or .='ln' or .='lg'] and"
-  - "*[2][self::m:mo][.='⁡']"
+  tag: mi
+  variables: [log_is_simple: "IsNode(following-sibling::*[2],'simple')"] # skip function apply
+  match: ".='log' or .='ln' or .='lg'"
   replace:
+  - bookmark: "@id"
   - test:
-      if: "$log_is_simple"
-      then_test:
-      - if: "*[1][.='log']"
-        then: [T: "log av"]      # phrase(the 'log' of x)
-      - else_if: "*[1][.='lg']"
-        then: [{spell: "'lg'"}, {T: "av"}]      # phrase(the 'lg' of x)
-      - else_if: $ClearSpeak_Log = 'LnAsNaturalLog' or $Verbosity='Verbose'
-        then: [T: "den naturlige logaritmen av"]      # phrase(the 'natural log' of the product of 2 numbers)
-        else: [{spell: "'ln'"}, {T: "av"}]
+      if: "IsNode(following-sibling::*[2],'simple')"
+      then:
+      - test:
+        - if: ".='log'"
+          then: [T: "log"]      # phrase(the 'log' of x)
+        - else_if: ".='lg'"
+          then: [spell: "'lg'"]      # phrase(the 'lg' of x)
+        - else_if: $ClearSpeak_Log = 'LnAsNaturalLog' or $Verbosity='Verbose'
+          then: [T: "den naturlige logaritmen"]      # phrase(the 'natural log' of the product of 2 numbers)
+          else: [spell: "'ln'"]
       else:
       - test:
-        - if: "*[1][.='log']"
+        - if: ".='log'"
           then:
           - test:
             - if: "$Verbosity='Verbose'"
               then: [T: "logaritmen"]
               else: [T: "log"]
-        - else_if: "*[1][.='lg']"
+        - else_if: ".='lg'"
           then:
           - test:
             - if: "$Verbosity='Verbose'"
@@ -608,10 +641,6 @@
         - else_if: $ClearSpeak_Log = 'LnAsNaturalLog' or $Verbosity='Verbose'
           then: [T: "den naturlige logaritmen"]      # phrase(the 'natural log' of x)
           else: [spell: "'ln'"]
-      #NORWEGIAN: Removed test for verbosity
-      - T: "av"
-      - pause: short
-  - x: "*[3]"
 
 #NORWEGIAN: Changed to English version
 - name: ClearSpeak-multi-line

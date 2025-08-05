@@ -310,24 +310,18 @@
 
 - NeuterUnits: {
     #SIUnits
-    "g": "gram",
-    "mol": "mol",
-    "s": "sekund", "sek": "sekund", 
-    "t": "tonn",
-    "a": "annuum",
-    "as": "buesekund",
+    "g","mol", "s", "sek", "t", "a", "as",
     
     #UnitsWithoutPrefixes
-    "″": "sekund", "\"": "sekund",
-    "′": "minutt", "'": "minutt", "min": "minutt",
-    "y": "år", "yr": "år",
-    "arcmin": "bueminutt", "amin": "bueminutt", "am": "bueminutt", "MOA": "bueminutt",                                    
-    "arcsec": "buesekund", "asec": "buesekund",
-    "ltyr": "lysår", "ly": "lysår", "l.y.": "lysår",
+    "″", "\"",
+    "′", "'", "min",
+    "y", "yr",
+    "arcmin", "amin", "am", "MOA":,                                    
+    "arcsec", "asec",
+    "ltyr", "ly", "l.y.",
     
     #EnglishUnits
-    "bbl": "fat", "BBL": "fat",
-    "lb": "pund",
+    "bbl", "BBL", "lb",
   }
 
 
@@ -389,6 +383,11 @@
          "nulldeler", "hele", "halve", "tredjedeler", "fjerdedeler", "femtedeler", "sjettedeler", "sjudeler", "åttedeler", "nideler",
          "tideler", "ellevedeler", "tolvdeler", "trettendeler", "fjortendeler", "femtendeler", "sekstendeler",
          "syttendeler", "attendeler", "nittendeler"
+    ]
+
+    # stop when regularity begins
+- NumbersOrdinalFractionalDenominatorsForUnits: [
+         "", "", "todels", "tredjedels", "fjerdedels", "femtedels", "sjettedels"
     ]
     
     # What to use for multiples of 10

@@ -72,7 +72,7 @@ fn simple_log() {
 #[test]
 fn normal_log() {
     let expr = "<math><mrow><mi>log</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("nb", "SimpleSpeak", expr, "log av, startparentes; x pluss y; sluttparentes");
+    test("nb", "SimpleSpeak", expr, "log av; startparentes; x pluss y; sluttparentes");
 }
 
 #[test]
@@ -91,11 +91,11 @@ fn normal_log_with_base() {
 fn normal_ln() {
     let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
     test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse")],
-                expr, "l n av, startparentes; x pluss y; sluttparentes");
+                expr, "l n av; startparentes; x pluss y; sluttparentes");
     test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Medium")],
-                expr, "den naturlige logaritmen av, startparentes; x pluss y; sluttparentes");
+                expr, "den naturlige logaritmen av; startparentes; x pluss y; sluttparentes");
     test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Verbose")],
-                expr, "den naturlige logaritmen av, startparentes; x pluss y; sluttparentes");
+                expr, "den naturlige logaritmen av; startparentes; x pluss y; sluttparentes");
 }
 
 #[test]

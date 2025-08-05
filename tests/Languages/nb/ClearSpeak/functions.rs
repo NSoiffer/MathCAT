@@ -15,7 +15,7 @@ fn trig_names() {
     <mi>csc</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>cot</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("nb", "ClearSpeak", expr, "sinus av x pluss cosinus av y pluss tangens av z pluss sekans av alfa, pluss cosekans av fi, pluss cotangens av fi");
+    test("nb", "ClearSpeak", expr, "sinus x pluss cosinus y pluss tangens z pluss sekans alfa, pluss cosekans fi, pluss cotangens fi");
 }
 
 #[test]
