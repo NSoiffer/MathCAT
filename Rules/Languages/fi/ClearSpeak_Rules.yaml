@@ -1,0 +1,809 @@
+---
+- name: intent-literal-silent
+  tag: [mi, mo, mn]
+  match: "contains(@data-intent-property, ':silent:')"
+  # say nothing
+  replace: []
+
+# handling of negative numbers that come from 'intent' is hard -- we do something that is close to right here 
+- name: intent-literal-negative-number
+  tag: mn
+  match: "starts-with(text(), '-')"
+  replace:
+  - T: "miinus"      # phrase(10 'minus' 4 equals 6)
+  - x: "translate(text(), '-_', '')"
+
+- name: default
+  tag: square-root
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {T: ""}      # phrase('the' square root of 25)
+  - test:
+      if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+      then:
+      - bookmark: "*[1]/@id"
+      - test:
+          if: parent::*[self::m:minus and count(*)=1]
+          then: [{T: "negatiivinen"}]      # phrase(minus 4 is a 'negative' number)
+          else: [{T: "positiivinen"}]      # phrase(10 is a 'positive' number)
+  - T: "neliöjuuri"      # phrase(8 is the 'square root' of 64)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {T: ""}      # phrase(the square root 'of' 5)
+      else: {pause: short}
+  - x: "*[1]"
+  - test:
+    - if: "$ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
+      then:
+      - pause: short
+      - T: "loppu juuri"      # phrase(the square root of x 'end root')
+      - pause: medium
+    - else_if: "IsNode(*[1], 'simple')"
+      then: [{pause: short}]
+      else: [{pause: long}]
+
+- name: default
+  tag: root
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {T: ""}      # phrase(6 is 'the' square root of 36)
+  - test:
+      if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+      then:
+      - test:
+          if: "parent::*[(self::m:minus or self::m:plus) and count(*)=1]"
+          then: [{bookmark: "parent/@id"}]
+      - test:
+          if: parent::m:minus
+          then: [{T: "negatiivinen"}]      # phrase(minus 6 is a 'negative' number)
+          else: [{T: "positiivinen"}]      # phrase(10 is a 'positive' number)
+  - test:
+      if: "*[2][self::m:mn]"
+      then_test:
+      - if: "*[2][.='2']"
+        then: {T: "neliöjuuri"}      # phrase(5 is the 'square root' of 25)
+      - else_if: "*[2][.='3']"
+        then: {T: "kuutiojuuri"}      # phrase(5 is the 'cube root' of 625)
+      - else_if: "*[2][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
+        then_test:
+            if: "*[2][.<=20]"
+            then: [{x: "ToOrdinal(*[2])"}, {T: "juuri"}]      # phrase(the square 'root' of 25)
+            else: [{x: "*[2]"}, {T: "juuri"}]      # phrase(the square 'root' of 25)
+      else:
+      - test:
+          if: "*[2][self::m:mi][string-length(.)=1]"
+          then:
+          - x: "*[2]"
+          - PRONOUNCE: [{text: "nes"}, {ipa: "nes"}, {sapi5: "nes"}, {eloquence: "nes"}]
+          else: {x: "*[2]"}
+      - T: "juuri"      # phrase(the square 'root' of 36)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {T: ""}      # phrase(the square root 'of' 36)
+  - x: "*[1]"
+  - test:
+      if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+      then:
+      - pause: short
+      - T: "loppu juuri"      # phrase(start the fifth root of x 'end root')
+      - pause: medium
+      else_test:
+        if: IsNode(*[1], 'simple')
+        then: [{pause: short}]
+        else: [{pause: long}]
+
+# The 'negative' rule interacts with the msqrt/mroot rules as those might pick off this case ("the negative square root of x")
+- name: negative_and_positive
+  tag: [plus, minus]
+  match: "count(*)=1 and contains(@data-intent-property, ':prefix:')"
+  replace:
+  - test:
+      if:
+      - "*[1][self::m:square-root or self::m:root] and"
+      - "($ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd')"
+      then: {T: ""}
+      else:
+      - bookmark: "@id"
+      - test:
+          if: "self::m:minus"
+          then: [{T: "negatiivinen"}]      # phrase(minus 5 is a 'negative' number)
+          else: [{T: "positiivinen"}]      # phrase(7 is a 'positive' number)
+  - x: "*[1]"
+
+# Fraction rules
+# Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
+
+# Units (e.g., meters per second)
+- name: per-fraction
+  tag: fraction
+  match: "$ClearSpeak_Fractions='Per'"
+  replace:
+  # Finnish: is there a better way? 'per' might not be widely known
+  - x: "*[1]"
+  - T: "per"      # phrase('5 meters 'per' second) 
+  - x: "*[2]"
+
+- name: common-fraction # have to test how this works in Finnish
+  tag: fraction
+  match:
+  - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
+  - "*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and" # FI: Changed decimal point to decimal comma
+  - "*[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]" # FI: Changed decimal point to decimal comma
+  variables: [IsPlural: "*[1]!=1"]
+  replace:
+  - x: "*[1]"
+  - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
+
+- name: common-fraction-mixed-number
+  tag: fraction
+  match:
+  - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
+  - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
+  - "*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and" # FI: Changed decimal point to decimal comma
+  - "*[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]" # FI: Changed decimal point to decimal comma
+  variables: [IsPlural: "*[1]!=1"]
+  replace:
+  - x: "*[1]"
+  - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
+
+- name: fraction-over-simple
+  tag: fraction
+  match:
+  - "($ClearSpeak_Fractions='Over' or $ClearSpeak_Fractions='FracOver' or $ClearSpeak_Fractions='OverEndFrac') or"
+  - "( not($ClearSpeak_Fractions='General' or $ClearSpeak_Fractions='GeneralEndFrac') and"
+  - "  (IsNode(*[1],'simple') and IsNode(*[2],'simple')) )" # simple fraction in ClearSpeak spec
+  replace:
+  - test:
+      if: "$ClearSpeak_Fractions='FracOver'"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: [{OT: ""}]
+      - T: "murtoluku"      # phrase(the 'fraction' with 3 over 4)
+  - x: "*[1]"
+  - T: "per"      # phrase(the fraction 3 'over' 4)
+  - x: "*[2]"
+  - test:
+      # very ugly!!! -- replicate nested ordinal fraction as they are an exception # FI: Changed decimal point to decimal comma
+      if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
+      then:
+      - pause: short
+      - T: "loppu murtoluku"      # phrase(7 over 8 'end fraction')
+      - pause: short
+
+- # fraction with text or numbers followed by text in both numerator and denominator
+  name: fraction-over-text
+  tag: fraction
+  match:
+  - "not($ClearSpeak_Fractions='General' or $ClearSpeak_Fractions='GeneralEndFrac') and"
+  - "( "
+  - "  ((*[1][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
+  - "   (*[1][self::m:mrow][count(*)=3][ "
+  - "        *[1][self::m:mn] and "
+  - "        *[2][self::m:mo][.='⁢'] and " # invisible times
+  - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) ) and"
+  - "  ((*[2][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
+  - "   (*[2][self::m:mrow][count(*)=3][ "
+  - "        *[1][self::m:mn] and "
+  - "        *[2][self::m:mo][.='⁢'] and " # invisible times
+  - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) )"
+  - ")"
+  replace:
+  - x: "*[1]"
+  - T: "per"      # phrase(the fraction 3 'over' 4)
+  - x: "*[2]"
+  - test:
+      if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
+      then:
+      - pause: short
+      - T: "loppu murtoluku"      # phrase(7 over 8 'end fraction')
+      - pause: short
+
+- name: default
+  tag: fraction
+  match: "."
+  replace:
+  - OT: ""      # phrase(5 is 'the' square toot of 25)
+  - T: "murtoluku osoittaja"      # phrase(the 'fraction with numerator' 6)
+  - test:
+      if: not(IsNode(*[1], 'simple'))
+      then: {pause: medium}
+  - x: "*[1]"
+  - pause: medium
+  - T: "ja nimittäjä"      # phrase(the fraction with numerator 5 'and denominator' 8)
+  - x: "*[2]"
+  - pause: long
+  - test:
+      if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='GeneralEndFrac'"
+      then:
+      - pause: short
+      - T: "loppu murtoluku"      # phrase(the fraction with 3 over 4 'end fraction')
+      - pause: short
+
+# rules for functions raised to a power
+# these could have been written on 'mrow' but putting them on msup seems more specific
+# to see if it is a function, we look right to see if the following sibling is apply-function
+- name: ClearSpeak-function-inverse
+  tag: inverse-function
+  match: "."
+  replace:
+  - test:
+      if: $ClearSpeak_Trig = 'TrigInverse'
+      then: [{T: "käänteis"}, {x: "*[1]"}, {bookmark: "*[2]/@id"}]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
+      else_test:
+        if: $ClearSpeak_Trig = 'ArcTrig'
+        then: [{bookmark: "*[2]/@id"}, {T: "arkus"}, {x: "*[1]"}]      # phrase(the 'arc' of a circle)
+        else: [{bookmark: "*[2]/@id"}, {T: "käänteis"}, {x: "*[1]"}] # default/Auto      # phrase(8 over 5 is the 'inverse' of 5 over 8)
+
+- name: function-squared-or-cubed
+  tag: power
+  match:
+  - "*[2][self::m:mn][.='2' or .='3'] and"
+  - "following-sibling::*[1][self::m:mo][.='⁡']" #invisible function apply
+  replace:
+  - x: "*[1]"
+  - bookmark: "*[2]/@id"
+  - test:
+      if: "*[2][.='2']"
+      # better way?
+      then: {T: "toiseen"}      # phrase(25 equals 5 'squared')
+      else: {T: "kolmanteen"}      # phrase(625 equals 5 'cubed')
+
+# FI: this grammar doesn't work in Finnish, so commented out
+# - name: function-power
+#   tag: power
+#   match:
+#   - "following-sibling::*[1][self::m:mo][.='⁡']" #invisible function apply
+#   replace:
+#   - test:
+#       if: "$Verbosity!='Terse'"
+#       then: {T: ""}      # phrase('the' third power of 2)
+#   - bookmark: "*[2]/@id"
+#   - test:
+#       if: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
+#       then: [{x: "ToOrdinal(*[2])"}]
+#       else: [{x: "*[2]"}]
+#   - T: "potenssi"      # phrase(the third 'power of' 6)
+#   - pause: short
+#   - x: "*[1]"
+
+- name: AfterPower-nested
+  tag: power
+  match: # directly a superscript or an mrow that contains a superscript
+  - "$ClearSpeak_Exponents = 'AfterPower' and"
+  - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
+  replace:
+  - x: "*[1]"
+  - T: "potenssiin"      # phrase(5 'raised to the exponent' x plus 1)
+  - pause: short
+  - x: "*[2]"
+  - pause: short
+  - T: "loppu potenssi"      # phrase(5 raised to the exponent x plus 1 'end exponent')
+
+- name: AfterPower-default
+  tag: power
+  match: "$ClearSpeak_Exponents = 'AfterPower'"
+  replace:
+  - x: "*[1]"
+  - T: "potenssiin"      # phrase(x is 'raised to the power' 4)
+  - x: "*[2]"
+  - pause: short
+
+- name: squared
+  tag: power
+  match: "*[2][self::m:mn][.='2'] and $ClearSpeak_Exponents = 'Auto'"
+  replace:
+  - x: "*[1]"
+  - bookmark: "*[2]/@id"
+  - T: "toiseen"      # phrase(7 'squared' equals 49)
+
+- name: cubed
+  tag: power
+  match: "*[2][self::m:mn][.='3'] and $ClearSpeak_Exponents = 'Auto'"
+  replace:
+  - x: "*[1]"
+  - bookmark: "*[2]/@id"
+  - T: "kolmanteen"      # phrase(5 'cubed' equals 125)
+
+# FI: this needs refactoring, maybe just simplifying?
+- name: simple-integer
+  tag: power
+  match: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
+  replace:
+  - x: "*[1]"
+  - T: "potenssiin"      # phrase(2 raised 'to the' power 7)
+  - x: "*[2]"
+  # - test:
+  #     if: "*[2][.>0]"
+  #     then: {x: "ToOrdinal(*[2])"}
+  #     else: {x: "*[2]"}
+  # - test:
+  #     if: "$ClearSpeak_Exponents != 'Ordinal'"
+  #     then: [{T: ""}]      # phrase(2 raised to the 'power' 7)
+
+- name: simple-negative-integer
+  tag: power
+  match:
+  - "*[2][self::m:minus and count(*)=1 and"
+  - "     *[1][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
+  - "    ]"
+  replace:
+  - x: "*[1]"
+  - T: "potenssiin"     # phrase(2 raised 'to the' power 7)
+  - x: "*[2]"
+  - test:
+      if: "$ClearSpeak_Exponents != 'Ordinal'"
+      then: [{T: ""}]      # phrase(2 raised to the 'power' 7)
+
+- name: simple-var
+  tag: power
+  match: "*[2][self::m:mi][string-length(.)=1]"
+  replace:
+  - x: "*[1]"
+  - T: "potenssiin"     # phrase(3 raised 'to the' power 7)
+  - x: "*[2]"
+  # - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}] # FI: no need to pronounce
+  - test:
+      if: "$ClearSpeak_Exponents != 'Ordinal'"
+      then: [{T: ""}]      # phrase(2 raised to the 'power' 7)
+
+# match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
+#   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
+# where xxx is a number or common fraction (or a var in the first two forms)
+# short of creating a specialized built-in function, I don't see a way to eliminate a lot of repetition in the matches
+# also really bad is that the test of a common fraction is replicated here (four times!)
+# Note: the ClearSpeak doc doesn't say these only apply when the pref is "Auto",
+#   but the test cases all fall back to "raised to the exponent" when not "Auto"
+#   If these are allowed for non-Auto values, then you end up with "...power power...".
+- # [xxx]^n
+  name: nested-squared-or-cubed
+  tag: power
+  match:
+  - "$ClearSpeak_Exponents = 'Auto' and"
+  - "*[2][self::m:power]["
+  - "     *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3
+  # base is mn, mi, common fraction ([xxx] case)
+  - "     *[1][self::m:mn or self::m:mi or "
+  - "          self::m:fraction[*[1][self::m:mn][not(contains(., ',')) and text()<20]   and" # FI: Changed decimal point to decimal comma
+  - "                        *[2][self::m:mn][not(contains(., ',')) and 2<= text() and text()<=10]]" # FI: Changed decimal point to decimal comma
+  - "         ]"
+  - "    ]"
+  replace:
+  - x: "*[1]"
+  - T: "potenssiin"      # phrase(x 'raised to the' second power)
+  - x: "*[2]"
+  # - T: "potenssiin"      # phrase(x raised to the second 'power')
+
+- # - [xxx]^n
+  name: nested-negative-squared-or-cubed
+  tag: power
+  match:
+  - "$ClearSpeak_Exponents = 'Auto' and"
+  - " *[2][self::m:minus and count(*)=1 and "
+  - "      *[1]/*[1][self::m:power]["
+  - "                *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3"
+  # base is mn, mi, common fraction ([xxx] case)
+  - "                *[1][self::m:mn or self::m:mi or "
+  - "                     self::m:fraction[*[1][self::m:mn][not(contains(., ',')) and text()<20]   and" # FI: Changed decimal point to decimal comma
+  - "                                   *[2][self::m:mn][not(contains(., ',')) and 2<= text() and text()<=10]]" # FI: Changed decimal point to decimal comma
+  - "               ]"
+  - "          ]"
+  - "     ]"
+  replace:
+  - x: "*[1]"
+  - T: "potenssiin"      # phrase(x 'raised to the' second power)
+  - x: "*[2]"
+  # - T: "potenssiin"      # phrase(x raised to the second 'power')
+
+- # [xxx] var^n
+  name: nested-var-squared-or-cubed
+  tag: power
+  match:
+  - "$ClearSpeak_Exponents = 'Auto' and"
+  - "  *[2][self::m:mrow][count(*)=3][ "
+  - "       *[3][self::m:power]["
+  - "            *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3
+  - "            *[1][self::m:mi]"
+  - "           ] and "
+  - "       *[2][self::m:mo][.='⁢'] and " # invisible times
+  # base is mn, or common fraction ([xxx] case)
+  - "       *[1][self::m:mn or "
+  - "            self::m:fraction[*[1][self::m:mn][not(contains(., ',')) and text()<20]   and" # FI: Changed decimal point to decimal comma
+  - "                          *[2][self::m:mn][not(contains(., ',')) and 2<= text() and text()<=10]]" # FI: Changed decimal point to decimal comma
+  - "           ]"
+  - "      ]"
+  replace:
+  - x: "*[1]"
+  - T: "potenssiin"      # phrase(x 'raised to the' second power)
+  - x: "*[2]"
+  # - T: "potenssiin"      # phrase(x raised to the second 'power')
+
+- # -[xxx] var^n
+  name: nested-negative-var-squared-or-cubed
+  tag: power
+  match:
+  - "$ClearSpeak_Exponents = 'Auto' and"
+  - "  *[2][self::m:mrow][count(*)=3][ "
+  - "       *[3][self::m:power]["
+  - "            *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3
+  - "            *[1][self::m:mi]"
+  - "           ] and "
+  - "       *[2][self::m:mo][.='⁢'] and " # invisible times
+  - "       *[1][self::m:minus and count(*)=1 and "
+  # base is mn, or common fraction ([xxx] case)
+  - "            *[1][self::m:mn or "
+  - "                 self::m:fraction[*[1][self::m:mn][not(contains(., ',')) and text()<20]   and" # FI: Changed decimal point to decimal comma
+  - "                                  *[2][self::m:mn][not(contains(., ',')) and 2<= text() and text()<=10]]" # FI: Changed decimal point to decimal comma
+  - "                ]"
+  - "           ]"
+  - "      ]"
+  replace:
+  - x: "*[1]"
+  - T: "potenssiin"      # phrase(x 'raised to the' second power)
+  - x: "*[2]"
+  # - T: "potenssiin"      # phrase(x raised to the second 'power')
+
+- name: default-exponent-power
+  tag: power
+  match: # directly a superscript or an mrow that contains a superscript
+  - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
+  replace:
+  - x: "*[1]"
+  - T: "potenssiin"      # phrase(x is 'raised to the exponent')
+  - pause: short
+  - x: "*[2]"
+  - pause: short
+  - T: "loppu potenssi"      # phrase(and now 'end exponent' has been reached)
+
+- name: default
+  tag: power
+  match: "."
+  replace:
+  - x: "*[1]"
+  - T: "potenssiin"      # phrase(x 'raised to the' second power)
+  - x: "*[2]"
+  # - T: "potenssiin"      # phrase(x raised to the second 'power')
+
+#
+# Some rules on mrows
+#
+- # the inference rules lump absolute value and cardinality together, so those rules are implemented here
+  name: ClearSpeak-absolute-value
+  tag: absolute-value
+  match: "."
+  variables: [{WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinaliteetti', 'itseisarvo')"}]
+  replace:
+  # FI: not needed
+  # - test:
+  #     if: "$Verbosity!='Terse'"
+  #     then: {T: ""}      # phrase('the' absolute value of 25)
+  - x: "$WordToSay"
+  # FI: not needed
+  # - T: ""      # phrase(the absolute value 'of' 25)
+  - x: "*[1]"
+  - test:
+      if: "$ClearSpeak_AbsoluteValue = 'AbsEnd'"
+      then:
+      - pause: short
+      - T: "loppu"      # phrase('end' absolute value)
+      - x: "$WordToSay"
+  - pause: short
+
+- name: set
+  tag: set
+  match: "."
+  replace:
+  - test:
+    - if: "count(*)=0"
+      then: [{T: "tyhjä joukko"}]      # phrase('the empty set')
+    - else_if: "count(*)=2"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {T: ""}      # phrase('the' empty set)
+      - T: "tyhjä joukko"      # phrase(the 'empty set')
+    - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {T: ""}      # phrase('the' set of all integers)
+      - T: "joukko"      # phrase(this is a 'set of' numbers)
+      - test:
+          if: $ClearSpeak_Sets != 'woAll'
+          then: [{T: "kaikilla"}]      # phrase(the set of 'all' integers)
+      - x: "*[1]/*[1]"
+      - T: "siten että"      # phrase(the set S 'such that' x is less than y)
+      - x: "*[1]/*[3]"
+      else:
+      - test:
+          if: $ClearSpeak_Sets != 'SilentBracket'
+          then:
+          - test:
+              if: "$Verbosity!='Terse'"
+              then: {T: ""}      # phrase('the' set of integers)
+          - T: "joukko"      # phrase(this is a 'set' of integers)
+      - x: "*[1]"
+
+- # intervals are controlled by a ClearSpeak Preference -- parens/brackets don't have to match, so we avoid IsBracketed
+  # alternatively, we could have four (or ten) rules, but there is a lot of duplication if we do that
+  # this one rule handles all ten cases listed as part $ClearSpeak_Paren = 'Interval'
+  # note that *[2] is an mrow with X, ",", Y, so getting X or Y is a double index
+  name: ClearSpeak-intervals # avoid overriding with default "intervals" name
+  variables:
+  - is_intervals_start_infinity: "*[1][self::m:minus and count(*)=1 and *[1][.='∞']]"
+  - is_intervals_end_infinity: "*[2][.='∞'or (self::m:plus and count(*)=1 and *[1][.='∞'])]"
+  tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
+  match: "."
+  replace:
+  - T: "väli"      # phrase('the interval from' a to b)
+  - x: "*[1]"
+  - T: ""      # phrase(the interval from a 'to' b)
+  - x: "*[2]"
+  - pause: short
+  - test:
+      if: "not($is_intervals_start_infinity)"
+      then:
+      - test:
+          if: "starts-with(name(.), 'open')"
+          then: [{T: "ei"}]      # phrase(the interval from a to b 'not' including b)
+      - T: "sisältäen"      # phrase(the interval from a to b not 'including' b)
+      - x: "*[1]"
+    # logic to deal with [not] arg #1
+  - test:
+      if: "not($is_intervals_start_infinity or $is_intervals_end_infinity)"
+      then_test:
+      - if: "name(.)='open-interval'"
+        then: [{T: "tai"}]      # phrase(the interval including a 'or' b )
+      - else_if: "name(.)='closed-interval'"
+        then: [{T: "ja"}]      # phrase(the interval including a 'and' b)
+        else: [{T: "mutta"}]      # phrase(the interval including a 'but' not b)
+    # some ugly logic dealing with connectives: or, but, but, and (cleaner to be part of next clause?)
+  - test:
+      if: not($is_intervals_end_infinity)
+      then:
+      - test:
+          # there is some asymmetry to the test because of the and/or/but logic above
+          if: not( name(.)='open-interval' or name(.)='closed-interval' ) or $is_intervals_start_infinity
+          then:
+          - test:
+              if: "name(.) = 'open-interval' or name(.) = 'closed-open-interval'"
+              then: [{T: "ei"}]      # phrase(the interval 'not' including a)
+          - T: "sisältäen"      # phrase(the interval not 'including' a)
+      - x: "*[2]"
+
+    # onto the [not] [including]... part
+- name: binomial-frac-vector
+  tag: matrix
+  match:
+  - "$ClearSpeak_Matrix = 'Combinatorics' and "
+  - "count(*[1]/*)=1 and count(*)=2"
+  replace:
+  - x: "*[1]/*[1]/*" # mtable/mtr/mtd
+  - T: "yli"      # phrase(the binomial coefficient n 'choose' m)
+  - x: "*[2]/*[1]/*"
+
+- name: ClearSpeak-default
+  tag: [mtr, mlabeledtr]
+  match: "parent::m:matrix or parent::m:determinant"
+  replace:
+  - pause: medium
+  - T: "rivi"      # phrase(the first 'row' of a matrix)
+  - x: "count(preceding-sibling::*)+1"
+  - test:
+      if: .[self::m:mlabeledtr]
+      then:
+      - T: "merkinnällä"      # phrase(the line 'with label' first equation)
+      - x: "*[1]/*"
+      - pause: short
+  - pause: medium
+  - test:
+      if: .[self::m:mlabeledtr]
+      then: [{x: "*[position()>1]"}]
+      else: {x: "*"}
+
+- # handle log, lg and ln
+  name: ClearSpeak-log
+  tag: mrow
+  variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
+  match:
+  - "count(*)=3 and"
+  - "*[1][self::m:mi][.='log' or .='lg' or .='ln'] and"
+  - "*[2][self::m:mo][.='⁡']"
+  replace:
+  - test:
+      if: "$log_is_simple"
+      then_test:
+      - if: "*[1][.='log']"
+        then: [{T: "log"}]      # phrase(the 'log' of x)
+      - else_if: "*[1][.='lg']"
+        then: [{SPELL: "'lg'"}] # phrase(the 'lg' of x)
+      - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
+        then: [{T: "luonnollinen log"}]      # phrase(the 'natural log' of the product of 2 numbers)
+        else: [{SPELL: "'ln'"}]
+      else:
+      # FI: not needed
+      # - test:
+      #     if: "$Verbosity!='Terse' and not(log_is_simple)"
+      #     then: {T: ""}      # phrase('the' square root of 25)
+      - test:
+        - if: "*[1][.='log']"
+          then:
+          - test:
+            - if: "$Verbosity='Verbose'"
+              then: [{T: "logaritmi"}]
+              else: [{T: "log"}]
+        - else_if: "*[1][text()]='lg'"
+          then:
+          - test:
+            - if: "$Verbosity='Verbose'"
+              then: [{T: "kymmenkantainen logaritmi"}]
+              else: [{SPELL: "'lg'"}]
+        - else_if: $ClearSpeak_Log = 'LnAsNaturalLog' or $Verbosity='Verbose'
+          then: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' of x)
+          else: [{SPELL: "'ln'"}]
+      - T: "arvolla"      # phrase(the natural log 'of' x)
+      - pause: short
+  - x: "*[3]"
+
+- name: ClearSpeak-multi-line
+  tag: [piecewise, system-of-equations, lines] # these are ignored in favor of the ClearSpeak prefs
+  match: "."
+  variables: [IsColumnSilent: true()]
+  replace:
+  - x: "count(*)"
+  - test:
+    - if: $ClearSpeak_MultiLineOverview = 'Auto'
+      then:
+      - test:
+        - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
+          then:
+            - test:
+              - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+                then: [{T: "tapausta"}]    # FI: plural
+                else: [{T: "tapaus"}]     # phrase(this is the first 'case' of three cases) # FI: singular
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
+          then:
+            - test:
+              - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+                then: [{T: "riviä"}]    # FI: plural
+                else: [{T: "rivi"}]      # phrase(this is the first 'line' of three lines) # FI: singular
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
+          then:
+            - test:
+              - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+                then: [{T: "ehtoa"}]    # FI: plural
+                else: [{T: "ehto"}]      # phrase(this is the first 'contraint' of three contrains) # FI: singular
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
+          then:
+            - test:
+              - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+                then: [{T: "yhtälöä"}]    # FI: plural
+                else: [{T: "yhtälö"}]     # phrase(this is the first 'equation' of three equations) # FI: singular
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
+          then:
+            - test:
+              - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+                then: [{T: "riviä"}]    # FI: plural
+                else: [{T: "rivi"}]     # phrase(this is the first 'row' of three rows) # FI: singular
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
+          then:
+            - test:
+              - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+                then: [{T: "vaihetta"}]    # FI: plural
+                else: [{T: "vaihe"}]      # phrase(this is the first 'step' of three steps)
+      #     # else 'None -- don't say anything'
+      # FI: following doesn't work for Finnish, new logic implemented above
+      # - test:
+      #   - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+      #     then: [{ct: "s"}] # plural      # phrase(shown by the letter 's')
+      - pause: short
+  - x: "*"
+
+- name: ClearSpeak-default-multiline
+  tag: [mtr, mlabeledtr]
+  match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
+  replace:
+  - pause: medium
+  - test:
+    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
+      then: [{T: "tapaus"}]      # phrase(in this  'case' x is not equal to y)
+    - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
+      then: [{T: "rivi"}]      # phrase(the straight 'line' between x and y)
+    - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
+      then: [{T: "ehto"}]      # phrase(there is a 'constraint' on possible values)
+    - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
+      then: [{T: "yhtälö"}]      # phrase(the 'equation' pi r squared gives the area of a circle)
+    - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
+      then: [{T: "rivillä"}]      # phrase(the values on the top 'row' are relevant)
+    - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
+      then: [{T: "vaihe"}]      # phrase(this is a 'step' by step process) # FI: new logic needed for Finnish
+      # else 'None -- don't say anything'
+  - test:
+      if: "$ClearSpeak_MultiLineLabel != 'None'"
+      then:
+      - x: "count(preceding-sibling::*)+1"
+      - test:
+          if: .[self::m:mlabeledtr]
+          then:
+          - T: "merkinnällä"      # phrase(the item 'with label' complete)
+          - x: "*[1]/*"
+      - pause: medium
+  - test:
+      if: .[self::m:mlabeledtr]
+      then: [{x: "*[position()>1]"}]
+      else: {x: "*"}
+  - test:
+      if: "$ClearSpeak_MultiLineLabel != 'None'"
+      then: [{pause: long}]
+
+- name: ClearSpeak_Functions_None
+  tag: mo
+  match:
+  - ".='⁡' and $ClearSpeak_Functions = 'None' and"
+  - "not(preceding-sibling::*[1][IsInDefinition(., 'TrigFunctionNames')])" # Functions=None does not apply to "trig" functions
+  replace:
+    test:
+      if: "$ClearSpeak_ImpliedTimes = 'None'"
+      then: [{T: ""}]
+      else: [{T: "kertaa"}]      # phrase(5 'times' 3 equals 15)
+
+- name: no-times
+  tag: mo
+  match:
+  # Note: this rule is also part of the paren rule so that the parens speak
+  - ".='⁢' and $ClearSpeak_ImpliedTimes = 'None'"
+  replace:
+  - T: ""
+
+- name: ClearSpeak-times
+  tag: mo
+  match:
+  # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s
+  # if we aren't sure if it is times or not, don't say anything
+  - ".='⁢' and (not(@data-function-guess) or $ClearSpeak_Functions = 'None') and"
+  - "not(ancestor-or-self::*[contains(@data-intent-property, ':structure:')]) and ("
+  - "  $ClearSpeak_ImpliedTimes = 'MoreImpliedTimes'"
+  - " or "
+  - "  following-sibling::*[1]["
+  - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|') or "
+  - "    self::m:matrix or self::m:determinant or self::m:binomial or" # followed by parens
+  - "    ( (self::m:msup or self::m:msub or self::m:msubsup or self::m:power) and " # followed by msup, etc.
+  - "       *[1][self::m:mrow[IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')] or "
+  - "            self::m:matrix or self::m:determinant]" # base has parens
+  - "    )"
+  - "  ]"
+  # other possibility is the preceding element has parens (but not the following)
+  # this is not mentioned in the ClearSpeak rules or examples but seems like it should say "times". E.g, |x| y
+  - " or "
+  - "  preceding-sibling::*[1]["
+  - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
+  - " )"
+  replace:
+  - T: "kertaa"      # phrase(5 'times' 3 equals 15)
+
+- name: no-say-parens
+  tag: mrow
+  match:
+  - "parent::*[not(self::m:msup) and not(self::m:msub) and not(self::m:msubsup) and not(self::m:power) and"
+  - "          not(self::m:math) ] and "       # rule out [x] standing alone
+  - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
+  - "not( $ClearSpeak_Functions = 'None' and "
+  - "     (preceding-sibling::*[1][.='⁡'] or following-sibling::*[1][.='⁡']) ) and "
+  - "not( $ClearSpeak_ImpliedTimes = 'None' and "
+  - "     (preceding-sibling::*[1][.='⁢'] or following-sibling::*[1][.='⁢']) ) and "
+  - "IsNode(*[2], 'simple') and"
+  - "not(ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
+  # missing clause: 'a positive fraction that is spoken as an ordinal
+  #   (either by the Ordinal preference or by the default rules)'
+  replace:
+  - x: "*[2]"
+
+- include: "SharedRules/geometry.yaml"
+- include: "SharedRules/linear-algebra.yaml"
+- include: "SharedRules/calculus.yaml"
+- include: "SharedRules/general.yaml"
+- include: "SharedRules/default.yaml"

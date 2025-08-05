@@ -1,0 +1,32 @@
+---
+
+- AddSpacing: {
+    "=", "<", ">",
+    "≠", "≤", "≥",
+    "≅", "≈", "≡",
+    "→", "↠", "↣", "↦", "⇒", "⇔",
+  }
+
+- FunctionNames: {
+    "lambda", "Lambda", "and", "or", "if",
+    "lim", "Lim",
+    "sin", "cos", "tan", "arcsin", "arccos", "arctan", "sinh", "cosh", "tanh", "cot", "coth", "sech", "csch", "sec", "csc",
+    "log", "ln", "abs", "norm", "floor", "ceil",
+    "Sin", "Cos", "Tan", "Arcsin", "Arccos", "Arctan", "Sinh", "Cosh", "Tanh", "Cot", "Sec", "Csc",
+    "Log", "Ln", "det", "exp", "dim", "mod", "gcd", "lcm", "lub", "glb", "min", "max",
+  }
+
+- MovableLimitsLargeOps: {
+    "⨜", "⨛", "⨚", "⨙", "⨘", "⨗", "⨖", "⨕", "⨔", "⨓", "⨒", "⨑", "⨐", "⨏", "⨎", "⨍",
+    "⨌", "∳", "∲", "∱", "∰", "∯", "∮", "∭", "∬", "∫",
+    "⨋", "∐", "∏", "⫿", "⫼", "⨉", "⨈", "⨇", "⨆", "⨅",
+    "⨂", "⨀", "⋂", "⋁", "⋀", "⨄", "⨃", "⋃", "⨁", "⨞", "⨝", "⨊", "∑",
+  }
+
+- Accents: {
+    "¯": "bar", "→": "vec", ".": "dot", "·": "dot", "˙": "dot", "..": "ddot", "~": "tilde", "^": "hat", "⏞": "obrace",
+  }
+
+- UnderAccents: {
+    "¯": "ul", "⏟": "ubrace",
+  }

@@ -1,0 +1,6 @@
+---
+- include: "../definitions.yaml"
+
+- Units: {
+    "cm", "km", "hm", "dam", "dm", "mm", "tấn", "tạ", "yến", "kg", "hg", "dag", "lít", "ml", "ft", "in"
+  }

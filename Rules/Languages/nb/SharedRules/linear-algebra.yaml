@@ -1,0 +1,77 @@
+---
+- name: scalar-determinant
+  tag: determinant
+  match: "count(*)=1 and not(*[1][self::m:mtr])"
+  replace:
+  - T: "determinanten"      # phrase(the 'determinant' of a matrix)
+  # NORWEGIAN: Removed test for Verbosity
+  - T: "til"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [T: "slutt determinant"]      # phrase('end determinant' of a matrix)
+
+- name: subscripted-norm
+  tag: subscripted-norm
+  match: "count(*)=2"
+  replace:
+  - x: "*[2]"
+  - T: "normen"      # phrase(the 'norm' can be a measure of distance)
+  # NORWEGIAN: Removed test for Verbosity
+  - T: "til"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+
+- name: homomorphism
+  # can't use IntentMappings because this doesn't fit the function pattern
+  tag: homomorphism
+  match: "count(*)=1"
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [T: "mengden av homomorfier på"]
+      else: [T: "homomorfiene på"]
+  - x: "*[1]"
+  - test:
+      if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
+      then: [T: "slutt homomorfier"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
+
+# NORWEGIAN: Removed test for Verbosity
+- name: kernel
+  # can't use IntentMappings because this doesn't fit the function pattern
+  tag: kernel
+  match: "count(*)=1"
+  replace:
+  - T: "nullrommet"      # phrase(this is the 'kernel' of the function)
+  - T: "til"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+  - test:
+      if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
+      then: [T: "slutt nullrommet"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
+
+# NORWEGIAN: Kept these rules here, cause we say "dimensjonen til" and "normen til" instead of "dimensjonen av" and "normen av".
+- name: dimension
+  tag: dimension
+  match: "count(*)=1"
+  replace:
+  - T: "dimensjonen"      # phrase(the 'dimension' of the matrix)
+  - T: "til"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+
+- name: norm
+  tag: norm
+  match: "count(*)=1"
+  replace:
+  - T: "normen"      # phrase(the 'norm' can be a measure of distance)
+  - T: "til"      # phrase(this is the mean 'of' the data)
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [{pause: short}, {T: "slutt norm"}]      # phrase('end norm' that is a measure of distance)

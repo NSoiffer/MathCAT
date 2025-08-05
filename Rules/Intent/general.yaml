@@ -13,7 +13,7 @@
   tag: msup
   match:
   - "*[1][string-length(text())=1 and translate(., 'ℂℕℚℝℤ', '')=''] and" 
-  - "*[2][string-length(text())=1 and (text()='+' or text()='-' or self::m:mn)]" 
+  - "*[2][string-length(text())=1 and (.='+' or .='-' or self::m:mn)]" 
   replace:
   - intent:
       name: number-sets
@@ -24,7 +24,7 @@
 -
   name: real-part
   tag: mi
-  match: "(text()='Re' or text()='re' or text()='ℜ') and following-sibling::*[1][text()='\u2061']" # before function apply
+  match: "(.='Re' or .='re' or .='ℜ') and following-sibling::*[1][.='\u2061']" # before function apply
   replace:
   - intent:
       name: real-part
@@ -33,7 +33,7 @@
 -
   name: imaginary-part
   tag: mi
-  match: "(text()='Im' or text()='im' or text()='ℑ') and following-sibling::*[1][text()='\u2061']" # before function apply
+  match: "(.='Im' or .='im' or .='ℑ') and following-sibling::*[1][.='\u2061']" # before function apply
   replace: 
   - intent:
       name: imaginary-part
@@ -49,22 +49,29 @@
       children: [x: "@data-number"]
 
 -
-  name: negative
+  name: positive-or-negative
   tag: mrow
-  match: "count(*)=2 and *[1][self::m:mo][text()='-']"
+  match: "count(*)=2 and *[1][self::m:mo][.='+' or .='-']"
+  variables:
+  - AtLeftEdge: "EdgeNode(., 'left', 'mtd')"
+  - AtLeftEdgeOfMTD: "name($AtLeftEdge) = 'mtd'"
+  - ContinuedColumn: "$TableProperty='lines' or $TableProperty='system-of-equations' or $TableProperty='piecewise'"
+  - InContinuedRow: "parent::m:mtd[parent::m:mtr[@data-intent-property[contains(., ':continued-row:')]]]"
+  - FirstColumn: "$AtLeftEdge/../*[1]=$AtLeftEdge"   # first child of mtr...
   replace:
-  - intent:
-      name: "negative"
-      children: [x: "*[2]"]
-               
--
-  name: positive
-  tag: mrow
-  match: "count(*)=2 and *[1][self::m:mo][text()='+']"
-  replace:
-  - intent:
-      name: "positive"
-      children: [x: "*[2]"]
+  - test:
+      # don't use positive/negative if a continued data cell
+      if: "$AtLeftEdgeOfMTD and $ContinuedColumn and (not($FirstColumn) or $InContinuedRow)"
+      then:
+      - intent:
+          xpath-name: "IfThenElse(*[1][self::m:mo][.='+'], 'plus', 'minus')"
+          attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
+          children: [x: "*[2]"]
+      else:
+      - intent:
+          xpath-name: "IfThenElse(*[1][self::m:mo][.='+'], 'plus', 'minus')"
+          attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
+          children: [x: "*[2]"]
                
 
 -
@@ -72,36 +79,40 @@
   # as an interval, it represents a set and hence a clue that it is an interval is that a set operator comes
   #   before or after it. '=' is also common.
   # They also commonly stand by themselves, but so does the interpretation as a point or gcd, so we don't include (xxx, yyy) in the inference
+  # Note [x,y] is also a commutator.
+  # Intervals are never contained in other intervals, so rule them out if there is an ancestor that could be an interval
   name: interval
   tag: mrow
   match: 
     - "count(*)=3 and "
        # FIX: consider adding ]...[ versions
-    - "(*[1][text()='(' or text()='['] and *[3][text()=')' or text()=']']) and"   # match bracketing
-    - "(*[2][count(*)=3 and *[2][text()=',']]) and"                               # inside should have ','
-    - "not(ancestor::*[IsBracketed(., '{', '}')]) and "                           # intervals are not part of set notation (e.g, { (x,y)∈L | ...})
+    - "(*[1][.='(' or .='['] and *[3][.=')' or .=']']) and"   # match bracketing
+    - "(*[2][count(*)=3 and *[2][.=',']]) and"                               # inside should have ','
+    # intervals are not part of set notation (e.g, { (x,y)∈L | ...}) nor are they nested
+    - "not(ancestor::*[IsBracketed(., '{', '}') or IsBracketed(., '[', ']') or IsBracketed(., '(', ')')]) and "  
+    - "not(descendant::*[IsBracketed(., '{', '}') or IsBracketed(., '[', ']') or IsBracketed(., '(', ')')]) and "  
       # FIX: if both the first and third children of *[2] are mn, then make sure first <= third
     - "("
     - "  not(IsBracketed(., '(', ')')) or "                                                                   # (.,.) is very ambiguous -- need more clues
     - "  $ClearSpeak_Paren = 'Interval' or "                                                                  # pref is set
     - " *[2]/*[1][contains(., '∞')] or "                                                                      # starts with infinity
     - " *[2]/*[3][contains(., '∞')] or "                                                                      # ends with infinity
-    - "  preceding-sibling::*[1][self::m:mo and ( text()='=' or IsInDefinition(., 'SubsetOperators') )] or "  # context hint
-    - "  following-sibling::*[1][self::m:mo and ( text()='=' or IsInDefinition(., 'SubsetOperators') )]"      # context hint
+    - "  preceding-sibling::*[1][self::m:mo and ( .='=' or IsInDefinition(., 'SubsetOperators') )] or "  # context hint
+    - "  following-sibling::*[1][self::m:mo and ( .='=' or IsInDefinition(., 'SubsetOperators') )]"      # context hint
     - ")"
   replace:
   - test:
-    - if: "*[1][text()='('] and *[3][text()=')']"
+    - if: "*[1][.='('] and *[3][.=')']"
       then:
       - intent:
           name: "open-interval"
           children: [x: "*[2]/*[1]", x: "*[2]/*[3]"]
-    - else_if: "*[1][text()='('] and *[3][text()=']']"
+    - else_if: "*[1][.='('] and *[3][.=']']"
       then:
       - intent:
           name: "open-closed-interval"
           children: [x: "*[2]/*[1]", x: "*[2]/*[3]"]
-    - else_if: "*[1][text()='['] and *[3][text()=']']"
+    - else_if: "*[1][.='['] and *[3][.=']']"
       then:
       - intent:
           name: "closed-interval"
@@ -114,32 +125,50 @@
 -
   name: binomial-frac
   tag: mrow
-  match: "IsBracketed(., '(', ')') and  *[2][self::m:mfrac][translate(@linethickness, 'abcdefghijklmnopqrstuvwxyz', '')=0]"
+  # "translate()" is used because it might be "0em" and we need to get rid of the "em"
+  match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][translate(@linethickness, 'abcdefghijklmnopqrstuvwxyz', '')=0]"
   replace:
   - intent:
       name: binomial
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
       - x: "*[2]/*[1]"
       - x: "*[2]/*[2]"
 
-
 -
-  # C with pre-subscript 'n' and post-subscript 'm'
+  # C with pre-subscript 'n' and post-subscript 'm'. The 'n' can be either in the sub or super position
+  # See https://en.wikipedia.org/wiki/Binomial_coefficient#History_and_notation
   name: binomial-mmultiscripts
   tag: mmultiscripts
   variables:
   - Prescripts: "m:mprescripts/following-sibling::*"
   - Postscripts: "m:mprescripts/preceding-sibling::*[position() < last()]"
   match: 
-  - "*[1][self::m:mi and text()='C'] and"
-  - "count($Prescripts)=2 and $Prescripts[2][self::m:none] and "
+  - "*[1][self::m:mi and .='C'] and"
+  - "count($Prescripts)=2 and ($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none]) and "
   - "count($Postscripts)=2 and $Postscripts[2][self::m:none]"
   replace:
   - intent:
       name: binomial
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
-      - x: "$Prescripts[1]"
+      - x: "IfThenElse(name($Prescripts[2])='none', $Prescripts[1], $Prescripts[2])"
       - x: "$Postscripts[1]"
+
+
+-
+  name: binomial-msub   # C_{n,k}
+  tag: msub
+  match:
+  - "*[1][self::m:mi and .='C'] and"
+  - "*[2][self::m:mrow and count(*)=3 and *[2][.=',']]"
+  replace:
+  - intent:
+      name: binomial
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
+      children:
+      - x: "*[2]/*[1]"
+      - x: "*[2]/*[3]"
 
 -
   # P with pre-sub or superscript 'n' and post-subscript 'k' (https://en.wikipedia.org/wiki/Permutation#k-permutations_of_n)
@@ -149,12 +178,13 @@
   - Prescripts: "m:mprescripts/following-sibling::*"
   - Postscripts: "m:mprescripts/preceding-sibling::*[position() < last()]"
   match: 
-  - "*[1][self::m:mi and text()='P'] and"
+  - "*[1][self::m:mi and .='P'] and"
   - "count($Prescripts)=2 and ($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none]) and "
   - "count($Postscripts)=2 and $Postscripts[2][self::m:none]"
   replace:
   - intent:
-      name: permutation-symbol
+      name: pochhammer
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
       - test:
           if: "$Prescripts[1][self::m:none]"
@@ -167,10 +197,11 @@
   name: permutation-msubsup
   tag: msubsup
   match: 
-  - "*[1][self::m:mi and text()='P']"
+  - "*[1][self::m:mi and .='P']"
   replace:
   - intent:
-      name: permutation-symbol
+      name: pochhammer
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
       - x: "*[3]"
       - x: "*[2]"
@@ -179,10 +210,11 @@
 -
   name: evaluated-at-msub
   tag: mrow
-  match: "count(*)=2 and *[2][self::m:msub and *[1][self::m:mo][text()='|']]"
+  match: "count(*)=2 and *[2][self::m:msub and *[1][self::m:mo][.='|']]"
   replace:
   - intent:
       name: "evaluate"
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
       - x: "*[1]"
       - x: "*[2]/*[2]"
@@ -190,7 +222,7 @@
 -
   name: evaluated-at-msubsup
   tag: mrow
-  match: "count(*)=2 and *[2][self::m:msubsup and *[1][self::m:mo][text()='|']]"
+  match: "count(*)=2 and *[2][self::m:msubsup and *[1][self::m:mo][.='|']]"
   replace: 
   - intent:
       name: "evaluate"
@@ -218,10 +250,11 @@
   # could also be cardinality, length, ...
   name: absolute-value
   tag: mrow
-  match: "IsBracketed(., '|', '|')"
+  match: "count(*) = 3 and not(*[2][self::m:mtable]) and IsBracketed(., '|', '|')"
   replace:
   - intent:
       name: "absolute-value"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[2]"]
 
 -
@@ -231,16 +264,18 @@
   replace:
   - intent:
       name: "square-root"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[1]"]
 
 
 -
   name: sqrt
   tag: mroot
-  match: "*[2][self::m:mn and text()='2']"
+  match: "*[2][self::m:mn and .='2']"
   replace:
   - intent:
       name: "square-root"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[1]"]
 
 -
@@ -254,28 +289,29 @@
       - x: "*[1]"
       - x: "*[2]"
 
-
--
-  name: log-base
-  tag: msub
-  match:
-  - "*[1][self::m:mi][text()='log']"
+  
+- # handle log with a base
+  name: log-with-base
+  tag: [msub, msubsup]
+  match: "*[1][self::m:mi and .='log']"
   replace:
-  - intent:
-      name: log-base
-      children: [x: "*[2]"]
-
--
-  name: log-base-power
-  tag: msubsup
-  match:
-  - "*[1][self::m:mi][text()='log']"
-  replace:
-  - intent:
-      name: log-base-power
-      children:
-      - x: "*[2]"
-      - x: "*[3]"
+  - test:
+      if: "self::m:msub"
+      then:
+      - intent:
+          name: "logarithm-with-base"
+          attrs: "data-intent-property='concat(data-intent-property, \":prefix\")'"
+          children: [x: "*[2]"]    # grab the base
+      else:
+      - intent:
+          name: "power"
+          attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
+          children:
+          - intent:
+              name: "logarithm-with-base"
+              attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
+              children: [x: "*[2]"]  # grab the base
+          - x: "*[3]"       # grab the exponent
 
 -
   name: bigop
@@ -290,25 +326,49 @@
 -
   name: limit
   tag: [msub, munder]
-  match: "*[1][text()='lim']"
+  variables: [NoSpacesBase: "translate(*[1], ' \u00A0\u2004\u2005\u2006\u2007\u2008\u2009\u200A','')"]   # Sometimes these have (weird) spaces in them
+  match: "*[1][$NoSpacesBase='lim' or $NoSpacesBase='limsup' or $NoSpacesBase='liminf']"
   replace: 
   - intent:
-      name: "limit"    # Fix: the name in the spreadsheet needs updating/fixing
+      xpath-name: "IfThenElse($NoSpacesBase='lim', 'limit', IfThenElse($NoSpacesBase='limsup', 'limit-sup', 'limit-inf'))"
+      attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
+      children: [x: "*[2]"]
+
+- name: repeating-decimal
+  tag: mrow
+  match: "count(*)=3 and *[1][self::m:mn] and 
+          *[2][.='\u2062'] and
+          *[3][self::m:mover][*[1][self::m:mn] and *[2][.='\u00AF']]"
+  replace:
+  - intent:
+      name: "repeating-decimal"
       children:
       - x: "*[1]"
-      - x: "*[2]"
+      - x: "*[3]/*[1]"
 
 -
   name: modified-var
   tag: mover
   # breve, check, dot, double-dot, triple-dot, quadruple-dot, grave, hat, tilde, line/bar
-  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~→¯_', '')='']"
+  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~¯_', '')='']"
   replace:
   - intent:
       name: "modified-variable"
+      attrs: "data-intent-property='concat(data-intent-property, \":silent:\")'"
       children:
       - x: "*[1]"
       - x: "*[2]"
+
+-
+  name: vector
+  tag: mover
+  match: "*[1][self::m:mi] and *[2][.='→' or .='⇀']"
+  replace:
+  - intent:
+      name: "vector"
+      attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
+      children:
+      - x: "*[1]"
 
 
 -
@@ -327,9 +387,9 @@
           if: "*[1][self::m:mrow]"
           then_test:
               if: "*[2][self::m:mrow]"
-              then: [t: "\u2B96"]    # this is currently unassigned and may get used by UTC at some point (<=>)
-              else: [t: "\u2B74"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
-          else: [t: "\u2B75"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
+              then: [t: "\u1f8d2"]    # this is currently unassigned and may get used by UTC at some point (<=>)
+              else: [t: "\u1f8d4"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
+          else: [t: "\u1f8d3"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
 
 -
   # need to include the name of the element so the rules know whether to say "sub" or "super"
@@ -375,6 +435,39 @@
       - x: "text()"
 
 -
+  name: unit
+  tag: [mi, mtext]
+  match: "@class='MathML-unit' or contains(@data-intent-property, ':unit')"
+  replace:
+  - intent:
+      name: "unit"
+      attrs: "data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
+      children:
+      - x: "text()"
+
+- # this is attempt to catch units when some has created a non-italic word that matches a unit
+  # other mtext unit cases were caught above
+  # would like to use forced mathvariant='normal', but it captures things it shouldn't in the tests like "H" and "F" (calculus)
+  # or (self::m:mi and string-length(.)=1 and @mathvariant='normal' and DefinitionValue(., 'Speech', 'SIUnits') != '')"
+  name: mtext-inference-unit
+  tag: mtext
+  match: "DefinitionValue(., 'Speech', 'SIUnits') != '' or
+          DefinitionValue(., 'Speech', 'UnitsWithoutPrefixes') != '' or 
+          DefinitionValue(., 'Speech', 'EnglishUnits') != '' or
+          (string-length(.) >= 3 and
+           substring(., 1, 2) = 'da' and 
+           DefinitionValue(substring(., 3), 'Speech', 'SIUnits') != '') or
+          (string-length(.) >= 2 and
+           DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != '' and
+           DefinitionValue(substring(., 2), 'Speech', 'SIUnits') != '')"
+  replace:
+  - intent:
+      name: "unit"
+      attrs: "data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
+      children:
+      - x: "text()"
+
+-
   name: chemical-formula-op
   tag: [mo]
   match: "@data-chem-formula-op"
@@ -406,12 +499,23 @@
       - x: "text()"
 
 -
+  name: chemistry-concentration
+  tag: mrow
+  match: "ancestor-or-self::*[@data-chem-equation] and IsBracketed(., '[', ']')"
+  replace:
+  - intent:
+      name: "chemistry-concentration"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
+      children:
+      - x: "*[2]"
+
+-
   name: chemistry-state
   tag: mrow
   match:
     - "(@data-chem-formula or @data-chem-equation) and"
     - "IsBracketed(., '(', ')') and"
-    - "*[2][text()='s' or text()='l' or text()='g' or text()='aq']"
+    - "*[2][.='s' or .='l' or .='g' or .='aq']"
   replace:
   - intent:
       name: "chemical-state"
@@ -477,14 +581,14 @@
 
 # Pseudo-script characters are characters such as "degree sign" ('°') that are raised but in MathML should be in a superscript.
 # They are not spoken as if in a superscript (e.g "x degrees", not "x superscripts degrees")
-
 -
   name: skip-super
   tag: [msup, msubsup]
-  match: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
+  match: "*[last()][translate(., '′″‴⁗\"†‡°*', '')='' or .=\"'\"]"  # you can't have both ' and " in an xpath string
   replace:
   - intent:
       name: "skip-super"
+      attrs: "data-intent-property='concat(data-intent-property, \":silent:\")'"
       children: [x: "*"]
 
 -
@@ -494,6 +598,7 @@
   replace:
   - intent:
       name: "say-super"
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children: [x: "*"]
 
 # rules for functions raised to a power
@@ -504,10 +609,10 @@
   tag: msup
   match:
   - "*[2][self::m:mrow][count(*)=2] and"                        # exponent is an mrow with children...
-  - "*[2]/*[1][self::m:mo][text()='-'] and"                     #   '-'
-  - "*[2]/*[2][self::m:mn][text()=1] and"                       #  and '1'
+  - "*[2]/*[1][self::m:mo][.='-'] and"                     #   '-'
+  - "*[2]/*[2][self::m:mn][.=1] and"                       #  and '1'
   - "*[1][self::m:mi] and IsInDefinition(*[1], 'TrigFunctionNames') and"        # base is a trig function name (e.g, sin, sinh)
-  - "following-sibling::*[1][self::m:mo][text()='\u2061']"      # and msup is followed by invisible function apply
+  - "following-sibling::*[1][self::m:mo][.='\u2061']"      # and msup is followed by invisible function apply
   replace:
   - intent:
       name: "inverse-function"
@@ -530,7 +635,9 @@
 - 
   name: set
   tag: mrow
-  match: "IsBracketed(., '{', '}')"
+  # sets have { }s and should have at least one of ",∈∉|" (vertical bar is "such that") or be the empty set
+  match: "IsBracketed(., '{', '}') and
+          (count(*)=2 or (count(*)=3 and IsNode(*[2], 'leaf')) or . != translate(., ',∈∉|:', ''))"
   replace: 
   - intent:
       name: "set"
@@ -545,7 +652,8 @@
   match: "."
   replace:
   - intent:
-      name: "particular-value-of"
+      name: "indexed-by"
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
       - x: "*[1]"
       - x: "*[2]"
@@ -571,7 +679,8 @@
       name: "power"
       children:
       - intent:
-          name: "sub"
+          name: "indexed-by"
+          attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
           children:
             - x: "*[1]"
             - x: "*[2]"
@@ -591,110 +700,172 @@
 
 # generic mtable: treat as multiline equations of some sort
 # if a property is set, handle that first
+
 -
-  name: mtable-matrix-property
+  name: mtable-property-is-set
   tag: mtable
-  match:
-  - "contains(@data-intent-property, ':matrix:') or"
-  - "..[self::m:mrow and (IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))]"
+  # any 'intent' property set overrides the inferred property
+  variables: [TableProperty: "IfThenElse(contains(@data-intent-property, ':array:'), 'array',
+                               IfThenElse(contains(@data-intent-property, ':matrix:'), 'matrix',
+                               IfThenElse(contains(@data-intent-property, ':determinant:'), 'determinant',
+                               IfThenElse(contains(@data-intent-property, ':piecewise:'), 'piecewise',
+                               IfThenElse(contains(@data-intent-property, ':system-of-equations:'), 'system-of-equations',
+                               IfThenElse(contains(@data-intent-property, ':lines:'), 'lines',
+                                 $TableProperty))))))"]   # '' is what to say if none match"
+  match: "$TableProperty !=''"
   replace:
   - intent:
-      name: "matrix"
+      xpath-name: "$TableProperty"
       children:
       - x: "*"
 
 -
-  name: mtable-determinant-property
-  tag: mtable
-  match: "contains(@data-intent-property, ':determinant:') or ..[self::m:mrow and IsBracketed(., '|', '|')]"
+  name: "piecewise"
+  tag: mrow
+  match: "count(*)=2 and *[1][.='{'] and
+          *[2][self::m:mtable and not(
+                        contains(@data-intent-property, ':array:') or
+                        contains(@data-intent-property, ':matrix:') or
+                        contains(@data-intent-property, ':determinant:') or
+                        contains(@data-intent-property, 'system-of-equations:') or
+                        contains(@data-intent-property, ':lines:') )
+              ]"
   replace:
-  - intent:
-      name: "determinant"
-      children:
-      - x: "*"
-      
+  - with:
+      variables: [TableProperty: "'piecewise'"]
+      replace: [x: "*[2]"]
+
 -
-  name: mtable-cases-property
-  tag: mtable
+  name: matrix
+  tag: mrow
   match:
-  - "contains(@data-intent-property, ':cases:') or"
-  - "..[self::m:mrow and count(*)=2 and *[1][text()='{']]"
+  - "count(*)=3 and (IsBracketed(., '(', ')') or IsBracketed(., '[', ']')) and
+          *[2][self::m:mtable and not(
+                        contains(@data-intent-property, ':piecewise:') or
+                        contains(@data-intent-property, ':matrix:') or
+                        contains(@data-intent-property, ':determinant:') or
+                        contains(@data-intent-property, 'system-of-equations:') or
+                        contains(@data-intent-property, ':lines:') )
+              ]"
   replace:
-  - intent:
-      name: "cases"
-      children:
-      - x: "*"
+  - with:
+      variables: [TableProperty: "'matrix'"]
+      replace: [x: "*[2]"]
+
+-
+  name: determinant
+  tag: mrow
+  match:
+  - "count(*)=3 and IsBracketed(., '|', '|') and
+          *[2][self::m:mtable and not(
+                        contains(@data-intent-property, ':array:') or
+                        contains(@data-intent-property, ':matrix:') or
+                        contains(@data-intent-property, ':piecewise:') or
+                        contains(@data-intent-property, 'system-of-equations:') or
+                        contains(@data-intent-property, ':lines:') )
+              ]"
+  replace:
+  - with:
+      variables: [TableProperty: "'determinant'"]
+      replace: [x: "*[2]"]
 
 -
   name: mtable-equations-property
   tag: mtable
-  match: "contains(@data-intent-property, ':equations:')"
+  match: "count(*) > 0 and *[1][contains(translate(., '=≠<>≤≥≦≧', '='), '=')]"
   replace:
-  - intent:
-      name: "equations"
-      children:
-      - x: "*"
+  - with:
+      variables:
+      - TableProperty: "'system-of-equations'"
+      replace:
+      - intent:
+          name: "system-of-equations"
+          children:
+          - x: "*"
 
 -
   name: mtable-lines-property
   tag: mtable
-  match: "contains(@data-intent-property, ':lines:')"
+  match: "count(*) > 0 and not(descendant::*[self::m:mo and not(.='-' or .='+')])"
   replace:
-  - intent:
-      name: "lines"
-      children:
-      - x: "*"
-
-
-# -
-#   name: mtable-property-is-set
-#   tag: mtable
-#   variables: [MTableProperty: "IfThenElse(contains(DEBUG(@data-intent-property), ':matrix:'), 'matrix',
-#                                IfThenElse(contains(@data-intent-property, ':determinant:'), 'determinant',
-#                                IfThenElse(contains(@data-intent-property, ':cases:'), 'cases',
-#                                IfThenElse(contains(@data-intent-property, ':equations:'), 'equations',
-#                                IfThenElse(contains(@data-intent-property, ':lines:'), 'lines','')))))"]
-#   match: "DEBUG($MTableProperty) !=''"
-#   replace:
-#   - intent:
-#       name: "$MTableProperty"    # doesn't work -- "name:" is not an xpath expr
-#       children:
-#       - x: "*"
+  - with:
+      variables:
+      - TableProperty: "'lines'"
+      replace:
+      - intent:
+          name: "lines"
+          children:
+          - x: "*"
 
 -
-  name: cases
-  tag: mrow
-  match: "count(*)=2 and *[1][text()='{'] and *[2][self::m:mtable]"
+  # merge all the mtd into a single mtd
+  name: consolidate-labeled-mtd-entries
+  tag: [mlabeledtr, mtr]
+  # Note: child hasn't been processed, so 'intent' hasn't been processed/turned into data-intent-property
+  match: "count(*) > 1 and
+          ($TableProperty = 'piecewise' or $TableProperty = 'system-of-equations' or $TableProperty = 'lines') and
+          (self::m:mlabeledtr or *[contains(@intent, ':equation-label')])"
   replace:
   - intent:
-      name: "intent-wrapper"
+      name: "mlabeledtr"
+      children:
+      - x: "*[contains(@intent, ':equation-label')]"
+      - intent:
+          name: "mtd"
+          attrs: "id=*[not(contains(@intent, ':equation-label'))][1]/*[1]/@id"
+          children: 
+          - intent:
+              name: "mrow"
+              attrs: "id=*[not(contains(@intent, ':equation-label'))][1]/*[1]/@id"
+              children: [x: "*[not(contains(@intent, ':equation-label'))]"]
+
+-
+  # convert a mtr to a mlabeledtr
+  name: mlabeledtr
+  tag: mtr
+  # Note: child hasn't been processed, so 'intent' hasn't been processed/turned into data-intent-property
+  match: "count(*) > 1 and *[contains(@intent, ':equation-label')]"
+  replace:
+  - intent:
+      name: "mlabeledtr"
+      children:
+      - x: "*[contains(@intent, ':equation-label')]"
+      - x: "*[not(contains(@intent, ':equation-label'))]"
+
+-
+  # merge all the mtd into a single mtd
+  name: consolidate-mtd-entries
+  tag: mtr
+  match: "count(*) > 1 and
+          ($TableProperty = 'piecewise' or $TableProperty = 'system-of-equations' or $TableProperty = 'lines')"
+  replace:
+  - intent:
+      name: "mtr"
+      attrs: "id='@id'"
       children:
       - intent:
-          name: "cases"
-          id: "*[2]/@id"
-          children: [x: "*[2]/*"]
+          name: "mtd"
+          attrs: "id='*[1]/@id'"
+          children: 
+          - intent:
+              name: "mrow"
+              attrs: "id='*[2]/@id'"
+              children: [x: "*"]
 
 -
-  # if there is a relational op in the first row, assume that's true of all rows and call them equations
-  name: equations
-  tag: mtable
-      # xpath hack: transform the chars we care about to an unlikely char and then see if that char exists
-  match: "count(*) > 0 and *[1][contains(translate(., '=≠<>≤≥≦≧', '='), '=')]"
+  # We need to preserve any intent properties that are on the mtd (e.g., :pause)
+  # Note: at this point "intent" has been processed so we look at @data-intent-property
+  name: mtd-to-mrow
+  tag: mtd
+  match: "($TableProperty = 'piecewise' or $TableProperty = 'system-of-equations' or $TableProperty = 'lines') and
+          not(contains(@data-intent-property, ':equation-label'))"
   replace:
-  - intent:
-      name: "equations"
-      children:
+  - test:
+      if: "@data-intent-property"
+      then:
+      - intent:
+          name: "mrow"
+          attrs: "id=@id data-intent-property=@data-intent-property"
+          children: [x: "*"]
+      else:
       - x: "*"
-
-
--
-  # don't know anything about them -- think of them as "lines"
-  name: lines
-  tag: mtable
-  match: "."
-  replace:
-  - intent:
-      name: "lines"
-      children:
-      - x: "*"
-

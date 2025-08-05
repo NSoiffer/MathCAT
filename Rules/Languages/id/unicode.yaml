@@ -49,6 +49,8 @@
 
 - "0-9": [T: "."]
 
+- " ": [t: " "]                                  # 0x20
+
 - "!": [T: faktorial] # 0x21
 - "\"": [T: tanda kutip] # 0x22
 - "#": [T: tagar] # 0x23
@@ -95,8 +97,12 @@
           # speak "comma" when not adjacent to '…'
         - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
           # except if expression starts with '…'
-        - " ../*[1][text()='…'] "
-      then: [T: '']
+        - " ../*[1][.='…'] "
+      then:
+      - T: "koma"                         # 	(en: 'comma', google translation)
+      - test:
+          if: "$Verbosity != Terse"
+          then: [pause: short]
       # else silent
 
 - "-": [T: kurang] # 0x2d
@@ -255,7 +261,7 @@
         - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
           # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
           # speak '…' as 'and so on...' unless expr starts with '…'
-        - "../*[1][text()='…']"
+        - "../*[1][.='…']"
       then: [T: titik titik titik]
       else_test: # must have $ClearSpeak_Ellipses = 'AndSoOn'
         if: 'count(following-sibling::*) = 0'
@@ -358,11 +364,6 @@
         if: "$Verbosity!='Terse'"
         then: [T: '']
     - T: laplacian dari
-- "∇": # 0x2207
-    - test:
-        if: "$Verbosity!='Terse'"
-        then: [T: '']
-    - T: gradien dari
 - "∈": # 0x2208
     - test:
         if: "$SpeechStyle != 'ClearSpeak'"

@@ -2,19 +2,45 @@
 # https://www.once.es/servicios-sociales/braille/comision-braille-espanola/documentos-tecnicos/documentos-tecnicos-relacionados-con-el-braille/documentos/b5-signografia-matematica.pdf
 ---
 -
+  name: unit-spaces
+  tag: "!*"
+  match: "not(self::m:math) and not($MatchingWhitespace) and (@data-previous-space-width >= 0.25 or @data-following-space-width >= 0.25)"
+  replace:
+   - with:
+      variables: [MatchingWhitespace: "true()"]
+      replace:
+      - test:
+        - if: "(@class='MathML-unit' or contains(@intent, ':unit') or BaseNode(.)[@class='MathML-unit' or contains(@intent, ':unit')]) and @data-previous-space-width >= 0.25" 
+          then: [t: "𝐖"]
+      - x: "."
+      - test:
+        - if: "(@class='MathML-unit' or contains(@intent, ':unit') or BaseNode(.)[@class='MathML-unit' or contains(@intent, ':unit')]) and @data-following-space-width >= 0.25" 
+          then: [t: "𝐖"]
+
+-
+  name: omissions
+  tag: "!*"
+  match: "contains(@intent, ':blank')"
+  replace:
+  - test:
+      - if: "self::m:mo"
+        then: [t: "⠰"]      # 14.5(1)
+      - else_if: "contains(., '\u00A0')"
+        then:   # treated as a number omission -- FIX: anything to look at to increase the odds of it being digits
+        - t: "N"
+        - x: "translate(., '_\u00A0', '⠰')"  # note space is removed
+        else: [t: "⠰⠤⠆"]
+  - t: ""
+
+
+-
   name: default
   tag: msqrt
   match: "."
   replace: 
   - t: "⠫⠱"
   - test:
-      if:
-      - "*[1][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "NeedsToBeGrouped(*[1], 'CMU', true())"
       then:
       - t: "⠢"
       - x: "*"
@@ -31,13 +57,7 @@
   - x: "*[2]"
   - t: "⠱"
   - test:
-      if:
-      - "*[1][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "NeedsToBeGrouped(*[1], 'CMU', true())"
       then:
       - t: "⠢"
       - x: "*[1]"
@@ -73,7 +93,7 @@
   name: common-fraction-mixed-number
   tag: mfrac
   match:
-    - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
+    - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
     - "*[1][self::m:mn][not(contains(., '.,'))]   and" 
     - "*[2][self::m:mn][not(contains(., '.,'))]"
   replace: 
@@ -112,7 +132,7 @@
   name: default
   tag: mfrac
   match: "."
-  variables: [AddGrouping: "preceding-sibling::*[2][self::m:mi][IsInDefinition(., 'CMUFunctionNames')]"] # '2' skip invis function apply
+  variables: [AddGrouping: "preceding-sibling::*[2][self::m:mi][IsInDefinition(., 'Braille', 'CMUFunctionNames')]"] # '2' skip invis function apply
   replace: 
   # Inferring from the examples 7.5.2(11) and 7.7(2) fractions are bracketed after log/trig functions
   # FIX: try to find exact rule
@@ -120,13 +140,7 @@
       if: "$AddGrouping"
       then: [t: "⠢"]
   - test:
-      if:
-      - "*[1][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "NeedsToBeGrouped(*[1], 'CMU', true())"
       then:
       - t: "⠢"
       - x: "*[1]"
@@ -135,13 +149,7 @@
       - x: "*[1]"
   - t: "⠲"
   - test:
-      if:
-      - "*[2][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "NeedsToBeGrouped(*[2], 'CMU', false())"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -225,6 +233,7 @@
     - RowStart: "''"           # empty string -- it needs to be set
     - RowEnd: "''"             # empty string -- it needs to be set
     - NewScriptContext: "''"    # empty string -- it needs to be set
+    - MatchingWhitespace: "false()"
   replace: [x: "*"]
 
 -
@@ -250,7 +259,7 @@
   - "IsBracketed(., '|', '|') and $NextRealChild and"
   - "( $NextRealChild[self::m:msqrt] or $NextRealChild[self::m:mroot] or"    # have indicator with dots in first half
   - "  (IsNode($NextRealChild, '2D') and $NextRealChild[*[1][self::m:mrow and not(IsBracketed(., '', ''))]]) or"  # grouping char added which has dots in first half 
-  - "  IsInDefinition(substring($NextRealChild, 1, 1), 'CMUCharsWithDotsOnLeft')"
+  - "  IsInDefinition(substring($NextRealChild, 1, 1), 'Braille', 'CMUCharsWithDotsOnLeft')"
   - ")"
   replace:
   - x: "*"
@@ -285,61 +294,13 @@
   replace: [x: "*"]
 
 -
-  # Non-breaking whitespace is added to the start/end of numbers in cases of adjoining text to help the parse.
-  # These generate a different char inside of a number, so we peel them off here because it doesn't seem possible
-  # to ask "what character position am I inside of an mn?" in unicode.yaml
-  # Here we deal with the messy abnormal case separately -- CMU seems to want to leave out spaces
-  name: peel-off-spaces
-  tag: [mn, mi]
-  match: "starts-with(., '\u00A0') or substring(., string-length(.), 1)='\u00A0'"
-  replace:
-  - test:
-      if: "starts-with(., '\u00A0')"
-      then:
-      - test:
-          if: "substring(., string-length(.), 1)='\u00A0'"
-          then:
-          - x: "BrailleChars(., 'CMU', 2, string-length(.))"
-          - test:
-              if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
-              then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
-              else: [t: "W"]
-          else:
-          - x: "BrailleChars(., 'CMU', 2, string-length(.)+1)"
-      else:
-      - test:
-          if: "substring(., string-length(.), 1)='\u00A0'"
-          then:
-          - x: "BrailleChars(., 'CMU', 1, string-length(.))"
-          - test:
-              if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
-              then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
-              else: [t: "W"]
-          else:
-          - x: "BrailleChars(., 'CMU', 1, string-length(.)+1)"
-
--
   name: roman_numeral
   tag: mn
-  match: "@data-roman-numeral"
+  match: "@data-roman-numeral or contains(@intent, ':roman-numeral')"
   replace:
   # for uppercase, need to only have one as uppercase
   - x: "BrailleChars(., 'CMU', 1, 2)"
   - x: "BrailleChars(translate(., 'IVXLCDM', 'ivxlcdm'), 'CMU', 2, string-length(.)+1)"
--
-  name: omissions
-  tag: [mi, mtext, mo]
-  match: "contains(@intent, ':omission')"
-  replace:
-  - test:
-      - if: "self::m:mo"
-        then: [t: "⠰"]      # 14.5(1)
-      - else_if: "contains(., '\u00A0')"
-        then:   # treated as a number omission -- FIX: anything to look at to increase the odds of it being digits
-        - t: "N"
-        - x: "translate(., '_\u00A0', '⠰')"  # note space is removed
-        else: [t: "⠰⠤⠆"]
-  - t: ""
 
 -
   name: Ln-hack
@@ -376,7 +337,8 @@
   replace:
   - x: "BrailleChars(., 'CMU')"   # also deals with "dot after 'arc'"
   - test:  # Section 12 says strings longer than one should end with dot 3 rather than restricting to just listed functions (don't do this for mtext)
-      if: "string-length(.) > 1 and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''"
+      if: "string-length(.) > 1 and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '' and
+           not(@class='MathML-unit' or contains(@intent, ':unit') )"
       then: [t: "."]
       
 
@@ -481,12 +443,12 @@
   match: "*[2][self::m:mo and string-length(.) = 1 and translate(., '_¯═→⟶↔⟷←⟵.˙~^ˇ̊ ⌢⌣⏜⏝','')='']"
   replace: 
   - test:
-      if: "*[2][text()='=']"  # in case someone uses this for a double bar
+      if: "*[2][.='=']"  # in case someone uses this for a double bar
       then: [t: "⠈⠉⠈⠉"]
       else: [x: "*[2]"]
   - test:
       # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
       then:
       - x: "*[1]"
       else:
@@ -501,7 +463,7 @@
   replace: 
   - test:
       # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
       then:
       - x: "*[1]"
       else:
@@ -519,14 +481,14 @@
   match: "*[2][self::m:mo and string-length(.) = 1 and translate(., '=¯〰﹏','')='']" # 0x3030, 0xFE4F ("_" canonicalized to "¯")
   replace: 
   - test:
-      - if: "*[2][text()='=']"  # in case someone uses this for a double bar
+      - if: "*[2][.='=']"  # in case someone uses this for a double bar
         then: [t: "⠈⠉⠈⠉"]
-      - else_if: "*[2][text()='¯']"
+      - else_if: "*[2][.='¯']"
         then: [t: "⠠⠤"]
         else: [t: "⠂⠢"]   # wavy line
   - test:
       # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
       then:
       - x: "*[1]"
       else:
@@ -543,7 +505,7 @@
   replace: 
   - test:
       # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
       then:
       - x: "*[1]"
       else:
@@ -565,20 +527,20 @@
           if: "*[2][.='═']"
           then: [t: "⠠⠤⠠⠤"]
           else: [t: "⠠⠤"]
-    # - else_if: "*[2][text()='→']"
+    # - else_if: "*[2][.='→']"
     #   then: [t: "⠘⠱"]
-    # - else_if: "*[2][text()='.' or text()='˙']"
+    # - else_if: "*[2][.='.' or .='˙']"
     #   then: [t: "⠘⠲"]
-    - else_if: "*[2][text()='~']"
+    - else_if: "*[2][.='~']"
       then: [t: "⠐⠢"]
-    # - else_if: "*[2][text()='^']"
+    # - else_if: "*[2][.='^']"
     #   then: [t: "⠐⠱ "]
-    # - else_if: "*[2][text()='=']"
+    # - else_if: "*[2][.='=']"
     #   then: [t: "⠐⠱ "]
       else: [x: "*[2]"]  # maybe not right, but do something
   - test:
       # FIX: CMUFunctionNames is a guess based on 7.2(1) and 7.1(2) which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
       then:
       - x: "*[1]"
       else:
@@ -604,13 +566,7 @@
   - test:
       # the rules for scripts seem to always want a nested script to be bracketed
       # there aren't any root examples in scripts and numeric fractions don't get bracketed
-      if:
-      - "*[2][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "NeedsToBeGrouped(*[2], 'CMU', false())"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -664,13 +620,7 @@
   - test:
       # the rules for scripts seem to always want a nested script to be bracketed
       # there aren't any root examples in scripts and numeric fractions don't get bracketed
-      if:
-      - "*[2][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "NeedsToBeGrouped(*[2], 'CMU', false())"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -726,17 +676,18 @@
           else: [x: "*[3]"]
   - t: "⠱"
 
--  # 4.2.2 -- numeric subscripts (note does not apply to msubsup -- 4.4.1, example 1, nor to nested subscript - 4.2.1, last example)
-   # the rule doesn't mention having a simple base, but I think that is what is meant
-  name: numeric-subscripts
-  tag: msub
-  match:
-  - "*[1][self::m:mi] and"
-  - "*[2][self::m:mn][not(contains(., '.,'))] and ..[1][not(IsNode(., 'modified'))]"
-  replace:
-  - x: "*[1]"
-  - t: "𝑁"    # don't add numeric indicator
-  - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the subscript
+# - # 4.2.2 -- numeric subscripts 
+  # Feedback from Jaime Muñoz Carenas is that they are only used for 2D structures (multiline)
+  # the rule doesn't mention having a simple base, but I think that is what is meant
+  # name: numeric-subscripts
+  # tag: msub
+  # match:
+  # - "*[1][self::m:mi] and"
+  # - "*[2][self::m:mn][not(contains(., '.,'))] and ..[1][not(IsNode(., 'modified'))]"
+  # replace:
+  # - x: "*[1]"
+  # - t: "𝑁"    # don't add numeric indicator
+  # - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the subscript
 
 -
   name: nested-scripts    # this case likely should have been written as mmultiscripts, but people will use this (4.4.2)
@@ -784,13 +735,7 @@
   - test:
       # the rules for scripts seem to always want a nested script to be bracketed
       # there aren't any root examples in scripts and numeric fractions don't get bracketed
-      if:
-      - "*[2][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "NeedsToBeGrouped(*[2], 'CMU', false())"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -807,13 +752,7 @@
       - test:
           # the rules for scripts seem to always want a nested script to be bracketed
           # there aren't any root examples and it seems like fractions don't get bracketed
-          if:
-          - "*[3][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-          - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-          - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-          - "     ) or" 
-          - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-          - "    ]"
+          if: "NeedsToBeGrouped(*[3], 'CMU', false())"
           then:
           - t: "⠢"
           - x: "*[3]"
@@ -1171,38 +1110,39 @@
   name: default
   tag: menclose
   match: "."
-  variables:
-  - IsCancellation: "contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
-                     contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike')"
   replace:
   - test:
-      if: "contains(@notation,'top')"
-      then: [t: "⠈⠉"]                  # overline
-  - test:
-      if: "contains(@notation,'bottom')"
-      then: [t: "⠠⠤"]                  # underline
-  - test:
-      if: "contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
-           contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike')"
-      then: [t: "⠻"]                   # cancellation
-  - test:  # group anything that isn't a single character or bracketed
-      if: "*[1][(IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))) or IsBracketed(., '', '')]"
-      then: [x: "*[1]"]
+      if: "contains(@notation,'box')"
+      then_test: 
+          if: "*[1][self::m:mtext and .='\u00A0']"                  # box and roundedbox
+          then: [t: "⠰⠤⠆"]                            # omission
+          else: [t: "1⠫⠼⠙"]                           # square (no rectangle in UEB)
       else:
-      - t: "⠢"
-      - x: "*[1]"
-      - t: "⠔"
- 
+      - with:
+          variables:
+          - IsCancellation: "contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
+                             contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike')"
+          replace:
+          - test:
+              if: "contains(@notation,'top')"
+              then: [t: "⠈⠉"]                  # overline
+          - test:
+              if: "contains(@notation,'bottom')"
+              then: [t: "⠠⠤"]                  # underline
+          - test:
+              if: "$IsCancellation"
+              then: [t: "⠻"]                   # cancellation
+          - test:
+              if: "*[1][(IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))) or IsBracketed(., '', '')]"
+              then: [x: "*[1]"]
+              else:
+              - t: "⠢"
+              - x: "*[1]"
+              - t: "⠔"
+
   #  - test:
   #     if: "contains(concat(' ', normalize-space(@notation), ' '), ' left ')"                  #avoid 'leftarrow'
   #     then: [t: "⠸"]
-  #  - test:
-  #     if: "contains(@notation,'box')"                  # box and roundedbox
-  #     then:
-  #     # - test:
-  #     #       if: "$AddSpaces"
-  #     #       then: [t: " "]
-  #     - t: "1⠫⠼⠙"                                  # square (no rectangle in UEB)
   #  - test:
   #     if: "contains(@notation,'circle')"
   #     then:
@@ -1268,7 +1208,7 @@
   #     - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
   #     - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
   #     - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-  #     - "     IsInDefinition(., 'Arrows')"
+  #     - "     IsInDefinition(., 'Braille', 'Arrows')"
   #     - "    ]"
   #     then: [x: "*[1]"]
   #     else:

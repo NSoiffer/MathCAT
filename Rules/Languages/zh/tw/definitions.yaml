@@ -1,0 +1,352 @@
+---
+- include: "../../../definitions.yaml"
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+# - name: { "...", "..." "..." }
+# For numbers, 
+# - name: [] "...", "..." "..." ]
+
+
+# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
+# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
+# If no ":"s are used, the same speech is used for all forms
+# If bracketing words make sense, they are separated with ";"s
+# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
+# If there are multiple fixities (e.g., see transpose), they are separated with "||
+#   for readability, spaces can be used around any of the delimiter characters
+# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+- IntentMappings: {
+    "indexed-by": "infix= ; 下標; 結束下標",
+    "modified-variable": "silent= ",
+    "say-super": "infix=上標",   # used with 'mo' for superscripts (e.g, "<")
+    "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
+
+    "absolute-value": "function= ; 絕對值; 結束絕對值",
+    "binomial": "infix=; 選; end binomial",
+    "limit": "prefix=極限",
+    "lim-sup": "prefix=lim sup as: the limit superior as: the limit superior as",
+    "lim-inf": "prefix=lim inf as: the limit inferior as : the limit inferior as",
+    "logarithm-with-base": "prefix=log 底",
+    "minus": "infix=減 || prefix=負",
+    "plus": "infix=加 || prefix=正",
+
+    # These act like postfix in linear-algebra.yaml, so rules are currently used instead of these defaults
+    # "transpose": "postfix=的 轉置 || function=的 轉置",
+    # "norm": "function=範數: 的 範數: 的 範數; 結束範數",
+    # "trace": "function=跡 : 的 跡: 的 跡",
+    # "dimension": "function=維數 : 的 維數: 的 維數",
+    # "homomorphism": "function=同態 : 的 同態: 的 同態",
+    # "kernel": "function=核 : 的 核: 的 核",
+    "vector": "function=向量 || prefix=向量",
+    "cross-product": "infix=cross: cross product: cross product",
+    "dot-product": "infix=dot: dot product: dot:dot product",
+
+    "divergence": "function= ; div: divergence: divergence; end divergence",
+    "curl": "function= ; curl; end curl",
+    "gradient": "function= ; grad: gradient: gradient; end gradient",
+    "laplacian": "function=lahplahsian",   # speech engines don't do a good job with "laplacian"
+  }
+
+- NavigationParts: {
+    "large-op": "base; lower limit; upper limit",
+    "mfrac": "numerator;denominator",
+    "fraction": "numerator;denominator",
+    "msqrt": "root",
+    "square-root": "root",
+    "mroot": "root;root index",
+    "root": "root;root index",
+    "msub": "base;subscript",
+    "sub": "base;subscript",
+    "msup": "base;superscript",
+    "say-super": "base;superscript",
+    "skip-super": "base;superscript",
+    "power": "base;exponent",
+    "msubsup": "base;subscript;superscript",
+    "munder": "base;under limit",
+    "mover": "base;upper limit",
+    "munderover": "base;under limit;upper limit",
+
+    # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
+    # it's a hack to put them here, but at least they are grouped with the other navigation parts
+    "in": "in",
+    "out": "out of",
+  }
+
+
+- SIPrefixes: {
+    "Q": "昆", "R": "羅", "Y": "佑", "Z": "皆", "E": "艾", "P": "拍", "T": "兆", "G": "吉", "M": "百萬", "k": "千", "h": "百", "da": "十",
+    "d": "分", "c": "厘", "m": "毫", "µ": "微", "n": "奈", "p": "皮", "f": "飛", "a": "阿", "z": "介", "y": "攸", "r": "絨", "q": "匱"
+  }
+
+# this is a list of all units that accept SIPrefixes
+# from www.bipm.org/documents/20126/41483022/SI-Brochure-9-EN.pdf
+#   Prefixes may be used with any of the 29 SI units with special names
+#   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
+- SIUnits: {
+    # base units
+    "A": "安培",
+    "cd": "燭光",
+    "K": "凱氏", "K": "凱氏", # U+212A
+    "g": "克",
+    "m": "米",     # British spelling works for US also
+    "mol": "莫耳",
+    "s": "秒", "″": "秒", "\"": "秒", "sec": "秒",  # "sec" not actually legal
+
+    # derived units
+    "Bq": "貝克",
+    "C": "庫侖",
+    "°C": "攝氏度", "℃": "攝氏度",
+    "F": "法拉",
+    "Gy": "格雷",
+    "H": "亨利",
+    "Hz": "赫茲",
+    "J": "焦耳",
+    "kat": "kattel",
+    "lm": "流明",
+    "lx": "勒克斯",
+    "N": "牛頓",
+    "Ω": "歐姆", "Ω": "歐姆",       # Greek Cap letter, U+2126 OHM SIGN
+    "Pa": "帕",
+    "rad": "弳",
+    "S": "西門子",
+    "Sv": "西弗",
+    "sr": "sterradion",
+    "T": "特士拉",
+    "V": "伏特",
+    "W": "瓦特",
+    "Wb": "韋伯",
+
+    # accepted (plus a few variants) that take SI prefixes
+    "l": "公升", "L": "公升", "ℓ": "公升",               # British spelling works for US also
+    "t": "公噸",
+    "Da": "道爾頓",
+    "Np": "奈培",       # nepar        # should only take negative powers
+    "amu": "原子質量單位", "u": "原子質量單位",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
+    "au": "天文單位", "AU": "天文單位",
+    "eV": "電子伏特",
+    
+    # copy from english version by hjy
+    # others that take a prefix
+    "a": "annum",               # should only take positive powers
+    "as": "弧秒",          # see en.wikipedia.org/wiki/Minute_and_second_of_arc
+
+    # Copy from english version by hjy
+    # technically wrong, but used in practice with SI Units
+    "b": "位元",               # should only take positive powers
+    "B": "位元組",              # should only take positive powers
+    "Bd": "鮑",             # should only take positive powers
+  }
+
+
+- UnitsWithoutPrefixes: {
+    # time
+    "′": "分", "'": "分","min": "分",
+    "h": "時", "hr": "時", "Hr": "時",
+    "d": "天", "dy": "天",
+    "w": "週", "wk": "週",
+    "y": "年", "yr": "年",    
+
+    # angles (could be temperature)
+    "°": "度", "deg": "度",
+    "arcmin": "弧分",
+    "amin": "弧分",
+    "am": "弧分",
+    "MOA": "弧分",
+    "arcsec": "弧秒",
+    "asec": "弧秒",
+    "as": "弧秒",
+
+    # other accepted units that don't take SI prefixes
+    "ha": "公頃",
+    "Np": "奈培",
+    "B": "貝爾",
+    "dB": "分貝",
+
+    # distance
+    "ltyr": "光年", "ly": "光年",
+    "pc": "秒差距",
+    "Å": "埃", "Å": "埃",           # U+00C5 and U+212B
+    "fm": "費米",
+
+    # others
+    "atm": "大氣壓",
+    "bar": "巴",
+    "cal": "卡",
+    "Ci": "居里",
+    "grad": "百分直角",
+    "M": "體積莫耳濃度",
+    "R": "倫琴",
+    "rpm": "轉速每分鐘",
+    "℧": "姆歐",
+    "dyn": "達因",
+    "erg": "爾格",
+    # copy from english version by hjy
+    # powers of 2 used with bits and bytes
+    "Kib": "kibi-位元", "Mib": "mebi-位元", "Gib": "gibi-位元", "Tib": "tebi-位元", "Pib": "pebi-位元", "Eib": "exbi-位元", "Zib": "zebi-位元", "Yib": "yobi-位元",
+    "KiB": "kibi-位元組", "MiB": "mebi-位元組", "GiB": "gibi-位元組", "TiB": "tebi-位元組", "PiB": "pebi-位元組", "EiB": "exbi-位元組", "ZiB": "zebi-位元組", "YiB": "yobi-位元組",
+
+  }
+
+  # this will only be used if the language is English, so it can be empty for other countries
+- EnglishUnits: {
+    # length
+    "in": "英寸",
+    "ft": "英尺",
+    "mi": "英里",
+    "rd": "桿",
+    "li": "link",
+    "ch": "鏈",
+
+    # area
+    "sq in": "平方英寸", "sq. in": "平方英寸", "sq. in.": "平方英寸",
+    "sq ft": "平方英尺", "sq. ft": "平方英尺", "sq. ft.": "平方英尺",
+    "sq yd": "平方碼", "sq. yd": "平方碼", "sq. yd.": "平方碼",
+    "sq mi": "平方英里", "sq. mi": "平方英里", "sq. mi.": "平方英里",
+    "ac": "英畝",
+    "FBM": "板英尺",
+
+    # volume
+    "cu in": "立方英寸", "cu. in": "立方英寸", "cu. in.": "立方英寸",
+    "cu ft": "立方英尺", "cu. ft": "立方英尺", "cu. ft.": "立方英尺",
+    "cu yd": "立方碼", "cu. yd": "立方碼", "cu. yd.": "立方碼",
+    "bbl": "桶", "BBL": "桶",
+    "pk": "配克",
+    "bu": "蒲式耳",
+    "tsp": "茶匙",
+    "tbl": "大匙",
+
+    # liquid
+    "fl dr": "液量打蘭",
+    "fl oz": "液量盎司",
+    "gi": "及耳",
+    "cp": "杯", "cup": "杯",
+    "pt": "品脫",
+    "qt": "夸脫",
+    "gal": "加侖",
+
+    # weight
+    "gr": "格林",
+    "dr": "打蘭",
+    "oz": "盎司", "℥": "盎司",
+    "lb": "磅",
+    "cwt": "英擔",
+    "dwt": "英錢",
+    "oz t": "金衡盎司",
+    "lb t": "金衡磅",
+
+    # energy
+    "hp": "馬力",
+    "BTU": "英熱單位",
+    "°F": "華氏度", "℉": "華氏度",
+
+    # other
+    "mph": "英里每小時",
+    "mpg": "英里每加侖",
+  }
+
+- PluralForms: {
+  # FIX: this needs to be flushed out
+    "inch": "英寸", "square inch": "平方英寸", "cubic inch": "立方英寸",
+    "foot": "英尺", "square foot": "平方英尺", "cubic foot": "立方英尺",
+    "board foot": "板英尺",
+    "degree celsius": "攝氏度",
+    "degree fahrenheit": "華氏度",
+    "hertz": "赫茲",
+    "siemens": "西門子",
+    "revolution per minute": "轉速每分鐘",
+  }
+
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+# For English, a regular pattern starts at twenty
+- NumbersOnes: [
+         "零", "一", "二", "三", "四", "五", "六", "七", "八", "九", 
+         "十", "十一", "十二", "十三", "十四", "十五", "十六", 
+         "十七", "十八", "十九"
+    ]
+
+- NumbersOrdinalOnes: [
+         "第零", "第一", "第二", "第三", "第四", "第五", "第六", "第七", "第八", "第九", 
+         "第十", "第十一", "第十二", "第十三", "第十四", "第十五", "第十六", 
+         "第十七", "第十八", "第十九"
+    ]
+
+- NumbersOrdinalPluralOnes: [
+         "零度", "一度", "二分", "三分", "四分", "五分", "六分", "七分", "八分", "九分", 
+         "十分", "十一分", "十二分", "十三分", "十四分", "十五分", "十六分", 
+         "十七分", "十八分", "十九分"
+    ]
+
+    # stop when regularity begins
+- NumbersOrdinalFractionalOnes: [
+         "零", "一度", "一半"
+    ]
+
+    # stop when regularity begins
+- NumbersOrdinalFractionalPluralOnes: [
+         "零", "一度", "一半"
+    ]
+
+
+    # What to use for multiples of 10
+- NumbersTens: [
+         "", "十", "二十", "三十", "四十", "五十", "六十", "七十", "八十", "九十"
+    ]
+
+- NumbersOrdinalTens: [
+         "", "第十", "第二十", "第三十", "第四十", "第五十", "第六十", "第七十", "第八十", "第九十"
+    ]
+
+- NumbersOrdinalPluralTens: [
+         "", "十分", "二十分", "三十分", "四十分", "五十分", "六十分", "七十分", "八十分", "九十分"
+    ]
+
+
+- NumbersHundreds: [
+       "", "一百", "兩百", "三百", "四百", "五百", 
+         "六百", "七百", "八百", "九百"
+    ]
+
+- NumbersOrdinalHundreds: [
+       "", "百分", "二百分", "三百分", "四百分", "五百分", 
+         "六百分", "七百分", "八百分", "九百分"
+    ]
+
+- NumbersOrdinalPluralHundreds: [
+       "", "百分", "二百分", "三百分", "四百分", "五百分", 
+         "六百分", "七百分", "八百分", "九百分"
+    ]
+      
+
+    # At this point, hopefully the language is regular. If not, code needs to be written
+- NumbersLarge: [
+         "", "千", "百萬", "十億", "兆", "quadrillion", 
+         "quintillion", "sextillion", "septillion", "octillion", "nonillion", 
+    ]
+      
+- NumbersOrdinalLarge: [
+         "", "千分", "百萬分", "十億分", "兆分", "quadrillionth",
+        "quintillionth", "sextillionth", "septillionth", "octillionth", "nonillionth"
+    ]
+      
+- NumbersOrdinalPluralLarge: [
+         "", "千分", "百萬分", "十億分", "兆分", "quadrillionths",
+        "quintillionths", "sextillionths", "septillionths", "octillionths", "nonillionths"
+    ]

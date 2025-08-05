@@ -1,0 +1,64 @@
+---
+
+- name: scalar-determinant
+  tag: determinant
+  match: "count(*)=1 and not(*[1][self::m:mtr])"
+  replace:
+  - T: "determinanten"      # phrase(the 'determinant' of a matrix)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "av"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [T: "slut determinant"]      # phrase('end determinant' of a matrix)
+
+- name: subscripted-norm
+  tag: subscripted-norm
+  match: "count(*)=2"
+  replace:
+  - x: "*[2]"
+  - T: "normen"      # phrase(the 'norm' can be a measure of distance)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "av"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+
+- name: homomorphism
+  # can't use IntentMappings because this doesn't fit the function pattern
+  tag: homomorphism
+  match: "count(*)=1"
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [T: "mängden av endomorfismer på"]
+      else: [T: "endomorfismerna på"]
+  - x: "*[1]"
+  - test:
+      if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
+      then: [T: "slut endomorfismerna"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
+
+- name: kernel
+  # can't use IntentMappings because this doesn't fit the function pattern
+  tag: kernel
+  match: "count(*)=1"
+  replace:
+  - T: "noll-rummet"      # phrase(this is the 'kernel' of the function)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "till"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+  - test:
+      if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
+      then: [T: "slut noll-rummet"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]

@@ -12,18 +12,9 @@
 # There is a balance that you want to maximize the info given, so 10 words is likely better then 3.
 #   That might mean that at the top level, we may want to allow the first few children to expand
 
-- name: default
-  tag: math
-  match: "."
-  replace: [{x: "*[1]"}]
 
-- name: default
-  tag: [mi, mn, mo, mtext]
-  match: "."
-  replace: [{x: text()}]
-
-- name: default
-  tag: mfrac
+- name: overview-default
+  tag: [mfrac, fraction]
   match: "."
   replace:
   - test:
@@ -35,8 +26,8 @@
       else:
       - t: "fraction"
 
-- name: default
-  tag: msqrt
+- name: overview-default
+  tag: [msqrt, "square-root"]
   match: "."
   replace:
   - t: "square root"
@@ -45,22 +36,22 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "of"}
+          then: [t: "of"]
       - x: "*[1]"
 
-- name: default
-  tag: mroot
+- name: overview-default
+  tag: [mroot, root]
   match: "."
   replace:
   - test:
       if: "*[2][self::m:mn]"
       then_test:
-      - if: "*[2][text()='2']"
-        then: {t: "square root"}
-      - else_if: "*[2][text()='3']"
-        then: {t: "cube root"}
+      - if: "*[2][.='2']"
+        then: [t: "square root"]
+      - else_if: "*[2][.='3']"
+        then: [t: "cube root"]
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {t: "root"}]
+        then: [x: "ToOrdinal(*[2])", t: "root"]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -74,11 +65,11 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "of"}
+          then: [t: "of"]
       - x: "*[1]"
 
-- name: default
-  tag: mtable
+- name: matrix-override
+  tag: mrow
   match:
   - "*[2][self::m:mtable] and"
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
@@ -88,11 +79,11 @@
   - t: "by"
   - x: count(*[2]/*[self::m:mtr][1]/*)
   - test:
-      if: "*[1][text()='|']" # just need to check the first bracket since we know it must be (, [, or |
-      then: {t: "determinant"}
-      else: {t: "matrix"}
+      if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
+      then: [t: "determinant"]
+      else: [t: "matrix"]
 
-- name: default
+- name: overview-default
   tag: mtable
   match: "."
   replace:
@@ -108,7 +99,7 @@
   replace:
   - insert:
       nodes: "*"
-      replace: [{pause: auto}]
+      replace: [pause: auto]
 
 - name: long-mrow
   tag: mrow

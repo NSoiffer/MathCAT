@@ -2,6 +2,8 @@
 // The numbering refers to the Nemeth green book in most cases.
 // The newer NFB lessons include NFB (https://nfb.org/programs-services/braille-certification/mathematics-braille-transcribing)
 // These lessons are still being developed, so it is possible the numbering gets changed from that used here.
+
+// New source: https://www.brailleauthority.org/sites/default/files/2024-02/Nemeth_2022.pdf
 use crate::common::*;
 
 #[test]
@@ -307,6 +309,24 @@ fn letter_26_b_19() {
 }
 
 #[test]
+fn boldface_32_a_7() {
+    let expr = "<math><mn mathvariant='bold-fraktur'>a</mn></math>";
+    test_braille("Nemeth", expr, "⠸⠸⠁");
+}
+
+#[test]
+fn boldface_32_a_14() {
+    let expr = "<math><mn mathvariant='sans-serif'>H</mn></math>";
+    test_braille("Nemeth", expr, "⠠⠨⠰⠠⠓");
+}
+
+#[test]
+fn boldface_32_b_2() {
+    let expr = "<math><mn mathvariant='script'>2</mn></math>";
+    test_braille("Nemeth", expr, "⠈⠼⠆");
+}
+
+#[test]
 fn boldface_32_b_3() {
     let expr = "<math><mn mathvariant='bold'>345</mn></math>";
     test_braille("Nemeth", expr, "⠸⠼⠒⠲⠢");
@@ -384,6 +404,19 @@ fn punct_37_11_1() {
 fn punct_37_16_1() {
     let expr = "<math><mn>100</mn><mo>%</mo><mo>.</mo></math>";
     test_braille("Nemeth", expr, "⠼⠂⠴⠴⠈⠴⠸⠲");
+}
+
+#[test]
+fn punct_37_17_1() {
+    let expr = "<math><mn>0</mn><mo>,</mo><mo>”</mo></math>";
+    test_braille("Nemeth", expr, "⠼⠴⠠⠸⠴");
+}
+
+#[test]
+fn punct_38_1_2() {
+    let expr = "<math><mo>’</mo><mn>49</mn></math>";
+    // Corrected: the green book has the quote mark encoded as if the character was a double quote (”), but this seems like a typo 
+    test_braille("Nemeth", expr, "⠴⠠⠼⠲⠔");
 }
 
 #[test]
@@ -470,6 +503,12 @@ fn omission_57_1() {
 }
 
 #[test]
+fn omission_57_3() {
+    let expr = " <math><mn>7</mn><mo>&#xD7;</mo><mn>2</mn><mo>?</mo><mn>14</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠶⠈⠡⠆⠀⠿⠀⠼⠂⠲");
+}
+
+#[test]
 fn omission_57_4() {
     let expr = "<math><mo>?</mo><mo>+</mo><mo>?</mo><mo>=</mo><mn>10</mn></math>";
     test_braille("Nemeth", expr, "⠿⠬⠿⠀⠨⠅⠀⠼⠂⠴");
@@ -500,7 +539,7 @@ fn omission_57_7() {
 
 #[test]
 fn omission_57_8() {
-    let expr = "<math><mn>5</mn><mo>×</mo><mn>25</mn><mo>=</mo><mspace width='1em'/></math>";
+    let expr = "<math><mn>5</mn><mo>×</mo><mn>25</mn><mo>=</mo><mspace width='1.5em'/></math>";
     test_braille("Nemeth", expr, "⠼⠢⠈⠡⠆⠢⠀⠨⠅⠀⠿");
 }
 
@@ -1418,21 +1457,39 @@ fn nested_sqrt_105_4() {
 }
 
 #[test]
-fn shape_110_1() {
-    let expr = "<math><mo>∠</mo><mn>1</mn></math>";
-    test_braille("Nemeth", expr, "⠫⠪⠀⠼⠂");
-}
-
-#[test]
 fn menclose_111_a_4() {
     let expr = "<math><menclose notation='phasorangle'><mrow><mn>30</mn><mo>&#xB0;</mo></mrow></menclose></math>";
     test_braille("Nemeth", expr, "⠫⠪⠸⠫⠼⠒⠴⠘⠨⠡⠐⠻");
 }
 
 #[test]
-fn menclose_115_1() {
+fn menclose_111_a_1() {
     let expr = "<math><menclose notation='circle'><mi>A</mi></menclose></math>";
     test_braille("Nemeth", expr, "⠫⠉⠸⠫⠠⠁⠻");
+}
+
+#[test]
+fn shape_115_a_1() {
+    let expr = "<math><mo>∠</mo><mn>1</mn></math>";
+    test_braille("Nemeth", expr, "⠫⠪⠀⠼⠂");
+}
+
+#[test]
+fn shape_115_a_3() {
+    let expr = "<math><mo>&#x25CB;</mo><mi>R</mi></math>";
+    test_braille("Nemeth", expr, "⠫⠉⠀⠠⠗");
+}
+
+#[test]
+fn shape_115_a_6() {
+    let expr = "<math><mo>∟</mo><mi>A</mi></math>";
+    test_braille("Nemeth", expr, "⠫⠪⠨⠗⠻⠀⠠⠁");
+}
+
+#[test]
+fn shape_115_a_11() {
+    let expr = "<math><mi>m</mi><mo>&#x2220;</mo><mi>A</mi><mi>B</mi><mi>C</mi></math>";
+    test_braille("Nemeth", expr, "⠍⠫⠪⠀⠠⠁⠠⠃⠠⠉");
 }
 
 #[test]
@@ -1634,6 +1691,12 @@ fn in_scripts_comparison_151_17() {
             </mrow>
         </math>";
     test_braille("Nemeth", expr, "⠮⠰⠭⠀⠰⠨⠅⠀⠁⠘⠭⠀⠘⠨⠅⠀⠃⠐⠋⠷⠭⠾⠙⠭");
+}
+
+#[test]
+fn degrees_165_1() {
+    let expr = "<math><mn>90</mn><mo>&#xB0;</mo><mo>+</mo><mn>90</mn><mo>&#xB0;</mo><mo>=</mo><mn>180</mn><mo>&#xB0;</mo></math>";
+    test_braille("Nemeth", expr, "⠼⠔⠴⠘⠨⠡⠐⠬⠔⠴⠘⠨⠡⠀⠨⠅⠀⠼⠂⠦⠴⠘⠨⠡");
 }
 
 #[test]
@@ -1856,6 +1919,16 @@ fn tensor_from_mathml_spec() {
     // Note: the braille answer was verified to be correct (see https://github.com/NSoiffer/MathCAT/issues/55) 
     test_braille("Nemeth", expr, "⠠⠗⠰⠊⠐⠘⠚⠐⠰⠅⠐⠰⠇");
 }
+
+// The following are from the new BANA Nemeth Code (2020): https://www.brailleauthority.org/nemeth/2020-nemeth-code.html
+
+#[test]
+fn perpendicular_17_57() {
+    let expr = "<math><mi>A</mi><mi>B</mi><mo>&#x22A5;</mo><mi>C</mi><mi>D</mi></math>";
+    test_braille("Nemeth", expr, "⠠⠁⠠⠃⠀⠫⠏⠀⠠⠉⠠⠙");
+}
+
+
 
 
 // The following are chemistry tests from Braille Code of Chemical Notation 1997 (http://www.brl.org/chemistry/ which seems bug, update in late 2023?)

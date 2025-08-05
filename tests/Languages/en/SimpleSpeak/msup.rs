@@ -269,7 +269,9 @@ fn nested_end_exponent_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths raised to the n plus 1 power, end exponent");
+  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths raised to the n plus 1 power; end exponent");
+  test_prefs("en", "SimpleSpeak", vec![("Impairment", "LearningDisability")], expr,
+  "t raised to the 4 fifths raised to the n plus 1 power");
 }
 
 #[test]

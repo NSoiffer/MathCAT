@@ -62,9 +62,11 @@
 
  - "0-9": [t: "."]
 
+ - " ": [t: " "]                     # 0x20
+
  - "!":                                            # 0x21
     - test:
-        if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
         then_test:
             if: "$Verbosity = 'Terse'"
             then: [t: "bang"]                      # 0x21
@@ -110,8 +112,12 @@
                # speak "comma" when not adjacent to '…'
             - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
                # except if expression starts with '…'
-            - "../*[1][text()='…'] "
-        then: [t: "comma"]
+            - "../*[1][.='…'] "
+        then:
+        - T: "comma"                         # 	(en: 'comma', google translation)
+        - test:
+            if: "$Verbosity != Terse"
+            then: [pause: short]
         # else silent
 
  - "-": [t: "minus"]                               # 0x2d
@@ -152,7 +158,11 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [t: "close bracket"]
         else: [t: "right bracket"]
- - "^": [t: "hat"]                                # 0x5e
+ - "^":                                           # 0x5e
+    - test:
+        if: "parent::m:modified-variable or parent::m:mover"
+        then: [t: "hat"]
+        else: [t: "caret"]
  - "_": [t: "under bar"]                          # 0x5f
  - "`": [t: "grave"]                              # 0x60
  - "{":                                         # 0x7b
@@ -162,14 +172,22 @@
         else: [t: "left brace"]                            
  - "|":                                          # 0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
-     - test:
-        - if: "$SpeechStyle != 'ClearSpeak' or not(preceding-sibling::*) or not(following-sibling::*)"
-          then: [t: "vertical line"]
-        - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
-          then: [t: "such that"]
-        - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
-          then: [t: "given"] 
-        - else: [t: "divides"]                   
+     - with:
+        variables: [DefaultToGiven: "count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and ../../../*[1][.='P']"] # P(A|B)
+        replace:
+        - test:
+            - if: "$SpeechStyle != 'ClearSpeak'"
+              then_test:
+                  if: "$DefaultToGiven"
+                  then: [t: "given"]
+                  else: [t: "vertical line"]
+            - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
+              then: [t: "vertical line"]
+            - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+              then: [t: "such that"]
+            - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
+              then: [t: "given"] 
+            - else: [t: "divides"]                   
 
  - "}":                                          # 0x7d
     - test:
@@ -180,7 +198,8 @@
  - "~": [t: "tilde"]                               # 0x7e
  - " ":                                            # 0xa0
     - test:
-        if: "@data-empty-in-2D and ../../../../*[name(.)!='equations']"
+        # could be mtext in mtd or mtext in an mrow that is a concatenation of mtd's. Is there a better solution?
+        if: "@data-empty-in-2D and not(ancestor::*[self::m:piecewise or self::m:system-of-equations or self::m:lines])"
         then: [t: "empty"]                         # want to say something for fraction (etc) with empty child
         else: [t: ""]                            
 
@@ -190,9 +209,9 @@
  - "´": [t: "acute"]                            # 0xb4
  - "·":                                            # 0xB7
     - test:
-        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
-        then: [t: "times"]
-        else: [t: "dot"]
+        if: "$SpeechStyle = 'LiteralSpeak' or not($SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultSymbolDot = 'Auto')"
+        then: [t: "dot"]
+        else: [t: "times"]
  - "×":                                          # 0xd7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
@@ -272,7 +291,7 @@
             - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
-            - "../*[1][text()='…']"
+            - "../*[1][.='…']"
         then: [t: "dot dot dot"]
         else_test:  # must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"
@@ -281,8 +300,9 @@
 
  - "⁡":                                          # 0x2061
     - test:
-        if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
-             not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
+        # skip saying "of" when Terse and a trig function, when it is a shape (does this happen?), or we are in :literal mode
+        if: "not($Verbosity='Terse' and preceding-sibling::*[1][IsInDefinition(., 'TrigFunctionNames')]) and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
+             not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
         then: [t: "of"]
  - "⁢": [t: ""]                                   # 0x2062
  - "⁣": [t: ""]                                   # 0x2063
@@ -336,15 +356,14 @@
          if: "$Verbosity!='Terse'"
          then: [t: "the"]
      - t: "laplacian of"
- - "∇":                                          # 0x2207
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "the"]
-     - t: "gradient of"
  - "∈":                                          # 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "an element of"]
+        then:
+        - test:
+            if: "$Verbosity!='Terse' and not(ancestor::*[self::m:set])"    # "the set x is an element of ..." sounds bad"
+            then: [t: "is"]
+        - t: "an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
@@ -368,7 +387,11 @@
     # rule is identical to 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "is not an element of"]
+        then:
+        - test: 
+            if: "$Verbosity!='Terse'"
+            then: [t: "is"]
+        - t: "not an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
@@ -391,7 +414,11 @@
  - "∊":                                          # 0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "is an element of"]
+        then:
+        - test: 
+            if: "$Verbosity!='Terse' and not(ancestor::*[self::m:set])"    # "the set x is an element of ..." sounds bad"
+            then: [t: "is"]
+        - t: "an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set

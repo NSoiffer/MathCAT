@@ -37,6 +37,10 @@
             then: [t: "by"]
             else: [t: "cross"]
  - "÷": [t: "divided by"]                          # 0xf7
+ - "¡": [t: "inverted exclamation mark"]           # 0xa1
+ - "¶": [t: "paragraph mark"]                      # 0xb6
+ - "¿": [t: "inverted question mark"]              # 0xbf
+
  - "ʰ": [t: "modifier small h"]                    # 0x2b0
  - "ʱ": [t: "modifier small h with hook"]          # 0x2b1
  - "ʲ": [t: "modifier small j"]                    # 0x2b2
@@ -63,7 +67,7 @@
  - "˄": [t: "modifier up arrowhead"]               # 0x2c4
  - "˅": [t: "modifier down arrowhead"]             # 0x2c5
  - "ˆ": [t: "modifier circumflex accent"]          # 0x2c6
- - "ˇ": [t: "caron"]                               # 0x2c7
+ - "ˇ": [t: "check"]                               # 0x2c7
  - "ˈ": [t: "modifier vertical line"]              # 0x2c8
  - "ˉ": [t: "modifier macron"]                     # 0x2c9
  - "ˊ": [t: "modifier acute accent"]               # 0x2ca
@@ -186,6 +190,7 @@
  - "̿": [t: "double overline embellishment"]       # 0x33f
  - "̀": [t: "grave tone mark embellishment"]       # 0x340
  - "́": [t: "acute tone mark embellishment"]       # 0x341
+ - "͆": [t: "bridge above"]                        # 0x346
 
  - "ΪΫϏ":                                          # 0x3aa, 0x3ab, 0x3cf
     - test: 
@@ -219,6 +224,8 @@
  - "ϕ": [t: "phi"]                                 # 0x3d5
  - "ϖ": [t: "pi"]                                  # 0x3d6
  - "ϗ": [t: "kai"]                                 # 0x3d7
+ - "Ϙ": [t: "cap archaic koppa"]                   # 0x3d8
+ - "ϙ": [t: "archaic koppa"]                       # 0x3d9
  - "ϵ": [t: "epsilon"]                             # 0x3f5
  - "϶": [t: "reversed epsilon"]                    # 0x3f6
  - "А-Я":                                          # 0x410 - 0x42f
@@ -271,6 +278,9 @@
  - "э": [t: "e"]                                   # 0x44d
  - "ю": [t: "yu"]                                  # 0x44e
  - "я": [t: "ya"]                                  # 0x44f
+ - "؆": [t: "Arabic-Indic cube root"]              # 0x606
+ - "؇": [t: "Arabic-Indic fourth root"]            # 0x607
+ - "؈": [t: "Arabic ray"]                          # 0x608
  - "‐": [t: "hyphen"]                              # 0x2010
  - "‑": [t: "hyphen"]                              # 0x2011
  - "‒": [t: "figure dash"]                         # 0x2012
@@ -280,6 +290,8 @@
  - "‖": [t: "double vertical line"]                # 0x2016
  - "†": [t: "dagger"]                              # 0x2020
  - "‡": [t: "double dagger"]                       # 0x2021
+
+ - " - ": [t: " "]                                 # 0x2000 - 0x2007
 
  - "•":                                            # 0x2022
     - test: 
@@ -293,7 +305,7 @@
             - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
-            - "../*[1][text()='…']"
+            - "../*[1][.='…']"
         then: [t: "dot dot dot"]
         else_test:  # must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"
@@ -315,8 +327,16 @@
  - "⁄": [t: "divided by"]                          # 0x2044
  - "⁅": [t: "left square bracket with quill"]      # 0x2045
  - "⁆": [t: "right square bracket with quill"]     # 0x2046
+ - "※": [t: "reference mark"]                     # 0x203b
+ - "‿": [t: "under tie"]                          # 0x203F
+ - "⁀": [t: "tie"]                                # 0x2040
+ - "⁎": [t: "low asterisk"]                        # 0x204e
+ - "⁏": [t: "reversed semicolon"]                  # 0x204f
+ - "⁐": [t: "close up"]                           # 0x2050
+ - "⁑": [t: "two vertical asterisks"]              # 0x2051
+ - "⁒": [t: "commercial minus sign"]               # 0x2052
  - "⁗": [t: "quadruple prime"]                     # 0x2057
- - "⁠": [t: ""]                                   # 0x2060
+ - "⁠": [t: ""]                                     # 0x2060
  - "⁰": [t: "to the zeroth power"]                 # 0x2070
  - "ⁱ": [t: "to the eihth power"]                  # 0x2071
  - "⁴": [t: "to the fourth power"]                 # 0x2074
@@ -430,17 +450,11 @@
     - spell: "translate('.', 'ℌℑℨℭ', 'HIZC')"
 
  - "ℍℙℾℿ":                                          # 0x210d, 0x2119, 0x213e, 0x213f
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', 'ℍℙℾℿ', 'HPΓΠ')" 
 
  - "ℎ": [t: "planck constant"]                     # 0x210e
- - "ℏ":                                          # 0x210f
-     - test: 
-         if: "($Verbosity='Terse')"
-         then: [t: "h bar"]
-         else: [t: "reduced planck constant"]
+ - "ℏ": [t: "h bar"]                               # 0x210f
 
  - "ℐℒ℘ℬℰℱℳ":                          # 0x2110, 0x2112, 0x2118, 0x2130, 0x2131, 0x2133
     - t: "script"
@@ -480,6 +494,9 @@
  - "⅋": [t: "turned ampersand"]                    # 0x214b
  - "⅌": [t: "per"]                                 # 0x214c
  - "ⅎ": [t: "turned F"]                            # 0x214e
+ - "¼": [t: "one quarter"]                         # 0x00bc
+ - "½": [t: "one half"]                            # 0x00bd
+ - "¾": [t: "three quarters"]                      # 0x00be
  - "⅐": [t: "one seventh"]                         # 0x2150
  - "⅑": [t: "one ninth"]                           # 0x2151
  - "⅒": [t: "one tenth"]                           # 0x2152
@@ -666,38 +683,15 @@
  - "∄": [t: "there does not exist"]                # 0x2204
  - "∅": [t: "empty set"]                           # 0x2205
  - "∆":                                          # 0x2206
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "the"]
-     - t: "laplacian of"
- - "∇":                                          # 0x2207
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "the"]
-     - t: "gradient of"
- - "∈":                                          # 0x2208
      - test:
-        if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "an element of"]
-        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
-        else_test:
-            if: "../../self::m:set or ../../../self::m:set" # inside a set
-            then_test:
-              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "in"]
-              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "member of"]
-              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "element of"]
-              - else: [t: "belonging to"]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
-            else_test:
-              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "is a member of"]
-              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "is an element of"]
-              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "is in"]
-              - else: [t: "belongs to"]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+         if: "following-sibling::*"
+         then_test:
+            if: "$Verbosity!='Terse'"
+            then: [t: "the LahPlahsian of"]     # "LahPlahsian" sounds better than "laplacian" in speech engines tested
+            else: [t: "LahPlahsian"]
+         else: [t: "LahPlahsian"]
+
+ - "∇": [t: "nahblah"]                           # 0x2207
  - "∉":                                          # 0x2209
     # rule is identical to 0x2208
      - test:
@@ -725,7 +719,11 @@
  - "∊":                                          # 0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "is an element of"]
+        then:
+        - test:
+            if: "$Verbosity!='Terse' and not(parent::m:set)"    # "the set x is an element of ..." sounds bad
+            then: [t: "is"]
+        - t: "an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
@@ -850,7 +848,7 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "is"]
-     - t: "approximately equal to"
+     - t: "congruent to"
  - "≆":                                          # 0x2246
      - test: 
          if: "$Verbosity!='Terse'"
@@ -860,22 +858,22 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "is"]
-     - t: "neither approximately nor actually equal to"
+     - t: "not congruent to"
  - "≈":                                          # 0x2248
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "is"]
-     - t: "almost equal to"
+     - t: "approximately equal to"
  - "≉":                                          # 0x2249
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "is"]
-     - t: "not almost equal to"
+     - t: "not approximately equal to"
  - "≊":                                          # 0x224a
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "is"]
-     - t: "almost equal or equal to"
+     - t: "approximately equal or equal to"
  - "≋": [t: "triple tilde"]                        # 0x224b
  - "≌": [t: "are all equal to"]                    # 0x224c
  - "≍":                                          # 0x224d
@@ -1386,10 +1384,28 @@
  - "⌳": [t: "slope"]                               # 0x2333
  - "⌴": [t: "counterbore"]                         # 0x2334
  - "⌵": [t: "countersink"]                         # 0x2335
+ - "⌶": [t: "apl i beam"]                         # 0x2336
+ - "⌽": [t: "apl circle stile"]                   # 0x233d
+ - "⌿": [t: "apl slash bar"]                      # 0x233f
  - "⍰": [t: "unknown box"]                        # 0x2370
+ - "⍼": [t: "right angle with downwards zigzag arrow"]       # 0x237c
+ - "⎔": [t: "hexagon"]                            # 0x2394
  - "⎕": [t: "box"]                                # 0x2395
- - "⏞": [t: "top brace"]                           # 0x23DE
- - "⏟": [t: "bottom brace"]                        # 0x23DF
+ - "⎶": [t: "bottom square bracket over top square bracket"] # 0x23b6
+ - "⏜": [t: "top paren"]                           # 0x23dc
+ - "⏝": [t: "bottom paren"]                        # 0x23dd
+ - "⏞": [t: "top brace"]                           # 0x23de
+ - "⏟": [t: "bottom brace"]                        # 0x23df
+ - "⏠": [t: "top tortoise shell bracket"]          # 0x23e0
+ - "⏡": [t: "bottom tortoise shell bracket"]        # 0x23e1
+ - "⏢": [t: "white trapezium"]                    # 0x23e2
+ - "⏣": [t: "benzene right with circle"]          # 0x23e3
+ - "⏤": [t: "straightness"]                       # 0x23e4
+ - "⏥": [t: "flatness"]                           # 0x23e5
+ - "⏦":                                           # 0x23e6
+     - spell: "ac"
+     - t: "current"
+ - "⏧": [t: "electrical intersection"]            # 0x23e7
  - "①-⑨":    # 0x2460 - 0x2469
     - t: "circled"
     - spell: "translate('.', '①②③④⑤⑥⑦⑧⑨', '123456789')"
@@ -1431,15 +1447,15 @@
  - "⒙": [t: "eighteen with period"]                # 0x2499
  - "⒚": [t: "nineteen with period"]                # 0x249a
  - "⒛": [t: "twenty with period"]                  # 0x249b
- - "⒜-⒵":                                        # 0x249c - 0x24b5
+ - "⒜-⒵":                                         # 0x249c - 0x24b5
     - t: "parenthesized"
     - spell: "translate('.', '⒜⒝⒞⒟⒠⒡⒢⒣⒤⒥⒦⒧⒨⒩⒪⒫⒬⒭⒮⒯⒰⒱⒲⒳⒴⒵', 'abcdefghijklmnopqrstuvwxyz')"
 
- - "Ⓐ-Ⓩ":
+ - "Ⓐ-ⓩ":                                         # 0x24b6 - 0x24cf
     - t: "circled"
     - spell: "translate('.', 'ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
- - "ⓐ-ⓩ":                                       # 0x24d0 - 0x24e9
+ - "ⓐ-ⓩ":                                         # 0x24d0 - 0x24e9
     - t: "circled"
     - spell: "translate('.', 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ', 'abcdefghijklmnopqrstuvwxyz')"
  - "⓪": [t: "circled zero"]                        # 0x24ea
@@ -1554,16 +1570,56 @@
  - "◽": [t: "white medium small square"]           # 0x25fd
  - "◾": [t: "black medium small square"]           # 0x25fe
  - "◿": [t: "lower right triangle"]                # 0x25ff
- - "♠": [t: "black spade suit"]                    # 0x2660
- - "♡": [t: "white heart suit"]                    # 0x2661
- - "♢": [t: "white diamond suit"]                  # 0x2662
- - "♣": [t: "black club suit"]                     # 0x2663
- - "♤": [t: "white spade suit"]                    # 0x2664
- - "♥": [t: "black heart suit"]                    # 0x2665
- - "♦": [t: "black diamond suit"]                  # 0x2666
- - "♧": [t: "white club suit"]                     # 0x2667
- - "❨": [t: "medium left parentheses ornament"]    # 0x2768
- - "❩": [t: "medium right parentheses ornament"]   # 0x2769
+ - "★": [t: "black star"]                          # 0x2605
+ - "☆": [t: "white star"]                          # 0x2606
+ - "☉": [t: "sun"]                                 # 0x2609
+ - "☌": [t: "conjuction"]                          # 0x260c
+ - "☒": [t: "ballot box with x"]                   # 0x2612
+ - "☽": [t: "waxing moon"]                         # 0x263d
+ - "☾": [t: "waning moon"]                         # 0x263e
+ - "☿": [t: "mercury"]                             # 0x263f
+ - "♀": [t: "female"]                              # 0x2640
+ - "♁": [t: "earth"]                               # 0x2641
+ - "♂": [t: "male"]                                # 0x2642
+ - "♃": [t: "jupiter"]                            # 0x2643
+ - "♄": [t: "saturn"]                             # 0x2644
+ - "♅": [t: "uranus"]                             # 0x2645
+ - "♆": [t: "neptune"]                           # 0x2646
+ - "♇": [t: "pluto"]                             # 0x2647
+ - "♈": [t: "aries"]                           # 0x2648
+ - "♉": [t: "taurus"]                          # 0x2649
+ - "♩": [t: "quarter note"]                      # 0x2669
+ - "♭": [t: "flat"]                              # 0x266d
+ - "♮": [t: "natural"]                           # 0x266e
+ - "♯": [t: "sharp"]                             # 0x266f
+ - "♠": [t: "black spade suit"]                  # 0x2660
+ - "♡": [t: "white heart suit"]                  # 0x2661
+ - "♢": [t: "white diamond suit"]                # 0x2662
+ - "♣": [t: "black club suit"]                   # 0x2663
+ - "♤": [t: "white spade suit"]                  # 0x2664
+ - "♥": [t: "black heart suit"]                  # 0x2665
+ - "♦": [t: "black diamond suit"]                # 0x2666
+ - "♧": [t: "white club suit"]                   # 0x2667
+ - "⚀": [t: "die face 1"]                        # 0x2680
+ - "⚁": [t: "die face 2"]                        # 0x2681
+ - "⚂": [t: "die face 3"]                        # 0x2682
+ - "⚃": [t: "die face 4"]                        # 0x2683
+ - "⚄": [t: "die face 5"]                        # 0x2684
+ - "⚅": [t: "die face 6"]                        # 0x2685
+ - "⚆": [t: "white circle with dot right"]       # 0x2686
+ - "⚇": [t: "white circle wiht two dots"]        # 0x2687
+ - "⚈": [t: "black circle with dot right"]       # 0x2688
+ - "⚉": [t: "black circle wiht two dots"]        # 0x2689
+ - "⚪": [t: "medium white circle"]              # 0x26aa
+ - "⚫": [t: "medium black circle"]              # 0x26ab
+ - "⚬": [t: "medium small white circle"]          # 0x26ac
+ - "⚲": [t: "neuter"]                            # 0x26b2
+ - "✓": [t: "check mark"]                        # 0x2713
+ - "✠": [t: "maltese cross"]                     # 0x2720
+ - "✪": [t: "circled white star"]                # 0x272a
+ - "✶": [t: "six pionted black star"]            # 0x2736
+ - "❨": [t: "medium left parentheses ornament"]   # 0x2768
+ - "❩": [t: "medium right parentheses ornament"]  # 0x2769
  - "❪": [t: "medium flattened left parentheses ornament"] # 0x276a
  - "❫": [t: "medium flattened right parentheses ornament"] # 0x276b
  - "❬": [t: "medium left-pointing angle bracket ornament"] # 0x276c
@@ -2027,7 +2083,11 @@
  - "⨬": [t: "minus sign with rising dots"]         # 0x2a2c
  - "⨭": [t: "plus sign in left half circle"]       # 0x2a2d
  - "⨮": [t: "plus sign in right half circle"]      # 0x2a2e
- - "⨯": [t: "cross product"]             # 0x2a2f
+ - "⨯":                                             # 0x2a2f
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: [t: "cross"]
+         else: [t: "cross product"]
  - "⨰": [t: "multiplication sign with dot above"]  # 0x2a30
  - "⨱": [t: "multiplication sign with underbar"]   # 0x2a31
  - "⨲": [t: "semidirect product with bottom closed"] # 0x2a32
@@ -2042,6 +2102,7 @@
  - "⨻": [t: "multiplication sign in triangle"]     # 0x2a3b
  - "⨼": [t: "interior product"]                    # 0x2a3c
  - "⨽": [t: "righthand interior product"]          # 0x2a3d
+ - "⨾": [t: "z notation relational composition"]    # 0x2a3e
  - "⨿": [t: "amalgamation or coproduct"]           # 0x2a3f
  - "⩀": [t: "intersection with dot"]               # 0x2a40
  - "⩁": [t: "union with minus sign"]               # 0x2a41
@@ -2512,7 +2573,7 @@
  - "㏄": [t: "cubic centimeters"]                   # 0x33c4
  - "㏅": [t: "candelas"]                            # 0x33c5
  - "㏆": [t: "coulombs per kilogram"]               # 0x33c6
- - "㏇": [t: "cardiac output"]                      # 0x33c7
+ - "㏇": [t: "cap C, o, period"]                    # 0x33c7 (I have no idea what this is)
  - "㏈": [t: "decibels"]                            # 0x33c8
  - "㏉": [t: "grays"]                               # 0x33c9
  - "㏊": [t: "hectares"]                            # 0x33ca
@@ -3017,7 +3078,6 @@
  - " ": [t: ""]                                  # 0x205f
  - "": [t: ""]                                  # 0xef04
  - "": [t: ""]                                  # 0xef05
- - " ": [t: ""]                                  # 0x2003
  - "": [t: ""]                                  # 0xef06
  - "": [t: ""]                                  # 0xef07
  - "": [t: ""]                                  # 0xef08
@@ -3071,39 +3131,27 @@
  # double struck (blackboard bold) chars in math alphabetic block and also MathType private use area
  # Some of these are reserved because they were used in Plane 0 -- that shouldn't be an issue other than causing the other chars to not display
  - "𝔸-𝕐":    # 0x1d504 - 0x1d51d ('z' version is reserved)
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '𝔸𝔹𝔺𝔻𝔼𝔽𝔾𝔿𝕀𝕁𝕂𝕃𝕄𝕅𝕆𝕇𝕈𝕉𝕊𝕋𝕌𝕍𝕎𝕏𝕐', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                          # 0xf080 - 0xf098
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝕒-𝕫":    # 0x1d552 - 0x1d56b
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":    # 0xf09a - 0xf0b3
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝟘-𝟡":    # 0x1d7d8 - 0x1d7e1
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡', '0123456789')"
  - "-":    # 0xf0c0 - 0xf0c9
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '', '0123456789')"
 
- - "": [t: "double struck nabla"]                 # 0xf0ca
+ - "": [t: "double struck nahblah"]                 # 0xf0ca
  - "": [t: "double struck euler constant"]        # 0xf0cb
  
  # script chars in math alphabetic block and also MathType private use area
@@ -3198,15 +3246,11 @@
 
  # MathType only has a few of the cap Greek letters in PUA
  - "":                                          # 0xf201 - 0xf209
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '', 'ΔΨΛΠΣΘΓΩΥ')"
 
  - "-":    # 0xf220 - 0xf236
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "": [t: "double struck final sigma"]           # 0xf237
@@ -3354,8 +3398,8 @@
     - t: "bold"
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
- - "": [t: "bold nabla"]                          # 0xf421
- - "𝛁": [t: "bold nabla"]                          # 0x1d6c1
+ - "": [t: "bold nahblah"]                          # 0xf421
+ - "𝛁": [t: "bold nahblah"]                          # 0x1d6c1
 
  - "𝛛𝛜𝛝𝛞𝛟𝛠𝛡":    # 0x1D6DB - 0x1D6E1
     - t: "bold"
@@ -3381,8 +3425,8 @@
       # - t: "italic"
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
- - "": [t: "italic nabla"]                          # 0xf45b
- - "𝛻": [t: "italic nabla"]                          # 0x1d6fb
+ - "": [t: "italic nahblah"]                          # 0xf45b
+ - "𝛻": [t: "italic nahblah"]                          # 0x1d6fb
 
  - "𝜕𝜖𝜗𝜘𝜙𝜚𝜛":    # 0x1d715 - 0x1d71b
       # - t: "italic"
@@ -3422,8 +3466,8 @@
     - t: "bold"
     - spell: "translate('.', '', '∂εθκφρπ')"
 
- - "𝜵": [t: "bold italic nabla"]                  # 0x1d735
- - "": [t: "bold italic nabla"]                  # 0xf495
+ - "𝜵": [t: "bold italic nahblah"]                  # 0x1d735
+ - "": [t: "bold italic nahblah"]                  # 0xf495
 
  - "𝝖-𝝮":    # 0x1d756 - 0x1d76e
     - t: "bold"
@@ -3448,8 +3492,8 @@
     - t: "bold"
     - spell: "translate('.', '', '∂εθκφρπ')"
 
- - "": [t: "bold nabla"]                          # 0xf4cf
- - "𝝯": [t: "bold nabla"]                          # 0x1d76f
+ - "": [t: "bold nahblah"]                          # 0xf4cf
+ - "𝝯": [t: "bold nahblah"]                          # 0x1d76f
 
  - "𝞐-𝞨":    # 0x1d790 - 0x1d7a8
     # - t: "bold italic"
@@ -3481,89 +3525,35 @@
     - t: "bold"
     - spell: "translate('.', '', '∂εθκφρπ')"
 
- - "": [t: "bold nabla"]                          # 0xf509
- - "𝞩": [t: "bold nabla"]                          # 0x1d7a9
+ - "": [t: "bold nahblah"]                          # 0xf509
+ - "𝞩": [t: "bold nahblah"]                          # 0x1d7a9
 
- - "": [t: "bold zero"]                           # 0xf52e
- - "𝟎": [t: "bold zero"]                           # 0x1d7ce
- - "": [t: "bold one"]                            # 0xf52f
- - "𝟏": [t: "bold one"]                            # 0x1d7cf
- - "": [t: "bold two"]                            # 0xf530
- - "𝟐": [t: "bold two"]                            # 0x1d7d0
- - "": [t: "bold three"]                          # 0xf531
- - "𝟑": [t: "bold three"]                          # 0x1d7d1
- - "": [t: "bold four"]                           # 0xf532
- - "𝟒": [t: "bold four"]                           # 0x1d7d2
- - "": [t: "bold five"]                           # 0xf533
- - "𝟓": [t: "bold five"]                           # 0x1d7d3
- - "": [t: "bold six"]                            # 0xf534
- - "𝟔": [t: "bold six"]                            # 0x1d7d4
- - "": [t: "bold seven"]                          # 0xf535
- - "𝟕": [t: "bold seven"]                          # 0x1d7d5
- - "": [t: "bold eight"]                          # 0xf536
- - "𝟖": [t: "bold eight"]                          # 0x1d7d6
- - "": [t: "bold nine"]                           # 0xf537
- - "𝟗": [t: "bold nine"]                           # 0x1d7d7
- - "": [t: "zero"]                                # 0xf542
- - "𝟢": [t: "zero"]                                # 0x1d7e2
- - "": [t: "one"]                                 # 0xf543
- - "𝟣": [t: "one"]                                 # 0x1d7e3
- - "": [t: "two"]                                 # 0xf544
- - "𝟤": [t: "two"]                                 # 0x1d7e4
- - "": [t: "three"]                               # 0xf545
- - "𝟥": [t: "three"]                               # 0x1d7e5
- - "": [t: "four"]                                # 0xf546
- - "𝟦": [t: "four"]                                # 0x1d7e6
- - "": [t: "five"]                                # 0xf547
- - "𝟧": [t: "five"]                                # 0x1d7e7
- - "": [t: "six"]                                 # 0xf548
- - "𝟨": [t: "six"]                                 # 0x1d7e8
- - "": [t: "seven"]                               # 0xf549
- - "𝟩": [t: "seven"]                               # 0x1d7e9
- - "": [t: "eight"]                               # 0xf54a
- - "𝟪": [t: "eight"]                               # 0x1d7ea
- - "": [t: "nine"]                                # 0xf54b
- - "𝟫": [t: "nine"]                                # 0x1d7eb
- - "": [t: "bold zero"]                           # 0xf54c
- - "𝟬": [t: "bold zero"]                           # 0x1d7ec
- - "": [t: "bold one"]                            # 0xf54d
- - "𝟭": [t: "bold one"]                            # 0x1d7ed
- - "": [t: "bold two"]                            # 0xf54e
- - "𝟮": [t: "bold two"]                            # 0x1d7ee
- - "": [t: "bold three"]                          # 0xf54f
- - "𝟯": [t: "bold three"]                          # 0x1d7ef
- - "": [t: "bold four"]                           # 0xf550
- - "𝟰": [t: "bold four"]                           # 0x1d7f0
- - "": [t: "bold five"]                           # 0xf551
- - "𝟱": [t: "bold five"]                           # 0x1d7f1
- - "": [t: "bold six"]                            # 0xf552
- - "𝟲": [t: "bold six"]                            # 0x1d7f2
- - "": [t: "bold seven"]                          # 0xf553
- - "𝟳": [t: "bold seven"]                          # 0x1d7f3
- - "": [t: "bold eight"]                          # 0xf554
- - "𝟴": [t: "bold eight"]                          # 0x1d7f4
- - "": [t: "bold nine"]                           # 0xf555
- - "𝟵": [t: "bold nine"]                           # 0x1d7f5
- - "": [t: "zero"]                                # 0xf556
- - "𝟶": [t: "zero"]                                # 0x1d7f6
- - "": [t: "one"]                                 # 0xf557
- - "𝟷": [t: "one"]                                 # 0x1d7f7
- - "": [t: "two"]                                 # 0xf558
- - "𝟸": [t: "two"]                                 # 0x1d7f8
- - "": [t: "three"]                               # 0xf559
- - "𝟹": [t: "three"]                               # 0x1d7f9
- - "": [t: "four"]                                # 0xf55a
- - "𝟺": [t: "four"]                                # 0x1d7fa
- - "": [t: "five"]                                # 0xf55b
- - "𝟻": [t: "five"]                                # 0x1d7fb
- - "": [t: "six"]                                 # 0xf55c
- - "𝟼": [t: "six"]                                 # 0x1d7fc
- - "": [t: "seven"]                               # 0xf55d
- - "𝟽": [t: "seven"]                               # 0x1d7fd
- - "": [t: "eight"]                               # 0xf55e
- - "𝟾": [t: "eight"]                               # 0x1d7fe
- - "": [t: "nine"]                                # 0xf55f
- - "𝟿": [t: "nine"]                                # 0x1d7ff
+ - "-":    # 0xf52e - 0xf537  (old MathType)
+    - t: "bold"
+    - spell: "translate('.', '', '0123456789')"
+
+ - "𝟎-𝟗":    # 0x1d7ce - 0x1d7d7  
+    - t: "bold"
+    - spell: "translate('.', '𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗', '0123456789')"
+
+ - "-":    # 0xf52e - 0xf537  (old MathType)
+    - t: "bold"
+    - spell: "translate('.', '', '0123456789')"
+
+ - "𝟬-𝟵":    # 0x1D7EC - 0x1D7F5  
+    - t: "bold"
+    - spell: "translate('.', '𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵', '0123456789')"
+
+ - "-":    # 0xf556 - 0xf55f  (old MathType)
+    - spell: "translate('.', '', '0123456789')"
+
+ - "𝟢-𝟫":    # 0x1d7e2 - 0x1d7eb  
+    - spell: "translate('.', '𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿', '0123456789')"
+
+ - "𝟶-𝟿":    # 0x1d7f6 - 0x1d7ff  
+    - spell: "translate('.', '𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿', '0123456789')"
+
+
  - "": [t: "unknown character"]                   # 0xf700
  - "": [t: "lower right and lower left triangles"] # 0xf726
  - "": [t: "horizontal ellipsis extender"]        # 0xf72d
@@ -3602,8 +3592,9 @@
  - "ﬄ": [t: "ffl"]                                 # 0xfb04
  - "ﬅ": [t: "ft"]                                  # 0xfb05
  - "ﬆ": [t: "st"]                                  # 0xfb06
- - "︠": [t: "ligature left half embellishment"]    # 0xfe20
- - "︡": [t: "ligature right half embellishment"]   # 0xfe21
+ - "﬩": [t: "hebrew letter alternative plus"]      # 0xfb29
+ - "︠": [t: "ligature left half embellishment"]     # 0xfe20
+ - "︡": [t: "ligature right half embellishment"]    # 0xfe21
  - "︢": [t: "double tilde left half embellishment"] # 0xfe22
  - "︣": [t: "double tilde right half embellishment"] # 0xfe23
  - "︤": [t: "macron left half embellishment"]      # 0xfe24
@@ -3615,6 +3606,41 @@
  - "︸": [t: "under brace"]                         # 0xfe38
  - "︿": [t: "over angle bracket"]                  # 0xfe3f
  - "﹀": [t: "under angle bracket"]                 # 0xfe40
- - "﹨": [t: "integer divide"]                      # 0xfe68
- - "￼": [t: "unknown or missing object"]           # 0xfffc
+ - "﹡": [t: "small asterisk"]                      # 0xfe61
+ - "﹢": [t: "small plus"]                          # 0xfe62
+ - "﹣": [t: "small minus"]                         # 0xfe63
+ - "﹤": [t: "small less than"]                     # 0xfe64
+ - "﹥": [t: "small greater than"]                  # 0xfe65
+ - "﹦": [t: "small equals"]                        # 0xfe66
+ - "＋": [t: "equals sign"]                         # 0xff0b
+ - "＜": [t: "less than"]                           # 0xff1c
+ - "＝": [t: "equals"]                              # 0xff1d
+ - "＞": [t: "greater than"]                        # 0xff1e
+ - "＼": [t: "backslash"]                           # 0xff3c
+ - "＾": [t: "hat"]                                 # 0xff3e
+ - "｜":                                            # 0xff5c
+    # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
+     - with:
+        variables: [DefaultToGiven: "count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and ../../../*[1][.='P']"] # P(A|B)
+        replace:
+        - test:
+            - if: "$SpeechStyle != 'ClearSpeak'"
+              then_test:
+                  if: "$DefaultToGiven"
+                  then: [t: "given"]
+                  else: [t: "vertical line"]
+            - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
+              then: [t: "vertical line"]
+            - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+              then: [t: "such that"]
+            - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
+              then: [t: "given"] 
+            - else: [t: "divides"]                   
+ - "～": [t: "tilde"]                               # 0xff5e
+ - "￢": [t: "not"]                                 # 0xffe2
+ - "￩": [t: "left arrow"]                           # 0xffe9
+ - "￪": [t: "up arrow"]                             # 0xffea
+ - "￫": [t: "right arrow"]                          # 0xffeb
+ - "￬": [t: "down arrow"]                           # 0xffec
+ - "￼": [t: "unknown or missing object"]            # 0xfffc
  - "�": [t: "unknown or missing character"]        # 0xfffd

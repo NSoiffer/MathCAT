@@ -2,7 +2,16 @@
  - "a-z": [T: "."]
 
  - "A-Z":
-    - x: "translate('.', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
+        replace: [spell: "translate('.', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]
     - test: 
         if: "$CapitalLetters_UseWord"
         then_test:
@@ -13,6 +22,8 @@
           else: [x: "$SpeechOverrides_CapitalLetters"] 
 
  - "0-9": [T: "."]
+
+ - " ": [t: " "]                                 # 0x20
 
  - "!": [T: giai thừa]                           # 0x21
  - "\"": [T: nháy kép]                     # 0x22
@@ -44,7 +55,7 @@
                # speak "comma" when not adjacent to '…'
             - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
                # except if expression starts with '…'
-            - " ../*[1][text()='…'] "
+            - " ../*[1][.='…'] "
         then: [T: phẩy]
         # else silent
 
@@ -202,7 +213,7 @@
             - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
-            - "../*[1][text()='…']"
+            - "../*[1][.='…']"
         then: [T: chấm chấm chấm]
         else_test:  # must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"
@@ -305,11 +316,11 @@
     #     if: "$Verbosity!='Terse'"
      #    then: [T: "the"]
      - T: đen ta
- - "∇":                                          # 0x2207
-   #  - test: 
-    #     if: "$Verbosity!='Terse'"
-     #    then: [T: "the"]
-     - T: độ dốc của
+ - "∇":                                             #  0x2207
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: "các"]                           #   (en: 'the')
+     - t: "độ dốc của"                              #   (en: 'gradient of')
  - "∈":                                          # 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"

@@ -1,0 +1,33 @@
+---
+- CMUCharsWithDotsOnLeft: {
+    # The caps indicator has no dots in left half, so cap letters are not included
+    "a", "b", "c", "d", "e", "f","g", "h", "i", "j", "k", "l",
+    "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+    "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+    "=", "<", "≤", ">", "≦", "≪", "≫", "×", "÷", "±",
+    "(", ")", "[", "]", "〈", "〉", "!", "*",
+    ";", "?", "¿", "_", "—", "²", "³",
+    "⩽", "⩾", "©", "®",
+    "\"", "'", "“", "”", "‘", "’", "«", "»",
+    ",", ".", ":", "-",
+  }
+
+  # These get a '.' after them (an abbreviation). From 7.2, 7.5.2, 7.5.3
+- CMUFunctionNames: {
+    "Dom", "Or", "Img", "Im", "conc", "conv", "crec", "dec", "arg", "rot",
+    "div", "grad", "Re", "Rec",
+    "máx", "mín", "mcd", "mcm", "ínf", "sup",   # from 5.5.3
+    "lim", "exp", 
+    "Antilog", "antilog", "Alog", "alog", "Colog", "colog", "Ln", "Aln", "aln", 
+    "cos", "cosec", "cosech", "cosh", "cot", "cotan", "cotanh", "coth", "csc", "csch",
+    "sec", "sech", "sin", "sinh", "tan", "tang", "tanh", "tg", "ln", "log", "lg",
+    "sen", "cotg", "tn", "senh", "tgh", "ctgh", 
+    "arccos", "arccosec", "arccosech", "arccosh",
+    "arccot", "arccotan", "arccotanh", "arccoth",
+    "arccsc", "arccsch", "arcsec", "arcsech", "arcsin", "arcsinh",
+    "arctan", "arctang", "arctanh", "csech", 
+    "arcsen", "arctn", "arccotg", "asin", "acos", "atan",
+    "versin", "versen", "coversin", "coversen", "semiversin", "semiversen", "semicoversin", "semicoversen", 
+    "argsinh", "argsenh", "argcosh", "argtanh", "argtgh", "argcoth", "argcotgh", "argsech", "argcsch", "argcosech",
+    "int", "sgn", "abs", "rg", "Adj",
+  }

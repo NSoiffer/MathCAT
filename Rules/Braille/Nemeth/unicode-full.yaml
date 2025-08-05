@@ -8,6 +8,7 @@
 # Some of the weird letters (e.g., circled letters) I didn't translate with the above because
 #   they don't interact with rules since they are enclosed in other chars.
 
+ - "⨯": [t: "⠈⠡"]               # U+2A2F(VECTOR OR CROSS PRODUCT) -- make the same as 0x00D7 (Multiplication sign)
 
   # --- Nemeth Default Alphabet bold chars. ---
  - "𝐀": [t: "BECL⠁"]            # 0x1d400
@@ -738,59 +739,59 @@
  - "８": [t: "N⠦"]               # 0xff18
  - "９": [t: "N⠔"]               # 0xff19
 
-  # --- Nemeth Default Alphabet italic chars. ---
- - "𝐴": [t: "IECL⠁"]            # 0x1d434
- - "𝐵": [t: "IECL⠃"]            # 0x1d435
- - "𝐶": [t: "IECL⠉"]            # 0x1d436
- - "𝐷": [t: "IECL⠙"]            # 0x1d437
- - "𝐸": [t: "IECL⠑"]            # 0x1d438
- - "𝐹": [t: "IECL⠋"]            # 0x1d439
- - "𝐺": [t: "IECL⠛"]            # 0x1d43a
- - "𝐻": [t: "IECL⠓"]            # 0x1d43b
- - "𝐼": [t: "IECL⠊"]            # 0x1d43c
- - "𝐽": [t: "IECL⠚"]            # 0x1d43d
- - "𝐾": [t: "IECL⠅"]            # 0x1d43e
- - "𝐿": [t: "IECL⠇"]            # 0x1d43f
- - "𝑀": [t: "IECL⠍"]            # 0x1d440
- - "𝑁": [t: "IECL⠝"]            # 0x1d441
- - "𝑂": [t: "IECL⠕"]            # 0x1d442
- - "𝑃": [t: "IECL⠏"]            # 0x1d443
- - "𝑄": [t: "IECL⠟"]            # 0x1d444
- - "𝑅": [t: "IECL⠗"]            # 0x1d445
- - "𝑆": [t: "IECL⠎"]            # 0x1d446
- - "𝑇": [t: "IECL⠞"]            # 0x1d447
- - "𝑈": [t: "IECL⠥"]            # 0x1d448
- - "𝑉": [t: "IECL⠧"]            # 0x1d449
- - "𝑊": [t: "IECL⠺"]            # 0x1d44a
- - "𝑋": [t: "IECL⠭"]            # 0x1d44b
- - "𝑌": [t: "IECL⠽"]            # 0x1d44c
- - "𝑍": [t: "IECL⠵"]            # 0x1d44d
- - "𝑎": [t: "IEL⠁"]             # 0x1d44e
- - "𝑏": [t: "IEL⠃"]             # 0x1d44f
- - "𝑐": [t: "IEL⠉"]             # 0x1d450
- - "𝑑": [t: "IEL⠙"]             # 0x1d451
- - "𝑒": [t: "IEL⠑"]             # 0x1d452
- - "𝑓": [t: "IEL⠋"]             # 0x1d453
- - "𝑔": [t: "IEL⠛"]             # 0x1d454
- - "ℎ": [t: "IEL⠓"]             # 0x210e
- - "𝑖": [t: "IEL⠊"]             # 0x1d456
- - "𝑗": [t: "IEL⠚"]             # 0x1d457
- - "𝑘": [t: "IEL⠅"]             # 0x1d458
- - "𝑙": [t: "IEL⠇"]             # 0x1d459
- - "𝑚": [t: "IEL⠍"]             # 0x1d45a
- - "𝑛": [t: "IEL⠝"]             # 0x1d45b
- - "𝑜": [t: "IEL⠕"]             # 0x1d45c
- - "𝑝": [t: "IEL⠏"]             # 0x1d45d
- - "𝑞": [t: "IEL⠟"]             # 0x1d45e
- - "𝑟": [t: "IEL⠗"]             # 0x1d45f
- - "𝑠": [t: "IEL⠎"]             # 0x1d460
- - "𝑡": [t: "IEL⠞"]             # 0x1d461
- - "𝑢": [t: "IEL⠥"]             # 0x1d462
- - "𝑣": [t: "IEL⠧"]             # 0x1d463
- - "𝑤": [t: "IEL⠺"]             # 0x1d464
- - "𝑥": [t: "IEL⠭"]             # 0x1d465
- - "𝑦": [t: "IEL⠽"]             # 0x1d466
- - "𝑧": [t: "IEL⠵"]             # 0x1d467
+  # --- Nemeth Default Alphabet italic chars -- treat as non-italic. ---
+ - "𝐴": [t: "ECL⠁"]            # 0x1d434
+ - "𝐵": [t: "ECL⠃"]            # 0x1d435
+ - "𝐶": [t: "ECL⠉"]            # 0x1d436
+ - "𝐷": [t: "ECL⠙"]            # 0x1d437
+ - "𝐸": [t: "ECL⠑"]            # 0x1d438
+ - "𝐹": [t: "ECL⠋"]            # 0x1d439
+ - "𝐺": [t: "ECL⠛"]            # 0x1d43a
+ - "𝐻": [t: "ECL⠓"]            # 0x1d43b
+ - "𝐼": [t: "ECL⠊"]            # 0x1d43c
+ - "𝐽": [t: "ECL⠚"]            # 0x1d43d
+ - "𝐾": [t: "ECL⠅"]            # 0x1d43e
+ - "𝐿": [t: "ECL⠇"]            # 0x1d43f
+ - "𝑀": [t: "ECL⠍"]            # 0x1d440
+ - "𝑁": [t: "ECL⠝"]            # 0x1d441
+ - "𝑂": [t: "ECL⠕"]            # 0x1d442
+ - "𝑃": [t: "ECL⠏"]            # 0x1d443
+ - "𝑄": [t: "ECL⠟"]            # 0x1d444
+ - "𝑅": [t: "ECL⠗"]            # 0x1d445
+ - "𝑆": [t: "ECL⠎"]            # 0x1d446
+ - "𝑇": [t: "ECL⠞"]            # 0x1d447
+ - "𝑈": [t: "ECL⠥"]            # 0x1d448
+ - "𝑉": [t: "ECL⠧"]            # 0x1d449
+ - "𝑊": [t: "ECL⠺"]            # 0x1d44a
+ - "𝑋": [t: "ECL⠭"]            # 0x1d44b
+ - "𝑌": [t: "ECL⠽"]            # 0x1d44c
+ - "𝑍": [t: "ECL⠵"]            # 0x1d44d
+ - "𝑎": [t: "EL⠁"]             # 0x1d44e
+ - "𝑏": [t: "EL⠃"]             # 0x1d44f
+ - "𝑐": [t: "EL⠉"]             # 0x1d450
+ - "𝑑": [t: "EL⠙"]             # 0x1d451
+ - "𝑒": [t: "EL⠑"]             # 0x1d452
+ - "𝑓": [t: "EL⠋"]             # 0x1d453
+ - "𝑔": [t: "EL⠛"]             # 0x1d454
+ - "ℎ": [t: "EL⠓"]             # 0x210e
+ - "𝑖": [t: "EL⠊"]             # 0x1d456
+ - "𝑗": [t: "EL⠚"]             # 0x1d457
+ - "𝑘": [t: "EL⠅"]             # 0x1d458
+ - "𝑙": [t: "EL⠇"]             # 0x1d459
+ - "𝑚": [t: "EL⠍"]             # 0x1d45a
+ - "𝑛": [t: "EL⠝"]             # 0x1d45b
+ - "𝑜": [t: "EL⠕"]             # 0x1d45c
+ - "𝑝": [t: "EL⠏"]             # 0x1d45d
+ - "𝑞": [t: "EL⠟"]             # 0x1d45e
+ - "𝑟": [t: "EL⠗"]             # 0x1d45f
+ - "𝑠": [t: "EL⠎"]             # 0x1d460
+ - "𝑡": [t: "EL⠞"]             # 0x1d461
+ - "𝑢": [t: "EL⠥"]             # 0x1d462
+ - "𝑣": [t: "EL⠧"]             # 0x1d463
+ - "𝑤": [t: "EL⠺"]             # 0x1d464
+ - "𝑥": [t: "EL⠭"]             # 0x1d465
+ - "𝑦": [t: "EL⠽"]             # 0x1d466
+ - "𝑧": [t: "EL⠵"]             # 0x1d467
  - "𝛢": [t: "IGCL⠁"]            # 0x1d6e2
  - "𝛣": [t: "IGCL⠃"]            # 0x1d6e3
  - "𝛤": [t: "IGCL⠛"]            # 0x1d6e4
@@ -1566,7 +1567,6 @@
   # --- Nemeth Default Characters math_geometry chars. ---
  - "─": [t: "⠱"]                # 0x2500
  - "│": [t: "⠳"]                # 0x2502
- - "▫": [t: "⠫⠸⠗"]              # 0x25ab
  - "▰": [t: "⠫⠸⠛"]              # 0x25b0
  - "▱": [t: "⠫⠛"]               # 0x25b1
  - "▽": [t: "⠨⠫"]               # 0x25bd
@@ -1625,7 +1625,7 @@
  - "‖": [t: "⠳⠳"]               # 0x2016
  - "†": [t: "⠸⠻"]               # 0x2020
  - "‡": [t: "⠸⠸⠻"]              # 0x2021
- - "•": [t: "⠔⠔"]               # 0x2022
+ - "•": [t: "⠡"]                # 0x2022
  - "․": [t: "⠄"]                # 0x2024
  - "‥": [t: "⠄⠄"]               # 0x2025
  - "′": [t: "⠄"]                # 0x2032
@@ -1663,8 +1663,8 @@
  - "∢": [t: "⠫⠪⠸⠫⠫⠁⠻"]          # 0x2222
  - "∣": [t: "⠳"]                # 0x2223
  - "∤": [t: "⠌⠳"]               # 0x2224
- - "∥": [t: "⠳⠳"]               # 0x2225
- - "∦": [t: "⠌⠳⠳"]              # 0x2226
+ - "∥": [t: "⠫⠇"]               # 0x2225
+ - "∦": [t: "⠌⠫⠇"]              # 0x2226
  - "∧": [t: "⠈⠩"]               # 0x2227
  - "∨": [t: "⠈⠬"]               # 0x2228
  - "∩": [t: "⠨⠩"]               # 0x2229
@@ -1846,8 +1846,16 @@
  - "Ü": [t: "⠠⠈⠥"]              # 0xdc
  - "Ý": [t: "⠠⠈⠽"]              # 0xdd
  - "←": [t: "⠫⠪⠒⠒"]             # 0x2190
- - "↑": [t: "⠫⠣⠒⠒⠕"]            # 0x2191
- - "↓": [t: "⠫⠩⠒⠒⠕"]            # 0x2193
+ - "↑":                          # 0x2191
+    - test:
+        if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+        then: [t: "⠫⠣"]
+        else: [t: "⠫⠣⠒⠒⠕"]
+ - "↓":                          # 0x2193
+    - test:
+        if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+        then: [t: "⠫⠩"]
+        else: [t: "⠫⠩⠒⠒⠕"]
  - "↔": [t: "⠫⠪⠒⠒⠕"]            # 0x2194
  - "↕": [t: "⠫⠣⠩⠪⠒⠒⠕"]          # 0x2195
  - "↖": [t: "⠫⠘⠪⠒⠒"]            # 0x2196
@@ -1966,8 +1974,17 @@
  - "⇁": [t: "⠫⠒⠒⠠⠕"]            # 0x21c1
  - "⇂": [t: "⠫⠪⠒⠒⠈⠕"]           # 0x21c2
  - "⇃": [t: "⠫⠩⠒⠒⠠⠕"]           # 0x21c3
- - "⇋": [t: "⠫⠈⠪⠒⠒⠫⠒⠒⠈⠕"]       # 0x21cb
- - "⇌": [t: "⠫⠒⠒⠈⠕⠫⠈⠪⠒⠒"]       # 0x21cc
+ - "⇋":                          # 0x21cb
+     - test:
+        if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+        then: [t: "⠫⠪⠒⠫⠒⠕"]
+        else: [t: "⠫⠈⠪⠒⠒⠫⠒⠒⠈⠕"]
+ - "⇌":                          # 0x21cc
+     - test:
+        if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+        then: [t: "⠫⠒⠕⠫⠪⠒"]
+        else: [t: "⠫⠒⠒⠈⠕⠫⠈⠪⠒⠒"]
+
  - "℔": [t: "⠳"]                # 0x2114
  - "™": [t: "⠘⠞"]               # 0x2122
  - "Å": [t: "⠈⠠⠁"]              # 0x212b
@@ -2104,7 +2121,9 @@
  - "⌢": [t: "⠫⠁"]             # 0x2322 (Frown)
  - "⌣": [t: "⠫⠄"]             # 0x2323 (Smile)
  - "■": [t: "⠫⠸⠲"]              # 0x25A0 (Filled square)
+ - "▫": [t: "⠫⠲"]               # 0x25AB (Small white Square)
  - "□": [t: "⠫⠲"]               # 0x25A1 (Square)
+ - "◻": [t: "⠫⠲"]               # 0x25FB (Square)
  - "▬": [t: "⠫⠸⠗"]              # 0x25AC (Filled rectangle)
  - "▭": [t: "⠫⠗"]               # 0x25AD (Rectangle)
  - "▲": [t: "⠫⠸⠞"]              # 0x25B2 (Black up-pointing triangle)
@@ -2137,6 +2156,55 @@
  - "⟿": [t: "⠀⠫⠢⠤⠔⠒⠢⠤⠔⠒⠢⠕⠀"]    # 0x27FF (Long rightwards squiggle arrow)
  - "⤡": [t: "⠀⠫⠘⠪⠒⠒⠕⠀"]         # 0x2921 (North west and south east arrow)
  - "⤢": [t: "⠀⠫⠰⠪⠒⠒⠕⠀"]         # 0x2922 (North east and south west arrow)
+ - "🣐":                            # 0x1f8d0 (Long rightwards arrow over leftwards arrow (equilibrium))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠕⠫⠪⠒"]
+          else: [t: "⠫⠒⠒⠈⠕⠫⠠⠪⠒⠒"]
+ - "🣑":                            # 0x1f8d1 (Long rightwards harpoon over leftwards harpoon (equilibrium))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠕⠫⠪⠒"]
+          else: [t: "⠫⠒⠒⠈⠕⠫⠠⠪⠒⠒"]
+ - "🣒":                            # 0x1f8d2 (Long rightwards harpoon over short leftwards harpoon (equilibrium))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠒⠕⠫⠪⠒"]
+          else: [t: "⠫⠒⠒⠈⠕⠫⠈⠪⠒⠒"]
+ - "🣓":                            # 0x1f8d3 (Short rightwards harpoon over long leftwards harpoon (equilibrium, trend to the right))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠕⠫⠪⠒⠒"]
+          else: [t: "⠫⠒⠈⠕⠫⠠⠪⠒⠒"]
+ - "🣔":                            # 0x1f8d4 (Long leftwards harpoon over short rightwards harpoon (equilibrium, trend to the left))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠪⠒⠒⠫⠒⠕"]
+          else: [t: "⠫⠈⠪⠒⠒⠫⠒⠠⠕"]
+ - "🣕":                             # 0x1f8d5 (Short leftwards harpoon over long rightwards harpoon (equilibrium, trend to the left))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠪⠒⠫⠒⠒⠕"]
+          else: [t: "⠫⠈⠪⠒⠫⠒⠒⠠⠕"]
+ - "⥂":                            # 0x2942 (Long rightwards harpoon over short leftwards harpoon (equilibrium))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠒⠕⠫⠪⠒"]
+          else: [t: "⠫⠒⠒⠈⠕⠫⠈⠪⠒⠒"]
+ - "⥄":                            # 0x2944 (Short rightwards harpoon over long leftwards harpoon (equilibrium, trend to the right))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠕⠫⠪⠒⠒"]
+          else: [t: "⠫⠒⠈⠕⠫⠠⠪⠒⠒"]
+ - "⥃":                            # 0x2943 (Long leftwards harpoon over short rightwards harpoon (equilibrium, trend to the left))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠪⠒⠒⠫⠒⠕"]
+          else: [t: "⠫⠈⠪⠒⠒⠫⠒⠠⠕"]
+ - "🣖": [t: "⠌⠫⠒⠒⠕"]            # 0x1f8d6 (long rightwards arrow with through X)
+ - "🣗": [t: "⠌⠫⠒⠒⠕"]            # 0x1f8d7 (long rightwards arrow with double slash) chem code says it is same as 0x1f8d6
+
+
  - "⦃": [t: "⠨⠸⠷"]              # 0x2983 (Left white curly bracket)
  - "⦄": [t: "⠨⠸⠾"]              # 0x2984 (Right white curly bracket)
  - "⦑": [t: "⠡⠈⠨⠨⠷⠻"]           # 0x2991 (Left angle bracket w dot)
@@ -2248,6 +2316,7 @@
  - "⬰": [t: "⠨⠡⠈⠫⠪⠒⠒⠻"]       # 0x2B30 (Left arrow w small circle)
  - "⬱": [t: "⠫⠪⠒⠒⠫⠪⠒⠒⠫⠪⠒⠒"]   # 0x2B31 (Three leftwards arrows)
  - "⬲": [t: "⠫⠪⠒⠒⠈⠫⠉⠸⠫⠬⠻"]    # 0x2B32 (Left arrow w circled plus)
+ - "⮖": [t: "⠨⠡"]              # 0x2B96 (Standard State Symbol)
  - "⯃": [t: "⠫⠸⠦"]              # 0x2BC3 (Horizontal black octagon)
 
  # SRE lists this as a custom transcription

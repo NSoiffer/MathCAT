@@ -50,14 +50,25 @@
     ResetOverview: true        # remember previous value and use it
     NavVerbosity: Medium        # Terse, Medium, Full (words to say for nav command)
     AutoZoomOut: true           # Auto zoom out of 2D exprs (use shift-arrow to force zoom out if unchecked)
+    CopyAs: "MathML"       # MathML, LaTeX, ASCIIMath
+
 
   Braille:
     BrailleCode: "Nemeth"                # Any supported braille code (currently Nemeth, UEB)
     BrailleNavHighlight: EndPoints   # Highlight with dots 7 & 8 the current nav node -- values are Off, FirstChar, EndPoints, All
+    UseSpacesAroundAllOperators: false  # true/false (otherwise typically around comparison operators only)
+
+    Nemeth:
+      # Nemeth defines the typeforms: Bold, Italic, SansSerif, and Script. That leaves out DoubleStruck (Blackboard Bold)
+      # Here we provide an option to specify a transcriber-defined typeform changes, with the default mapping DoubleStruck to Italic
+      SansSerif:    "⠠⠨"     # first transcriber-defined typeform prefix indicator
+      Bold:         "⠸"     # t
+      DoubleStruck: "⠨"     # script
+      Script:       "⠈"     # script
+      Italic:       "⠨"     # script
 
     UEB:
       StartMode: "Grade2"   # Grade1/Grade2 -- assumed starting mode UEB braille (Grade1 assumes we are in G1 passage mode)
-      UseSpacesAroundAllOperators: false  # true/false
 
       # UEB Guide to Technical Material (https://iceb.org/Guidelines_for_Technical_Material_2008-10.pdf)
       #   says to normally treat Fraktur and DoubleStruck as Script
@@ -80,7 +91,11 @@
       SansSerif:    "⠈⠼"    # first transcriber-defined typeform prefix indicator
       GreekVariant: "⠸"     # default to Greek
 
+    LaTeX:
+      UseShortName: false   # Use the short form for the latex (e.g., "~a" instead of "\alpha")
+
 
   Other:
     DecimalSeparators: "." # [default]
     BlockSeparators: ", \u00A0\u202F" # [default -- includes two forms of non-breaking spaces]
+    DecimalSeparator: "Auto" # Auto, '.', ',', Custom
