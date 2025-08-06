@@ -472,10 +472,14 @@
  - "∣": [t: "divides"]                              # 0x2223
  - "∤": [t: "does not divide"]                      # 0x2224
  - "∥":                                           # 0x2225
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "is"]
-     - t: "parallel to"
+     - test:
+         if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+         then: [t: "double vertical line"]
+         else:
+         - test:
+              if: "$Verbosity!='Terse'"
+              then: [t: "is"]
+         - t: "parallel to"
  - "∦":                                           # 0x2226
      - test: 
          if: "$Verbosity!='Terse'"
