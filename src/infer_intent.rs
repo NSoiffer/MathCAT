@@ -612,6 +612,7 @@ mod tests {
 
     fn test_intent(mathml: &str, target: &str, intent_error_recovery: &str) -> bool {
 		use crate::interface::*;
+        use crate::pretty_print::mml_to_string;
 		// this forces initialization
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         // crate::speech::SpeechRules::initialize_all_rules().unwrap();
@@ -620,12 +621,12 @@ mod tests {
         let package1 = &parser::parse(mathml).expect("Failed to parse test input");
         let mathml = get_element(package1);
         trim_element(mathml, false);
-        debug!("test:\n{}", crate::pretty_print::mml_to_string(mathml));
+        debug!("test:\n{}", mml_to_string(mathml));
         
         let package2 = &parser::parse(target).expect("Failed to parse target input");
         let target = get_element(package2);
         trim_element(target,true);
-        debug!("target:\n{}", crate::pretty_print::mml_to_string(target));
+        debug!("target:\n{}", mml_to_string(target));
 
         let result = match crate::speech::intent_from_mathml(mathml, package2.as_document()) {
             Ok(e) => e,
@@ -634,10 +635,10 @@ mod tests {
                 return false;       // could be intentional failure
             }
         };
-        debug!("result:\n{}", crate::pretty_print::mml_to_string(result));
+        debug!("result:\n{}", mml_to_string(result));
         match is_same_element(result, target) {
 			Ok(_) => return true,
-			Err(e) => panic!("{}", e),
+			Err(e) => panic!("{}:\nresult: {}target: {}", e, mml_to_string(result), mml_to_string(target)),
 		}
     }
 
