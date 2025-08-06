@@ -419,11 +419,15 @@
  - "∡": [T: "målt vinkel"]                       #  0x2221 (en: 'measured angle')
  - "∣": [T: "deler"]                             #  0x2223 (en: 'divides')
  - "∤": [T: "deler ikke"]                        #  0x2224 (en: 'does not divide')
- - "∥":                                          #  0x2225
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [T: "er"]                         #  (en: 'is', google translation)
-     - T: "parallell med"                       #  (en: 'parallel to')
+ - "∥":                                           # 0x2225
+     - test:
+         if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+         then: [T: "dobbel vertikal linje"]
+         else:
+         - test:
+              if: "$Verbosity!='Terse'"
+              then: [T: "er"]
+         - T: "parallell med"
  - "∦":                                          #  0x2226
      - test: 
          if: "$Verbosity!='Terse'"
