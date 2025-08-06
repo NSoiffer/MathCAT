@@ -844,7 +844,6 @@ fn FinME_secant_algorithm() {
 
 #[test]
 fn Fin_ME_law_of_sines() {
-  init_logger();
     let expr = "<math>
     <mfrac>
       <mi>a</mi>

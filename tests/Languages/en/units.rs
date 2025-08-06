@@ -497,3 +497,16 @@ fn test_mtext_inference() {
         "open bracket; 1 metric ton, comma; 2 peta-amps, comma, \
                 3 pascals, comma; 4.5 milli-teslas; close bracket");
 }
+
+    #[test]
+    fn infer_unit() {
+        let expr = r#"<math>
+            <mn>3</mn><mi mathvariant="normal">m</mi><mo>,</mo>
+            <mn>1</mn><mi>km</mi><mo>,</mo>
+            <mn>3</mn><mtext>m</mtext><mo>,</mo>
+            <mfrac><mn>3</mn><mn>10</mn></mfrac><mi mathvariant="normal">F</mi><mo>,</mo>
+            <msub><mi>m</mi><mi>min</mi></msub>
+            </math>"#;
+        test("en", "SimpleSpeak", expr, 
+            "3 metres, comma; 1 kilo-metre, comma, 3 metres, comma; 3 tenths farads, comma; m sub min end sub");
+    }

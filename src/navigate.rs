@@ -478,7 +478,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                 add_literal = false;
             } else {
                 mathml.set_attribute_value("data-intent-property", (":literal:".to_string() + properties).as_str());
-            }
+            };
         }
         // we should always find the start node.
         // however, if were were navigating by character, then switched the NavMode, the intent tree might not have that node in it
@@ -599,6 +599,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                 return Ok( (speech + " " + &node_speech, true) );
             }
         } else {
+            remove_literal_property(mathml, add_literal, properties);
             pop_stack(nav_state, loop_count, nav_command);
             return Ok( (speech, true) );
         };
@@ -619,7 +620,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
     fn pop_stack(nav_state: &mut NavigationState, count: usize, nav_command: &'static str) {
         // save the final state and pop the intermediate states that did nothing
         let push_command_on_stack = (nav_command.starts_with("Move") && nav_command != "MoveLastLocation") || nav_command.starts_with("Zoom");
-        debug!("pop_stack: nav_command={}, count={}, push? {} stack=\n{}", nav_command, count, push_command_on_stack, nav_state);
+        // debug!("pop_stack: nav_command={}, count={}, push? {} stack=\n{}", nav_command, count, push_command_on_stack, nav_state);
         if count == 0 {
             if !push_command_on_stack && nav_command == nav_state.top().unwrap().1 {
                 nav_state.pop();    // remove ReadXXX, SetPlacemarker, etc. commands that don't change the state
@@ -1850,7 +1851,6 @@ mod tests {
     
     #[test]
     fn placemarker() -> Result<()> {
-        init_logger();
         let mathml_str = "<math display='block' id='math'>
         <mrow displaystyle='true' id='mrow'>
           <mi id='a'>a</mi>
