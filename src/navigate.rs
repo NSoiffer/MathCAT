@@ -461,30 +461,32 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             loop_count: usize) -> Result<(String, bool)> {
         let context = rules_with_context.get_context();
         context.set_variable("MatchCounter", loop_count as f64);
-        context.set_variable("SpeechStyle",
-                             Value::String(
-                                if nav_state.mode != "Enhanced" {
-                                    "LiteralSpeak".to_string()
-                                } else {
-                                    rules.pref_manager.borrow().pref_to_string("SpeechStyle")
-                                }
-                             ));
         nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
 
-        let (intent, nav_intent) = if nav_state.mode == "Character" {
+        let (intent, nav_intent) = if nav_state.mode != "Enhanced" {
             (mathml, mathml)
         } else {
             let intent = crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?;
             (intent, add_fixity_children(copy_mathml(intent)))
         };
 
+        let mut add_literal = nav_state.mode != "Enhanced";
+        let mut properties = "";
+        if add_literal {
+            properties  = mathml.attribute_value("data-intent-property").unwrap_or_default();
+            if properties.contains(":literal:") {
+                add_literal = false;
+            } else {
+                mathml.set_attribute_value("data-intent-property", (":literal:".to_string() + properties).as_str());
+            }
+        }
         // we should always find the start node.
-        // however, if were were navigating by character, then switch the NavMode, the intent tree might not have that node in it
+        // however, if were were navigating by character, then switched the NavMode, the intent tree might not have that node in it
         let start_node = match get_start_node(nav_intent, nav_state) {
             Ok(node) => node,
             Err(_) => {
                 // find the node in the other tree (probably mathml) and walk up to find a parent that has an id in both
-                let other_tree = if nav_state.mode == "Character" {nav_intent} else {mathml};
+                let other_tree = if nav_state.mode != "Enhanced" {nav_intent} else {mathml};
                 let mut found_node = get_start_node(other_tree, nav_state)?;
                 while name(found_node) != "math" {
                     found_node = get_parent(found_node);
@@ -547,7 +549,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             !nav_state.speak_overview
         };
 
-        if (nav_command.starts_with("Move") || nav_command.starts_with("Zoom")) && nav_command != "MoveLastLocation" {
+        { //if (nav_command.starts_with("Move") || nav_command.starts_with("Zoom")) && nav_command != "MoveLastLocation" {
             // push the new location on the stack
             if nav_position != NavigationPosition::default() {
                 // debug!("nav_state: pushing on {}", &nav_position);
@@ -569,12 +571,14 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         let nav_mathml = get_node_by_id(intent, &nav_position.current_node);
         if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", intent)?.0.unwrap() == "true" {
             // Speak/Overview of where we landed (if we are supposed to speak it) -- use intent, not nav_intent
-            let literal_speak = context_get_variable(context, "SpeechStyle", intent)?.0.unwrap() == "LiteralSpeak";
+            // Note: NavMode might have changed, so we need to recheck the mode to see if we use LiteralSpeak
+            let literal_speak = nav_state.mode != "Enhanced";
             let node_speech = match speak(mathml, intent, &nav_position.current_node, literal_speak, use_read_rules) {
                 Ok(speech) => speech,
                 Err(e) => {
+                    remove_literal_property(mathml, add_literal, properties);
                     if e.to_string() == crate::speech::NAV_NODE_SPEECH_NOT_FOUND {
-                        bail!("Internal error: With {}/{} in {} mode, can't {} to expression with id '{}' inside:\n{}",
+                        bail!("Internal error: With {}/{} in {} mode, can't {} from expression with id '{}' inside:\n{}",
                               rules.pref_manager.as_ref().borrow().pref_to_string("Language"),
                               rules.pref_manager.as_ref().borrow().pref_to_string("SpeechStyle"),
                               &nav_state.mode, nav_command, &nav_position.current_node, mml_to_string(if literal_speak {mathml} else {intent}));
@@ -583,42 +587,59 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                     }
                 },
             };
+            remove_literal_property(mathml, add_literal, properties);
+
             // debug!("node_speech: '{}'", node_speech);
             if node_speech.is_empty() {
                 // try again in loop
                 return Ok( (speech, false));
             } else {
-                pop_stack(nav_state, loop_count);
+                pop_stack(nav_state, loop_count, nav_command);
                 // debug!("returning: '{}'", speech.clone() + " " + &node_speech);
                 return Ok( (speech + " " + &node_speech, true) );
             }
         } else {
-            pop_stack(nav_state, loop_count);
+            pop_stack(nav_state, loop_count, nav_command);
             return Ok( (speech, true) );
         };
+
+        fn remove_literal_property(mathml: Element, add_literal: bool, properties: &str) {
+            if add_literal {
+                if properties.is_empty() {
+                    mathml.remove_attribute("data-intent-property");
+                } else {
+                    mathml.set_attribute_value("data-intent-property", properties);
+                }
+            }
+        }
+
     }
 
 
-    fn pop_stack(nav_state: &mut NavigationState, count: usize) {
+    fn pop_stack(nav_state: &mut NavigationState, count: usize, nav_command: &'static str) {
         // save the final state and pop the intermediate states that did nothing
+        let push_command_on_stack = (nav_command.starts_with("Move") && nav_command != "MoveLastLocation") || nav_command.starts_with("Zoom");
+        debug!("pop_stack: nav_command={}, count={}, push? {} stack=\n{}", nav_command, count, push_command_on_stack, nav_state);
         if count == 0 {
+            if !push_command_on_stack && nav_command == nav_state.top().unwrap().1 {
+                nav_state.pop();    // remove ReadXXX, SetPlacemarker, etc. commands that don't change the state
+            }
             return;
         }
-
         let (top_position, top_command) = nav_state.pop().unwrap();
-        let mut count = count-1;
+        let mut count = count - 1;
         loop {
             // debug!("  ... loop count={}", count);
-            let (_, nav_command) = nav_state.top().unwrap();
-            if (nav_command.starts_with("Move") || nav_command.starts_with("Zoom")) && nav_command != "MoveLastLocation" {
-                nav_state.pop();
-            }
+            nav_state.pop();
             if count == 0 {
                 break;
             };
             count -= 1;
         };
-        nav_state.push(top_position, top_command);
+        if push_command_on_stack {
+            nav_state.push(top_position, top_command);
+        }
+        // debug!("END pop_stack: stack=\n{}", nav_state);
     }
 }
 
@@ -644,20 +665,9 @@ fn speak(mathml: Element, intent: Element, nav_node_id: &str, literal_speak: boo
                 },
             }
         }
-        let properties  = mathml.attribute_value("data-intent-property").unwrap_or_default();
-        let add_literal = literal_speak && !properties.contains(":literal:");
-        if add_literal {
-            mathml.set_attribute_value("data-intent-property", (":literal:".to_string() + properties).as_str());
-        }
         // debug!("speak (literal): nav_node_id={}, mathml=\n{}", nav_node_id, mml_to_string(mathml));
         let speech = crate::speech::speak_mathml(mathml, &nav_node_id);
-        if add_literal {
-            if properties.is_empty() {
-                mathml.remove_attribute("data-intent-property");
-            } else {
-                mathml.set_attribute_value("data-intent-property", properties);
-            }
-        }
+        // debug!("speech from speak: {:?}", speech);
         return speech;
     } else {
         return crate::speech::overview_mathml(mathml, &nav_node_id);
@@ -1023,14 +1033,14 @@ mod tests {
     #[test]
     fn test_init_navigate_move_right() -> Result<()> {
         // this is how navigation typically starts up
-        let mathml_str = " <math display='block' id='id-0' data-id-added='true'>
-            <mrow data-changed='added' id='id-1' data-id-added='true'>
+        let mathml_str = " <math display='block' id='id-0'>
+            <mrow data-changed='added' id='id-1'>
             <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
-            <mo id='id-3' data-id-added='true'>=</mo>
-            <mrow data-changed='added' id='id-4' data-id-added='true'>
-                <mi id='id-5' data-id-added='true'>a</mi>
-                <mo id='id-6' data-id-added='true'>-</mo>
-                <mn id='id-7' data-id-added='true'>2</mn>
+            <mo id='id-3'>=</mo>
+            <mrow data-changed='added' id='id-4'>
+                <mi id='id-5'>a</mi>
+                <mo id='id-6'>-</mo>
+                <mn id='id-7'>2</mn>
             </mrow>
             </mrow>
         </math>";
@@ -1176,14 +1186,14 @@ mod tests {
     
     #[test]
     fn move_start_end() -> Result<()> {
-        let mathml_str = " <math display='block' id='id-0' data-id-added='true'>
-        <mrow data-changed='added' id='id-1' data-id-added='true'>
-          <mi id='id-2' data-id-added='true'>x</mi>
-          <mo id='id-3' data-id-added='true'>=</mo>
-          <mrow data-changed='added' id='id-4' data-id-added='true'>
-            <mi id='id-5' data-id-added='true'>a</mi>
-            <mo id='id-6' data-id-added='true'>-</mo>
-            <mn id='id-7' data-id-added='true'>2</mn>
+        let mathml_str = " <math display='block' id='id-0'>
+        <mrow data-changed='added' id='id-1'>
+          <mi id='id-2'>x</mi>
+          <mo id='id-3'>=</mo>
+          <mrow data-changed='added' id='id-4'>
+            <mi id='id-5'>a</mi>
+            <mo id='id-6'>-</mo>
+            <mn id='id-7'>2</mn>
           </mrow>
         </mrow>
        </math>";
@@ -1215,16 +1225,16 @@ mod tests {
     
     #[test]
     fn move_line_start_end() -> Result<()> {
-        let mathml_str = " <math display='block' id='id-0' data-id-added='true'>
-        <mfrac displaystyle='true' id='id-1' data-id-added='true'>
-          <mi id='id-2' data-id-added='true'>x</mi>
-          <mrow id='id-3' data-id-added='true'>
-            <msup id='id-4' data-id-added='true'>
-              <mi id='id-5' data-id-added='true'>y</mi>
-              <mn id='id-6' data-id-added='true'>2</mn>
+        let mathml_str = " <math display='block' id='id-0'>
+        <mfrac displaystyle='true' id='id-1'>
+          <mi id='id-2'>x</mi>
+          <mrow id='id-3'>
+            <msup id='id-4'>
+              <mi id='id-5'>y</mi>
+              <mn id='id-6'>2</mn>
             </msup>
-            <mo id='id-7' data-id-added='true'>+</mo>
-            <mn id='id-8' data-id-added='true'>1</mn>
+            <mo id='id-7'>+</mo>
+            <mn id='id-8'>1</mn>
           </mrow>
         </mfrac>
        </math>";
@@ -1370,17 +1380,17 @@ mod tests {
         
     #[test]
     fn move_msubsup_char() -> Result<()> {
-        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
-        <mrow data-changed='added' id='id-1' data-id-added='true'>
-          <mn id='id-2' data-id-added='true'>1</mn>
-          <mo id='id-3' data-id-added='true'>+</mo>
-          <msubsup id='id-4' data-id-added='true'>
-            <mi id='id-5' data-id-added='true'>x</mi>
-            <mn id='id-6' data-id-added='true'>2</mn>
-            <mn id='id-7' data-id-added='true'>3</mn>
+        let mathml_str = "<math display='block' id='id-0'>
+        <mrow data-changed='added' id='id-1'>
+          <mn id='id-2'>1</mn>
+          <mo id='id-3'>+</mo>
+          <msubsup id='id-4'>
+            <mi id='id-5'>x</mi>
+            <mn id='id-6'>2</mn>
+            <mn id='id-7'>3</mn>
           </msubsup>
-          <mo id='id-8' data-id-added='true'>+</mo>
-          <mn id='id-9' data-id-added='true'>4</mn>
+          <mo id='id-8'>+</mo>
+          <mn id='id-9'>4</mn>
         </mrow>
        </math>";
         init_default_prefs(mathml_str, "Character");
@@ -1404,21 +1414,21 @@ mod tests {
         
     #[test]
     fn move_mmultiscripts_char() -> Result<()> {
-        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
-            <mmultiscripts data-mjx-texclass='ORD' data-chem-formula='5' id='id-1' data-id-added='true'>
-                <mrow data-changed='added' data-chem-formula='3' id='id-2' data-id-added='true'>
-                    <mo stretchy='false' id='id-3' data-id-added='true'>[</mo>
-                    <mmultiscripts data-chem-formula='3' id='id-4' data-id-added='true'>
-                        <mi data-chem-element='3' id='id-5' data-id-added='true'>Co</mi>
-                        <mn id='id-6' data-id-added='true'>6</mn>
-                        <none id='id-7' data-id-added='true'></none>
+        let mathml_str = "<math display='block' id='id-0'>
+            <mmultiscripts data-mjx-texclass='ORD' data-chem-formula='5' id='id-1'>
+                <mrow data-changed='added' data-chem-formula='3' id='id-2'>
+                    <mo stretchy='false' id='id-3'>[</mo>
+                    <mmultiscripts data-chem-formula='3' id='id-4'>
+                        <mi data-chem-element='3' id='id-5'>Co</mi>
+                        <mn id='id-6'>6</mn>
+                        <none id='id-7'></none>
                     </mmultiscripts>
-                    <mo stretchy='false' id='id-8' data-id-added='true'>]</mo>
+                    <mo stretchy='false' id='id-8'>]</mo>
                 </mrow>
-                <none id='id-9' data-id-added='true'></none>
-                <mrow id='id-10' data-id-added='true'>
-                    <mn id='id-11' data-id-added='true'>3</mn>
-                    <mo id='id-12' data-id-added='true'>+</mo>
+                <none id='id-9'></none>
+                <mrow id='id-10'>
+                    <mn id='id-11'>3</mn>
+                    <mo id='id-12'>+</mo>
                 </mrow>
             </mmultiscripts>
             </math>";
@@ -1581,14 +1591,14 @@ mod tests {
     
     #[test]
     fn move_char_speech() -> Result<()> {
-        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
-                <mrow id='id-1' data-id-added='true'>
-                <mfrac id='id-2' data-id-added='true'>
-                    <mi id='id-3' data-id-added='true'>x</mi>
-                    <mi id='id-4' data-id-added='true'>y</mi>
+        let mathml_str = "<math display='block' id='id-0'>
+                <mrow id='id-1'>
+                <mfrac id='id-2'>
+                    <mi id='id-3'>x</mi>
+                    <mi id='id-4'>y</mi>
                 </mfrac>
-                <mo data-changed='added' id='id-5' data-id-added='true'>&#x2062;</mo>
-                <mi id='id-6' data-id-added='true'>z</mi>
+                <mo data-changed='added' id='id-5'>&#x2062;</mo>
+                <mi id='id-6'>z</mi>
                 </mrow>
             </math>";
             init_default_prefs(mathml_str, "Character");
@@ -1607,18 +1617,18 @@ mod tests {
     
     #[test]
     fn move_enhanced_times() -> Result<()> {
-        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
-        <mrow displaystyle='true' data-changed='added' id='id-1' data-id-added='true'>
-          <mn id='id-2' data-id-added='true'>2</mn>
-          <mo data-changed='added' id='id-3' data-id-added='true'>&#x2062;</mo>
-          <mrow id='id-4' data-id-added='true'>
-            <mo id='id-5' data-id-added='true'>(</mo>
-            <mrow data-changed='added' id='id-6' data-id-added='true'>
-              <mn id='id-7' data-id-added='true'>1</mn>
-              <mo id='id-8' data-id-added='true'>-</mo>
-              <mi id='id-9' data-id-added='true'>x</mi>
+        let mathml_str = "<math display='block' id='id-0'>
+        <mrow displaystyle='true' data-changed='added' id='id-1'>
+          <mn id='id-2'>2</mn>
+          <mo data-changed='added' id='id-3'>&#x2062;</mo>
+          <mrow id='id-4'>
+            <mo id='id-5'>(</mo>
+            <mrow data-changed='added' id='id-6'>
+              <mn id='id-7'>1</mn>
+              <mo id='id-8'>-</mo>
+              <mi id='id-9'>x</mi>
             </mrow>
-            <mo id='id-10' data-id-added='true'>)</mo>
+            <mo id='id-10'>)</mo>
           </mrow>
         </mrow>
        </math>";
@@ -1638,18 +1648,18 @@ mod tests {
     
     #[test]
     fn move_simple_no_times() -> Result<()> {
-        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
-        <mrow displaystyle='true' data-changed='added' id='id-1' data-id-added='true'>
-          <mn id='id-2' data-id-added='true'>2</mn>
-          <mo data-changed='added' id='id-3' data-id-added='true'>&#x2062;</mo>
-          <mrow id='id-4' data-id-added='true'>
-            <mo id='id-5' data-id-added='true'>(</mo>
-            <mrow data-changed='added' id='id-6' data-id-added='true'>
-              <mn id='id-7' data-id-added='true'>1</mn>
-              <mo id='id-8' data-id-added='true'>-</mo>
-              <mi id='id-9' data-id-added='true'>x</mi>
+        let mathml_str = "<math display='block' id='id-0'>
+        <mrow displaystyle='true' data-changed='added' id='id-1'>
+          <mn id='id-2'>2</mn>
+          <mo data-changed='added' id='id-3'>&#x2062;</mo>
+          <mrow id='id-4'>
+            <mo id='id-5'>(</mo>
+            <mrow data-changed='added' id='id-6'>
+              <mn id='id-7'>1</mn>
+              <mo id='id-8'>-</mo>
+              <mi id='id-9'>x</mi>
             </mrow>
-            <mo id='id-10' data-id-added='true'>)</mo>
+            <mo id='id-10'>)</mo>
           </mrow>
         </mrow>
        </math>";
@@ -1671,55 +1681,55 @@ mod tests {
     
     #[test]
     fn move_cell() -> Result<()> {
-        let mathml_str = "<math id='nav-0' data-id-added='true'>
-        <mtable id='nav-1' data-id-added='true'>
-          <mtr id='nav-2' data-id-added='true'>
-            <mtd id='nav-3' data-id-added='true'> <mn id='nav-4' data-id-added='true'>1</mn></mtd>
-            <mtd id='nav-5' data-id-added='true'> <mn id='nav-6' data-id-added='true'>2</mn></mtd>
-            <mtd id='nav-7' data-id-added='true'><mn id='nav-8' data-id-added='true'>3</mn> </mtd>
+        let mathml_str = "<math id='nav-0'>
+        <mtable id='nav-1'>
+          <mtr id='nav-2'>
+            <mtd id='nav-3'> <mn id='nav-4'>1</mn></mtd>
+            <mtd id='nav-5'> <mn id='nav-6'>2</mn></mtd>
+            <mtd id='nav-7'><mn id='nav-8'>3</mn> </mtd>
           </mtr>
-          <mtr id='nav-9' data-id-added='true'>
-            <mtd id='nav-10' data-id-added='true'>
-              <mrow id='nav-11' data-id-added='true'>
-                <mi id='nav-12' data-id-added='true'>x</mi>
-                <mo id='nav-13' data-id-added='true'>-</mo>
-                <mi id='nav-14' data-id-added='true'>y</mi>
+          <mtr id='nav-9'>
+            <mtd id='nav-10'>
+              <mrow id='nav-11'>
+                <mi id='nav-12'>x</mi>
+                <mo id='nav-13'>-</mo>
+                <mi id='nav-14'>y</mi>
               </mrow>
             </mtd>
-            <mtd id='nav-15' data-id-added='true'>
-              <mfrac id='nav-16' data-id-added='true'>
-                <mn id='nav-17' data-id-added='true'>1</mn>
-                <mn id='nav-18' data-id-added='true'>2</mn>
+            <mtd id='nav-15'>
+              <mfrac id='nav-16'>
+                <mn id='nav-17'>1</mn>
+                <mn id='nav-18'>2</mn>
               </mfrac>
             </mtd>
-            <mtd id='nav-19' data-id-added='true'>
-              <mi id='nav-20' data-id-added='true'>z</mi>
+            <mtd id='nav-19'>
+              <mi id='nav-20'>z</mi>
             </mtd>
           </mtr>
-          <mtr id='nav-21' data-id-added='true'>
-            <mtd id='nav-22' data-id-added='true'><mn id='nav-23' data-id-added='true'>7</mn> </mtd>
-            <mtd id='nav-24' data-id-added='true'><mn id='nav-25' data-id-added='true'>8</mn> </mtd>
-            <mtd id='nav-26' data-id-added='true'> <mn id='nav-27' data-id-added='true'>9</mn></mtd>
+          <mtr id='nav-21'>
+            <mtd id='nav-22'><mn id='nav-23'>7</mn> </mtd>
+            <mtd id='nav-24'><mn id='nav-25'>8</mn> </mtd>
+            <mtd id='nav-26'> <mn id='nav-27'>9</mn></mtd>
           </mtr>
-          <mtr id='nav-28' data-id-added='true'>
-            <mtd id='nav-29' data-id-added='true'>
-              <mrow id='nav-30' data-id-added='true'>
-                <mi id='nav-31' data-id-added='true'>sin</mi>
-                <mo id='nav-32' data-id-added='true'>&#x2061;</mo>
-                <mi id='nav-33' data-id-added='true'>x</mi>
+          <mtr id='nav-28'>
+            <mtd id='nav-29'>
+              <mrow id='nav-30'>
+                <mi id='nav-31'>sin</mi>
+                <mo id='nav-32'>&#x2061;</mo>
+                <mi id='nav-33'>x</mi>
               </mrow>
             </mtd>
-            <mtd id='nav-34' data-id-added='true'>
-              <msup id='nav-35' data-id-added='true'>
-                <mi id='nav-36' data-id-added='true'>e</mi>
-                <mi id='nav-37' data-id-added='true'>x</mi>
+            <mtd id='nav-34'>
+              <msup id='nav-35'>
+                <mi id='nav-36'>e</mi>
+                <mi id='nav-37'>x</mi>
               </msup>
             </mtd>
-            <mtd id='nav-38' data-id-added='true'>
-              <mrow id='nav-39' data-id-added='true'>
-                <mn id='nav-40' data-id-added='true'>2</mn>
-                <mo id='nav-41' data-id-added='true'>-</mo>
-                <mi id='nav-42' data-id-added='true'>y</mi>
+            <mtd id='nav-38'>
+              <mrow id='nav-39'>
+                <mn id='nav-40'>2</mn>
+                <mo id='nav-41'>-</mo>
+                <mi id='nav-42'>y</mi>
               </mrow>
             </mtd>
           </mtr>
@@ -1752,55 +1762,55 @@ mod tests {
     
     #[test]
     fn move_cell_char_mode() -> Result<()> {
-        let mathml_str = "<math id='nav-0' data-id-added='true'>
-        <mtable id='nav-1' data-id-added='true'>
-          <mtr id='nav-2' data-id-added='true'>
-            <mtd id='nav-3' data-id-added='true'> <mn id='nav-4' data-id-added='true'>1</mn></mtd>
-            <mtd id='nav-5' data-id-added='true'> <mn id='nav-6' data-id-added='true'>2</mn></mtd>
-            <mtd id='nav-7' data-id-added='true'><mn id='nav-8' data-id-added='true'>3</mn> </mtd>
+        let mathml_str = "<math id='nav-0'>
+        <mtable id='nav-1'>
+          <mtr id='nav-2'>
+            <mtd id='nav-3'> <mn id='nav-4'>1</mn></mtd>
+            <mtd id='nav-5'> <mn id='nav-6'>2</mn></mtd>
+            <mtd id='nav-7'><mn id='nav-8'>3</mn> </mtd>
           </mtr>
-          <mtr id='nav-9' data-id-added='true'>
-            <mtd id='nav-10' data-id-added='true'>
-              <mrow id='nav-11' data-id-added='true'>
-                <mi id='nav-12' data-id-added='true'>x</mi>
-                <mo id='nav-13' data-id-added='true'>-</mo>
-                <mi id='nav-14' data-id-added='true'>y</mi>
+          <mtr id='nav-9'>
+            <mtd id='nav-10'>
+              <mrow id='nav-11'>
+                <mi id='nav-12'>x</mi>
+                <mo id='nav-13'>-</mo>
+                <mi id='nav-14'>y</mi>
               </mrow>
             </mtd>
-            <mtd id='nav-15' data-id-added='true'>
-              <mfrac id='nav-16' data-id-added='true'>
-                <mn id='nav-17' data-id-added='true'>1</mn>
-                <mn id='nav-18' data-id-added='true'>2</mn>
+            <mtd id='nav-15'>
+              <mfrac id='nav-16'>
+                <mn id='nav-17'>1</mn>
+                <mn id='nav-18'>2</mn>
               </mfrac>
             </mtd>
-            <mtd id='nav-19' data-id-added='true'>
-              <mi id='nav-20' data-id-added='true'>z</mi>
+            <mtd id='nav-19'>
+              <mi id='nav-20'>z</mi>
             </mtd>
           </mtr>
-          <mtr id='nav-21' data-id-added='true'>
-            <mtd id='nav-22' data-id-added='true'><mn id='nav-23' data-id-added='true'>7</mn> </mtd>
-            <mtd id='nav-24' data-id-added='true'><mn id='nav-25' data-id-added='true'>8</mn> </mtd>
-            <mtd id='nav-26' data-id-added='true'> <mn id='nav-27' data-id-added='true'>9</mn></mtd>
+          <mtr id='nav-21'>
+            <mtd id='nav-22'><mn id='nav-23'>7</mn> </mtd>
+            <mtd id='nav-24'><mn id='nav-25'>8</mn> </mtd>
+            <mtd id='nav-26'> <mn id='nav-27'>9</mn></mtd>
           </mtr>
-          <mtr id='nav-28' data-id-added='true'>
-            <mtd id='nav-29' data-id-added='true'>
-              <mrow id='nav-30' data-id-added='true'>
-                <mi id='nav-31' data-id-added='true'>sin</mi>
-                <mo id='nav-32' data-id-added='true'>&#x2061;</mo>
-                <mi id='nav-33' data-id-added='true'>x</mi>
+          <mtr id='nav-28'>
+            <mtd id='nav-29'>
+              <mrow id='nav-30'>
+                <mi id='nav-31'>sin</mi>
+                <mo id='nav-32'>&#x2061;</mo>
+                <mi id='nav-33'>x</mi>
               </mrow>
             </mtd>
-            <mtd id='nav-34' data-id-added='true'>
-              <msup id='nav-35' data-id-added='true'>
-                <mi id='nav-36' data-id-added='true'>e</mi>
-                <mi id='nav-37' data-id-added='true'>x</mi>
+            <mtd id='nav-34'>
+              <msup id='nav-35'>
+                <mi id='nav-36'>e</mi>
+                <mi id='nav-37'>x</mi>
               </msup>
             </mtd>
-            <mtd id='nav-38' data-id-added='true'>
-              <mrow id='nav-39' data-id-added='true'>
-                <mn id='nav-40' data-id-added='true'>2</mn>
-                <mo id='nav-41' data-id-added='true'>-</mo>
-                <mi id='nav-42' data-id-added='true'>y</mi>
+            <mtd id='nav-38'>
+              <mrow id='nav-39'>
+                <mn id='nav-40'>2</mn>
+                <mo id='nav-41'>-</mo>
+                <mi id='nav-42'>y</mi>
               </mrow>
             </mtd>
           </mtr>
@@ -1840,6 +1850,7 @@ mod tests {
     
     #[test]
     fn placemarker() -> Result<()> {
+        init_logger();
         let mathml_str = "<math display='block' id='math'>
         <mrow displaystyle='true' id='mrow'>
           <mi id='a'>a</mi>
@@ -1992,18 +2003,18 @@ mod tests {
     #[test]
     fn chem_speech() -> Result<()> {
         // this comes from bug 218
-        let mathml_str = "<math data-latex='H_2SO_4' display='block' id='id-0' data-id-added='true'>
-            <mrow data-changed='added' data-chem-formula='5' id='id-1' data-id-added='true'>
-                <msub data-latex='H_2' data-chem-formula='1' id='id-2' data-id-added='true'>
-                    <mi data-latex='H' data-chem-element='1' id='id-3' data-id-added='true'>H</mi>
-                    <mn data-latex='2' id='id-4' data-id-added='true'>2</mn>
+        let mathml_str = "<math data-latex='H_2SO_4' display='block' id='id-0'>
+            <mrow data-changed='added' data-chem-formula='5' id='id-1'>
+                <msub data-latex='H_2' data-chem-formula='1' id='id-2'>
+                    <mi data-latex='H' data-chem-element='1' id='id-3'>H</mi>
+                    <mn data-latex='2' id='id-4'>2</mn>
                 </msub>
-                <mo data-changed='added' data-chem-formula-op='0' id='id-5' data-id-added='true'>&#x2063;</mo>
-                <mi data-latex='S' data-chem-element='1' id='id-6' data-id-added='true'>S</mi>
-                <mo data-changed='added' data-chem-formula-op='0' id='id-7' data-id-added='true'>&#x2063;</mo>
-                <msub data-latex='O_4' data-chem-formula='1' id='id-8' data-id-added='true'>
-                    <mi data-latex='O' data-chem-element='1' id='id-9' data-id-added='true'>O</mi>
-                    <mn data-latex='4' id='id-10' data-id-added='true'>4</mn>
+                <mo data-changed='added' data-chem-formula-op='0' id='id-5'>&#x2063;</mo>
+                <mi data-latex='S' data-chem-element='1' id='id-6'>S</mi>
+                <mo data-changed='added' data-chem-formula-op='0' id='id-7'>&#x2063;</mo>
+                <msub data-latex='O_4' data-chem-formula='1' id='id-8'>
+                    <mi data-latex='O' data-chem-element='1' id='id-9'>O</mi>
+                    <mn data-latex='4' id='id-10'>4</mn>
                 </msub>
             </mrow>
         </math>";
@@ -2160,13 +2171,15 @@ mod tests {
             set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
             debug!("Simple mode");
             let speech = test_command("ZoomIn", mathml, "id-4");
-            assert_eq!(speech, "zoom in; in part 1; n");
+            assert_eq!(speech, "zoom in; in numerator; n");
             let speech = test_command("MoveNext", mathml, "id-5");
-            assert_eq!(speech, "move right; in part 2; k");
-            let speech = test_command("MoveNext", mathml, "id-5");
+            assert_eq!(speech, "move right; in denominator; k");
+            let speech = test_command("MoveNext", mathml, "id-6");
+            assert_eq!(speech, "move right; out of denominator; close paren");
+            let speech = test_command("MoveNext", mathml, "id-6");
             assert_eq!(speech, "cannot move right, end of math");
             let speech = test_command("ZoomOut", mathml, "id-1");
-            assert_eq!(speech, "zoom out; out of part 2; open paren n over k, close paren");
+            assert_eq!(speech, "zoom out; open paren n over k, close paren");
             let speech = test_command("ZoomOut", mathml, "id-1");
             assert_eq!(speech, "zoomed out all the way; open paren n over k, close paren");
 
@@ -2272,6 +2285,31 @@ mod tests {
             assert_eq!(speech, "read current; 1 plus 2 plus 3 plus 4 plus 5 plus 6 plus 7");
             let speech = test_command("DescribeCurrent", mathml, "mrow");
             assert_eq!(speech, "describe current; 1 plus 2 plus 3 and so on");
+            return Ok( () );
+        });
+    }
+
+
+    #[test]
+    fn read_next_invisible_char() -> Result<()> {
+        let mathml_str = "<math id='id-0'>
+            <mrow id='id-1'>
+                <mi id='id-2'>x</mi>
+                <mo id='id-3'>&#x2062;</mo>
+                <mi id='id-4'>y</mi>
+            </mrow>
+            </math>";
+        init_default_prefs(mathml_str, "Simple");
+        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            let speech = test_command("ZoomIn", mathml, "id-2");
+            assert_eq!(speech, "zoom in; x");
+            let speech = test_command("ToggleZoomLockUp", mathml, "id-2");
+            assert_eq!(speech, "enhanced mode; x");
+            let speech = test_command("ReadNext", mathml, "id-2");
+            assert_eq!(speech, "read right; y");
             return Ok( () );
         });
     }
