@@ -44,10 +44,6 @@
     "chemistry-concentration": "function= ; konzentration: konzentration von: die konzentration von; ende konzentration"
   }
 
-- TerseFunctionNames: {
-    "divergenz", "gradient", "rotation"
-  }
-
 - NavigationParts: {
     "large-op": "basis; untergrenze; obergrenze",
     "mfrac": "zähler; nenner",
@@ -68,10 +64,6 @@
     "munderover": "basis; untere grenze; obere grenze",
     "in": "in",
     "out": "außerhalb von"
-  }
-
-- KnownWords: {
-    "abel", "aery", "ails", "airy", "amps", "cent", "fluss", "strom", "knoten"
   }
 
 - SIPrefixes: {
