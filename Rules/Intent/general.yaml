@@ -455,8 +455,8 @@
   match: "not(@data-chem-element) and
           (self::m:mtext or string-length(.) > 1 or @mathvariant='normal') and
           (parent::*[1][self::m:mrow and count(*)=3 and *[2][.='\u2062'] and
-                        *[1][self::m:mn or (self::m:mfrac and *[1][self::m:mn] and *[2][self::m:mn])]] and
-           ../*[3]=.) and
+                        *[1][self::m:mn or (self::m:mfrac and *[1][self::m:mn] and *[2][self::m:mn])]]) and
+          count(preceding-sibling::*) = 2 and 
           (DefinitionValue(., 'Speech', 'SIUnits') != '' or
            DefinitionValue(., 'Speech', 'UnitsWithoutPrefixes') != '' or 
            DefinitionValue(., 'Speech', 'EnglishUnits') != '' or
