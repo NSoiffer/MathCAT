@@ -25,7 +25,7 @@
   tag: mn
   match: "starts-with(text(), '-')"
   replace:
-  -T: "minus"        # phrase(x 'minus' y)
+  - T: "minus"        # phrase(x 'minus' y)
   - x: "translate(text(), '-_', '')"
 
 - name: default
@@ -35,7 +35,7 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: "die"]    # phrase('the' square root of x)
-  -T: "quadratwurzel"      # phrase(the 'square root' of x)
+  - T: "quadratwurzel"      # phrase(the 'square root' of x)
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: "von"]   # phrase(the square root 'of' x)
@@ -68,7 +68,7 @@
           - x: "*[2]"
           - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: [x: "*[2]"]
-      -T: "wurzel"        # phrase(the square 'root' of)
+      - T: "wurzel"        # phrase(the square 'root' of)
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: "von"]        # phrase(the square root 'of' x)
@@ -112,7 +112,7 @@
   - "BaseNode(*[2])[contains(@data-intent-property, ':unit')] "
   replace:
   - x: "*[1]"
-  -T: "5 meter"      # phrase('5 meters 'per' second)
+  - T: "5 meter"      # phrase('5 meters 'per' second)
   - x: "*[2]"
 
 - name: simple
@@ -125,7 +125,7 @@
   - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
   replace:
   - x: "*[1]"
-  -T: "über"      # phrase(the fraction 3 'over' 4)
+  - T: "über"      # phrase(the fraction 3 'over' 4)
   - x: "*[2]"
   - pause: short
 
@@ -141,7 +141,7 @@
   - test:
       if: "not(IsNode(*[1],'leaf'))"
       then: [pause: short]
-  -T: "über"      # phrase(the fraction 3 'over' 4)
+  - T: "über"      # phrase(the fraction 3 'over' 4)
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [pause: short]
@@ -159,7 +159,7 @@
   tag: inverse-function
   match: "."
   replace:
-  -T: "umgekehrte"      # phrase(the 'inverse' of f)
+  - T: "umgekehrte"      # phrase(the 'inverse' of f)
   - x: "*[1]"
 
 - name: function-squared-or-cubed
@@ -187,7 +187,7 @@
       if: "*[2][self::m:mn][not(contains(., '.'))]"
       then: [x: "ToOrdinal(*[2])"]
       else: [x: "*[2]"]
-  -T: "kraft von"      # phrase(the fourth 'power of' 2)
+  - T: "kraft von"      # phrase(the fourth 'power of' 2)
   - pause: short
   - x: "*[1]"
 
@@ -208,7 +208,7 @@
   match: "*[2][self::m:mn][not(contains(., '.'))]"
   replace:
   - x: "*[1]"
-  -T: "zu dem"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "zu dem"      # phrase(15 raised 'to the' second power equals 225)
   - test:
       if: "*[2][.>0]"
       then: {x: "ToOrdinal(*[2])"}
@@ -220,14 +220,14 @@
   - "     *[1][self::m:mn][not(contains(., '.'))]]"
   replace:
   - x: "*[1]"
-  -T: "zu dem"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "zu dem"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  -T: "zu dem"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "zu dem"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
   - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
 
@@ -236,7 +236,7 @@
   match: "IsNode(*[2], 'leaf')"
   replace:
   - x: "*[1]"
-  -T: "zu dem"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "zu dem"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
 
 - name: nested
@@ -251,13 +251,13 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  -T: "auf die"      # phrase(15 'raised to the' second power equals 225)
+  - T: "auf die"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
   - pause: short
   - test:
       if: "$Impairment = 'Blindness'"
       then:
-      -T: "ende des exponenten"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+      - T: "ende des exponenten"      # phrase(start 2 raised to the exponent 4 'end of exponent')
       - pause: short
       else:
       - pause: medium
@@ -267,9 +267,9 @@
   match: "."
   replace:
   - x: "*[1]"
-  -T: "auf die"      # phrase(15 'raised to the' second power equals 225)
+  - T: "auf die"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
-  -T: "power"      # phrase(15 raised to the second 'power' equals 225)
+  - T: "power"      # phrase(15 raised to the second 'power' equals 225)
   - pause: short
 
 #
@@ -285,21 +285,21 @@
       - test:
           if: "$Verbosity!='Terse'"
           then: [T: "das"]      # phrase('the' empty set)
-      -T: "leeres satz"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
+      - T: "leeres satz"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
           then: [T: "die"]      # phrase('the' set of all integers)
-      -T: "set aller"      # phrase(the 'set of all' positive integers less than 10)
+      - T: "set aller"      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
-      -T: "so dass"      # phrase(x 'such that' x is less than y)
+      - T: "so dass"      # phrase(x 'such that' x is less than y)
       - x: "*[1]/*[3]"
       else:
       - test:
           if: "$Verbosity!='Terse'"
           then: [T: "die"]      # phrase('the' set of integers)
-      -T: "satz"      # phrase(here is a 'set' of numbers)
+      - T: "satz"      # phrase(here is a 'set' of numbers)
       - x: "*[1]"
 
 - name: times
@@ -328,7 +328,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  -T: "mal"      # phrase(7 'times' 5 equals 35)
+  - T: "mal"      # phrase(7 'times' 5 equals 35)
 
 - name: no-say-parens
   tag: mrow

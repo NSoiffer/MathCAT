@@ -117,4 +117,5 @@
   - pause: auto
   - T: "und so weiter"
 
+- T "dd"
 - include: "SimpleSpeak_Rules.yaml"
