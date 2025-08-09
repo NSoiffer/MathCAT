@@ -808,8 +808,9 @@ struct IfThenElse;
 
 struct Debug;
 /**
- * Returns true if the node is a large op
- * @param(node)     -- node(s) to test -- should be an <mo>
+ * Prints it's argument along with the string that was evaluated
+ * @param(node)     -- node(s) to be evaluated/printed
+ * @param(string)   -- string showing what is being evaluated
  */
  impl Function for Debug {
 
