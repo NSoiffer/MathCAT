@@ -698,7 +698,10 @@
   - x: "SpeakIntentName(name(.), $Verbosity, 'function')"
   - test:
       if: "not(contains(@data-intent-property, ':literal:')) and
-           not(count(*)=2 and (IsInDefinition(*[1], 'TrigFunctionNames') or IsInDefinition(name(.), 'TerseFunctionNames')) and IsNode(*[2], 'simple'))"
+           not(count(*)=2 and
+           (IsInDefinition(*[1], 'Speech', 'TrigFunctionNames') or
+            IsInDefinition(name(.), 'Speech', 'TerseFunctionNames')) and
+           IsNode(*[2], 'simple'))"
       then: [T: "av", pause: auto]      # phrase(sine 'of' 5)
   - insert:
       nodes: "*"
