@@ -85,13 +85,13 @@ fn si_base() {
                 1 candela, komma, 2 candela, komma, \
                 1 kelvin, komma, 2 kelvin, komma, \
                 1 kelvin, komma, 2 kelvin, komma, \
-                1 gram, komma, 2 gram, komma, \
+                ett gram, komma, 2 gram, komma, \
                 1 meter, komma, 2 meter, komma, \
-                1 mol, komma, 2 mol, komma, \
-                1 sekund, komma, 2 sekunder, komma, \
-                1 sekund, komma, 2 sekunder, komma, \
-                1 sekund, komma, 2 sekunder, komma, \
-                1 sekund, komma, 2 sekunder");
+                ett mol, komma, 2 mol, komma, \
+                ett sekund, komma, 2 sekunder, komma, \
+                ett sekund, komma, 2 sekunder, komma, \
+                ett sekund, komma, 2 sekunder, komma, \
+                ett sekund, komma, 2 sekunder");
 }
 
 #[test]
@@ -112,11 +112,11 @@ fn si_base_with_prefixes() {
                 1 yotta-candela, komma; 2 zetta-candela, komma; \
                 1 exa-kelvin, komma; 2 peta-kelvin, komma; \
                 1 tera-kelvin, komma; 2 giga-kelvin, komma; \
-                1 mega-gram, komma; 2 kilo-gram, komma; \
+                ett mega-gram, komma; 2 kilo-gram, komma; \
                 1 hekto-meter, komma; 2 deka-meter, komma; \
-                1 desi-mol, komma; 2 centi-mol, komma; \
-                1 milli-sekund, komma; 2 mikro-sekunder, komma; \
-                1 nano-sekund, komma; 2 piko-sekunder");
+                ett desi-mol, komma; 2 centi-mol, komma; \
+                ett milli-sekund, komma; 2 mikro-sekunder, komma; \
+                ett nano-sekund, komma; 2 piko-sekunder");
 }
 
 
@@ -257,7 +257,7 @@ fn si_accepted() {
         <mn>1</mn><mi intent=":unit">Bd</mi><mo>,</mo><mn>2</mn><mi intent=":unit">Bd</mi>
     </math>"#;
     test("nb", "SimpleSpeak", expr, 
-        "1 liter, komma, 2 liter, komma, 1 liter, komma, 2 liter, komma, 1 liter, komma, 2 liter, komma, 1 tonn, komma, 2 tonn, komma, 1 dalton, komma, 2 dalton, komma, 1 neper, komma, 2 neper, komma; 1 atommasseenhet, komma; 2 atommasseenheter, komma; 1 elektronvolt, komma; 2 elektronvolt, komma, 1 radian, komma, 2 radianer, komma, 1 steradian, komma, 2 steradianer, komma, 1 annuum, komma, 2 annua, komma, 1 buesekund, komma, 2 buesekunder, komma, 1 bit, komma, 2 bit, komma, 1 byte, komma, 2 byte, komma, 1 baud, komma, 2 bauder");
+        "1 liter, komma, 2 liter, komma, 1 liter, komma, 2 liter, komma, 1 liter, komma, 2 liter, komma, ett tonn, komma, 2 tonn, komma, 1 dalton, komma, 2 dalton, komma, 1 neper, komma, 2 neper, komma; 1 atommasseenhet, komma; 2 atommasseenheter, komma; 1 elektronvolt, komma; 2 elektronvolt, komma, 1 radian, komma, 2 radianer, komma, 1 steradian, komma, 2 steradianer, komma, ett annuum, komma, 2 annua, komma, ett buesekund, komma, 2 buesekunder, komma, 1 bit, komma, 2 bit, komma, 1 byte, komma, 2 byte, komma, 1 baud, komma, 2 bauder");
 }
 
 #[test]
@@ -283,15 +283,15 @@ fn si_accepted_with_prefixes() {
         "1 quetta-liter, komma; 2 ronna-liter, komma; \
                 1 yotta-liter, komma; 2 zetta-liter, komma; \
                 1 exa-liter, komma; 2 peta-liter, komma; \
-                1 tera-tonn, komma; 2 giga-tonn, komma; \
+                ett tera-tonn, komma; 2 giga-tonn, komma; \
                 1 mega-dalton, komma; 2 kilo-dalton, komma; \
                 1 desi-neper, komma; 2 centi-neper, komma; \
                 1 hekto-atommasseenhet; komma; 2 deka-atommasseenheter; komma; \
                 1 milli-elektronvolt, komma; 2 mikro-elektronvolt, komma; \
                 1 nano-radian, komma; 2 piko-radianer, komma; \
                 1 femto-steradian, komma; 2 atto-steradianer, komma; \
-                1 giga-annuum, komma; 2 mega-annua, komma; \
-                1 zepto-buesekund, komma; 2 yokto-buesekunder, komma; \
+                ett giga-annuum, komma; 2 mega-annua, komma; \
+                ett zepto-buesekund, komma; 2 yokto-buesekunder, komma; \
                 1 kilo-bit, komma; 2 mega-bit, komma; \
                 1 giga-byte, komma; 2 tera-byte, komma; \
                 1 tera-baud, komma; 2 exa-bauder");
@@ -316,11 +316,11 @@ fn without_prefix_time() {
         <mn>1</mn><mi intent=":unit">yr</mi><mo>,</mo><mn>2</mn><mi intent=":unit">yr</mi>
     </math>"#;
     test("nb", "SimpleSpeak", expr, 
-        "1 sekund, komma, 2 sekunder, komma, \
-                1 sekund, komma, 2 sekunder, komma, \
-                1 minutt, komma, 2 minutter, komma, \
-                1 minutt, komma, 2 minutter, komma, \
-                1 minutt, komma, 2 minutter, komma, \
+        "ett sekund, komma, 2 sekunder, komma, \
+                ett sekund, komma, 2 sekunder, komma, \
+                ett minutt, komma, 2 minutter, komma, \
+                ett minutt, komma, 2 minutter, komma, \
+                ett minutt, komma, 2 minutter, komma, \
                 1 time, komma, 2 timer, komma, \
                 1 time, komma, 2 timer, komma, \
                 1 time, komma, 2 timer, komma, \
@@ -328,8 +328,8 @@ fn without_prefix_time() {
                 1 dag, komma, 2 dager, komma, \
                 1 uke, komma, 2 uker, komma, \
                 1 uke, komma, 2 uker, komma, \
-                1 år, komma, 2 år, komma, \
-                1 år, komma, 2 år");
+                ett år, komma, 2 år, komma, \
+                ett år, komma, 2 år");
 }
 
 #[test]
@@ -347,12 +347,12 @@ fn without_prefix_angles() {
     test("nb", "SimpleSpeak", expr, 
         "1 grad, komma, 2 grader, komma, \
                 1 grad, komma, 2 grader, komma, \
-                1 bueminutt, komma, 2 bueminutter, komma, \
-                1 bueminutt, komma, 2 bueminutter, komma, \
-                1 bueminutt, komma, 2 bueminutter, komma, \
-                1 bueminutt, komma, 2 bueminutter, komma, \
-                1 buesekund, komma, 2 buesekunder, komma, \
-                1 buesekund, komma, 2 buesekunder");
+                ett bueminutt, komma, 2 bueminutter, komma, \
+                ett bueminutt, komma, 2 bueminutter, komma, \
+                ett bueminutt, komma, 2 bueminutter, komma, \
+                ett bueminutt, komma, 2 bueminutter, komma, \
+                ett buesekund, komma, 2 buesekunder, komma, \
+                ett buesekund, komma, 2 buesekunder");
 }
 
 #[test]
@@ -473,7 +473,7 @@ fn test_mtext_inference() {
                 <mn>4,5</mn><mtext>mT</mtext>
             <mo>]</mo></math>"#;
     test_prefs("nb", "SimpleSpeak", vec![("DecimalSeparators", ","), ("BlockSeparators", ".")], expr, 
-        "start hakeparentes; 1 tonn, komma; 2 peta-ampere, komma, 3 pascal, komma; 4,5 milli-tesla; slutt hakeparentes");
+        "start hakeparentes; ett tonn, komma; 2 peta-ampere, komma, 3 pascal, komma; 4,5 milli-tesla; slutt hakeparentes");
 }
 
 
@@ -494,8 +494,8 @@ fn one_masculine_feminine_unit() {
     let expr = r#"<math>
     <mn>1</mn><mi mathvariant="normal" intent=":unit">hr</mi>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "én time");
-    test("nb", "SimpleSpeak", expr, "én time");
+    test("nb", "ClearSpeak", expr, "1 time");
+    test("nb", "SimpleSpeak", expr, "1 time");
 }
 
 
@@ -521,8 +521,8 @@ fn half_masculine_feminine_unit() {
     </mfrac>
     <mi mathvariant="normal" intent=":unit">l</mi>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "én halv liter");
-    test("nb", "SimpleSpeak", expr, "én halv liter");
+    test("nb", "ClearSpeak", expr, "1 halv liter");
+    test("nb", "SimpleSpeak", expr, "1 halv liter");
 }
 
 
@@ -547,8 +547,8 @@ fn one_third_masculine_feminine_unit() {
     </mfrac>
     <mi mathvariant="normal" intent=":unit">m</mi>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "én tredjedels meter");
-    test("nb", "SimpleSpeak", expr, "én tredjedels meter");
+    test("nb", "ClearSpeak", expr, "1 tredjedels meter");
+    test("nb", "SimpleSpeak", expr, "1 tredjedels meter");
 }
 
 
@@ -600,8 +600,8 @@ fn mixed_fraction__half_neuter_unit() {
     </mfrac>
     <mi mathvariant="normal" intent=":unit">min</mi>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "3 og ett halvt minutt");
-    test("nb", "SimpleSpeak", expr, "3 og ett halvt minutt");
+    test("nb", "ClearSpeak", expr, "3 og ett halvt, minutt");
+    test("nb", "SimpleSpeak", expr, "3 og ett halvt, minutt");
 }
 
 
@@ -614,8 +614,8 @@ fn mixed_fraction__half_masculine_feminine_unit() {
     </mfrac>
     <mi mathvariant="normal" intent=":unit">hr</mi>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "3 og én halv time");
-    test("nb", "SimpleSpeak", expr, "3 og én halv time");
+    test("nb", "ClearSpeak", expr, "3 og 1 halv, time");
+    test("nb", "SimpleSpeak", expr, "3 og 1 halv, time");
 }
 
 
@@ -628,8 +628,8 @@ fn mixed_fractions_third_neuter_unit() {
     </mfrac>
     <mi mathvariant="normal" intent=":unit">min</mi>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "ett og ett tredjedels minutt");
-    test("nb", "SimpleSpeak", expr, "ett og ett tredjedels minutt");
+    test("nb", "ClearSpeak", expr, "ett og ett tredjedels, minutt");
+    test("nb", "SimpleSpeak", expr, "ett og ett tredjedels, minutt");
 }
 
 
@@ -642,8 +642,8 @@ fn mixed_fractions_third_masculine_feminine_unit() {
     </mfrac>
     <mi mathvariant="normal" intent=":unit">hr</mi>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "én og én tredjedels time");
-    test("nb", "SimpleSpeak", expr, "én og én tredjedels time");
+    test("nb", "ClearSpeak", expr, "1 og 1 tredjedels, time");
+    test("nb", "SimpleSpeak", expr, "1 og 1 tredjedels, time");
 }
 
 #[test]
@@ -655,8 +655,8 @@ fn mixed_fractions_two_and_two_thirds_unit() {
     </mfrac>
     <mi mathvariant="normal" intent=":unit">hr</mi>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "2 og 2 tredjedels time");
-    test("nb", "SimpleSpeak", expr, "2 og 2 tredjedels time");
+    test("nb", "ClearSpeak", expr, "2 og 2 tredjedels, time");
+    test("nb", "SimpleSpeak", expr, "2 og 2 tredjedels, time");
 }
 
 #[test]
@@ -668,8 +668,8 @@ fn mixed_fractions_four_and_five_sevenths_unit() {
     </mfrac>
     <mi mathvariant="normal" intent=":unit">min</mi>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "4 og 5 sjudels minutt");
-    test("nb", "SimpleSpeak", expr, "4 og 5 sjudels minutt");
+    test("nb", "ClearSpeak", expr, "4 og 5 sjudels, minutt");
+    test("nb", "SimpleSpeak", expr, "4 og 5 sjudels, minutt");
 }
 
 
@@ -690,8 +690,8 @@ fn fraction_with_units_masculine_feminine_unit() {
     <mfrac><mn>1</mn><mn>2</mn></mfrac>
     <mfrac><mi mathvariant="normal" intent=":unit">m</mi><mi mathvariant="normal" intent=":unit">sek</mi></mfrac>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "én halv meter per sekund");
-    test("nb", "SimpleSpeak", expr, "én halv meter per sekund");
+    test("nb", "ClearSpeak", expr, "1 halv meter per sekund");
+    test("nb", "SimpleSpeak", expr, "1 halv meter per sekund");
 }
 
 #[test]
@@ -715,8 +715,8 @@ fn fraction_with_units_2_masculine_feminine_unit() {
         <mrow><mn>3</mn><mi mathvariant="normal" intent=":unit">sek</mi></mrow>
     </mfrac>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "brøken med teller én meter; og nevner 3 sekunder");
-    test("nb", "SimpleSpeak", expr, "brøk, én meter, over, 3 sekunder, slutt brøk");
+    test("nb", "ClearSpeak", expr, "brøken med teller 1 meter; og nevner 3 sekunder");
+    test("nb", "SimpleSpeak", expr, "brøk, 1 meter, over, 3 sekunder, slutt brøk");
 }
 
 
@@ -775,8 +775,8 @@ fn one_masculine_feminine_unit_prefix() {
     let expr = r#"<math>
     <mn>1</mn><mi mathvariant="normal" intent=":unit">µm</mi>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "én mikro-meter");
-    test("nb", "SimpleSpeak", expr, "én mikro-meter");
+    test("nb", "ClearSpeak", expr, "1 mikro-meter");
+    test("nb", "SimpleSpeak", expr, "1 mikro-meter");
 }
 
 
@@ -814,8 +814,8 @@ fn mixed_fractions_third_masculine_feminine_unit_prefix() {
     </mfrac>
     <mi mathvariant="normal" intent=":unit">dN</mi>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "én og én tredjedels desi-newton");
-    test("nb", "SimpleSpeak", expr, "én og én tredjedels desi-newton");
+    test("nb", "ClearSpeak", expr, "1 og 1 tredjedels, desi-newton");
+    test("nb", "SimpleSpeak", expr, "1 og 1 tredjedels, desi-newton");
 }
 
 
@@ -828,8 +828,8 @@ fn mixed_fractions_four_and_five_sevenths_unit_prefix() {
     </mfrac>
     <mi mathvariant="normal" intent=":unit">nas</mi>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "4 og 5 sjudels nano-buesekund");
-    test("nb", "SimpleSpeak", expr, "4 og 5 sjudels nano-buesekund");
+    test("nb", "ClearSpeak", expr, "4 og 5 sjudels, nano-buesekund");
+    test("nb", "SimpleSpeak", expr, "4 og 5 sjudels, nano-buesekund");
 }
 
 
@@ -861,8 +861,8 @@ fn acceleration_half() {
     <mfrac><mn>1</mn><mn>2</mn></mfrac>
     <mfrac><mi mathvariant="normal" intent=":unit">m</mi><msup><mi mathvariant="normal" intent=":unit">s</mi><mn>2</mn></msup></mfrac>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "én halv meter per sekund i andre");
-    test("nb", "SimpleSpeak", expr, "én halv meter per sekund i andre");
+    test("nb", "ClearSpeak", expr, "1 halv meter per sekund i andre");
+    test("nb", "SimpleSpeak", expr, "1 halv meter per sekund i andre");
 }
 
 
@@ -874,8 +874,8 @@ fn acceleration_half_one_fraction() {
     <mrow><mn>2</mn><msup><mi mathvariant="normal" intent=":unit">s</mi><mn>2</mn></msup></mrow>
     </mfrac>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "brøken med teller én meter; og nevner 2 sekunder i andre");
-    test("nb", "SimpleSpeak", expr, "brøk, én meter, over, 2 sekunder i andre, slutt brøk");
+    test("nb", "ClearSpeak", expr, "brøken med teller 1 meter; og nevner 2 sekunder i andre");
+    test("nb", "SimpleSpeak", expr, "brøk, 1 meter, over, 2 sekunder i andre, slutt brøk");
 }
 
 
@@ -896,8 +896,8 @@ fn density_thirds() {
     <mfrac><mn>1</mn><mn>3</mn></mfrac>
     <mfrac><mi mathvariant="normal" intent=":unit">kg</mi><msup><mi mathvariant="normal" intent=":unit">m</mi><mn>3</mn></msup></mfrac>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "ett tredjedels kilo-gram per meter i tredje");
-    test("nb", "SimpleSpeak", expr, "ett tredjedels kilo-gram per meter i tredje");
+    test("nb", "ClearSpeak", expr, "ett tredjedels, kilo-gram per meter i tredje");
+    test("nb", "SimpleSpeak", expr, "ett tredjedels, kilo-gram per meter i tredje");
 }
 
 
@@ -920,6 +920,6 @@ fn density_two_fifths() {
     <mfrac><mn>2</mn><mn>5</mn></mfrac>
     <mfrac><mi mathvariant="normal" intent=":unit">kg</mi><msup><mi mathvariant="normal" intent=":unit">m</mi><mn>3</mn></msup></mfrac>
 </math>"#;
-    test("nb", "ClearSpeak", expr, "2 femtedels kilo-gram per meter i tredje");
-    test("nb", "SimpleSpeak", expr, "2 femtedels kilo-gram per meter i tredje");
+    test("nb", "ClearSpeak", expr, "2 femtedels, kilo-gram per meter i tredje");
+    test("nb", "SimpleSpeak", expr, "2 femtedels, kilo-gram per meter i tredje");
 }
