@@ -555,7 +555,8 @@ impl InsertChildren {
 lazy_static! {
     static ref ATTR_NAME_VALUE: Regex = Regex::new(
         // match name='value', where name is sort of an NCNAME (see CONCEPT_OR_LITERAL in infer_intent.rs)
-        r#"(?P<name>[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*)\s*=\s*'(?P<value>[^']+)'"#
+        // The quotes can be either single or double quotes 
+        r#"(?P<name>[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*)\s*=\s*('(?P<value>[^']+)'|"(?P<dqvalue>[^"]+)")"#
     ).unwrap();
 }
 
@@ -622,7 +623,8 @@ impl Intent {
         if let Some(intent_name) = &self.name {
             result.set_attribute_value(MATHML_FROM_NAME_ATTR, name(mathml));
             set_mathml_name(result, intent_name.as_str());
-        } else if let Some(my_xpath) = &self.xpath{    // self.xpath_name must be != None
+        }
+        if let Some(my_xpath) = &self.xpath{    // self.xpath_name must be != None
             let xpath_value = my_xpath.evaluate(rules_with_context.get_context(), mathml)?;
             match xpath_value {
                 Value::String(intent_name) => {
@@ -631,7 +633,8 @@ impl Intent {
                 },
                 _ => bail!("'xpath-name' value '{}' was not a string", &my_xpath),
             }
-        } else {
+        }
+        if self.name.is_none() && self.xpath.is_none() {
             panic!("Intent::replace: internal error -- neither 'name' nor 'xpath' is set");
         };
         
@@ -640,16 +643,19 @@ impl Intent {
         }
 
         if !self.attrs.is_empty() {
+            // debug!("MathML after children, before attr processing:\n{}", mml_to_string(mathml));
+            // debug!("Result after children, before attr processing:\n{}", mml_to_string(result));
             // debug!("Intent::replace attrs = \"{}\"", &self.attrs);
             for cap in ATTR_NAME_VALUE.captures_iter(&self.attrs) {
-                let value_as_xpath = MyXPath::new(cap["value"].to_string()).chain_err(||"attr value inside 'intent'")?;
-                let value = value_as_xpath.evaluate(rules_with_context.get_context(), mathml)
+                let matched_value = if cap["value"].is_empty() {&cap["dqvalue"]} else {&cap["value"]};
+                let value_as_xpath = MyXPath::new(matched_value.to_string()).chain_err(||"attr value inside 'intent'")?;
+                let value = value_as_xpath.evaluate(rules_with_context.get_context(), result)
                         .chain_err(||"attr xpath evaluation value inside 'intent'")?;
                 let mut value = value.into_string();
                 if &cap["name"] == INTENT_PROPERTY {
                     value = simplify_fixity_properties(&value)
                 }
-                // debug!("Intent::replace  name={}, value={}, xpath value={}", &cap["name"], &cap["value"], &value);
+                // debug!("Intent::replace match\n  name={}\n  value={}\n  xpath value={}", &cap["name"], &cap["value"], &value);
                 result.set_attribute_value(&cap["name"], &value);
             };
         }
@@ -1101,54 +1107,66 @@ impl MyXPath {
         }
     }
 
+    /// Convert DEBUG(...) input to the internal function which is DEBUG(arg, arg_as_string)
     fn add_debug_string_arg(xpath: &str) -> Result<String> {
-        // lazy_static! {
-        //     static ref OPEN_OR_CLOSE_PAREN: Regex = Regex::new("^['\"][()]").unwrap();    // match paren that doesn't follow a quote
-        // }
-        // Find all the DEBUG(...) commands in 'xpath' and adds a string argument.
-        // The DEBUG function that is used internally takes two arguments, the second one being a string version of the DEBUG arg.
-        //   Being a string, any quotes need to be escaped, and DEBUGs inside of DEBUGs need more escaping.
-        //   This is done via recursive calls to this function.
-        // FIX: this doesn't handle parens in strings correctly -- it only catches the common case of quoted parens
-        // FIX: to do this right, one has to be careful about escape chars, so it gets ugly for nesting
+        // do a quick check to see if "DEBUG" is in the string -- this is the common case
         let debug_start = xpath.find("DEBUG(");
         if debug_start.is_none() {
             return Ok( xpath.to_string() );
         }
-        let debug_start = debug_start.unwrap();
-        let string_start = xpath[..debug_start+6].to_string();   // includes "DEBUG("
-        let mut count = 1;  // open/close count -- starting after "(" in "DEBUG("
-        let mut remainder: &str = &xpath[debug_start+6..];
-            
-        loop {
-            // debug!("  add_debug_string_arg: count={}, remainder='{}'", count, remainder);
-            let next = remainder.find(['(', ')']);
-            match next {
-                None => bail!("Did not find closing paren for DEBUG in\n{}", xpath),
-                Some(i_paren) => {
-                    let remainder_as_bytes = remainder.as_bytes();
 
-                    // if the paren is inside of quote (' or "), don't count it
-                    // FIX: this could be on a non-char boundary
-                    if i_paren == 0 || remainder_as_bytes[i_paren-1] != b'\'' ||
-                       i_paren+1 >= remainder.len() || remainder_as_bytes[i_paren+1] != b'\'' {
-                        // debug!("     found '{}'", remainder_as_bytes[i_paren].to_string());
-                        if remainder_as_bytes[i_paren] == b'(' {
+        let debug_start = debug_start.unwrap();
+        let mut before_paren = xpath[..debug_start+5].to_string();   // includes "DEBUG"
+        let chars = xpath[debug_start+5..].chars().collect();     // begins at '('
+        before_paren.push_str(&chars_add_debug_string_arg(&chars).chain_err(|| format!("In xpath='{}'", xpath))?);
+        // debug!("add_debug_string_arg: {}", before_paren);
+        return Ok(before_paren);
+
+        fn chars_add_debug_string_arg(chars: &Vec<char>) -> Result<String>  {
+            // Find all the DEBUG(...) commands in 'xpath' and adds a string argument.
+            // The DEBUG function that is used internally takes two arguments, the second one being a string version of the DEBUG arg.
+            //   Being a string, any quotes need to be escaped, and DEBUGs inside of DEBUGs need more escaping.
+            //   This is done via recursive calls to this function.
+            assert_eq!(chars[0], '(', "{} does not start with ')'", chars.iter().collect::<String>());
+            let mut count = 1;  // open/close count
+            let mut i = 1;
+            let mut inside_quote = false;
+            while i < chars.len() {
+                let ch = chars[i];
+                match ch {
+                    '\\' => {
+                        if i+1 == chars.len() {
+                            bail!("Syntax error in DEBUG: last char is escape char\n{}");
+                        }
+                        i += 1;
+                    },
+                    '\'' => inside_quote = !inside_quote,
+                    '(' => {
+                        if !inside_quote {
                             count += 1;
-                        } else {            // must be ')'
+                        }
+                        // FIX: it would be more efficient to spot "DEBUG" preceding this and recurse rather than matching the whole string and recursing
+                    },
+                    ')' => {
+                        if !inside_quote {
                             count -= 1;
                             if count == 0 {
-                                let i_end = xpath.len() - remainder.len() + i_paren;
-                                let escaped_arg = &xpath[debug_start+6..i_end].to_string().replace('"', "\\\"");
-                                let contents = MyXPath::add_debug_string_arg(&xpath[debug_start+6..i_end])?;
-                                return Ok( string_start + &contents + ", \"" + escaped_arg + "\" "
-                                                + &MyXPath::add_debug_string_arg(&xpath[i_end..])? );
+                                let arg = &chars[1..i].iter().collect::<String>();
+                                let escaped_arg = arg.replace('"', "\\\"");
+                                // DEBUG(...) may be inside 'arg' -- recurse
+                                let processed_arg = MyXPath::add_debug_string_arg(arg)?;
+
+                                // DEBUG(...) may be in the remainder of the string -- recurse
+                                let processed_rest = MyXPath::add_debug_string_arg(&chars[i+1..].iter().collect::<String>())?;
+                                return Ok( format!("({}, \"{}\") {}", processed_arg, escaped_arg, processed_rest) );
                             }
-                        }    
-                    }
-                    remainder = &remainder[i_paren+1..];
+                        }
+                    },
+                    _ => (),
                 }
+                i += 1;
             }
+            bail!("Syntax error in DEBUG: didn't find matching closing paren\nDEBUG{}", chars.iter().collect::<String>());
         }
     }
 
@@ -1193,7 +1211,7 @@ impl MyXPath {
         return match result {
             Ok(val) => Ok( val ),
             Err(e) => {
-                debug!("MyXPath::trying to evaluate:\n  '{}'\n caused the error\n'{}'", self, e.to_string().replace("OwnedPrefixedName { prefix: None, local_part:", "").replace(" }", ""));
+                // debug!("MyXPath::trying to evaluate:\n  '{}'\n caused the error\n'{}'", self, e.to_string().replace("OwnedPrefixedName { prefix: None, local_part:", "").replace(" }", ""));
                 bail!( "{}\n\n",
                      // remove confusing parts of error message from xpath
                     e.to_string().replace("OwnedPrefixedName { prefix: None, local_part:", "").replace(" }", "") );
