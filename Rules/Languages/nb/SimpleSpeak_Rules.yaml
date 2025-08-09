@@ -72,10 +72,47 @@
   match:
   - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and text()<20]   and"                               #NORWEGIAN: Changed decimal point to $DecimalSeparators
   - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and 2<= text() and text()<=10]"
-  variables: [IsPlural: "*[1]!=1"]
+  variables:
+  - IsPlural: "not(*[1]=1 or preceding-sibling::*[1][self::m:mo and .='\u2064'])"     # '\u2064' is invisible plus and is used in mixed fractions
+  - UnitSibling: "IfThenElse(preceding-sibling::*[1][.='\u2064'],  .., .)"
+    # set the potential unit node -- otherwise set it to a empty node set (use a made up name)
+  - UnitNodeLocation: "IfThenElse($UnitSibling/..[self::m:mrow and count(*)=3 and *[2][.='\u2062']],
+                                  $UnitSibling/following-sibling::*[2],
+                                  self::m:select-no-nodes)"
+    # pick out the right node to test for being a neuter unit
+  - UnitNode: "IfThenElse($UnitNodeLocation[self::m:unit],
+                          $UnitNodeLocation[self::m:unit],
+                          $UnitNodeLocation[self::m:fraction[contains(@data-intent-property, ':unit:')]]/*[1])"
+    # test the node for being a neuter unit
+    # note: bias ha->hektar and Pa->Pascal, not si-prefix "a" (annum)
+  - NeuterUnitFollows: "$UnitNode[DEBUG(IsInDefinition(., 'Speech', 'NeuterUnits')) or 
+                                  IsInDefinition(., 'Speech', 'NeuterUnitsWithoutPrefixes') or
+                                  (string-length(.) >= 2 and
+                                    .!='ha' and .!='Pa' and
+                                    DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != '' and
+                                    IsInDefinition(substring(., 2), 'Speech', 'NeuterUnits') != ''
+                                  ) ]"  
   replace:
-  - x: "*[1]"
-  - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
+  - test:
+    - if: "not($UnitNode)"
+      then:
+      - x: "*[1]"
+      - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
+    # unit follows the fraction -- special cases
+    - else:
+      - test:
+          if: "*[1]=1 and $NeuterUnitFollows"
+          then: [T: "ett"]
+          else: [x: "*[1]"]
+      - test:
+        - if: "*[1]=1 and *[2]=2"
+          then_test:
+          - if: "$NeuterUnitFollows"
+            then: [T: "halvt"]
+            else: [T: "halv"]
+        - else_if: "*[2] <= 10"
+          then: [x: "DefinitionValue(*[2], 'Speech', 'OrdinalFractionalDenominatorsForUnits')"]
+          else: [x: "*[2]", CT: "dels"]   # this is wrong but shouldn't occur normally -- need to write a function to compute cardinal numbers as words
 
 # - name: common-fraction-mixed-number
 #   tag: fraction

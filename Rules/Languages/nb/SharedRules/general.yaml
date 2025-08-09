@@ -201,7 +201,7 @@
 
 - name: largeop
   tag: mrow
-  match: "count(*)=2 and IsInDefinition(*[1], 'LargeOperators')"
+  match: "count(*)=2 and IsInDefinition(*[1], 'Speech', 'LargeOperators')"
   replace:
   - x: "*[1]"
   - T: "av"      # phrase(the square root 'of' 25 equals 5)
@@ -248,6 +248,25 @@
   - x: "*[3]"
   - pause: short
 
+# need to say "ett" for '1' in front of a neuter unit
+# note: bias ha->hektar and Pa->Pascal, not si-prefix "a" (annum)
+- name: one-for-unit
+  tag: mn
+  match: ".=1 and not(preceding-sibling:*) and
+          parent::*[1][self::m:mrow and *[2][.='\u2062'] and
+                       *[3][IsInDefinition(., 'Speech', 'NeuterUnits') or 
+                            IsInDefinition(., 'Speech', 'NeuterUnitsWithoutPrefixes') or 
+                            (string-length(.) >= 3 and
+                              substring(., 1, 2) = 'da' and 
+                              IsInDefinition(substring(., 3), 'Speech', 'NeuterUnits')) or
+                            (string-length(.) >= 2 and
+                             .!='ha' and .!='Pa' and
+                             DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != '' and
+                             IsInDefinition(substring(., 2), 'Speech', 'NeuterUnits') != ''
+                            ) ]
+                      ]"
+  replace:
+  - T: "ett"
 
 # the order of matching is
 # 1. does it match the base of an SI unit
@@ -271,9 +290,7 @@
                          IfThenElse(parent::m:fraction and not(preceding-sibling::*), ancestor::*[2][self::m:mrow],
                          IfThenElse(parent::m:power[parent::m:fraction and not(preceding-sibling::*)], ancestor::*[3][self::m:mrow], false()) ) ) )"
   # If a common fraction occurs before the unit, then it is singular, which means we have to copy the rules for common fractions (ugly!!!)
-  # It is also singular for a mixed fraction; in this case, the common fraction is buried inside of an mrow
-  # - Coefficient: "$MRowForCoefficient/*[1]"
-  # - FractionalPart: "IfThenElse($MRowForCoefficient, MRowForCoefficient[*[1][]], false())"
+  # It is also singular for a mixed fraction; in this case, the common fraction is buried inside of an mrow and we cheat and check for InvisiblePlus (2064)
   - IsSingular: "(not($MRowForCoefficient) and parent::*[name(.)!='skip-super' or *[1][.=1]]) or
                  ($MRowForCoefficient and
                   $MRowForCoefficient[count(*) = 3 and 
@@ -285,7 +302,8 @@
                                                        $SpeechStyle='SimpleSpeak') and
                                             *[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)] and
                                             *[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]
-                                           )
+                                           ) or
+                                           (self::m:mrow and *[2][self::m:mo and .='\u2064'])
                                           ]
                                      ]
                   
@@ -605,7 +623,7 @@
   variables: [LongPause: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultiLinePausesBetweenColumns = 'Long'"]
   replace:
   - test:
-      if: "IsInDefinition(*[1], 'ComparisonOperators')"
+      if: "IsInDefinition(*[1], 'Speech', 'ComparisonOperators')"
       then: [pause: short]
   - test:
       if: "*[1][@data-added!='missing-content']"
@@ -620,7 +638,7 @@
               then: [pause: long]
               else: [pause: medium]
       else_test:
-          if: "IsInDefinition(*[1], 'ComparisonOperators')"
+          if: "IsInDefinition(*[1], 'Speech', 'ComparisonOperators')"
           then: [pause: short]
           else: [pause: auto]
 
