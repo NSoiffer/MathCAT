@@ -278,10 +278,10 @@
              not(
               ( $Verbosity='Terse' or ($SpeechStyle = 'ClearSpeak' and IsNode(following-sibling::*[1],'simple')) and
                 preceding-sibling::*[1][IfThenElse($SpeechStyle='ClearSpeak',
-                                                   IsInDefinition(., 'ClearSpeakTrigFunctionNames'),
-                                                   IsInDefinition(., 'TrigFunctionNames') )]
+                                                   IsInDefinition(., 'Speech', 'ClearSpeakTrigFunctionNames'),
+                                                   IsInDefinition(., 'Speech', 'TrigFunctionNames') )]
               ) or
-              preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')] or
+              preceding-sibling::*[1][IsInDefinition(., 'Speech', 'GeometryShapes')] or
               (@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])
             )"
         then: [T: "av"]                          #  (en: 'of', google translation)
