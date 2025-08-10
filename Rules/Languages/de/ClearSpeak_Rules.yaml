@@ -69,7 +69,7 @@
       - else_if: "*[2][.='3']"
         then: {T: "kubikwurzel"}
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {T: "raíz"}]
+        then: [{x: "ToOrdinal(*[2])"}, {T: "Wurzel"}]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -502,7 +502,7 @@
           if: $ClearSpeak_Sets != 'woAll'
           then: [{T: "alles"}]
       - x: "*[1]/*[1]"
-      - T: "tal que"
+      - T: "so dass"
       - x: "*[1]/*[3]"
       else:
       - test:
