@@ -653,10 +653,15 @@ impl Intent {
                         .chain_err(||"attr xpath evaluation value inside 'intent'")?;
                 let mut value = value.into_string();
                 if &cap["name"] == INTENT_PROPERTY {
-                    value = simplify_fixity_properties(&value)
+                    value = simplify_fixity_properties(&value);
                 }
                 // debug!("Intent::replace match\n  name={}\n  value={}\n  xpath value={}", &cap["name"], &cap["value"], &value);
-                result.set_attribute_value(&cap["name"], &value);
+                if &cap["name"] == INTENT_PROPERTY && value == ":" {
+                    // should have been an empty string, so remove the attribute
+                    result.remove_attribute(INTENT_PROPERTY);
+                } else {
+                    result.set_attribute_value(&cap["name"], &value);
+                }
             };
         }
 
@@ -1158,7 +1163,7 @@ impl MyXPath {
 
                                 // DEBUG(...) may be in the remainder of the string -- recurse
                                 let processed_rest = MyXPath::add_debug_string_arg(&chars[i+1..].iter().collect::<String>())?;
-                                return Ok( format!("({}, \"{}\") {}", processed_arg, escaped_arg, processed_rest) );
+                                return Ok( format!("({}, \"{}\"){}", processed_arg, escaped_arg, processed_rest) );
                             }
                         }
                     },
@@ -2793,7 +2798,7 @@ mod tests {
         let str = r#"DEBUG(*[2]/*[3][text()='3'])"#;
         let result = MyXPath::add_debug_string_arg(str);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][text()='3'], "*[2]/*[3][text()='3']" )"#);
+        assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][text()='3'], "*[2]/*[3][text()='3']")"#);
     }
 
     #[test]
@@ -2801,7 +2806,7 @@ mod tests {
         let str = r#"DEBUG(*[2]/*[3][text()='('])"#;
         let result = MyXPath::add_debug_string_arg(str);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][text()='('], "*[2]/*[3][text()='(']" )"#);
+        assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][text()='('], "*[2]/*[3][text()='(']")"#);
     }
 
     #[test]
@@ -2809,7 +2814,7 @@ mod tests {
         let str = r#"DEBUG(ClearSpeak_Matrix = 'Combinatorics') and IsBracketed(., '(', ')')"#;
         let result = MyXPath::add_debug_string_arg(str);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), r#"DEBUG(ClearSpeak_Matrix = 'Combinatorics', "ClearSpeak_Matrix = 'Combinatorics'" ) and IsBracketed(., '(', ')')"#);
+        assert_eq!(result.unwrap(), r#"DEBUG(ClearSpeak_Matrix = 'Combinatorics', "ClearSpeak_Matrix = 'Combinatorics'") and IsBracketed(., '(', ')')"#);
     }
 
     
