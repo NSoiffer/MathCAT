@@ -1122,12 +1122,12 @@ impl MyXPath {
 
         let debug_start = debug_start.unwrap();
         let mut before_paren = xpath[..debug_start+5].to_string();   // includes "DEBUG"
-        let chars = xpath[debug_start+5..].chars().collect();     // begins at '('
+        let chars = xpath[debug_start+5..].chars().collect::<Vec<char>>();     // begins at '('
         before_paren.push_str(&chars_add_debug_string_arg(&chars).chain_err(|| format!("In xpath='{}'", xpath))?);
         // debug!("add_debug_string_arg: {}", before_paren);
         return Ok(before_paren);
 
-        fn chars_add_debug_string_arg(chars: &Vec<char>) -> Result<String>  {
+        fn chars_add_debug_string_arg(chars: &[char]) -> Result<String>  {
             // Find all the DEBUG(...) commands in 'xpath' and adds a string argument.
             // The DEBUG function that is used internally takes two arguments, the second one being a string version of the DEBUG arg.
             //   Being a string, any quotes need to be escaped, and DEBUGs inside of DEBUGs need more escaping.
