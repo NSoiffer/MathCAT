@@ -654,9 +654,9 @@ fn speak(mathml: Element, intent: Element, nav_node_id: &str, literal_speak: boo
         // We are probably safer in terms of getting the same speech if we retry intent starting at the nav node,
         //  but the node to speak is almost certainly trivial.
         // By speaking the non-intent tree, we are certain to speak on the next try
-        if !literal_speak && get_node_by_id(intent, &nav_node_id).is_some() {
+        if !literal_speak && get_node_by_id(intent, nav_node_id).is_some() {
             // debug!("speak: nav_node_id={}, intent=\n{}", nav_node_id, mml_to_string(intent));
-            match crate::speech::speak_mathml(intent, &nav_node_id) {
+            match crate::speech::speak_mathml(intent, nav_node_id) {
                 Ok(speech) => return Ok(speech),
                 Err(e) => {
                     if e.to_string() != crate::speech::NAV_NODE_SPEECH_NOT_FOUND {
@@ -667,11 +667,11 @@ fn speak(mathml: Element, intent: Element, nav_node_id: &str, literal_speak: boo
             }
         }
         // debug!("speak (literal): nav_node_id={}, mathml=\n{}", nav_node_id, mml_to_string(mathml));
-        let speech = crate::speech::speak_mathml(mathml, &nav_node_id);
+        let speech = crate::speech::speak_mathml(mathml, nav_node_id);
         // debug!("speech from speak: {:?}", speech);
         return speech;
     } else {
-        return crate::speech::overview_mathml(mathml, &nav_node_id);
+        return crate::speech::overview_mathml(mathml, nav_node_id);
     }
 }
 
