@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: Remove empty Rules directories
+      run:  find /path/to/directory -type d -empty -delete
     - name: Build
       run: cargo build --verbose
     - name: Run tests
@@ -33,26 +35,20 @@ jobs:
     name: zip up the rules directory
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Build Rust Library
-        run: |
-          cargo build --target x86_64-unknown-linux-gnu   # doesn't need a release build since all that we want is the Rules dir
-          ls -l   # debug location of the Rules dir
-      - name: create rules.zip
-        uses: thedoctor0/zip-release@0.7.5
-        with:
-          type: 'zip'
-          filename: 'Rules.zip'
-          directory: 'Rules'
-          path: 'Rules'
-      - name: Upload Rules.zip
-        uses: actions/upload-artifact@v4
-        with:
-          name: 'Rules.zip'
-          path: 'addon/globalPlugins/MathCAT/Rules.zip'
-          compression-level: 0
-          retention-days: 1
+    - name: create rules.zip
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: 'zip'
+        filename: 'Rules.zip'
+        directory: '.'
+        path: 'Rules'
+    - name: Upload Rules.zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: 'Rules.zip'
+        path: 'Rules.zip'
+        compression-level: 0
+        retention-days: 1
   
   pre-release:
     name: Pre Release
@@ -60,8 +56,6 @@ jobs:
     needs: [zip-rules]
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
 
     # download the previous build artifacts and put them in their proper places
     - name: Download Rules.zip
