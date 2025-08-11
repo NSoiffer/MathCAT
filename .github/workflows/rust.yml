@@ -38,6 +38,7 @@ jobs:
       - name: Build Rust Library
         run: |
           cargo build --target x86_64-unknown-linux-gnu   # doesn't need a release build since all that we want is the Rules dir
+          ls -l   # debug location of the Rules dir
       - name: create rules.zip
         uses: thedoctor0/zip-release@0.7.5
         with:
