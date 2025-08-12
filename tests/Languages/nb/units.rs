@@ -367,7 +367,7 @@ fn without_prefix_distance() {
     </math>"#;
     test("nb", "SimpleSpeak", expr, 
         "1 astronomisk enhet, komma; 2 astronomiske enheter, komma, \
-                1 lysår, komma, 2 lysår, komma, \
+                ett lysår, komma, 2 lysår, komma, \
                 1 parsec, komma, 2 parsec, komma, \
                 1 ångstrøm, komma, 2 ångstrøm, komma, \
                 1 ångstrøm, komma, 2 ångstrøm, komma, \
