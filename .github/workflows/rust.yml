@@ -56,7 +56,8 @@ jobs:
     needs: [zip-rules]
     runs-on: ubuntu-latest
     steps:
-
+    - name: list files for debugging
+      run: ls -l
     # download the previous build artifacts and put them in their proper places
     - name: Download Rules.zip
       uses: actions/download-artifact@v4
