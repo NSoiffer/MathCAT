@@ -1053,7 +1053,7 @@
 
 # skip 'none'
 - name: move-next-none
-  tag: "none"
+  tag: [none, mprescripts]
   match: 
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext' or $NavCommand = 'DescribePrevious' or $NavCommand = 'MoveNextZoom') and"
   - "parent::*[1][name(.)='mmultiscripts'] and following-sibling::*"
@@ -1075,7 +1075,7 @@
 
 # skip 'none'
 - name: move-previous-none
-  tag: "none"
+  tag: [none, mprescripts]
   match: 
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious' or $NavCommand = 'MovePreviousZoom') and"
   - "parent::*[1][name(.)='mmultiscripts'] and preceding-sibling::*"

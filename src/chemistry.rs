@@ -495,7 +495,7 @@ fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
             }
             "mfrac" => {
                 let children = mathml.children();
-                debug!("mfrac children: {}", mml_to_string(mathml));
+                // debug!("mfrac children: {}", mml_to_string(mathml));
                 let numerator_is_chem_equation = IsBracketed::is_bracketed(as_element(children[0]), "[", "]", false, true);
                 let denominator_is_chem_equation = IsBracketed::is_bracketed(as_element(children[1]), "[", "]", false, true);
                 if  numerator_is_chem_equation && denominator_is_chem_equation {
@@ -1004,7 +1004,7 @@ fn likely_chem_superscript(sup: Element) -> isize {
 /// * fences around a chemical formula
 /// * an mrow made up of only chemical formulas
 fn likely_chem_formula(mathml: Element) -> isize {
-    debug!("start likely_chem_formula:\n{}", mml_to_string(mathml));
+    // debug!("start likely_chem_formula:\n{}", mml_to_string(mathml));
     if let Some(value) = get_marked_value(mathml) {
         return value;       // already marked
     }
@@ -1079,7 +1079,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
     if likelihood >= 0 {
         mathml.set_attribute_value(MAYBE_CHEMISTRY, &likelihood.to_string());
     }
-    debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(mathml));
+    // debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(mathml));
 
     return likelihood;
 
