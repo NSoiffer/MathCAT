@@ -34,10 +34,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: list files for debugging
-      run: ls -l
     - name: Remove empty Rules directories
       run:  find Rules -type d -empty -delete
+    - name: Remove test directory
+      run:  rm -r Rules/Languages/zz
     - name: create rules.zip
       uses: thedoctor0/zip-release@0.7.5
       with:
