@@ -79,12 +79,12 @@ cfg_if! {
                             if parent == containing_dir {
                                 break;
                             }
-                            dirs.insert(parent.to_str().unwrap_or_default().to_string());
+                            dirs.insert(parent.to_str().unwrap_or_default().replace("/", std::path::MAIN_SEPARATOR_STR));
                         }
                         if file.is_file() {
-                            files.insert(path.to_str().unwrap_or_default().to_string(), FilesEntry{ data: zip_file.clone(), index: i});
+                            files.insert(path.to_str().unwrap_or_default().replace("/", std::path::MAIN_SEPARATOR_STR), FilesEntry{ data: zip_file.clone(), index: i});
                         } else if file.is_dir() {
-                            dirs.insert(path.to_str().unwrap_or_default().to_string());
+                            dirs.insert(path.to_str().unwrap_or_default().replace("/", std::path::MAIN_SEPARATOR_STR));
                         } else {
                             bail!("read_zip_file: {} is neither a file nor a directory", path.display());
                         }
@@ -214,12 +214,12 @@ cfg_if! {
 
         pub fn zip_extract_shim(dir: &Path, zip_file_name: &str) -> Result<bool> {
             let zip_file_path = dir.join(zip_file_name);
-            let full_zip_file_name = zip_file_path.to_str().unwrap_or_default();
+            let full_zip_file_name = zip_file_path.to_str().unwrap_or_default().replace(std::path::MAIN_SEPARATOR_STR, "/");
 
             // first, extract full_zip_file_name from ZIPPED_RULE_FILES
             let buf_reader = Cursor::new(ZIPPED_RULE_FILES);
             let mut archive = zip::ZipArchive::new(buf_reader).unwrap();
-            let mut file = match archive.by_name(full_zip_file_name) {
+            let mut file = match archive.by_name(&full_zip_file_name) {
                 Ok(file) => file,
                 Err(..) => {
                     bail!("Didn't find {} in dir {} in zip archive", zip_file_name, dir.display());
