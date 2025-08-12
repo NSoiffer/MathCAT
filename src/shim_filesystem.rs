@@ -290,7 +290,7 @@ cfg_if! {
                         }
                     } else {
                         let file_name = path.file_name().unwrap_or_default().to_str().unwrap_or_default();
-                        if !found_rules_file && (file_name.starts_with("unicode") || file_name.ends_with("_Rules.yaml")) {
+                        if !found_rules_file && (file_name.starts_with("unicode") || file_name.ends_with("_Rules.yaml") || file_name.ends_with(".zip")) {
                             found_dirs.push(path.parent().unwrap().to_path_buf());
                             found_rules_file = true;
                         }
