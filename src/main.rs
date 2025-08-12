@@ -240,7 +240,7 @@ fn main() {
   set_preference("Bookmark".to_string(), "false".to_string()).unwrap();
   set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
   info!("Languages: {}", libmathcat::interface::get_supported_languages().join(", "));
-  info!("Speech styles: {}", libmathcat::interface::get_supported_speech_styles("en").join(", "));
+  info!("Speech styles: {}", libmathcat::interface::get_supported_speech_styles("en".to_string()).join(", "));
   info!("BrailleCodes: {}", libmathcat::interface::get_supported_braille_codes().join(", "));
   // set_preference("DecimalSeparators".to_string(), ",".to_string()).unwrap();
   // set_preference("BlockSeparators".to_string(), ". ".to_string()).unwrap();

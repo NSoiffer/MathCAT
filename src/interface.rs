@@ -530,7 +530,7 @@ pub fn get_supported_languages() -> Vec<String> {
     return language_paths;
  }
 
- pub fn get_supported_speech_styles(lang: &str) -> Vec<String> {
+ pub fn get_supported_speech_styles(lang: String) -> Vec<String> {
     enable_logs();
     let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
     let lang_dir = rules_dir.join("Languages").join(lang);
