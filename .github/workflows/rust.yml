@@ -34,10 +34,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Remove empty Rules directories
-      run:  find /path/to/directory -type d -empty -delete
     - name: list files for debugging
       run: ls -l
+    - name: Remove empty Rules directories
+      run:  find Rules -type d -empty -delete
     - name: create rules.zip
       uses: thedoctor0/zip-release@0.7.5
       with:
@@ -59,10 +59,8 @@ jobs:
     needs: [zip-rules]
     runs-on: ubuntu-latest
     steps:
-    - name: list files for debugging
-      run: ls -l
     # download the previous build artifacts and put them in their proper places
-    - name: Download Rules.zip
+    - name: download Rules.zip
       uses: actions/download-artifact@v4
       with:
         name: Rules.zip
