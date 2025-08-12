@@ -19,8 +19,7 @@ use zip::CompressionMethod;
 ///    So we get out_dir/Rules/Langauges/en/en.zip, out_dir/Rules/Langauges/es/es.zip, etc.
 /// The resulting archive will reproduce the Rules tree but with the yaml files zipped up per/directory.
 fn zip_dir(rules_dir: &Path, archive_zip: &mut ZipWriter<File>, options: SimpleFileOptions, out_dir: &Path, current_out_dir: &Path) -> Result<(), std::io::Error> {
-    for entry in read_dir(rules_dir)? {
-        let entry = entry?;
+    for entry in read_dir(rules_dir)?.flatten() {
         let entry_path = entry.path();
 
         // .zip files return true for is_dir() -- test in case there is some leftover zip files
@@ -31,7 +30,7 @@ fn zip_dir(rules_dir: &Path, archive_zip: &mut ZipWriter<File>, options: SimpleF
         }
         // println!("trying dir entry {:?}", entry_path.to_str());
         if entry_path.is_dir(){
-            if let Some(dir_name) = entry_path.components().last() {
+            if let Some(dir_name) = entry_path.components().next_back() {
                 let dir_name = dir_name.as_os_str().to_str().unwrap();
                 if dir_name == "zz" {       // test dir
                     continue;
@@ -46,8 +45,8 @@ fn zip_dir(rules_dir: &Path, archive_zip: &mut ZipWriter<File>, options: SimpleF
                 let zipped_dir_file_name = current_out_dir_zip_path.join(&zip_name);  // e.g., ...out/Rules/Languages/en/en.zip
                 let zip_file = match File::create(&zipped_dir_file_name) {
                     Ok(file) => file,
-                    Err(e) => return Err(std::io::Error::new(std::io::ErrorKind::Other,
-                                                             format!("build.rs couldn't create {:?}: {}", &zip_name, e))),
+                    Err(e) => return Err(std::io::Error::other(
+                                                    format!("build.rs couldn't create {:?}: {}", &zip_name, e))),
                 };
                 let mut zip = ZipWriter::new(zip_file);
                 let n_files_in_zip = zip_entry(&mut zip, &entry_path, &PathBuf::from("."), options)?;
@@ -68,7 +67,7 @@ fn zip_dir(rules_dir: &Path, archive_zip: &mut ZipWriter<File>, options: SimpleF
             if suffix == "yaml" || suffix == "yml" {
                 // make sure the appropriate directory exists in 'out'
                 DirBuilder::new().recursive(true).create(current_out_dir).unwrap();
-                let entry_name = entry_path.components().last().unwrap().as_os_str().to_str().unwrap();
+                let entry_name = entry_path.components().next_back().unwrap().as_os_str().to_str().unwrap();
                 let out_dir_file_name = current_out_dir.join(entry_name);  // e.g., ...out/Rules/prefs.yaml
                 std::fs::copy(&entry_path, &out_dir_file_name)?;
                 let relative_out_dir = out_dir_file_name.strip_prefix(out_dir).unwrap();
@@ -87,7 +86,7 @@ fn zip_other_files(rules_dir: &Path, archive_zip: &mut ZipWriter<File>, options:
     for entry in read_dir(rules_dir)? {
         let entry = entry?;
         let entry_path = entry.path();
-        let entry_name = entry_path.components().last().unwrap().as_os_str().to_str().unwrap();
+        let entry_name = entry_path.components().next_back().unwrap().as_os_str().to_str().unwrap();
 
         if entry_path.is_dir(){
             if entry_name == "Intent" {       // handled elsewhere
@@ -137,7 +136,7 @@ fn zip_entry<W: Write + Seek>(
     if full_path.is_dir() {
         for entry in read_dir(full_path)? {
             let entry_path = entry?.path();
-            let entry_name = entry_path.components().last().unwrap().as_os_str().to_str().unwrap();
+            let entry_name = entry_path.components().next_back().unwrap().as_os_str().to_str().unwrap();
             n_files_in_zip += zip_entry(zip, &entry_path, &relative_path.join(entry_name), options)?;
         }
     } else if let Some(suffix) = full_path.extension() {
