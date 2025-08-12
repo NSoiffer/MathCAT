@@ -260,7 +260,7 @@ impl PreferenceManager {
     /// 
     /// If rules_dir is an empty PathBuf, the existing rules_dir is used (an error if it doesn't exist)
     pub fn initialize(&mut self, rules_dir: PathBuf) -> Result<()> {
-        #[cfg(not(target_family = "wasm"))]
+        #[cfg(not(feature = "include-zip"))]
         let rules_dir = match rules_dir.canonicalize() {
             Err(e) => bail!("set_rules_dir: could not canonicalize path {}: {}", rules_dir.display(), e.to_string()),
             Ok(rules_dir) =>  rules_dir,
@@ -270,8 +270,8 @@ impl PreferenceManager {
         self.set_preference_files()?;
         self.set_all_files(&rules_dir)?;
         return Ok( () );
+        
     }
-
 
     pub fn get() -> Rc<RefCell<PreferenceManager>> {
         return PREF_MANAGER.with( |pm| pm.clone() );
@@ -296,6 +296,12 @@ impl PreferenceManager {
         }
         self.rules_dir = rules_dir.to_path_buf();
         return Ok( () );
+    }
+
+    /// Set the rules dir and return failure if it is a bad directory (non-existent, can't find all files, ...)
+    pub fn get_rules_dir(&self) -> PathBuf {
+        // Fix: should make sure rules_dir is set -- fail if not true
+        return self.rules_dir.clone();
     }
 
     /// Read the preferences from the files (if not up to date) and set the preferences and preference files
@@ -581,9 +587,11 @@ impl PreferenceManager {
         fn find_any_style_file(path: &Path) -> Result<PathBuf> {    
             // try to find a xxx_Rules.yaml file
             // we find the first file because this is the deepest (most language specific) speech rule file
-            match find_file_in_dir_that_ends_with_shim(path, "_Rules.yaml") {
-                None => bail!{"didn't find file"},
-                Some(file_name) => return Ok(path.join(file_name)),
+            let rule_files = find_files_in_dir_that_ends_with_shim(path, "_Rules.yaml");
+            if rule_files.is_empty() {
+                bail!{"didn't find file"};
+            } else {
+                return Ok( path.join(rule_files[0].clone()) );
             }
         }
     }

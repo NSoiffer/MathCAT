@@ -13,6 +13,7 @@ use sxd_document::parser;
 use sxd_document::Package;
 
 use crate::canonicalize::{as_element, name};
+use crate::shim_filesystem::{find_all_dirs_shim, find_files_in_dir_that_ends_with_shim};
 
 use crate::navigate::*;
 use crate::pretty_print::mml_to_string;
@@ -493,6 +494,61 @@ pub fn get_navigation_node_from_braille_position(position: usize) -> Result<(Str
         return crate::braille::get_navigation_node_from_braille_position(mathml, position);
     });
 }
+
+pub fn get_supported_braille_codes() -> Vec<String> {
+    enable_logs();
+    let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
+    let braille_dir = rules_dir.join("Braille");
+    let mut braille_code_paths = Vec::new();
+
+    find_all_dirs_shim(&braille_dir, &mut braille_code_paths);
+    let mut braille_code_paths = braille_code_paths.iter()
+                    .map(|path| path.strip_prefix(&braille_dir).unwrap().to_string_lossy().to_string())
+                    .filter(|string_path| !string_path.is_empty() )
+                    .collect::<Vec<String>>();
+    braille_code_paths.sort();
+
+    return braille_code_paths;
+ }
+
+pub fn get_supported_languages() -> Vec<String> {
+    enable_logs();
+    let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
+    let lang_dir = rules_dir.join("Languages");
+    let mut lang_paths = Vec::new();
+
+    find_all_dirs_shim(&lang_dir, &mut lang_paths);
+    let mut language_paths = lang_paths.iter()
+                    .map(|path| path.strip_prefix(&lang_dir).unwrap()
+                                              .to_string_lossy()
+                                              .replace(std::path::MAIN_SEPARATOR, "-")
+                                              .to_string())
+                    .filter(|string_path| !string_path.is_empty() )
+                    .collect::<Vec<String>>();
+
+    language_paths.sort();
+    return language_paths;
+ }
+
+ pub fn get_supported_speech_styles(lang: &str) -> Vec<String> {
+    enable_logs();
+    let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
+    let lang_dir = rules_dir.join("Languages").join(lang);
+    let mut speech_styles = find_files_in_dir_that_ends_with_shim(&lang_dir, "_Rules.yaml");
+    for file_name in &mut speech_styles {
+        file_name.truncate(file_name.len() - "_Rules.yaml".len())
+    }
+    speech_styles.sort();
+    let mut i = 1;
+    while i < speech_styles.len() {
+        if speech_styles[i-1] == speech_styles[i] {
+            speech_styles.remove(i);
+        } else {
+            i += 1;
+        }
+    }
+    return speech_styles;
+ }
 
 // utility functions
 
