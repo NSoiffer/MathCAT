@@ -326,7 +326,7 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - T: "a la"
+  - T: "hoch"
   - x: "*[2]"
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
@@ -337,7 +337,7 @@
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - T: "a la"
+  - T: "hoch"
   - x: "*[2]"
   - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
   - test:
