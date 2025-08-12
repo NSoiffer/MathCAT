@@ -16,8 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Remove empty Rules directories
-      run:  find /path/to/directory -type d -empty -delete
     - name: Build
       run: cargo build --verbose
     - name: Run tests
@@ -35,6 +33,11 @@ jobs:
     name: zip up the rules directory
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v3
+    - name: Remove empty Rules directories
+      run:  find /path/to/directory -type d -empty -delete
+    - name: list files for debugging
+      run: ls -l
     - name: create rules.zip
       uses: thedoctor0/zip-release@0.7.5
       with:
