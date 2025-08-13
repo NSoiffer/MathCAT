@@ -19,14 +19,15 @@ pub fn init_logger() {
 
 /// Build Absolute path to rules dir for testing
 pub fn abs_rules_dir_path() -> String {
-    return std::env::current_exe().unwrap().parent().unwrap()
-                .join("../../../Rules")
-                .to_str().unwrap().to_string();
-    // use std::path::PathBuf;
-    // let out_dir = std::env::var_os("OUT_DIR").unwrap();
-    // println!("abs_rules_dir_path: out_dir={:?}", out_dir);
-    // let out_dir = PathBuf::from(&out_dir);
-    // return PathBuf::from(&out_dir).join("Rules").to_string_lossy().to_string();
+    cfg_if::cfg_if! {
+    if #[cfg(feature = "include-zip")] {
+          return "Rules".to_string();
+    } else {
+        return std::env::current_exe().unwrap().parent().unwrap()
+                    .join("../../../Rules")
+                    .to_str().unwrap().to_string();
+        }
+    }
 }
 
 

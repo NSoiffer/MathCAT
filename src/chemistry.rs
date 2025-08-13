@@ -1,39 +1,39 @@
 #![allow(clippy::needless_return)]
 
-/// Chemistry terms used here:
-/// chemical formula -- this references a molecule (one or more elements with bonds between them), including its state.
-/// chemical equation -- this is a notation specialized to chemistry -- it has concentration, arrows, equality, "addition" along with 
-///    some special symbols for operators and (mostly) chemical formulas for operands.
-///    Operand exceptions are the equilibrium constant, numbers, and identifiers.
-///    Although a chemical equation is a superset of a chemical formula, because we want to distinguish the two (e.g., '=' is in both),
-///      we require that chemical equation is an mrow
-///    FIX?? -- can it be an adorned mrow?
-///    Note: with the current definition, if any element in a potential chem equation is ruled out, the entire mrow is ruled out.
-///
-/// The general flow is that for every element that looks like a chem formula/equation, we mark it with data-likely-[equation/formula]
-/// After we are done marking "likely", we go back and either delete them or replace them with data-[equation/formula].
-/// Note: anything already marked with data-[equation/formula] doesn't need recomputation later (essentially the result is cached)
-///
-/// There is a chicken and egg problem with detecting chemistry: to more reliably detect it, we need good structure.
-/// However, to get the structure right (e.,g "=" being a double bond, not equality; chem elements being in 'mi's; ...),
-///   we need to know "=" is part of a chemical formula.
-/// The imperfect solution used is:
-///   As the final step of each recursive call to 'clean_mathml',
-///     1. mi/mtext: is it a chemical element(s) or one of the symbols used in chemical formulas (not equations).
-///        If so, mark it MAYBE_CHEMISTRY.
-///     2. msub/msup/msubsup/mmultiscripts: is base marked MAYBE_CHEMISTRY and the scripts are potential adornments, mark it MAYBE_CHEMISTRY
-///     3. mrows: these take a few passes (remember, they aren't structured properly yet)
-///        On the assumption that chemistry is not common we implement a "show me" attitude before changing the structure.
-///        Pass 1:
-///        a) for any run of mi/mtext that can be re-split into chem elements, split them and mark them if it is at least 3 chars long
-///        b) if there are any potential chem formula operators (e.g., "=" and ":") and the previous node is marked MAYBE_CHEMISTRY,
-///           mark this as MAYBE_CHEMISTRY
-///        Pass 2: (assuming something was marked in pass 1)
-///        a) find the first marked child and then the last consecutive marked child and trim any mo's from the ends
-///        b) evaluate the likelihood that the sequence is chemistry
-///           yes: replace mathml children with new (potentially restructured) children
-///           no: clear all the marks for the old children
-/// After canonicalization, we take another pass looking for chemical equations and marking them if found.
+// Chemistry terms used here:
+// chemical formula -- this references a molecule (one or more elements with bonds between them), including its state.
+// chemical equation -- this is a notation specialized to chemistry -- it has concentration, arrows, equality, "addition" along with 
+//    some special symbols for operators and (mostly) chemical formulas for operands.
+//    Operand exceptions are the equilibrium constant, numbers, and identifiers.
+//    Although a chemical equation is a superset of a chemical formula, because we want to distinguish the two (e.g., '=' is in both),
+//      we require that chemical equation is an mrow
+//    FIX?? -- can it be an adorned mrow?
+//    Note: with the current definition, if any element in a potential chem equation is ruled out, the entire mrow is ruled out.
+//
+// The general flow is that for every element that looks like a chem formula/equation, we mark it with data-likely-[equation/formula]
+// After we are done marking "likely", we go back and either delete them or replace them with data-[equation/formula].
+// Note: anything already marked with data-[equation/formula] doesn't need recomputation later (essentially the result is cached)
+//
+// There is a chicken and egg problem with detecting chemistry: to more reliably detect it, we need good structure.
+// However, to get the structure right (e.,g "=" being a double bond, not equality; chem elements being in 'mi's; ...),
+//   we need to know "=" is part of a chemical formula.
+// The imperfect solution used is:
+//   As the final step of each recursive call to 'clean_mathml',
+//     1. mi/mtext: is it a chemical element(s) or one of the symbols used in chemical formulas (not equations).
+//        If so, mark it MAYBE_CHEMISTRY.
+//     2. msub/msup/msubsup/mmultiscripts: is base marked MAYBE_CHEMISTRY and the scripts are potential adornments, mark it MAYBE_CHEMISTRY
+//     3. mrows: these take a few passes (remember, they aren't structured properly yet)
+//        On the assumption that chemistry is not common we implement a "show me" attitude before changing the structure.
+//        Pass 1:
+//        a) for any run of mi/mtext that can be re-split into chem elements, split them and mark them if it is at least 3 chars long
+//        b) if there are any potential chem formula operators (e.g., "=" and ":") and the previous node is marked MAYBE_CHEMISTRY,
+//           mark this as MAYBE_CHEMISTRY
+//        Pass 2: (assuming something was marked in pass 1)
+//        a) find the first marked child and then the last consecutive marked child and trim any mo's from the ends
+//        b) evaluate the likelihood that the sequence is chemistry
+//           yes: replace mathml children with new (potentially restructured) children
+//           no: clear all the marks for the old children
+// After canonicalization, we take another pass looking for chemical equations and marking them if found.
 
 use sxd_document::dom::*;
 use crate::canonicalize::*;
@@ -502,7 +502,7 @@ fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
                     mathml.set_attribute_value(CHEM_EQUATION, "true");
                 }
             }
-            _ => error!("Internal error: {} should not be marked as 'MAYBE_CHEMISTRY'", tag_name),
+            _ => error!("Internal error: {tag_name} should not be marked as 'MAYBE_CHEMISTRY'"),
         }
     } else if tag_name == "mrow" {
         // could have been added during canonicalization, so never marked. Recurse to the children
@@ -1221,7 +1221,7 @@ fn is_structural(elements: &[&str]) -> bool {
 
 /// collect up all the elements in the mrow.
 ///  Returns the elements (which can be an empty vector) or None if something (right now an operator) rules out them being elements
-fn collect_elements(mrow: Element) -> Option<Vec<&str>> {
+fn collect_elements(mrow: Element<'_>) -> Option<Vec<&str>> {
     let mut elements = Vec::with_capacity(mrow.children().len()/2+1);       // don't bother with slots for operators
     for child in mrow.children() {
         let child = as_element(child);
@@ -1251,7 +1251,7 @@ fn is_alphabetical(elements: &[&str]) -> bool {
     assert!(!elements.len() > 1);   // already handled
     // debug!("is_alphabetical: {:?}", elements);
     let mut elements = elements;
-    if elements[1..].iter().any(|&e| e=="C") {  // "C" must be first if present
+    if elements[1..].contains(&"C") {  // "C" must be first if present
         return false;
     }
     if elements[0] == "C" {
