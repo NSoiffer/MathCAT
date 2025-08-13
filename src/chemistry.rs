@@ -502,7 +502,7 @@ fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
                     mathml.set_attribute_value(CHEM_EQUATION, "true");
                 }
             }
-            _ => error!("Internal error: {} should not be marked as 'MAYBE_CHEMISTRY'", tag_name),
+            _ => error!("Internal error: {tag_name} should not be marked as 'MAYBE_CHEMISTRY'"),
         }
     } else if tag_name == "mrow" {
         // could have been added during canonicalization, so never marked. Recurse to the children

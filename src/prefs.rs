@@ -427,6 +427,7 @@ impl PreferenceManager {
 
         let old_language = old_language.unwrap();
         let new_language = new_prefs.prefs.get("Language").unwrap();
+        debug!("set_files_based_on_changes: old_language={old_language:?}, new_language={new_language:?}");
         if old_language != new_language {
             let language_dir = self.rules_dir.to_path_buf().join("Languages");
             self.set_speech_files(&language_dir, new_language.as_str().unwrap(), None)?;  // also sets style file
@@ -612,7 +613,7 @@ impl PreferenceManager {
         // didn't find the language -- try again with the default language
         match default_lang {
             Some(default_lang) => {
-                warn!("Couldn't find rules for language {}, ", lang);
+                warn!("Couldn't find rules for language {lang}, ");
                 return PreferenceManager::get_language_dir(rules_dir, default_lang, None);
             },
             None => {

@@ -234,7 +234,7 @@ impl fmt::Display for TTSCommandRule {
             TTSCommandValue::Pronounce(p) => p.to_string(),
         };
         if self.command == TTSCommand::Pause {
-            return write!(f, "pause: {}", value);
+            return write!(f, "pause: {value}");
         } else {
             return write!(f, "{}: {}{}", self.command, value, self.replacements);
         };
@@ -311,14 +311,14 @@ impl TTS {
                     Err(_) => {
                         // let's try as an xpath (e.g., could be '$CapitalLetters_Pitch')
                         TTSCommandValue::XPath(
-                            MyXPath::build(tts_value).chain_err(|| format!("while trying to evaluate value of '{}:'", tts_enum))?
+                            MyXPath::build(tts_value).chain_err(|| format!("while trying to evaluate value of '{tts_enum}:'"))?
                         )
                     }
                 }
             },
             TTSCommand::Bookmark | TTSCommand::Spell => {
                 TTSCommandValue::XPath(
-                    MyXPath::build(values).chain_err(|| format!("while trying to evaluate value of '{}:'", tts_enum))?
+                    MyXPath::build(values).chain_err(|| format!("while trying to evaluate value of '{tts_enum}:'"))?
                 )
             },
             TTSCommand::Pronounce => {
@@ -476,7 +476,7 @@ impl TTS {
             match value {
                 TTSCommandValue::XPath(xpath) => {
                     let id = xpath.replace::<String>(rules_with_context, mathml)?;
-                    return Ok( format!("<{}='{}'/>", tag_and_attr, id) );
+                    return Ok( format!("<{tag_and_attr}='{id}'/>") );
                 },
                 _ => bail!("Implementation error: found bookmark value that did not evaluate to a string"),
             }
@@ -685,7 +685,7 @@ impl TTS {
             static ref CONSECUTIVE_BREAKS: Regex = Regex::new(r"(<silence msec[^>]+?> *){2,}").unwrap();   // two or more pauses
             static ref PAUSE_AMOUNT: Regex = Regex::new(r"msec=.*?(\d+)").unwrap();   // amount after 'time'
         }
-        let replacement = |amount: usize| format!("<silence msec=='{}ms'/>", amount);
+        let replacement = |amount: usize| format!("<silence msec=='{amount}ms'/>");
         return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
     }
 
@@ -694,7 +694,7 @@ impl TTS {
             static ref CONSECUTIVE_BREAKS: Regex = Regex::new(r"(<break time=[^>]+?> *){2,}").unwrap();   // two or more pauses
             static ref PAUSE_AMOUNT: Regex = Regex::new(r"time=.*?(\d+)").unwrap();   // amount after 'time'
         }
-        let replacement = |amount: usize| format!("<break time='{}ms'/>", amount);
+        let replacement = |amount: usize| format!("<break time='{amount}ms'/>");
         return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
     }
 }

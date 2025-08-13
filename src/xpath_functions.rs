@@ -56,7 +56,7 @@ fn get_text_from_COE(coe: &ChildOfElement) -> String {
 // Returns the node or an Error
 pub fn validate_one_node<'n>(nodes: Nodeset<'n>, func_name: &str) -> Result<Node<'n>, Error> {
     if nodes.size() == 0 {
-        return Err(Error::Other(format!("Missing argument for {}", func_name)));
+        return Err(Error::Other(format!("Missing argument for {func_name}")));
     } else if nodes.size() > 1 {
         return Err( Error::Other(format!("{} arguments for {}; expected 1 argument", nodes.size(), func_name)) );
     }
@@ -641,7 +641,7 @@ impl Function for ToOrdinal {
     {
         let mut args = Args(args);
         if let Err(e) = args.exactly(1).or_else(|_| args.exactly(3)) {
-            return Err( XPathError::Other(format!("ToOrdinal requires 1 or 3 args: {}", e)));
+            return Err( XPathError::Other(format!("ToOrdinal requires 1 or 3 args: {e}")));
         };
         let mut fractional = false;
         let mut plural = false;
@@ -823,7 +823,7 @@ struct Debug;
         args.exactly(2)?;
         let xpath_str = args.pop_string()?;
         let eval_result = &args[0];
-        debug!("  -- Debug: value of '{}' is ", xpath_str);
+        debug!("  -- Debug: value of '{xpath_str}' is ");
         match eval_result {
             Value::Nodeset(nodes) => {
                 if nodes.size() == 0 {
@@ -840,12 +840,12 @@ struct Debug;
                             match node {
                                 Node::Element(mathml) => debug!("#{}:\n{}",
                                         i, mml_to_string(*mathml)),
-                                _ => debug!("'{:?}'", node),
+                                _ => debug!("'{node:?}'"),
                             }   
                         })    
                 }
             },
-            _ => debug!("'{:?}'", eval_result),
+            _ => debug!("'{eval_result:?}'"),
         }
         return Ok( eval_result.clone() );
     }
@@ -955,7 +955,7 @@ impl IsInDefinition {
             if let Some(hashmap) = definitions.borrow().get_hashmap(set_name) {
                 return Ok( hashmap.contains_key(test_str) );
             }
-            return Err( Error::Other( format!("\n  IsInDefinition: '{}' is not defined in definitions.yaml", set_name) ) );
+            return Err( Error::Other( format!("\n  IsInDefinition: '{set_name}' is not defined in definitions.yaml") ) );
         });
     }
 }
@@ -1031,7 +1031,7 @@ impl DefinitionValue {
                     Some(str) => str.clone(),
                 });
             }
-            return Err( Error::Other( format!("\n  DefinitionValue: '{}' is not defined in definitions.yaml", set_name) ) );
+            return Err( Error::Other( format!("\n  DefinitionValue: '{set_name}' is not defined in definitions.yaml") ) );
         });
     }
 }
@@ -1133,7 +1133,7 @@ impl Function for DistanceFromLeaf {
         }
 
         // FIX: should having a non-element be an error instead??
-        return Err(Error::Other(format!("DistanceFromLeaf: first arg '{:?}' is not a node", node)));
+        return Err(Error::Other(format!("DistanceFromLeaf: first arg '{node:?}' is not a node")));
     }
 }
 
@@ -1210,7 +1210,7 @@ impl Function for EdgeNode {
         }
 
         // FIX: should having a non-element be an error instead??
-        return Err(Error::Other(format!("EdgeNode: first arg '{:?}' is not a node", node)));
+        return Err(Error::Other(format!("EdgeNode: first arg '{node:?}' is not a node")));
     }
 }
 
@@ -1259,7 +1259,7 @@ impl GetBracketingIntentName {
                         1 => return speech[0].to_string(),
                         2 | 3 => {
                             if speech.len() == 2 {
-                                warn!("Intent '{}'  has only two ':' separated parts, but should have three", intent_name);
+                                warn!("Intent '{intent_name}'  has only two ':' separated parts, but should have three");
                                 speech.push(speech[1]);
                             }
                             let bracketing_words = match verbosity {
@@ -1363,7 +1363,7 @@ impl FontSizeGuess {
                     "ex" => 0.5,
                     "em" => 1.0,
                     "rem" => 16.0/12.0,
-                    default => {debug!("unit='{}'", default); 10.0}
+                    default => {debug!("unit='{default}'"); 10.0}
                 };
                 // debug!("FontSizeGuess: {}->{}, val={}, multiplier={}", value_with_unit, value*multiplier, value, multiplier);
                 return cap[1].parse::<f64>().unwrap_or(0.0) * multiplier;

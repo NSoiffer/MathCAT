@@ -250,15 +250,15 @@ fn main() {
 
   match do_navigate_command("ZoomIn".to_string())  {
     Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
-    Ok(speech) => info!("\nZoomIn speech: '{}'", speech),
+    Ok(speech) => info!("\nZoomIn speech: '{speech}'"),
   }
   match do_navigate_command("ToggleZoomLockUp".to_string()) {
     Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
-    Ok(speech) => info!("ToggleZoomLockUp speech: '{}'", speech),
+    Ok(speech) => info!("ToggleZoomLockUp speech: '{speech}'"),
   }
   match do_navigate_command("MovePrevious".to_string()) {
     Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
-    Ok(speech) => info!("MovePrevious speech: '{}'", speech),
+    Ok(speech) => info!("MovePrevious speech: '{speech}'"),
   }
   // match do_navigate_command("MovePrevious".to_string()) {
   //   Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
@@ -285,7 +285,7 @@ fn main() {
   //   Ok(speech) => info!("MoveNext speech: '{}'", speech),
   // }
   match get_spoken_text() {
-    Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
+    Ok(speech) => info!("Computed speech string:\n   '{speech}'"),
     Err(e) => panic!("{}", errors_to_string(&e)),
   }
   debug!("Speech language is {}", get_preference("Language".to_string()).unwrap());
@@ -306,7 +306,7 @@ fn main() {
   // info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()));
   
   match get_braille("".to_string()) {
-    Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
+    Ok(braille) => info!("Computed braille string:\n   '{braille}'"),
     Err(e) => panic!("{}", errors_to_string(&e)),
   }
   debug!("...using BrailleCode: {:?}", get_preference("BrailleCode".to_string()).unwrap());

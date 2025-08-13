@@ -587,10 +587,10 @@ pub fn errors_to_string(e: &Error) -> String {
     let mut first_time = true;
     for e in e.iter() {
         if first_time {
-            result = format!("{}\n", e);
+            result = format!("{e}\n");
             first_time = false;
         } else {
-            result += &format!("caused by: {}\n", e);
+            result += &format!("caused by: {e}\n");
         }
     }
     return result;
@@ -705,8 +705,7 @@ pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
         if !single_text.trim_matches(WHITESPACE).is_empty() {
             error!(
-                "trim_element: both element and textual children which shouldn't happen -- ignoring text '{}'",
-                single_text
+                "trim_element: both element and textual children which shouldn't happen -- ignoring text '{single_text}'"
             );
         }
         return;

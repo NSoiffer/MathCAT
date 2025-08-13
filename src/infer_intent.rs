@@ -183,7 +183,7 @@ pub fn add_fixity_children(intent: Element) -> Element {
         fn create_operator_element<'a>(intent_name: &str, fixity: &str, id: &str, id_inc: usize, doc: &Document<'a>) -> ChildOfElement<'a> {
             let intent_name = intent_speech_for_name(intent_name, &PreferenceManager::get().borrow().pref_to_string("NavMode"), fixity);
             let element = create_mathml_element(doc, &intent_name);
-            element.set_attribute_value("id", &format!("{}-{}",id, id_inc));
+            element.set_attribute_value("id", &format!("{id}-{id_inc}"));
             element.set_attribute_value(MATHML_FROM_NAME_ATTR, "mo");
             return ChildOfElement::Element(element);
         }
@@ -206,7 +206,7 @@ pub fn intent_speech_for_name(intent_name: &str, verbosity: &str, fixity: &str) 
                     1 => return operator_names[0].trim().to_string(),
                     2 | 3 => {
                         if operator_names.len() == 2 {
-                            warn!("Intent '{}' has only two operator names, but should have three", intent_name);
+                            warn!("Intent '{intent_name}' has only two operator names, but should have three");
                             operator_names.push(operator_names[1]);
                         }
                         let intent_word = match verbosity {
@@ -277,11 +277,11 @@ impl fmt::Display for Token<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return write!(f, "{}",
             match self {
-                Token::Terminal(str) => format!("Terminal('{}')", str),
-                Token::Property(str) => format!("Property({})", str),
-                Token::ArgRef(str) => format!("ArgRef({})", str),
-                Token::ConceptOrLiteral(str) => format!("Literal({})", str),
-                Token::Number(str) => format!("Number({})", str),
+                Token::Terminal(str) => format!("Terminal('{str}')"),
+                Token::Property(str) => format!("Property({str})"),
+                Token::ArgRef(str) => format!("ArgRef({str})"),
+                Token::ConceptOrLiteral(str) => format!("Literal({str})"),
+                Token::Number(str) => format!("Number({str})"),
                 Token::None => "None".to_string(),
             }
         );

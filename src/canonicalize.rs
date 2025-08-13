@@ -1191,7 +1191,7 @@ impl CanonicalizeContext {
 				}
 				let attr_name = match child.attribute_value("encoding") {
 					Some(encoding_name) => format!("data-{}-{}", child_name, encoding_name.replace('/', "_slash_")),
-					None => format!("data-{}", child_name),		// probably shouldn't happen
+					None => format!("data-{child_name}"),		// probably shouldn't happen
 				};
 				let attr_name = attr_name.as_str();
 				if child_name == "annotation" {
@@ -2446,7 +2446,7 @@ impl CanonicalizeContext {
 					'‴' => n_primes += 3,
 					'⁗' => n_primes += 4,
 					_ => {
-						eprint!("merge_prime_text: unexpected char '{}' found", ch);
+						eprint!("merge_prime_text: unexpected char '{ch}' found");
 						return text.to_string();
 					}
 				}
