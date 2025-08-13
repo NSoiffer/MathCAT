@@ -155,10 +155,10 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
 /// Converts its argument to a string that can be used in a debugging message.
 pub fn yaml_to_type(yaml: &Yaml) -> String {
     return match yaml {
-        Yaml::Real(v)=> format!("real='{:#}'", v),
-        Yaml::Integer(v)=> format!("integer='{:#}'", v),
-        Yaml::String(v)=> format!("string='{:#}'", v),
-        Yaml::Boolean(v)=> format!("boolean='{:#}'", v),
+        Yaml::Real(v)=> format!("real='{v:#}'"),
+        Yaml::Integer(v)=> format!("integer='{v:#}'"),
+        Yaml::String(v)=> format!("string='{v:#}'"),
+        Yaml::Boolean(v)=> format!("boolean='{v:#}'"),
         Yaml::Array(v)=> match v.len() {
             0 => "array with no entries".to_string(),
             1 => format!("array with the entry: {}", yaml_to_type(&v[0])),
@@ -282,7 +282,7 @@ pub fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new
         }
     }
     new_file.push(new_file_name);
-    info!("...processing include: {}...", new_file_name);
+    info!("...processing include: {new_file_name}...");
     let new_file = match crate::shim_filesystem::canonicalize_shim(new_file.as_path()) {
         Ok(buf) => buf,
         Err(msg) => bail!("-include: constructed file name '{}' causes error '{}'",
@@ -392,7 +392,7 @@ impl fmt::Display for Replacement {
         return write!(f, "{}",
             match self {
                 Replacement::Test(c) => c.to_string(),
-                Replacement::Text(t) => format!("t: \"{}\"", t),
+                Replacement::Text(t) => format!("t: \"{t}\""),
                 Replacement::XPath(x) => x.to_string(),
                 Replacement::Intent(i) => i.to_string(),
                 Replacement::TTS(t) => t.to_string(),
@@ -964,7 +964,7 @@ impl ReplacementArray {
             group_string += &format!("[{}]", self.replacements[0]);
         } else {
             group_string += &self.replacements.iter()
-                    .map(|replacement| format!("\n  - {}", replacement))
+                    .map(|replacement| format!("\n  - {replacement}"))
                     .collect::<Vec<String>>()
                     .join("");
             group_string += "\n";
@@ -1123,7 +1123,7 @@ impl MyXPath {
         let debug_start = debug_start.unwrap();
         let mut before_paren = xpath[..debug_start+5].to_string();   // includes "DEBUG"
         let chars = xpath[debug_start+5..].chars().collect::<Vec<char>>();     // begins at '('
-        before_paren.push_str(&chars_add_debug_string_arg(&chars).chain_err(|| format!("In xpath='{}'", xpath))?);
+        before_paren.push_str(&chars_add_debug_string_arg(&chars).chain_err(|| format!("In xpath='{xpath}'"))?);
         // debug!("add_debug_string_arg: {}", before_paren);
         return Ok(before_paren);
 
@@ -1163,7 +1163,7 @@ impl MyXPath {
 
                                 // DEBUG(...) may be in the remainder of the string -- recurse
                                 let processed_rest = MyXPath::add_debug_string_arg(&chars[i+1..].iter().collect::<String>())?;
-                                return Ok( format!("({}, \"{}\"){}", processed_arg, escaped_arg, processed_rest) );
+                                return Ok( format!("({processed_arg}, \"{escaped_arg}\"){processed_rest}") );
                             }
                         }
                     },
@@ -1386,7 +1386,7 @@ struct TestArray {
 impl fmt::Display for TestArray {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for test in &self.tests {
-            writeln!(f, "{}", test)?;
+            writeln!(f, "{test}")?;
         }
         return Ok( () );
     }
@@ -1480,8 +1480,8 @@ impl fmt::Display for TestOrReplacements {
         }
         write!(f, ":")?;
         return match self {
-            TestOrReplacements::Test(t) => write!(f, "{}", t),
-            TestOrReplacements::Replacements(r) => write!(f, "{}", r),
+            TestOrReplacements::Test(t) => write!(f, "{t}"),
+            TestOrReplacements::Replacements(r) => write!(f, "{r}"),
         };
     }
 }
@@ -1530,13 +1530,13 @@ impl fmt::Display for Test {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "test: [ ")?;
         if let Some(if_part) = &self.condition {
-            write!(f, " if: '{}'", if_part)?;
+            write!(f, " if: '{if_part}'")?;
         }
         if let Some(then_part) = &self.then_part {
-            write!(f, " then{}", then_part)?;
+            write!(f, " then{then_part}")?;
         }
         if let Some(else_part) = &self.else_part {
-            write!(f, " else{}", else_part)?;
+            write!(f, " else{else_part}")?;
         }
         return write!(f, "]");
     }
@@ -1576,7 +1576,7 @@ impl fmt::Display for VariableValue<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let value = match &self.value {
             None => "unset".to_string(),
-            Some(val) => format!("{:?}", val)
+            Some(val) => format!("{val:?}")
         };
         return write!(f, "[name: {}, value: {}]", self.name, value);
     }   
@@ -1621,7 +1621,7 @@ struct VariableDefinitions {
 impl fmt::Display for VariableDefinitions {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for def in &self.defs {
-            write!(f, "{},", def)?;
+            write!(f, "{def},")?;
         }
         return Ok( () );
     }
@@ -1634,7 +1634,7 @@ struct VariableValues<'v> {
 impl fmt::Display for VariableValues<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for value in &self.defs {
-            write!(f, "{}", value)?;
+            write!(f, "{value}")?;
         }
         return writeln!(f);
     }
@@ -1682,7 +1682,7 @@ impl fmt::Display for ContextStack<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, " {} old_values", self.old_values.len())?;
         for values in &self.old_values {
-            writeln!(f, "  {}", values)?;
+            writeln!(f, "  {values}")?;
         }
         return writeln!(f);
     }
@@ -1837,7 +1837,7 @@ impl UnicodeDef {
                     for ch in str.chars() {     // restart the iterator
                         let ch_as_str = ch.to_string();
                         if unicode_table.insert(ch as u32, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
-                                            .chain_err(|| format!("In definition of char: '{}'", str))?.replacements).is_some() {
+                                            .chain_err(|| format!("In definition of char: '{str}'"))?.replacements).is_some() {
                             error!("*** Character '{}' (0x{:X}) is repeated", ch, ch as u32);
                         }
                     }
@@ -1867,7 +1867,7 @@ impl UnicodeDef {
             for ch in first..last+1 {
                 let ch_as_str = char::from_u32(ch).unwrap().to_string();
                 unicode_table.insert(ch, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
-                                        .chain_err(|| format!("In definition of char: '{}'", def_range))?.replacements);
+                                        .chain_err(|| format!("In definition of char: '{def_range}'"))?.replacements);
             };
 
             return Ok(None)
@@ -1942,7 +1942,7 @@ impl UnicodeDef {
             RulesFor::Navigation => "Navigation",
             RulesFor::Braille => "Braille",
         };
-       return write!(f, "{}", name);
+       return write!(f, "{name}");
     }
  }
 
@@ -2684,7 +2684,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                         .iter()
                         .map(|replacement|
                             rules_with_context.replace(replacement, mathml)
-                                    .chain_err(|| format!("Unicode replacement error: {}", replacement)) )
+                                    .chain_err(|| format!("Unicode replacement error: {replacement}")) )
                         .collect::<Result<Vec<String>>>()?
                         .join(" ");
             rules_with_context.translate_count = 0;     // found a replacement, so not in a loop
@@ -2817,7 +2817,9 @@ mod tests {
         assert_eq!(result.unwrap(), r#"DEBUG(ClearSpeak_Matrix = 'Combinatorics', "ClearSpeak_Matrix = 'Combinatorics'") and IsBracketed(., '(', ')')"#);
     }
 
-    
+
+// zipped files do NOT include "zz", hence we need to exclude this test
+cfg_if::cfg_if! {if #[cfg(not(feature = "include-zip"))] {  
     #[test]
     fn test_up_to_date() {
         use crate::interface::*;
@@ -2858,6 +2860,7 @@ mod tests {
             });
         }    
     }
+}}
 
     // #[test]
     // fn test_nested_debug_quoted_paren() {

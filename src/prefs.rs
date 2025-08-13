@@ -427,6 +427,7 @@ impl PreferenceManager {
 
         let old_language = old_language.unwrap();
         let new_language = new_prefs.prefs.get("Language").unwrap();
+        debug!("set_files_based_on_changes: old_language={old_language:?}, new_language={new_language:?}");
         if old_language != new_language {
             let language_dir = self.rules_dir.to_path_buf().join("Languages");
             self.set_speech_files(&language_dir, new_language.as_str().unwrap(), None)?;  // also sets style file
@@ -462,6 +463,7 @@ impl PreferenceManager {
         let zip_file_name = language.to_string() + ".zip";
         let zip_file_path = dir.join(&zip_file_name);
         let zip_file_string = zip_file_path.to_string_lossy().to_string();
+        // debug!("unzip_files: dir: {}, zip_file_name: {}, zip_file_path: {}", dir.to_string_lossy(), zip_file_name, zip_file_string);
         if UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow().contains(&zip_file_string)) {
             return Ok(false);
         }
@@ -470,16 +472,25 @@ impl PreferenceManager {
             Err(e) => {
                 if language.contains('-') {
                     // try again in parent dir of regional language
-                    let language = language.split('-').next().unwrap_or(language);
-                    return PreferenceManager::unzip_files(path, language, default_lang);
+                    let language = language.split_once('-').unwrap_or((language, "")).0; // get the parent language
+                    // debug!("unzip_files: trying again in parent language: {}", language);
+                    PreferenceManager::unzip_files(path, language, default_lang)
+                                                .chain_err(|| format!("Couldn't open zip file {zip_file_string} in parent {language}: {e}."))?
+                } else {
+                    bail!("Couldn't open zip file {}: {}.", zip_file_string, e)
                 }
-                bail!("Couldn't open zip file {}: {}.", zip_file_string, e)
             },
             Ok(result) => {
                 result
             },
         };
-        UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow_mut().insert(zip_file_string) );
+
+        UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow_mut().insert(zip_file_string.clone()) );
+        // debug!("  unzip_files: unzipped {} files from {}", result, &zip_file_string);
+        // UNZIPPED_FILES.with( |unzipped_files| {
+        //     debug!("unzip_files: unzipped_files: {:?}", unzipped_files.borrow());
+        // });
+        
         return Ok(result);
     }
 
@@ -612,7 +623,7 @@ impl PreferenceManager {
         // didn't find the language -- try again with the default language
         match default_lang {
             Some(default_lang) => {
-                warn!("Couldn't find rules for language {}, ", lang);
+                warn!("Couldn't find rules for language {lang}, ");
                 return PreferenceManager::get_language_dir(rules_dir, default_lang, None);
             },
             None => {
@@ -853,6 +864,7 @@ mod tests {
     // definitions.yaml is in Rules, zz, aa dirs
     // unicode.yaml is in zz
     // ClearSpeak_Rules.yaml is in zz
+    // These files are NOT in the zipped up version -- hence the config
     use super::*;
 
     /// Version of abs_rules_dir_path that returns a PathBuf
@@ -925,6 +937,7 @@ mod tests {
         });
     }
 
+cfg_if::cfg_if! {if #[cfg(not(feature = "include-zip"))] {  
     #[test]
     fn find_style_other_language() {
         // zz dir should have both ClearSpeak and SimpleSpeak styles
@@ -1146,4 +1159,6 @@ mod tests {
                 // assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "SimpleSpeak");
                 // assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/SimpleSpeak_Rules.yaml"));
     }
+
+}}
 }

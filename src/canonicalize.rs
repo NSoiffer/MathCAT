@@ -1191,7 +1191,7 @@ impl CanonicalizeContext {
 				}
 				let attr_name = match child.attribute_value("encoding") {
 					Some(encoding_name) => format!("data-{}-{}", child_name, encoding_name.replace('/', "_slash_")),
-					None => format!("data-{}", child_name),		// probably shouldn't happen
+					None => format!("data-{child_name}"),		// probably shouldn't happen
 				};
 				let attr_name = attr_name.as_str();
 				if child_name == "annotation" {
@@ -2446,7 +2446,7 @@ impl CanonicalizeContext {
 					'‴' => n_primes += 3,
 					'⁗' => n_primes += 4,
 					_ => {
-						eprint!("merge_prime_text: unexpected char '{}' found", ch);
+						eprint!("merge_prime_text: unexpected char '{ch}' found");
 						return text.to_string();
 					}
 				}
@@ -4155,7 +4155,7 @@ pub fn add_attrs<'a>(mathml: Element<'a>, attrs: &[Attribute]) -> Element<'a> {
 }
 
 
-pub fn name(node: Element) -> &str {
+pub fn name(node: Element<'_>) -> &str {
 	return node.name().local_part();
 }
 
@@ -4172,7 +4172,7 @@ pub fn as_element(child: ChildOfElement) -> Element {
 
 /// The child of a leaf element must be text (previously trimmed)
 /// Note: trim() combines all the Text children into a single string
-pub fn as_text(leaf_child: Element) -> &str {
+pub fn as_text(leaf_child: Element<'_>) -> &str {
 	assert!(is_leaf(leaf_child));
 	let children = leaf_child.children();
 	if children.is_empty() {

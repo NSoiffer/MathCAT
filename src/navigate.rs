@@ -312,14 +312,14 @@ pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: E
         Some(value) => match value {
             Value::String(s) => Ok((Some(s.clone()), None)),
             Value::Number(f) => Ok((None, Some(*f))),
-            Value::Boolean(b) => Ok((Some(format!("{}", b)), None)),
+            Value::Boolean(b) => Ok((Some(format!("{b}")), None)),
             Value::Nodeset(nodes) => {
                 if nodes.size() == 1 {
                     if let Some(attr) = nodes.document_order_first().unwrap().attribute() {
                         return Ok( (Some(attr.value().to_string()), None) );
                     }
                 };
-                let mut error_message = format!("Variable '{}' set somewhere in navigate.yaml is nodeset and not an attribute: ", var_name);
+                let mut error_message = format!("Variable '{var_name}' set somewhere in navigate.yaml is nodeset and not an attribute: ");
                 if nodes.size() == 0 {
                     error_message += &format!("0 nodes (false) -- {} set to non-existent node in\n{}",
                                               var_name, mml_to_string(mathml));
@@ -336,7 +336,7 @@ pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: E
                             match node {
                                 sxd_xpath::nodeset::Node::Element(mathml) =>
                                     error_message += &format!("#{}:\n{}",i, mml_to_string(*mathml)),
-                                _ => error_message += &format!("'{:?}'", node),
+                                _ => error_message += &format!("'{node:?}'"),
                             }   
                         })    
                 };
