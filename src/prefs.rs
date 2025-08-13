@@ -853,6 +853,7 @@ mod tests {
     // definitions.yaml is in Rules, zz, aa dirs
     // unicode.yaml is in zz
     // ClearSpeak_Rules.yaml is in zz
+    // These files are NOT in the zipped up version -- hence the config
     use super::*;
 
     /// Version of abs_rules_dir_path that returns a PathBuf
@@ -925,6 +926,7 @@ mod tests {
         });
     }
 
+cfg_if::cfg_if! {if #[cfg(not(feature = "include-zip"))] {  
     #[test]
     fn find_style_other_language() {
         // zz dir should have both ClearSpeak and SimpleSpeak styles
@@ -1146,4 +1148,6 @@ mod tests {
                 // assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "SimpleSpeak");
                 // assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/SimpleSpeak_Rules.yaml"));
     }
+
+}}
 }

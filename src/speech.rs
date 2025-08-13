@@ -2817,7 +2817,9 @@ mod tests {
         assert_eq!(result.unwrap(), r#"DEBUG(ClearSpeak_Matrix = 'Combinatorics', "ClearSpeak_Matrix = 'Combinatorics'") and IsBracketed(., '(', ')')"#);
     }
 
-    
+
+// zipped files do NOT include "zz", hence we need to exclude this test
+cfg_if::cfg_if! {if #[cfg(not(feature = "include-zip"))] {  
     #[test]
     fn test_up_to_date() {
         use crate::interface::*;
@@ -2858,6 +2860,7 @@ mod tests {
             });
         }    
     }
+}}
 
     // #[test]
     // fn test_nested_debug_quoted_paren() {
