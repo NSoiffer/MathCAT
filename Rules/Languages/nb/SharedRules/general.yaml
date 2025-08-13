@@ -249,24 +249,35 @@
   - pause: short
 
 # need to say "ett" for '1' in front of a neuter unit
+# this is extra complicated because we need to allow do it for a 1 in front of a mixed fraction
 # note: bias ha->hektar and Pa->Pascal, not si-prefix "a" (annum)
 - name: one-for-unit
   tag: mn
-  match: ".=1 and not(preceding-sibling:*) and
-          parent::*[1][self::m:mrow and *[2][.='\u2062'] and
-                       *[3][IsInDefinition(., 'Speech', 'NeuterUnits') or 
-                            IsInDefinition(., 'Speech', 'NeuterUnitsWithoutPrefixes') or 
-                            (string-length(.) >= 3 and
-                              substring(., 1, 2) = 'da' and 
-                              IsInDefinition(substring(., 3), 'Speech', 'NeuterUnits')) or
-                            (string-length(.) >= 2 and
-                             .!='ha' and .!='Pa' and
-                             DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != '' and
-                             IsInDefinition(substring(., 2), 'Speech', 'NeuterUnits') != ''
-                            ) ]
-                      ]"
+  match: ".=1"
+  variables:
+    # set right level for the location of the common fraction/mixed fraction
+  - IsMixedFraction: "following-sibling::*[1][.='\u2064']"
+  - UnitSibling: "IfThenElse($IsMixedFraction, .., .)"
+    # set the potential unit node -- otherwise set it to a empty node set (use a made up name)
+  - UnitNodeLocation: "IfThenElse($UnitSibling/..[self::m:mrow and count(*)=3 and *[2][.='\u2062']],
+                                  $UnitSibling/following-sibling::*[2],
+                                  self::m:select-no-nodes)"
+    # pick out the right node to test for being a neuter unit
+  - UnitNode: "IfThenElse($UnitNodeLocation[self::m:unit],
+                          $UnitNodeLocation[self::m:unit],
+                          $UnitNodeLocation[self::m:fraction[contains(@data-intent-property, ':unit:')]]/*[1])"
+    # test the node for being a neuter unit
+    # note: bias ha->hektar and Pa->Pascal, not si-prefix "a" (annum)
+  - NeuterUnitFollows: "$UnitNode[IsInDefinition(., 'Speech', 'NeuterUnits') or 
+                                  IsInDefinition(., 'Speech', 'NeuterUnitsWithoutPrefixes') or
+                                  (string-length(.) >= 2 and
+                                    . != 'ha' and . != 'Pa' and
+                                    DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != '' and
+                                    IsInDefinition(substring(., 2), 'Speech', 'NeuterUnits') != ''
+                                  ) ]"  
+
   replace:
-  - T: "ett"
+  - x: "IfThenElse($NeuterUnitFollows, 'ett', 1)"
 
 # the order of matching is
 # 1. does it match the base of an SI unit
