@@ -1,9 +1,10 @@
+#![allow(clippy::needless_return)]
 //! XPath underlies rule matching and speech generation. The version of xpath used is based on xpath 1.0
 //! and includes the ability to define functions and variables.
 //! The variables defined are all the preferences and also variables set in speech rules via the `variables` keyword.
 //! The function defined here are:
 //! * `IsNode(node, kind)`:  returns true if the node matches the "kind".
-//!    Valid values are "leaf", "2D", "simple", "common_fraction", "trig_name".
+//!   Valid values are "leaf", "2D", "simple", "common_fraction", "trig_name".
 //! * `ToOrdinal(number, fractional, plural)`: converts the number to an ordinal (e.g, third)
 //!   * `number` -- the number to translate
 //!   * `fractional` -- true if this is a fractional ordinal (e.g, "half")
@@ -11,11 +12,10 @@
 //! * `ToCommonFraction(mfrac)` -- converts the fraction to an ordinal version (e.g, 2 thirds)
 //! * `IsLargeOp(node)` -- returns true if the node is a large operator (e.g, integral or sum)
 //! * `IsBracketed(node, left, right, requires_comma)` -- returns true if the first/last element in the mrow match `left`/`right`.
-//!    If the optional `requires_comma` argument is given and is `true`, then there also must be a "," in the mrow (e.g., "f(x,y)")
+//!   If the optional `requires_comma` argument is given and is `true`, then there also must be a "," in the mrow (e.g., "f(x,y)")
 //! * `DEBUG(xpath)` -- _Very_ useful function for debugging speech rules.
-//!    This can be used to surround a whole or part of an xpath expression in a match or output.
-//!    The result will be printed to standard output and the result returned so that `DEBUG` does not affect the computation.    
-#![allow(clippy::needless_return)]
+//!   This can be used to surround a whole or part of an xpath expression in a match or output.
+//!   The result will be printed to standard output and the result returned so that `DEBUG` does not affect the computation.    
 
 use sxd_document::dom::{Element, ChildOfElement};
 use sxd_xpath::{Value, Context, context, function::*, nodeset::*};

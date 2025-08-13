@@ -37,7 +37,7 @@ use crate::shim_filesystem::read_to_string_shim;
 ///
 /// Having a Rc<RefCell<FromFileVariable>> seems a bit complicated in terms of types but...
 /// 1. The rust book seems to endorse the Rc<RefCell<...>>> approach when there are multiple owners of mutable date.
-///     See <https://doc.rust-lang.org/book/ch15-05-interior-mutability.html> towards the end
+///    See <https://doc.rust-lang.org/book/ch15-05-interior-mutability.html> towards the end
 /// 2. When a file is read, we need to clear and add data to the structure being read (reassigning could work for clearing).
 ///    When we use the data, we either want to index into it or test if an item is there.
 ///    The structures we use are either a Vec or a HashMap, so we need to abstract that away in `FromFileVariable`.
@@ -45,7 +45,7 @@ use crate::shim_filesystem::read_to_string_shim;
 ///    *  Vec implements extends (`add`), but there is no test/contains
 ///    *  Hashmap implements `index`, but panics if the item isn't there
 ///
-///    Because of the above limitations, we introduce the enum [`Contains`] which dispatches appropriately to Vec/Hashmap
+/// Because of the above limitations, we introduce the enum [`Contains`] which dispatches appropriately to Vec/Hashmap
 #[derive(Debug, Clone)]
 pub enum Contains {
     Vec(Rc<RefCell<Vec<String>>>),

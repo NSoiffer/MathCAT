@@ -213,7 +213,7 @@ pub fn get_preference(name: String) -> Result<String> {
 /// * TTS -- SSML, SAPI5, None
 /// * Pitch -- normalized at '1.0'
 /// * Rate -- words per minute (should match current speech rate).
-///       There is a separate "MathRate" that is user settable that causes a relative percentage change from this rate.
+///   There is a separate "MathRate" that is user settable that causes a relative percentage change from this rate.
 /// * Volume -- default 100
 /// * Voice -- set a voice to use (not implemented)
 /// * Gender -- set pick any voice of the given gender (not implemented)
