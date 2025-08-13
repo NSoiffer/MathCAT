@@ -463,6 +463,7 @@ impl PreferenceManager {
         let zip_file_name = language.to_string() + ".zip";
         let zip_file_path = dir.join(&zip_file_name);
         let zip_file_string = zip_file_path.to_string_lossy().to_string();
+        // debug!("unzip_files: dir: {}, zip_file_name: {}, zip_file_path: {}", dir.to_string_lossy(), zip_file_name, zip_file_string);
         if UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow().contains(&zip_file_string)) {
             return Ok(false);
         }
@@ -471,16 +472,25 @@ impl PreferenceManager {
             Err(e) => {
                 if language.contains('-') {
                     // try again in parent dir of regional language
-                    let language = language.split('-').next().unwrap_or(language);
-                    return PreferenceManager::unzip_files(path, language, default_lang);
+                    let language = language.split_once('-').unwrap_or((language, "")).0; // get the parent language
+                    // debug!("unzip_files: trying again in parent language: {}", language);
+                    PreferenceManager::unzip_files(path, language, default_lang)
+                                                .chain_err(|| format!("Couldn't open zip file {zip_file_string} in parent {language}: {e}."))?
+                } else {
+                    bail!("Couldn't open zip file {}: {}.", zip_file_string, e)
                 }
-                bail!("Couldn't open zip file {}: {}.", zip_file_string, e)
             },
             Ok(result) => {
                 result
             },
         };
-        UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow_mut().insert(zip_file_string) );
+
+        UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow_mut().insert(zip_file_string.clone()) );
+        // debug!("  unzip_files: unzipped {} files from {}", result, &zip_file_string);
+        // UNZIPPED_FILES.with( |unzipped_files| {
+        //     debug!("unzip_files: unzipped_files: {:?}", unzipped_files.borrow());
+        // });
+        
         return Ok(result);
     }
 
