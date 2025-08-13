@@ -1221,7 +1221,7 @@ fn is_structural(elements: &[&str]) -> bool {
 
 /// collect up all the elements in the mrow.
 ///  Returns the elements (which can be an empty vector) or None if something (right now an operator) rules out them being elements
-fn collect_elements(mrow: Element) -> Option<Vec<&str>> {
+fn collect_elements(mrow: Element<'_>) -> Option<Vec<&str>> {
     let mut elements = Vec::with_capacity(mrow.children().len()/2+1);       // don't bother with slots for operators
     for child in mrow.children() {
         let child = as_element(child);

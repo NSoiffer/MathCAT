@@ -632,7 +632,7 @@ fn add_ids(mathml: Element) -> Element {
     }
 }
 
-pub fn get_element(package: &Package) -> Element {
+pub fn get_element(package: &Package) -> Element<'_> {
     enable_logs();
     let doc = package.as_document();
     let mut result = None;

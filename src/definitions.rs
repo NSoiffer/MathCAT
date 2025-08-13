@@ -98,7 +98,7 @@ impl Definitions {
         }
     }
 
-    pub fn get_hashset(&self, name: &str) -> Option<Ref<HashSet<String>>> {
+    pub fn get_hashset(&self, name: &str) -> Option<Ref<'_, HashSet<String>>> {
         let names = self.name_to_var_mapping.get(name);
         if let Some(Contains::Set(set)) = names {
             return Some(set.borrow());
@@ -106,7 +106,7 @@ impl Definitions {
         return None;
     }
 
-    pub fn get_hashmap(&self, name: &str) ->  Option<Ref<HashMap<String, String>>> {
+    pub fn get_hashmap(&self, name: &str) ->  Option<Ref<'_, HashMap<String, String>>> {
         let names = self.name_to_var_mapping.get(name);
         if let Some(Contains::Map(map)) = names {
             return Some(map.borrow());
@@ -114,7 +114,7 @@ impl Definitions {
         return None;
     }
 
-    pub fn get_vec(&self, name: &str) -> Option<Ref<Vec<String>>> {
+    pub fn get_vec(&self, name: &str) -> Option<Ref<'_, Vec<String>>> {
         let names = self.name_to_var_mapping.get(name);
         if let Some(Contains::Vec(vec)) = names {
             return Some(vec.borrow());

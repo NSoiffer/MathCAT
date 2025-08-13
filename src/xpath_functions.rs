@@ -112,7 +112,7 @@ impl IsNode {
 
 
         // returns the element's text value
-        fn to_str(e: Element) -> &str {
+        fn to_str(e: Element<'_>) -> &str {
             // typically usage assumes 'e' is a leaf
             // bad MathML is the following isn't true
             if e.children().len() == 1 {
@@ -125,7 +125,7 @@ impl IsNode {
         }
 
         // same as 'to_str' but for ChildOfElement
-        fn coe_to_str(coe: ChildOfElement) -> &str {
+        fn coe_to_str(coe: ChildOfElement<'_>) -> &str {
             // typically usage assumes 'coe' is a leaf
             let element_node = coe.element();
             if let Some(e) = element_node {

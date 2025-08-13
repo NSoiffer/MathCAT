@@ -348,7 +348,7 @@ impl<'i> LexState<'i> {
         return Ok( () );
     }
 
-    fn get_next(&mut self) -> Result<&Token> {
+    fn get_next(&mut self) -> Result<&Token<'_>> {
         if self.remaining_str.is_empty() {
             self.token = Token::None;
         } else if TERMINALS_AS_U8.contains(&self.remaining_str.as_bytes()[0]) {
