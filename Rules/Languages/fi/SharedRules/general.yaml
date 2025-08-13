@@ -304,7 +304,7 @@
                          IfThenElse(parent::m:power, ancestor::*[2][self::m:mrow],
                          IfThenElse(parent::m:fraction and not(preceding-sibling::*), ancestor::*[2][self::m:mrow],
                          IfThenElse(parent::m:power[parent::m:fraction and not(preceding-sibling::*)], ancestor::*[3][self::m:mrow], false()) ) ) )"
-  - IsSingular: "(not(DEBUG($MRowForCoefficient)) and parent::*[name(.)!='skip-super' or *[1][.=1]]) or
+  - IsSingular: "(not($MRowForCoefficient) and parent::*[name(.)!='skip-super' or *[1][.=1]]) or
                  ($MRowForCoefficient and $MRowForCoefficient[(count(*) = 3 and *[1][self::m:mn and .=1] and *[2]='\u2062')])"
   - Prefix: "''"
   - Word: "''"  
