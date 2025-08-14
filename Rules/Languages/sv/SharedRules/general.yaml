@@ -245,6 +245,36 @@
   - pause: short
 
 
+# need to say "ett" for '1' in front of a neuter unit
+# this is extra complicated because we need to allow do it for a 1 in front of a mixed fraction
+# note: bias ha->hektar and Pa->Pascal, not si-prefix "a" (annum)
+- name: one-for-unit
+  tag: mn
+  match: ".=1"
+  variables:
+    # set right level for the location of the common fraction/mixed fraction
+  - IsMixedFraction: "following-sibling::*[1][.='\u2064']"
+  - UnitSibling: "IfThenElse($IsMixedFraction, .., .)"
+    # set the potential unit node -- otherwise set it to a empty node set (use a made up name)
+  - UnitNodeLocation: "IfThenElse($UnitSibling/..[self::m:mrow and count(*)=3 and *[2][.='\u2062']],
+                                  $UnitSibling/following-sibling::*[2],
+                                  self::m:select-no-nodes)"
+    # pick out the right node to test for being a neuter unit
+  - UnitNode: "IfThenElse($UnitNodeLocation[self::m:unit],
+                          $UnitNodeLocation[self::m:unit],
+                          $UnitNodeLocation[self::m:fraction[contains(@data-intent-property, ':unit:')]]/*[1])"
+    # test the node for being a neuter unit
+    # note: bias ha->hektar and Pa->Pascal, not si-prefix "a" (annum)
+  - NeuterUnitFollows: "$UnitNode[IsInDefinition(., 'Speech', 'NeuterUnits') or 
+                                  IsInDefinition(., 'Speech', 'NeuterUnitsWithoutPrefixes') or
+                                  (string-length(.) >= 2 and
+                                    . != 'ha' and . != 'Pa' and
+                                    DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != '' and
+                                    IsInDefinition(substring(., 2), 'Speech', 'NeuterUnits') != ''
+                                  ) ]"  
+  replace:
+  - x: "IfThenElse($NeuterUnitFollows, 'ett', 1)"
+
 # the order of matching is
 # 1. does it match the base of an SI unit
 # 2. does it match an English unit (if in an English language)
@@ -266,9 +296,25 @@
                          IfThenElse(parent::m:power, ancestor::*[2][self::m:mrow],
                          IfThenElse(parent::m:fraction and not(preceding-sibling::*), ancestor::*[2][self::m:mrow],
                          IfThenElse(parent::m:power[parent::m:fraction and not(preceding-sibling::*)], ancestor::*[3][self::m:mrow], false()) ) ) )"
+  # If a common fraction occurs before the unit, then it is singular, which means we have to copy the rules for common fractions (ugly!!!)
+  # It is also singular for a mixed fraction; in this case, the common fraction is buried inside of an mrow and we cheat and check for InvisiblePlus (2064)
   - IsSingular: "(not($MRowForCoefficient) and parent::*[name(.)!='skip-super' or *[1][.=1]]) or
-                 ($MRowForCoefficient and $MRowForCoefficient[(count(*) = 3 and *[1][self::m:mn and .=1] and *[2]='\u2062')])"
-
+                 ($MRowForCoefficient and
+                  $MRowForCoefficient[count(*) = 3 and 
+                                      *[2]='\u2062' and
+                                      *[1][(self::m:mn and .=1) or
+                                           (self::m:fraction and
+                                            IfThenElse($SpeechStyle='ClearSpeak',
+                                                       $ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac',
+                                                       $SpeechStyle='SimpleSpeak') and
+                                            *[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)] and
+                                            *[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]
+                                           ) or
+                                           (self::m:mrow and *[2][self::m:mo and .='\u2064'])
+                                          ]
+                                     ]
+                  
+                 )"
   - Prefix: "''"
   - Word: "''"  
   replace:
