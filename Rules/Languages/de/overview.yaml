@@ -21,10 +21,10 @@
       if: "IsNode(*[1], 'simple') and IsNode(*[2], 'simple')"
       then:
       - x: "*[1]"
-      - T: "über"
+      - T: "durch"
       - x: "*[2]"
       else:
-      - T: "fraktion"
+      - T: "bruch"
 
 - name: overview-default
   tag: [msqrt, "square-root"]
@@ -49,7 +49,7 @@
       - if: "*[2][.='2']"
         then: [T: "quadratwurzel"]
       - else_if: "*[2][.='3']"
-        then: [T: "würfelwurzel"]
+        then: [T: "dritte wurzel"]
       - else_if: "*[2][not(contains(., '.'))]"
         then: [x: "ToOrdinal(*[2])", T: "wurzel"]
       else:
@@ -57,7 +57,7 @@
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+          - pronounce: [{text: "-te"}, {ipa: "te"}, {sapi5: "te"}, {eloquence: "T"}]
           else: {x: "*[2]"}
       - T: "wurzel"
   - test:
