@@ -587,8 +587,8 @@ fn four_eighths_unit() {
     </mfrac>
     <mi mathvariant="normal" intent=":unit">g</mi>
 </math>"#;
-    test("sv", "ClearSpeak", expr, "4 åttedels gram");
-    test("sv", "SimpleSpeak", expr, "4 åttedels gram");
+    test("sv", "ClearSpeak", expr, "4 åttondels gram");
+    test("sv", "SimpleSpeak", expr, "4 åttondels gram");
 }
 
 
@@ -815,8 +815,8 @@ fn third_neuter_unit_prefix() {
     </mfrac>
     <mi mathvariant="normal" intent=":unit">mt</mi>
 </math>"#;
-    test("sv", "ClearSpeak", expr, "ett tredjedels milli-tonn");
-    test("sv", "SimpleSpeak", expr, "ett tredjedels milli-tonn");
+    test("sv", "ClearSpeak", expr, "ett tredjedels milli-ton");
+    test("sv", "SimpleSpeak", expr, "ett tredjedels milli-ton");
 }
 
 #[test]
@@ -910,8 +910,8 @@ fn density_thirds() {
     <mfrac><mn>1</mn><mn>3</mn></mfrac>
     <mfrac><mi mathvariant="normal" intent=":unit">kg</mi><msup><mi mathvariant="normal" intent=":unit">m</mi><mn>3</mn></msup></mfrac>
 </math>"#;
-    test("sv", "ClearSpeak", expr, "ett tredjedels, kilo-gram per meter kubik");
-    test("sv", "SimpleSpeak", expr, "ett tredjedels, kilo-gram per meter kubik");
+    test("sv", "ClearSpeak", expr, "ett tredjedels kilo-gram per meter kubik");
+    test("sv", "SimpleSpeak", expr, "ett tredjedels kilo-gram per meter kubik");
 }
 
 
@@ -934,6 +934,6 @@ fn density_two_fifths() {
     <mfrac><mn>2</mn><mn>5</mn></mfrac>
     <mfrac><mi mathvariant="normal" intent=":unit">kg</mi><msup><mi mathvariant="normal" intent=":unit">m</mi><mn>3</mn></msup></mfrac>
 </math>"#;
-    test("sv", "ClearSpeak", expr, "2 femtedels, kilo-gram per meter kubik");
-    test("sv", "SimpleSpeak", expr, "2 femtedels, kilo-gram per meter kubik");
+    test("sv", "ClearSpeak", expr, "2 femtedels kilo-gram per meter kubik");
+    test("sv", "SimpleSpeak", expr, "2 femtedels kilo-gram per meter kubik");
 }
