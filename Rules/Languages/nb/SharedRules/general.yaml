@@ -275,7 +275,6 @@
                                     DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != '' and
                                     IsInDefinition(substring(., 2), 'Speech', 'NeuterUnits') != ''
                                   ) ]"  
-
   replace:
   - x: "IfThenElse($NeuterUnitFollows, 'ett', 1)"
 

@@ -114,16 +114,6 @@
           then: [x: "DefinitionValue(*[2], 'Speech', 'OrdinalFractionalDenominatorsForUnits')"]
           else: [x: "*[2]", CT: "dels"]   # this is wrong but shouldn't occur normally -- need to write a function to compute cardinal numbers as words
 
-# - name: common-fraction-mixed-number
-#   tag: fraction
-#   match:
-#   - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
-#   - "*[1][self::m:mn][not(contains(., $DecimalSeparators))]   and"    #NORWEGIAN: Changed decimal point to $DecimalSeparators
-#   - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and text()<=10]"
-#   variables: [IsPlural: "*[1]!=1"]
-#   replace:
-#   - x: "*[1]"
-#   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 # Units (e.g., meters per second, m^2/s^2, (3m^2)/s)
 #NORWEGIAN: Added rule for t="time"

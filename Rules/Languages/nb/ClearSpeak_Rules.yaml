@@ -187,18 +187,6 @@
           else: [x: "*[2]", CT: "dels"]   # this is wrong but shouldn't occur normally -- need to write a function to compute cardinal numbers as words
 
 
-# - name: common-fraction-mixed-number
-#   tag: fraction
-#   match:
-#   - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
-#   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
-#   - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"     #NORWEGIAN: Changed decimal point to $DecimalSeparators
-#   - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]"                              #NORWEGIAN: Removed $ClearSpeak_Fractions='Ordinal', cause the pattern for ordinal fractions is not right.
-#   variables: [IsPlural: "*[1]!=1"]
-#   replace:
-#   - x: "*[1]"
-#   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
-
 #NORWEGIAN: Changed to English version, but changed decimal point to $DecimalSeparators 
 - name: fraction-over-simple
   tag: fraction
