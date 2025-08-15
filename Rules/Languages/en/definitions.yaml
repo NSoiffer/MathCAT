@@ -17,6 +17,7 @@
 
     "absolute-value": "function= ; absolute value: the absolute value: the absolute value; end absolute value",
     "binomial": "infix=binomial; choose; end binomial",
+    "dimension-product": "infix=by",
     # "closed-interval": "other=closed-interval; from,to; end closed-interval",
     "greatest-common-divisor": "function=gcd: the gcd: the greatest common divisor",
     "imaginary-part": "function=imaginary part, the imaginary part, the imaginary part",
@@ -49,8 +50,8 @@
 
     "chemistry-concentration": "function= ; concentration: concentration of: the concentration of; end concentration",
   }
-  # Names of functions that in terse mode don't say "of" (or it's equivalent in other languages)
 
+  # Names of functions that in terse mode don't say "of" (or it's equivalent in other languages)
 - TerseFunctionNames: {
     "divergence", "gradient", "curl"
   }
@@ -79,11 +80,6 @@
     # it's a hack to put them here, but at least they are grouped with the other navigation parts
     "in": "in",
     "out": "out of",
-  }
-
-- OperatorIntentRenaming: {
-    # These are the intents that are renamed to something else (probably most intents for non-English languages)
-    "dimension-product": "by"
   }
 
 - KnownWords: {

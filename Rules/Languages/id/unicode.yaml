@@ -154,14 +154,25 @@
         else: [T: buka kurung kurawal]
 - "|": # 0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" in side of sets is handled at the mrow level, same for 'sets'
-    - test:
-        - if: "$SpeechStyle != 'ClearSpeak' or not(preceding-sibling::*) or not(following-sibling::*)"
-          then: [T: garis vertikal]
-        - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
-          then: [T: sedemikian sehingga]
-        - else_if: "$ClearSpeak_VerticalLine = 'Given'"
-          then: [T: diberikan]
-        - else: [T: membagi]
+     - with:
+        variables: [DefaultToGiven: "count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and ../../../*[1][.='P']"] # P(A|B)
+        replace:
+        - test:
+            - if: "$SpeechStyle != 'ClearSpeak'"
+              then_test:
+                - if: "$DefaultToGiven"
+                  then: [T: diberikan]
+                - else_if: "preceding-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))] and 
+                            following-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))]"
+                  then: [T: membagi]
+                  else: [T: garis vertikal]
+            - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
+              then: [T: garis vertikal]
+            - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+              then: [T: sedemikian sehingga]
+            - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
+              then: [T: diberikan] 
+            - else: [T: membagi]                   
 
 - "}": # 0x7d
     - test:
@@ -268,10 +279,7 @@
         then: [T: dan seterusnya]
         else: [T: dan seterusnya hingga]
 
-- "⁡": # 0x2061
-    - test:
-        if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])"
-        then: [T: '']
+- "⁡": [T: '']  # 0x2061
 - "⁢": [T: ''] # 0x2062
 - "⁣": [T: ''] # 0x2063
 - "⁤": [T: 'and'] # 0x2064

@@ -13,6 +13,7 @@ use sxd_document::parser;
 use sxd_document::Package;
 
 use crate::canonicalize::{as_element, name};
+use crate::shim_filesystem::{find_all_dirs_shim, find_files_in_dir_that_ends_with_shim};
 
 use crate::navigate::*;
 use crate::pretty_print::mml_to_string;
@@ -212,7 +213,7 @@ pub fn get_preference(name: String) -> Result<String> {
 /// * TTS -- SSML, SAPI5, None
 /// * Pitch -- normalized at '1.0'
 /// * Rate -- words per minute (should match current speech rate).
-///       There is a separate "MathRate" that is user settable that causes a relative percentage change from this rate.
+///   There is a separate "MathRate" that is user settable that causes a relative percentage change from this rate.
 /// * Volume -- default 100
 /// * Voice -- set a voice to use (not implemented)
 /// * Gender -- set pick any voice of the given gender (not implemented)
@@ -494,6 +495,61 @@ pub fn get_navigation_node_from_braille_position(position: usize) -> Result<(Str
     });
 }
 
+pub fn get_supported_braille_codes() -> Vec<String> {
+    enable_logs();
+    let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
+    let braille_dir = rules_dir.join("Braille");
+    let mut braille_code_paths = Vec::new();
+
+    find_all_dirs_shim(&braille_dir, &mut braille_code_paths);
+    let mut braille_code_paths = braille_code_paths.iter()
+                    .map(|path| path.strip_prefix(&braille_dir).unwrap().to_string_lossy().to_string())
+                    .filter(|string_path| !string_path.is_empty() )
+                    .collect::<Vec<String>>();
+    braille_code_paths.sort();
+
+    return braille_code_paths;
+ }
+
+pub fn get_supported_languages() -> Vec<String> {
+    enable_logs();
+    let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
+    let lang_dir = rules_dir.join("Languages");
+    let mut lang_paths = Vec::new();
+
+    find_all_dirs_shim(&lang_dir, &mut lang_paths);
+    let mut language_paths = lang_paths.iter()
+                    .map(|path| path.strip_prefix(&lang_dir).unwrap()
+                                              .to_string_lossy()
+                                              .replace(std::path::MAIN_SEPARATOR, "-")
+                                              .to_string())
+                    .filter(|string_path| !string_path.is_empty() )
+                    .collect::<Vec<String>>();
+
+    language_paths.sort();
+    return language_paths;
+ }
+
+ pub fn get_supported_speech_styles(lang: String) -> Vec<String> {
+    enable_logs();
+    let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
+    let lang_dir = rules_dir.join("Languages").join(lang);
+    let mut speech_styles = find_files_in_dir_that_ends_with_shim(&lang_dir, "_Rules.yaml");
+    for file_name in &mut speech_styles {
+        file_name.truncate(file_name.len() - "_Rules.yaml".len())
+    }
+    speech_styles.sort();
+    let mut i = 1;
+    while i < speech_styles.len() {
+        if speech_styles[i-1] == speech_styles[i] {
+            speech_styles.remove(i);
+        } else {
+            i += 1;
+        }
+    }
+    return speech_styles;
+ }
+
 // utility functions
 
 /// Copy (recursively) the (MathML) element and return the new one.
@@ -531,10 +587,10 @@ pub fn errors_to_string(e: &Error) -> String {
     let mut first_time = true;
     for e in e.iter() {
         if first_time {
-            result = format!("{}\n", e);
+            result = format!("{e}\n");
             first_time = false;
         } else {
-            result += &format!("caused by: {}\n", e);
+            result += &format!("caused by: {e}\n");
         }
     }
     return result;
@@ -576,7 +632,7 @@ fn add_ids(mathml: Element) -> Element {
     }
 }
 
-pub fn get_element(package: &Package) -> Element {
+pub fn get_element(package: &Package) -> Element<'_> {
     enable_logs();
     let doc = package.as_document();
     let mut result = None;
@@ -649,8 +705,7 @@ pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
         if !single_text.trim_matches(WHITESPACE).is_empty() {
             error!(
-                "trim_element: both element and textual children which shouldn't happen -- ignoring text '{}'",
-                single_text
+                "trim_element: both element and textual children which shouldn't happen -- ignoring text '{single_text}'"
             );
         }
         return;

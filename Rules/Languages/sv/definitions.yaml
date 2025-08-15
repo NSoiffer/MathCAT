@@ -297,6 +297,31 @@
   }
 
 
+- NeuterUnits: {
+    #SIUnits
+    "Bq", "C", "F", "g", "Gy", "H", "Hz", "J", "kat", "lx", "m", "N", "Ω", "Pa",
+    "S", "Sv", "T", "t", "V", "W",
+  }
+    
+- NeuterUnitsWithoutPrefixes: {
+    #UnitsWithoutPrefixes
+    "″", "\"",
+    "′", "'", "min",
+    "y", "yr",
+    "arcmin", "amin", "am", "MOA":,                                    
+    "arcsec", "asec",
+    "ltyr", "ly", "l.y.",
+    
+    #EnglishUnits
+    "bbl", "BBL", "lb",
+  }
+
+    # stop when regularity begins
+- OrdinalFractionalDenominatorsForUnits: {
+          "0": "", "1": "", "2": "halv/halvt*", "3": "tredjedels", "4": "fjärdedels", "5": "femtedels",
+          "6": "sjättedels", "7": "sjundedels", "8": "åttondels", "9": "niondels", "10": "tiondels",
+  }
+
 # ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words
 # The are mainly used for ordinals, of which there are two cases:

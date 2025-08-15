@@ -232,7 +232,7 @@
 - name: zoom-in-mrow-in-math
   # zooming in only once is meaningless because 'math' has only a single child and it was spoken at the math level -- dig inside and do it again 
   tag: math
-  match: "($NavCommand = 'ZoomIn' or $NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom')"
+  match: "$NavCommand = 'ZoomIn' or $NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom'"
   replace:
   - test:
       if: "$NavCommand = 'MovePreviousZoom'"
@@ -278,7 +278,7 @@
           variables: [Move2D: "'in'", Child2D: "*[1]/*[1]"]   # phrase('in' the denominator)
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/*[1]/@id"] # skip mtd
-    - else_if: "*[1][self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]" # auto zoom
+    - else_if: "*[1][self::m:mrow and (IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false))]" # auto zoom
       then:
       - with:
           variables: [Move2D: "'in'", Child2D: "*[1]"]   # phrase('in' the denominator)
@@ -402,7 +402,7 @@
   replace:
   #don't bother with MatchCounter since we only get here if > 1
   - test:
-      if: "$ReadZoomLevel >= DistanceFromLeaf(., false, $NavMode!='Character')"
+      if: "IsNode(., 'leaf') or $ReadZoomLevel >= DistanceFromLeaf(., false, $NavMode!='Character')"
       then:
       # - with:
       #     variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]    # phrase('in' the denominator)
@@ -459,7 +459,7 @@
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
   - test:
-      if: "$NavMode='Enhanced' and parent::*[self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
+      if: "$NavMode='Enhanced' and parent::*[self::m:mrow and (IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false))]"
       then: [x: ".."] # auto-zoom: move out a level and retry
       else:
       - with:
@@ -1053,7 +1053,7 @@
 
 # skip 'none'
 - name: move-next-none
-  tag: "none"
+  tag: [none, mprescripts]
   match: 
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext' or $NavCommand = 'DescribePrevious' or $NavCommand = 'MoveNextZoom') and"
   - "parent::*[1][name(.)='mmultiscripts'] and following-sibling::*"
@@ -1075,7 +1075,7 @@
 
 # skip 'none'
 - name: move-previous-none
-  tag: "none"
+  tag: [none, mprescripts]
   match: 
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious' or $NavCommand = 'MovePreviousZoom') and"
   - "parent::*[1][name(.)='mmultiscripts'] and preceding-sibling::*"
@@ -1659,7 +1659,7 @@
   - t: "inside"                                           # phrase('inside' a big expression)
   - pause: medium
   - test:
-    - if: "$NavMode='Enhanced' and parent::*[self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
+    - if: "$NavMode='Enhanced' and parent::*[self::m:mrow and (IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false))]"
       then: [x: ".."] # auto-zoom up
     - else_if: "$NavCommand = 'WhereAmI'"
       then: [set_variables: [NavNode: "@id"]]

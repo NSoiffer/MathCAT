@@ -669,7 +669,7 @@ fn hcl_na_yields() {
       <msub> <mi>H</mi> <mn>2</mn> </msub>
       </mrow>
     </math>";
-  test_braille("Vietnam", expr, "⠼⠃⠨⠓⠨⠉⠇⠐⠖⠼⠃⠨⠝⠁⠳⠕⠼⠃⠨⠝⠁⠨⠉⠇⠐⠖⠨⠓⠢⠼⠃");
+  test_braille("Vietnam", expr, "⠼⠃⠸⠓⠉⠇⠐⠖⠼⠃⠨⠝⠁⠳⠕⠼⠃⠨⠝⠁⠨⠉⠇⠐⠖⠨⠓⠢⠼⠃");
 }
 
 #[test]
@@ -800,7 +800,7 @@ fn mhchem_hcl_aq_etc() {
       <mo stretchy='false'>)</mo>
     </mrow>
   </math>";
-  test_braille("Vietnam", expr, "⠼⠃⠨⠓⠨⠉⠇⠈⠣⠁⠟⠈⠜⠐⠖⠼⠃⠨⠝⠁⠈⠣⠎⠈⠜⠳⠕⠼⠃⠨⠝⠁⠨⠉⠇⠈⠣⠁⠟⠈⠜⠐⠖⠨⠓⠢⠼⠃⠈⠣⠛⠈⠜");
+  test_braille("Vietnam", expr, "⠼⠃⠸⠓⠉⠇⠈⠣⠁⠟⠈⠜⠐⠖⠼⠃⠨⠝⠁⠈⠣⠎⠈⠜⠳⠕⠼⠃⠨⠝⠁⠨⠉⠇⠈⠣⠁⠟⠈⠜⠐⠖⠨⠓⠢⠼⠃⠈⠣⠛⠈⠜");
 }
 
 #[test]
