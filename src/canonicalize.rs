@@ -1056,6 +1056,7 @@ impl CanonicalizeContext {
 							(children.len() > 1 && ELEMENTS_WITH_ONE_CHILD.contains(element_name)) {
 					let merged = merge_dots(mathml);	// FIX -- switch to passing in children
 					let merged = merge_primes(merged);
+					let merged = merge_degrees_C_F(merged);
 					let merged = merge_chars(merged, &IS_UNDERSCORE);
 					handle_pseudo_scripts(merged)
 				} else {
@@ -2285,6 +2286,44 @@ impl CanonicalizeContext {
 
 			children.drain(start+1..end);
 		}
+
+		
+		/// merge  ° C or  ° F into a single <mi> with the text '℃' or '℉' -- prevents '°' from becoming a superscript
+		#[allow(non_snake_case)]
+		fn merge_degrees_C_F<'a>(mrow: Element<'a>) -> Element<'a> {
+			let mut degree_child = None;
+			for child in mrow.children() {
+				let child = as_element(child);
+				if is_leaf(child) {
+					match as_text(child) {
+						"°" => {
+							degree_child = Some(child);
+						},
+						"°C" => {
+							child.set_text("℃");
+							degree_child = None;
+						},
+						"°F" => {
+							child.set_text("℉");
+							degree_child = None;
+						},
+						text  => {
+							if let Some(degree_child) = degree_child {
+								if text == "C" || text == "F" {
+									// merge the degree child with the current child
+									degree_child.set_text(if text == "C" { "℃" } else { "℉" });
+									child.remove_from_parent();
+								}
+								// merge the degree child with the current child
+							}
+							degree_child = None;	
+						},
+					}
+				}
+			}
+			return mrow;
+		}
+
 
 		/// merge consecutive leaves containing any of the 'chars' into the first leaf -- probably used for omission with('_')
 		fn merge_chars<'a>(mrow: Element<'a>, pattern: &Regex) -> Element<'a> {
