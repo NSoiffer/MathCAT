@@ -1158,7 +1158,7 @@ impl CanonicalizeContext {
 				}
 
 				mathml.replace_children(children);
-				// debug!("clean_mathml: after loop\n{}", mml_to_string(mathml));
+				debug!("clean_mathml: after loop\n{}", mml_to_string(mathml));
 
 				if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					clean_chemistry_mrow(mathml);
