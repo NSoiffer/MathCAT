@@ -19,7 +19,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: "el"}
+      then: {T: "der"}
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
@@ -157,10 +157,10 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [{OT: "la"}]
+          then: [{OT: "der"}]
       - T: "bruch"
   - x: "*[1]"
-  - T: "duch"
+  - T: "durch"
   - x: "*[2]"
   - test:
       # very ugly!!! -- replicate nested ordinal fraction as they are an exception
@@ -195,7 +195,7 @@
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
       then:
       - pause: short
-      - T: "end brich"
+      - T: "end bruch"
       - pause: short
 
 - name: default
@@ -256,7 +256,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: "la"}
+      then: {T: ""}
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][self::m:mn][not(contains(., '.'))]"
@@ -330,7 +330,7 @@
   - x: "*[2]"
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{T: "potencia"}]
+      then: [{T: "hoch"}]
 
 - name: simple-var
   tag: power
@@ -467,7 +467,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: "el"}
+      then: {T: "der"}
   - x: "$WordToSay"
   - T: "von"
   - x: "*[1]"
@@ -490,7 +490,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: "el"}
+          then: {T: "die"}
       - T: "leere Menge"
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
       then:
@@ -634,7 +634,7 @@
       else:
       - test:
           if: "$Verbosity!='Terse' and not(log_is_simple)"
-          then: {T: "el"}
+          then: {T: "der"}
       - test:
         - if: "*[1][.='log']"
           then: [{T: "log"}]
