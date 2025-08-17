@@ -10,6 +10,9 @@ is a library that supports conversion of MathML to:
 
 This is the fork of [MathCAT](https://github.com/NSoiffer/MathCAT) of Neil Soiffer focussed on the translations to the German speaking contexts. 
 
+## Status
+This translation project was launched in the summer 2025 it is quite new still.
+
 ## How to contribute?
 This project is untertaken by the team of IT&Tech at the [IU University of Applied Sciences](https://www.iu.org/) and welcomes test-reports in the form of issues and proposed changes in the form of pull-requests.
 
