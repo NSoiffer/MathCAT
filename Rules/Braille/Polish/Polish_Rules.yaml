@@ -1,21 +1,21 @@
 # References such as 7.2(5) refer to the fifth example in section 7.2 in guide from ONCE
 # https://www.once.es/servicios-sociales/braille/comision-braille-espanola/documentos-tecnicos/documentos-tecnicos-relacionados-con-el-braille/documentos/b5-signografia-matematica.pdf
 ---
--
-  name: unit-spaces
-  tag: "!*"
-  match: "not(self::m:math) and not($MatchingWhitespace) and (@data-previous-space-width >= 0.25 or @data-following-space-width >= 0.25)"
-  replace:
-   - with:
-      variables: [MatchingWhitespace: "true()"]
-      replace:
-      - test:
-        - if: "(@class='MathML-unit' or contains(@intent, ':unit') or BaseNode(.)[@class='MathML-unit' or contains(@intent, ':unit')]) and @data-previous-space-width >= 0.25" 
-          then: [t: "𝐖"]
-      - x: "."
-      - test:
-        - if: "(@class='MathML-unit' or contains(@intent, ':unit') or BaseNode(.)[@class='MathML-unit' or contains(@intent, ':unit')]) and @data-following-space-width >= 0.25" 
-          then: [t: "𝐖"]
+# -
+#   name: unit-spaces
+#   tag: "!*"
+#   match: "not(self::m:math) and not($MatchingWhitespace) and (@data-previous-space-width >= 0.25 or @data-following-space-width >= 0.25)"
+#   replace:
+#    - with:
+#       variables: [MatchingWhitespace: "true()"]
+#       replace:
+#       - test:
+#         - if: "(@class='MathML-unit' or contains(@intent, ':unit') or BaseNode(.)[@class='MathML-unit' or contains(@intent, ':unit')]) and @data-previous-space-width >= 0.25" 
+#           then: [t: "𝐖"]
+#       - x: "."
+#       - test:
+#         - if: "(@class='MathML-unit' or contains(@intent, ':unit') or BaseNode(.)[@class='MathML-unit' or contains(@intent, ':unit')]) and @data-following-space-width >= 0.25" 
+#           then: [t: "𝐖"]
 
 -
   name: omissions
@@ -38,32 +38,22 @@
   tag: msqrt
   match: "."
   replace: 
-  - t: "⠫⠱"
-  - test:
-      if: "NeedsToBeGrouped(*[1], 'CMU', true())"
-      then:
-      - t: "⠢"
-      - x: "*"
-      - t: "⠔"
-      else:
-      - x: "*"
+  - t: "⠩"
+  - x: "*"
 
 -
   name: default
   tag: mroot
   match: "."
   replace: 
-  - t: "⠫"
-  - x: "*[2]"
-  - t: "⠱"
+  - t: "⠌"
   - test:
-      if: "NeedsToBeGrouped(*[1], 'CMU', true())"
-      then:
-      - t: "⠢"
-      - x: "*[1]"
-      - t: "⠔"
-      else:
-      - x: "*[1]"
+      if: "*[2][self::m:mn][not(contains(., '.,'))]"
+      then: [x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
+
+      else: [x: "*[2]"]
+  - t: "⠩"
+  - x: "*[1]"
         
 -
   name: repeating decimal (2.3 uses a "^" over the repeating decimals)
@@ -99,8 +89,7 @@
   replace: 
   - t: "#"   # need to force a number sign between the numbers
   - x: "*[1]"
-  - t: "n"  # don't need number indicator
-  - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
+  - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
 
 # -
 #   name: numeric-slash  (includes -1/2, etc)
@@ -117,17 +106,30 @@
 #       then: [x: "*[1]"]
 #       else: [x: "*[1]/*[1]", x: "*[1]/*[2]"]
 #   # '/' not used
-#   - x: "BrailleChars(translate(*[3], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
+#   - x: "BrailleChars(translate(*[3], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
 #   - t: "W"
 -
   name: simple-number
   tag: mfrac
-  match: "*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]"
+  match: "$Polish_UseShortForm and *[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]"
   replace:
   - x: "*[1]"
-  - t: "n"  # don't need number indicator
-  - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
+  - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
   - t: "W"
+
+-
+  name: simple-fraction
+  tag: mfrac
+  match: "$Polish_UseShortForm and *[1][string-length(.)=1] and *[2][string-length(.)=1]"
+  replace:
+  - x: "*[1]"
+  - t: "⠳"  # don't need number indicator
+  - test:
+      if: "$Polish_UseShortForm and *[2][self::m:mn][not(contains(., '.,'))]"
+      then:
+      - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
+      else:
+      - x: "*[2]"
 
 -
   name: default
@@ -136,9 +138,15 @@
   replace: 
   - t: "⠆"
   - x: "*[1]"
-  - t: "W⠳W"
-  - x: "*[2]"
-  - t: "⠰"
+  - test:
+      if: "$Polish_UseShortForm and *[2][self::m:mn][not(contains(., '.,'))]"
+      then:
+      - t: "⠳"
+      - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
+      else:
+      - t: "W⠳W"
+      - x: "*[2]"
+      - t: "⠰"
 
 #
 # Matrix/Determinant rules
@@ -222,7 +230,7 @@
   match: "not(*)"
   replace: [t: "W"] # not sure what is correct -- if in a fraction, probably something is better than nothing
 
--
+# -
   # 1.3 says that if the character after a closing(?) bar has any of dots 1, 2, or 3, then a blank must be added.
   # The rule should exam the translation of right sibling, but there is no way to do that.
   # The ugly hack is to define a variable lists all the chars with dots in any of position 1, 2, or 3.
@@ -232,18 +240,18 @@
   # It grabs the text of the leftmost child, but this is wrong if some braille indicators come first,
   #   such as a sqrt or implicit grouping. All of these cases have dots in positions 1, 2, or 3.
   #   We do a one level down test for these cases, but it is only a band-aid
-  name: space-after-bar
-  tag: mrow
-  variables: [NextRealChild: "IfThenElse(following-sibling::*[1][.='\u2062'], following-sibling::*[2], following-sibling::*[1])"]
-  match:
-  - "IsBracketed(., '|', '|') and $NextRealChild and"
-  - "( $NextRealChild[self::m:msqrt] or $NextRealChild[self::m:mroot] or"    # have indicator with dots in first half
-  - "  (IsNode($NextRealChild, '2D') and $NextRealChild[*[1][self::m:mrow and not(IsBracketed(., '', ''))]]) or"  # grouping char added which has dots in first half 
-  - "  IsInDefinition(substring($NextRealChild, 1, 1), 'Braille', 'CMUCharsWithDotsOnLeft')"
-  - ")"
-  replace:
-  - x: "*"
-  - t: "W"
+  # name: space-after-bar
+  # tag: mrow
+  # variables: [NextRealChild: "IfThenElse(following-sibling::*[1][.='\u2062'], following-sibling::*[2], following-sibling::*[1])"]
+  # match:
+  # - "IsBracketed(., '|', '|') and $NextRealChild and"
+  # - "( $NextRealChild[self::m:msqrt] or $NextRealChild[self::m:mroot] or"    # have indicator with dots in first half
+  # - "  (IsNode($NextRealChild, '2D') and $NextRealChild[*[1][self::m:mrow and not(IsBracketed(., '', ''))]]) or"  # grouping char added which has dots in first half 
+  # - "  IsInDefinition(substring($NextRealChild, 1, 1), 'Braille', 'CMUCharsWithDotsOnLeft')"
+  # - ")"
+  # replace:
+  # - x: "*"
+  # - t: "W"
 
 -
   # 7.5.1 defines special rule for binomial
@@ -279,47 +287,94 @@
   match: "@data-roman-numeral or contains(@intent, ':roman-numeral')"
   replace:
   # for uppercase, need to only have one as uppercase
-  - x: "BrailleChars(., 'CMU', 1, 2)"
-  - x: "BrailleChars(translate(., 'IVXLCDM', 'ivxlcdm'), 'CMU', 2, string-length(.)+1)"
+  - x: "BrailleChars(., 'Polish', 1, 2)"
+  - x: "BrailleChars(translate(., 'IVXLCDM', 'ivxlcdm'), 'Polish', 2, string-length(.)+1)"
 
 -
-  name: Ln-hack
+  name: sin
   tag: mi
-  match: ".='Ln'"   # 'Ln' is supposed braille the same as 'ln'
+  match: ".='sin'"
   replace:
-  - t: "L⠇L⠝."
+  - t: "f⠫⠎"      # "f" -- for function, forces letter mode
 
 -
-  name: bolívar
-  tag: [mi, mtext]
-  match: ".='Bs'"
+  name: cos
+  tag: mi
+  match: ".='cos'"
   replace:
-  - t: "L⠸L⠃L⠎"
+  - t: "f⠫⠉"
 
 -
-  name: real
-  tag: [mi, mtext]
-  match: ".='R$'"
+  name: tg
+  tag: mi
+  match: ".='tg'"
   replace:
-  - t: "L⠸L⠗"
+  - t: f⠫⠞"
 
 -
-  name: remarco-alemánal
-  tag: [mi, mtext]
-  match: ".='DM'"
+  name: ctg
+  tag: mi
+  match: ".='ctg'"
   replace:
-  - t: "L⠸L⠍"
+  - t: "f⠫⠳"
+
+-
+  name: sec
+  tag: mi
+  match: ".='sin'"
+  replace:
+  - t: "f⠫⠤"
+
+-
+  name: cosec
+  tag: mi
+  match: ".='cosec'"
+  replace:
+  - t: "f⠫⠣"
+
+-
+  name: const
+  tag: mi
+  match: ".='const'"
+  replace:
+  - t: "N⠅"
+
+-
+  name: signum
+  tag: mi
+  match: ".='sgn'"
+  replace:
+  - t: "N⠎"
+
 
 -
   name: default
-  tag: mi
+  tag: [mtext, mi]
   match: "."
   replace:
-  - x: "BrailleChars(., 'CMU')"   # also deals with "dot after 'arc'"
-  - test:  # Section 12 says strings longer than one should end with dot 3 rather than restricting to just listed functions (don't do this for mtext)
-      if: "string-length(.) > 1 and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '' and
-           not(@class='MathML-unit' or contains(@intent, ':unit') )"
-      then: [t: "."]
+  - test:
+      # add unit indicator
+      if: "@class='MathML-unit' or contains(@intent, ':unit') or
+           (not(@data-chem-element) and
+            (self::m:mtext or string-length(.) > 1 or @mathvariant='normal') and
+            (parent::*[1][self::m:mrow and count(*)=3 and *[2][.='\u2062'] and
+                          *[1][self::m:mn or
+                               (self::m:mfrac and *[1][self::m:mn] and *[2][self::m:mn]) or
+                               (self::m:msup and *[1][self::m:mn])
+                              ]]) and
+            count(preceding-sibling::*) = 2 and 
+            (IsInDefinition(., 'Braille', 'SIUnits') or
+             IsInDefinition(., 'Braille', 'UnitsWithoutPrefixes') or 
+             IsInDefinition(., 'Braille', 'EnglishUnits') or
+             (string-length(.) >= 3 and
+              substring(., 1, 2) = 'da' and 
+              IsInDefinition(substring(., 3), 'Braille', 'SIUnits')) or
+             (string-length(.) >= 2 and
+              IsInDefinition(substring(., 1, 1), 'Braille', 'SIPrefixes') and
+              IsInDefinition(substring(., 2), 'Braille', 'SIUnits')))
+           )"
+      then: [t: "U"]
+  - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
       
 
 -
@@ -334,14 +389,14 @@
   - "translate(., '0123456789abcdefABCDEF', '')=''"
   replace:
   - x: "BrailleChars(concat(substring(.,1,1), translate(substring(., 2), 'abcdefABCDEF',
-            '\ue00a\ue00b\ue00c\ue00d\ue00e\ue00f\ue01a\ue01b\ue01c\ue01d\ue01e\ue01f')), 'CMU')"
+            '\ue00a\ue00b\ue00c\ue00d\ue00e\ue00f\ue01a\ue01b\ue01c\ue01d\ue01e\ue01f')), 'Polish')"
 
 -
   name: default
-  tag: [mn, mo, mtext]
+  tag: [mn, mo]
   match: "."
   replace:
-  - x: "BrailleChars(., 'CMU')"
+  - x: "BrailleChars(., 'Polish')"
 
 -
   name: default
@@ -354,14 +409,36 @@
       # else do nothing -- no content
 
 -
-  # 9.1 (doesn't say what to do about munderover -- seems to only apply to right arrow)  -- splits dots25
   name: modified-right-arrow
   tag: [mover, munder]
   match: "*[1][self::m:mo and (.='→' or .='⟶')]"
   replace:
-  - t: "⠒"
+  - t: "⠨⠁⠃"
   - x: "*[2]"
-  - t: "⠒⠂"
+
+-
+  name: over-arc
+  tag: mover
+  match: "*[2][self::m:mo and .='⏜']"  # 0x23dc
+  replace:
+  - t: "⠨⠣"
+  - x: "*[1]"
+
+-
+  name: over-line
+  tag: mover
+  match: "*[2][self::m:mo and .='¯']"  # 0x00AF
+  replace:
+  - t: "⠨⠒"
+  - x: "*[1]"
+
+-
+  name: under-line
+  tag: munder
+  match: "*[2][self::m:mo and .='¯']"  # 0x00AF
+  replace:
+  - t: "⠨⠒⠒"
+  - x: "*[1]"
 
 -
   # special hack to catch double over/under bar built from nested mover/munder
@@ -543,37 +620,27 @@
   - x: "*[1]"
   - x: "*[3]"
   - t: "⠌"
-  - test:
-      # the rules for scripts seem to always want a nested script to be bracketed
-      # there aren't any root examples in scripts and numeric fractions don't get bracketed
-      if: "NeedsToBeGrouped(*[2], 'CMU', false())"
-      then:
-      - t: "⠢"
-      - x: "*[2]"
-      - t: "⠔"
-      else:
-      - x: "*[2]"
+  - x: "*[2]"
 
 -
   # simple numeric scripts are written as drop numbers
   name: simple-number-exponent
   tag: [msub, msup]
-  match: "*[2][self::m:mn or (self::m:mrow and count(*)=2 and *[1]='-' and *[2][self::m:mn])]"  # FIX: test for integers
+  match: "*[2][(self::m:mn and not(contains(., $DecimalSeparators))) or
+               (self::m:mrow and count(*)=2 and *[1]='-' and *[2][self::m:mn and not(contains(., $DecimalSeparators))])]"
   replace:
   - x: "*[1]"
   - test:
       - if: "self::m:msup"
-        then: [t: "⠌"]
+        then: [t: "⠬"]   # FIX: find out which is right, could be "⠌"
         else: [t: "⠡"]
   - test:
       if: "*[2][self::m:mn]"
       then:
-      - t: "n"  # don't need number indicator
-      - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"
+      - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"
       else:
       - x: "*[2]/*[1]"
-      - t: "n"  # don't need number indicator
-      - x: "BrailleChars(translate(*[2]/*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
+      - x: "BrailleChars(translate(*[2]/*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
 
 -
   name: single-char-exceptions    # 4.3.1
@@ -597,35 +664,7 @@
       # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
       if: "not(*[3][.='°'] and *[1][self::m:mn or @data-chem-element])" 
       then: [t: "⠄"]
-  - test:
-      # the rules for scripts seem to always want a nested script to be bracketed
-      # there aren't any root examples in scripts and numeric fractions don't get bracketed
-      if: "NeedsToBeGrouped(*[2], 'CMU', false())"
-      then:
-      - t: "⠢"
-      - x: "*[2]"
-      - t: "⠔"
-      else:
-      - x: "*[2]"
-
--
-  # this is the last part of the section -- something like "4*" in superscript indicating 4 "*"s
-  name: number-char-exceptions    # 4.3.1  (FIX: degree doesn't use dot-3 for chemistry or temp/angles/etc)
-  tag: [msub, msup]
-  match:
-  - "*[2][translate(., \"'*`+-∞ª°²³´¹º‘’“”‟‵‶‷\",'')=''] or"
-  - "*[2][self::m:mrow and count(*)=2 and *[1][self::m:mn] and *[2][self::m:mo][translate(., \"'*`+-ª°²³´¹º‘’“”‟‵‶‷\",'')='']]"
-  replace:
-  - x: "*[1]"
-  - test:
-      - if: "self::m:msub"
-        then: [t: "⠌"]
-        else: [t: "⠡"]
   - x: "*[2]"
-  - test:
-      # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
-      if: "not(*[2][.='°'] and *[1][self::m:mn or @data-chem-element])" 
-      then: [t: "⠄"]
 
 -  # 9.2 (guessing this applies to limits written with both munder and msub)
   name: known-functions
@@ -667,7 +706,7 @@
   # replace:
   # - x: "*[1]"
   # - t: "𝑁"    # don't add numeric indicator
-  # - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the subscript
+  # - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the subscript
 
 -
   name: nested-scripts    # this case likely should have been written as mmultiscripts, but people will use this (4.4.2)
@@ -693,55 +732,21 @@
 
 -
   name: default
-  tag: [msub, msup, msubsup, munder, mover, munderover]
+  tag: [msub, msup, msubsup]
   match: "."
-  replace: 
-  - test:
-      if: "*[1][self::m:mrow and not(IsBracketed(., '', ''))]"
-      then:
-      - t: "⠢"
-      - x: "*[1]"
-      - t: "⠔"
-      else:
-      - x: "*[1]"
+  replace:
+  - x: "*[1]"
   - test:
       - if: "self::m:msub or self::m:msubsup"
-        then: [t: "⠌"]
-      - else_if: "self::m:msup"
         then: [t: "⠡"]
-      - else_if: "self::m:munder or self::m:munderover"
-        then: [t: "⠌⠌"]
-        else: [t: "⠡⠡"]  # mover
+      - else_if: "self::m:msup"
+        then: [t: "⠬"]
+  - x: "*[2]"
   - test:
-      # the rules for scripts seem to always want a nested script to be bracketed
-      # there aren't any root examples in scripts and numeric fractions don't get bracketed
-      if: "NeedsToBeGrouped(*[2], 'CMU', false())"
+      if: "self::m:msubsup"
       then:
-      - t: "⠢"
-      - x: "*[2]"
-      - t: "⠔"
-      else:
-      - x: "*[2]"
-  - test:
-      if: "self::m:msubsup or self::m:munderover"
-      then:
-      - test:
-          - if: "self::m:msubsup"
-            then: [t: "⠡"]
-            else: [t: "⠡⠡"]  # munderover
-      - test:
-          # the rules for scripts seem to always want a nested script to be bracketed
-          # there aren't any root examples and it seems like fractions don't get bracketed
-          if: "NeedsToBeGrouped(*[3], 'CMU', false())"
-          then:
-          - t: "⠢"
-          - x: "*[3]"
-          - t: "⠔"
-          else:
-          - x: "*[3]"
-  - test:
-     if: "self::m:msup and *[2][self::m:mo]"
-     then: [t: "⠄"]
+      - t: "⠬"
+      - x: "*[3]"
 
 -
   # This is incredibly messy because it needs to handle all the special cases for scripts, and then repeat them for each pre/postscript
@@ -779,7 +784,7 @@
                 - "count($Prescripts[1]/*) > 3 and string-length($Prescripts[1]/*[1])=1 and"    # at least four mo's, the first of which has a single char
                 - "$Prescripts[1][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
                 then:
-                - x: "BrailleChars(count($Prescripts[1]/*), 'CMU')"
+                - x: "BrailleChars(count($Prescripts[1]/*), 'Polish')"
                 - x: "$Prescripts[1]/*[1]"
                 - test:
                     # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
@@ -809,7 +814,7 @@
                 - "count($Prescripts[2]/*) > 3 and string-length($Prescripts[2]/*[1])=1 and"    # at least four mo's, the first of which has a single char
                 - "$Prescripts[2][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
                 then:
-                - x: "BrailleChars(count($Prescripts[2]/*), 'CMU')"
+                - x: "BrailleChars(count($Prescripts[2]/*), 'Polish')"
                 - x: "$Prescripts[2]/*[1]"
                 - test:
                     # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
@@ -842,7 +847,7 @@
                     - "count($Prescripts[3]/*) > 3 and string-length($Prescripts[3]/*[1])=1 and"    # at least four mo's, the first of which has a single char
                     - "$Prescripts[3][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
                     then:
-                    - x: "BrailleChars(count($Prescripts[3]/*), 'CMU')"
+                    - x: "BrailleChars(count($Prescripts[3]/*), 'Polish')"
                     - x: "$Prescripts[3]/*[1]"
                     - test:
                         # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
@@ -872,7 +877,7 @@
                     - "count($Prescripts[4]/*) > 3 and string-length($Prescripts[4]/*[1])=1 and"    # at least four mo's, the first of which has a single char
                     - "$Prescripts[4][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
                     then:
-                    - x: "BrailleChars(count($Prescripts[4]/*), 'CMU')"
+                    - x: "BrailleChars(count($Prescripts[4]/*), 'Polish')"
                     - x: "$Prescripts[4]/*[1]"
                     - test:
                         # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
@@ -909,7 +914,7 @@
                 - "count($Postscripts[1]/*) > 3 and string-length($Postscripts[1]/*[1])=1 and"    # at least four mo's, the first of which has a single char
                 - "$Postscripts[1][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
                 then:
-                - x: "BrailleChars(count($Postscripts[1]/*), 'CMU')"
+                - x: "BrailleChars(count($Postscripts[1]/*), 'Polish')"
                 - x: "$Postscripts[1]/*[1]"
                 - test:
                     # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
@@ -939,7 +944,7 @@
                 - "count($Postscripts[2]/*) > 3 and string-length($Postscripts[2]/*[1])=1 and"    # at least four mo's, the first of which has a single char
                 - "$Postscripts[2][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
                 then:
-                - x: "BrailleChars(count($Postscripts[2]/*), 'CMU')"
+                - x: "BrailleChars(count($Postscripts[2]/*), 'Polish')"
                 - x: "$Postscripts[2]/*[1]"
                 - test:
                     # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
@@ -965,7 +970,7 @@
                     - "count($Postscripts[3]/*) > 3 and string-length($Postscripts[3]/*[1])=1 and"    # at least four mo's, the first of which has a single char
                     - "$Postscripts[3][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
                     then:
-                    - x: "BrailleChars(count($Postscripts[3]/*), 'CMU')"
+                    - x: "BrailleChars(count($Postscripts[3]/*), 'Polish')"
                     - x: "$Postscripts[3]/*[1]"
                     - test:
                         # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
@@ -995,7 +1000,7 @@
                     - "count($Postscripts[4]/*) > 3 and string-length($Postscripts[4]/*[1])=1 and"    # at least four mo's, the first of which has a single char
                     - "$Postscripts[4][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
                     then:
-                    - x: "BrailleChars(count($Postscripts[4]/*), 'CMU')"
+                    - x: "BrailleChars(count($Postscripts[4]/*), 'Polish')"
                     - x: "$Postscripts[4]/*[1]"
                     - test:
                         # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
@@ -1028,7 +1033,7 @@
                         - "count($Postscripts[5]/*) > 3 and string-length($Postscripts[5]/*[1])=1 and"    # at least four mo's, the first of which has a single char
                         - "$Postscripts[5][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
                         then:
-                        - x: "BrailleChars(count($Postscripts[5]/*), 'CMU')"
+                        - x: "BrailleChars(count($Postscripts[5]/*), 'Polish')"
                         - x: "$Postscripts[5]/*[1]"
                         - test:
                             # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
@@ -1058,7 +1063,7 @@
                         - "count($Postscripts[6]/*) > 3 and string-length($Postscripts[6]/*[1])=1 and"    # at least four mo's, the first of which has a single char
                         - "$Postscripts[6][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
                         then:
-                        - x: "BrailleChars(count($Postscripts[6]/*), 'CMU')"
+                        - x: "BrailleChars(count($Postscripts[6]/*), 'Polish')"
                         - x: "$Postscripts[6]/*[1]"
                         - test:
                             # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
@@ -1251,7 +1256,7 @@
          if: "string(@lquote)!=''"
          then: [x: "@lquote"]
          else: [t: "⠄⠄"]
-      - x: "BrailleChars(., 'CMU')"
+      - x: "BrailleChars(., 'Polish')"
       - test:
          if: "string(@rquote)!=''"
          then: [x: "@rquote"]

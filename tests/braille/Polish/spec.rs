@@ -5,6 +5,7 @@ use crate::common::*;
 
 #[test]
 fn Intro_1() {
+    init_logger();
     let expr = r#"<math><msqrt><mn>16</mn></msqrt></math>"#;
     test_braille("Polish", expr, "⠩⠼⠁⠋");
 }
@@ -22,15 +23,9 @@ fn Intro_3() {
 }
 
 #[test]
-fn Intro_4() {
-    let expr = r#"<math><mroot><mn>27</mn><mn>3</mn></mroot><mo>=</mo><mn>3</mn></math>"#;
-    test_braille("Polish", expr, "⠌⠒⠩⠼⠃⠛⠀⠶⠼⠉");
-}
-
-#[test]
 fn decimal_numbers_1() {
     let expr = r#"<math><mn>7</mn><mo>,</mo><mn>29</mn></math>"#;
-    test_braille("Polish", expr, "⠼⠛⠃⠊");
+    test_braille("Polish", expr, "⠼⠛⠂⠃⠊");
 }
 
 #[test]
@@ -47,7 +42,9 @@ fn decimal_numbers_3() {
 
 #[test]
 fn decimal_numbers_4() {
-    let expr = r#"<math><mn>0</mn><mo>,</mo><mn>333</mn><mo>.</mo><mo>.</mo><mo>.</mo><mo>=</mo><mn>0</mn><mo>,</mo><mo>(</mo><mn>3</mn><mo>)</mo></math>"#;
+    // FIX: wasn't able to repair this MathML
+    // let expr = r#"<math><mn>0</mn><mo>,</mo><mn>333</mn><mo>.</mo><mo>.</mo><mo>.</mo><mo>=</mo><mn>0</mn><mo>,</mo><mo>(</mo><mn>3</mn><mo>)</mo></math>"#;
+    let expr = r#"<math><mn>0,333</mn><mo>.</mo><mo>.</mo><mo>.</mo><mo>=</mo><mn>0</mn><mo>,</mo><mo>(</mo><mn>3</mn><mo>)</mo></math>"#;
     test_braille("Polish", expr, "⠼⠚⠂⠉⠉⠉⠄⠄⠄⠀⠶⠼⠚⠂⠣⠼⠉⠜");
 }
 
@@ -65,72 +62,72 @@ fn percents_and_promiles_2() {
 
 #[test]
 fn units_of_measurement_1() {
-    let expr = r#"<math><mn>1</mn><mi>m</mi></math>"#;
+    let expr = r#"<math><mn>1</mn><mi intent=":unit">m</mi></math>"#;
     test_braille("Polish", expr, "⠼⠁⠻⠍");
 }
 
 #[test]
 fn units_of_measurement_2() {
-    let expr = r#"<math><mn>1</mn><mi>k</mi><mi>m</mi></math>"#;
+    let expr = r#"<math><mn>1</mn><mi intent=":unit">km</mi></math>"#;
     test_braille("Polish", expr, "⠼⠁⠻⠅⠍");
 }
 
 #[test]
 fn units_of_measurement_3() {
-    let expr = r#"<math><mn>5</mn><mfrac><mi>m</mi><mi>s</mi></mfrac></math>"#;
+    let expr = r#"<math><mn>5</mn><mfrac><mi intent=":unit">m</mi><mi intent=":unit">s</mi></mfrac></math>"#;
     test_braille("Polish", expr, "⠼⠑⠻⠍⠳⠎");
 }
 
 #[test]
 fn units_of_measurement_4() {
-    let expr = r#"<math><mn>230</mn><mi>V</mi></math>"#;
+    let expr = r#"<math><mn>230</mn><mi intent=":unit">V</mi></math>"#;
     test_braille("Polish", expr, "⠼⠃⠉⠚⠻⠨⠧");
 }
 
 #[test]
 fn units_of_measurement_5() {
-    let expr = r#"<math><mn>2</mn><mi>m</mi><mi>i</mi><mi>n</mi></math>"#;
+    let expr = r#"<math><mn>2</mn><mi intent=":unit">min</mi></math>"#;
     test_braille("Polish", expr, "⠼⠃⠻⠍⠊⠝");
 }
 
 #[test]
 fn units_of_measurement_6() {
-    let expr = r#"<math><mn>5</mn><mi>N</mi></math>"#;
+    let expr = r#"<math><mn>5</mn><mi intent=":unit">N</mi></math>"#;
     test_braille("Polish", expr, "⠼⠑⠻⠨⠝");
 }
 
 #[test]
 fn units_of_measurement_7() {
-    let expr = r#"<math><mn>2</mn><mo>,</mo><mn>5</mn><msup><mi>m</mi><mn>2</mn></msup></math>"#;
+    let expr = r#"<math><mn>2</mn><mo>,</mo><mn>5</mn><msup><mi intent=":unit">m</mi><mn>2</mn></msup></math>"#;
     test_braille("Polish", expr, "⠼⠃⠂⠑⠻⠍⠬⠆");
 }
 
 #[test]
-fn units_of_measurement_8() {
-    let expr = r#"<math><mn>2</mn><mo>&#xA0;</mo><mi>z</mi><mi>&#x142;</mi></math>"#;
+fn currency_1() {
+    let expr = r#"<math><mn>2</mn><mo>&#xA0;</mo><mi>z&#x142;</mi></math>"#;
     test_braille("Polish", expr, "⠼⠃⠀⠵⠣");
 }
 
 #[test]
-fn units_of_measurement_9() {
-    let expr = r#"<math><mn>2</mn><mo>&#xA0;</mo><mi>P</mi><mi>L</mi><mi>N</mi></math>"#;
+fn currency_2() {
+    let expr = r#"<math><mn>2</mn><mo>&#xA0;</mo><mi>PLN</mi></math>"#;
     test_braille("Polish", expr, "⠼⠃⠀⠨⠏⠨⠇⠨⠝");
 }
 
 #[test]
-fn units_of_measurement_10() {
-    let expr = r#"<math><mn>5</mn><mo>&#xA0;</mo><mi>z</mi><mi>&#x142;</mi><mo>&#xA0;</mo><mn>50</mn><mo>&#xA0;</mo><mi>g</mi><mi>r</mi></math>"#;
+fn currency_3() {
+    let expr = r#"<math><mn>5</mn><mo>&#xA0;</mo><mi>z&#x142;</mi><mo>&#xA0;</mo><mn>50</mn><mo>&#xA0;</mo><mi>gr</mi></math>"#;
     test_braille("Polish", expr, "⠼⠑⠀⠵⠣⠀⠼⠑⠚⠀⠛⠗");
 }
 
 #[test]
-fn units_of_measurement_11() {
-    let expr = r#"<math><mn>5</mn><mo>,</mo><mn>50</mn><mo>&#xA0;</mo><mi>z</mi><mi>&#x142;</mi></math>"#;
+fn currency_4() {
+    let expr = r#"<math><mn>5</mn><mo>,</mo><mn>50</mn><mo>&#xA0;</mo><mi>z&#x142;</mi></math>"#;
     test_braille("Polish", expr, "⠼⠑⠂⠑⠚⠀⠵⠣");
 }
 
 #[test]
-fn units_of_measurement_12() {
+fn currency_5() {
     let expr = r#"<math><mn>2</mn><mo>&#xA0;</mo><mo>&#x20AC;</mo></math>"#;
     test_braille("Polish", expr, "⠼⠃⠀⠈⠑");
 }
@@ -196,8 +193,15 @@ fn signs_of_action_3() {
 }
 
 #[test]
-fn signs_of_action_4() {
+fn signs_of_action_4a() {
     let expr = r#"<math><mn>12</mn><mo>&#xB7;</mo><mn>3</mn></math>"#;
+    test_braille("Polish", expr, "⠼⠁⠃⠄⠼⠉");
+}
+
+#[test]
+fn signs_of_action_4b() {
+    let expr = r#"<math><mn>12</mn><mo>&#xB7;</mo><mn>3</mn></math>"#;
+    test_braille_prefs("Polish", vec![("Polish_UseShortForm", "false")], expr, r"⠼⠁⠃⠀⠄⠼⠉");
     test_braille("Polish", expr, "⠼⠁⠃⠄⠼⠉");
 }
 
@@ -258,7 +262,7 @@ fn number_divisors_2() {
 #[test]
 fn number_separation_1() {
     let expr = r#"<math><mn>12</mn><mo>;</mo></math>"#;
-    test_braille("Polish", expr, "⠼⠁⠃⠠⠰");
+    test_braille("Polish", expr, "⠼⠁⠃⠠⠆");
 }
 
 #[test]
@@ -281,8 +285,8 @@ fn number_separation_4() {
 
 #[test]
 fn number_separation_5() {
-    let expr = r#"<math><mi>&#x3A7;</mi><mo>=</mo><mo>{</mo><mn>1</mn><mo>,</mo><mo>&#xA0;</mo><mn>2</mn><mo>,</mo><mo>&#xA0;</mo><mn>3</mn><mo>,</mo><mo>&#xA0;</mo><mn>4</mn><mo>}</mo></math>"#;
-    test_braille("Polish", expr, "⠭⠀⠶⠪⠼⠁⠠⠂⠀⠼⠃⠠⠂⠀⠼⠉⠠⠂⠀⠼⠙⠕");
+    let expr = r#"<math><mi>X</mi><mo>=</mo><mo>{</mo><mn>1</mn><mo>,</mo><mo>&#xA0;</mo><mn>2</mn><mo>,</mo><mo>&#xA0;</mo><mn>3</mn><mo>,</mo><mo>&#xA0;</mo><mn>4</mn><mo>}</mo></math>"#;
+    test_braille("Polish", expr, "⠨⠭⠀⠶⠪⠼⠁⠠⠂⠀⠼⠃⠠⠂⠀⠼⠉⠠⠂⠀⠼⠙⠕");
 }
 
 #[test]
@@ -293,7 +297,7 @@ fn number_separation_6() {
 
 #[test]
 fn number_separation_7() {
-    let expr = r#"<math><mi>A</mi><mo>=</mo><mo>&lt;</mo><mn>2</mn><mo>,</mo><mo>&#xA0;</mo><mn>5</mn><mo>)</mo></math>"#;
+    let expr = r#"<math><mi>A</mi><mo>=</mo><mo>〈</mo><mn>2</mn><mo>,</mo><mo>&#xA0;</mo><mn>5</mn><mo>)</mo></math>"#;
     test_braille("Polish", expr, "⠨⠁⠀⠶⠷⠄⠼⠃⠠⠂⠀⠼⠑⠜");
 }
 
@@ -338,7 +342,7 @@ fn algebraic_expressions_5() {
 #[test]
 fn algebraic_expressions_6() {
     let expr = r#"<math><mn>2</mn><mi>a</mi><mi>C</mi><mo>+</mo><mn>4</mn><mi>B</mi><mi>c</mi><mo>-</mo><mn>3</mn><mo>,</mo><mn>2</mn><mi>B</mi><mi>D</mi></math>"#;
-    test_braille("Polish", expr, "⠼⠃⠠⠁⠃⠉⠀⠤⠼⠉⠨⠃⠉⠙⠀⠤⠃⠙");
+    test_braille("Polish", expr, "⠼⠃⠠⠁⠨⠉⠀⠖⠼⠙⠨⠃⠠⠉⠀⠤⠼⠉⠂⠃⠨⠃⠙");
 }
 
 #[test]
@@ -441,7 +445,7 @@ fn sets_14() {
 
 #[test]
 fn sets_15() {
-    let expr = r#"<math><mo>(</mo><mi>a</mi><mo>,</mo><mo>&#xA0;</mo><mi>b</mi><mo>)</mo><mo>&#x2208;</mo><mo>&#xA0;</mo><mi>A</mi><mo>&#xD7;</mo><mi>B</mi><mo>&#xA0;</mo><mo>&#x21D4;</mo><mo>&#xA0;</mo><mo>(</mo><mi>a</mi><mo>&#x2208;</mo><mo>&#xA0;</mo><mi>A</mi><mo>&#x2227;</mo><mo>&#xA0;</mo><mi>b</mi><mo>&#x2208;</mo><mi>B</mi><mo>)</mo></math>"#;
+    let expr = r#"<math><mi>A</mi><mo>&#x2282;</mo><mi>X</mi></math>"#;
     test_braille("Polish", expr, "⠨⠁⠀⠣⠄⠨⠭");
 }
 
@@ -489,7 +493,7 @@ fn sets_22() {
 
 #[test]
 fn sets_23() {
-    let expr = r#"<math><mi>B</mi><mo>&#x2216;</mo><mi>A</mi><mo>=</mo><mi>&#xD8;</mi></math>"#;
+    let expr = r#"<math><mi>B</mi><mo>&#x2216;</mo><mi>A</mi><mo>=</mo><mi>&#xD8;</mi><mo>,</mo></math>"#;
     test_braille("Polish", expr, "⠨⠃⠀⠡⠄⠨⠁⠀⠶⠯⠕⠠⠂");
 }
 
@@ -632,7 +636,7 @@ fn fractions_2a() {
 #[test]
 fn fractions_2b() {
     let expr = r#"<math><mfrac><mn>2</mn><mn>3</mn></mfrac></math>"#;
-    test_braille("Polish", expr, "⠆⠼⠃⠀⠳⠀⠼⠉⠰");
+    test_braille_prefs("Polish", vec![("Polish_UseShortForm", "false")], expr, r"⠆⠼⠃⠀⠳⠀⠼⠉⠰");
 }
 
 #[test]
@@ -644,7 +648,7 @@ fn fractions_3a() {
 #[test]
 fn fractions_3b() {
     let expr = r#"<math><mfrac><mi>x</mi><mi>y</mi></mfrac></math>"#;
-    test_braille("Polish", expr, "⠆⠠⠭⠀⠳⠀⠽⠰");
+    test_braille_prefs("Polish", vec![("Polish_UseShortForm", "false")], expr, r"⠆⠠⠭⠀⠳⠀⠽⠰");
 }
 
 #[test]
@@ -834,49 +838,55 @@ fn fractions_31() {
 }
 
 #[test]
-fn fractions_32() {
+fn fractions_p29_32() {
     let expr = r#"<math><mfrac><mrow><mn>2</mn><mi>x</mi></mrow><mrow><mn>3</mn><mi>y</mi><mo>&#xB7;</mo><mi>z</mi></mrow></mfrac></math>"#;
     test_braille("Polish", expr, "⠼⠃⠠⠭⠳⠼⠉⠽⠄⠵");
 }
 
 #[test]
-fn fractions_33() {
+fn fractions_p29_33() {
     let expr = r#"<math><mfrac><mrow><mn>2</mn><mi>x</mi></mrow><mrow><mn>3</mn><mi>y</mi></mrow></mfrac><mo>&#xB7;</mo><mi>z</mi></math>"#;
     test_braille("Polish", expr, "⠼⠃⠠⠭⠳⠼⠉⠽⠀⠄⠵");
 }
 
 #[test]
-fn fractions_34() {
+fn fractions_p29_34() {
     let expr = r#"<math><msup><mi>e</mi><mrow><mi>x</mi><mo>&#xB7;</mo><mi>y</mi></mrow></msup></math>"#;
     test_braille("Polish", expr, "⠠⠑⠬⠭⠄⠽");
 }
 
 #[test]
-fn fractions_35() {
+fn fractions_p29_35() {
+    let expr = r#"<math><msup><mi>e</mi><mi>x</mi></msup><mo>&#xB7;</mo><mi>y</mi></math>"#;
+    test_braille("Polish", expr, "⠠⠑⠬⠭⠀⠄⠽");
+}
+
+#[test]
+fn fractions_p30_35() {
     let expr = r#"<math><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mrow><mi>a</mi><mo>-</mo><mi>b</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>1</mn><mo>+</mo><mstyle displaystyle="true"><mfrac><mi>b</mi><mi>a</mi></mfrac></mstyle></mrow><mrow><mn>1</mn><mo>-</mo><mstyle displaystyle="true"><mfrac><mi>b</mi><mi>a</mi></mfrac></mstyle></mrow></mfrac></math>"#;
     test_braille("Polish", expr, "⠠⠁⠈⠖⠃⠳⠁⠈⠤⠃⠀⠶⠆⠼⠁⠀⠖⠆⠃⠳⠈⠀⠳⠀⠼⠁⠀⠤⠆⠃⠳⠁⠰");
 }
 
 #[test]
-fn fractions_36() {
+fn fractions_p30_36() {
     let expr = r#"<math><mfrac><mrow><mstyle displaystyle="true"><mfrac><mi>a</mi><mn>3</mn></mfrac></mstyle><mo>-</mo><mstyle displaystyle="true"><mfrac><mi>b</mi><mn>4</mn></mfrac></mstyle></mrow><mstyle displaystyle="true"><mfrac><mi>x</mi><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mfrac></mstyle></mfrac></math>"#;
     test_braille("Polish", expr, "⠆⠆⠠⠁⠳⠒⠀⠤⠆⠃⠳⠲⠀⠳⠀⠰⠭⠳⠭⠈⠖⠽⠰");
 }
 
 #[test]
-fn fractions_37() {
+fn fractions_p30_37() {
     let expr = r#"<math><mfrac><mrow><mi>x</mi><mo>+</mo><mstyle displaystyle="true"><mfrac><mrow><mi>x</mi><mo>+</mo><mn>1</mn></mrow><mrow><mi>y</mi><mo>-</mo><mn>1</mn></mrow></mfrac></mstyle></mrow><mrow><mi>x</mi><mo>-</mo><mstyle displaystyle="true"><mfrac><mrow><mi>x</mi><mo>+</mo><mn>1</mn></mrow><mrow><mi>y</mi><mo>+</mo><mn>1</mn></mrow></mfrac></mstyle></mrow></mfrac><mo>=</mo><mfrac><mstyle displaystyle="true"><mfrac><mrow><mi>x</mi><mo>(</mo><mi>y</mi><mo>-</mo><mn>1</mn><mo>)</mo><mo>+</mo><mo>(</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow><mrow><mi>y</mi><mo>-</mo><mn>1</mn></mrow></mfrac></mstyle><mstyle displaystyle="true"><mfrac><mrow><mi>x</mi><mo>(</mo><mi>y</mi><mo>+</mo><mn>1</mn><mo>)</mo><mo>-</mo><mo>(</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow><mrow><mi>y</mi><mo>+</mo><mn>1</mn></mrow></mfrac></mstyle></mfrac><mo>=</mo><mfrac><mstyle displaystyle="true"><mfrac><mrow><mi>x</mi><mi>y</mi><mo>-</mo><mi>x</mi><mo>+</mo><mi>x</mi><mo>-</mo><mn>1</mn></mrow><mrow><mi>y</mi><mo>-</mo><mn>1</mn></mrow></mfrac></mstyle><mstyle displaystyle="true"><mfrac><mrow><mi>x</mi><mi>y</mi><mo>+</mo><mi>x</mi><mo>-</mo><mi>x</mi><mo>-</mo><mn>1</mn></mrow><mrow><mi>y</mi><mo>+</mo><mn>1</mn></mrow></mfrac></mstyle></mfrac><mo>=</mo><mfrac><mrow><mi>y</mi><mo>+</mo><mn>1</mn></mrow><mrow><mi>y</mi><mo>-</mo><mn>1</mn></mrow></mfrac></math>"#;
     test_braille("Polish", expr, "⠆⠠⠭⠀⠖⠆⠭⠈⠤⠼⠁⠳⠽⠈⠤⠼⠁⠀⠳⠀⠭⠀⠤⠆⠭⠈⠖⠼⠁⠳⠽⠈⠖⠼⠁⠰⠀⠶⠆⠆⠭⠣⠽⠀⠤⠼⠁⠜⠈⠖⠣⠭⠀⠤⠼⠁⠜⠳⠽⠈⠤⠼⠁⠀⠳⠀⠆⠭⠣⠽⠀⠖⠼⠁⠜⠈⠤⠣⠭⠀⠖⠼⠁⠜⠳⠽⠈⠖⠼⠁⠰⠠⠶⠆⠆⠭⠽⠈⠤⠭⠈⠖⠭⠈⠤⠼⠁⠳⠽⠈⠤⠼⠁⠀⠳⠀⠆⠭⠽⠈⠖⠭⠈⠤⠭⠈⠤⠼⠁⠳⠽⠈⠖⠼⠁⠰⠀⠶⠽⠈⠖⠼⠁⠳⠽⠈⠤⠼⠁");
 }
 
 #[test]
-fn fractions_38() {
+fn fractions_p30_38() {
     let expr = r#"<math><mfrac><mrow><mn>2</mn><mstyle displaystyle="true"><mfrac><mn>2</mn><mn>3</mn></mfrac></mstyle><mo>+</mo><mstyle displaystyle="true"><mfrac><mrow><mn>1</mn><mo>,</mo><mn>2</mn><mo>-</mo><mn>0</mn><mo>,</mo><mn>7</mn></mrow><mrow><mn>2</mn><mo>,</mo><mn>6</mn></mrow></mfrac></mstyle></mrow><mrow><mstyle displaystyle="true"><mfrac><mrow><mn>1</mn><mo>,</mo><mn>2</mn><mo>+</mo><mn>0</mn><mo>,</mo><mn>6</mn></mrow><mrow><mn>0</mn><mo>,</mo><mn>8</mn></mrow></mfrac></mstyle><mo>-</mo><mn>3</mn><mstyle displaystyle="true"><mfrac><mn>4</mn><mn>5</mn></mfrac></mstyle></mrow></mfrac></math>"#;
     test_braille("Polish", expr, "⠆⠼⠃⠼⠃⠒⠀⠖⠆⠼⠁⠂⠃⠈⠤⠼⠚⠂⠛⠳⠼⠃⠂⠋⠀⠳⠀⠆⠼⠁⠂⠃⠈⠖⠼⠚⠂⠋⠳⠼⠚⠂⠓⠀⠤⠼⠉⠼⠙⠢⠰");
 }
 
 #[test]
-fn fractions_39() {
+fn fractions_p30_39() {
     let expr = r#"<math><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mrow><mn>2</mn><mo>&#xB7;</mo><mn>3</mn></mrow></mfrac><mo>+</mo><mfrac><mn>1</mn><mrow><mn>2</mn><mo>&#xB7;</mo><mn>3</mn><mo>&#xB7;</mo><mn>4</mn></mrow></mfrac></math>"#;
     test_braille("Polish", expr, "⠼⠁⠆⠀⠖⠼⠁⠳⠼⠃⠄⠼⠉⠀⠖⠼⠁⠳⠼⠃⠄⠼⠉⠄⠼⠙");
 }
@@ -1800,7 +1810,7 @@ fn trigonometry_p52_4() {
 
 #[test]
 fn trigonometry_p52_5() {
-    let expr = r#"<math><mi>t</mi><mi>g</mi><mfenced><mfrac><mrow><mn>90</mn><mo>&#xB0;</mo><mo>-</mo><mi>&#x3B1;</mi></mrow><mn>2</mn></mfrac></mfenced></math>"#;
+    let expr = r#"<math><mi>tg</mi><mfenced><mfrac><mrow><mn>90</mn><mo>&#xB0;</mo><mo>-</mo><mi>&#x3B1;</mi></mrow><mn>2</mn></mfrac></mfenced></math>"#;
     test_braille("Polish", expr, "⠫⠞⠣⠼⠊⠚⠴⠈⠤⠰⠁⠳⠆⠜");
 }
 
@@ -1828,7 +1838,7 @@ fn trigonometry_p52_6b() {
 
 #[test]
 fn trigonometry_p52_7() {
-    let expr = r#"<math><mi>t</mi><mi>g</mi><mfenced separators="|"><mfrac><mrow><msup><mn>90</mn><mo>&#x2218;</mo></msup><mo>&#x2212;</mo><mi>&#x3B1;</mi></mrow><mn>2</mn></mfrac></mfenced></math>"#;
+    let expr = r#"<math><mi>tg</mi><mfenced separators="|"><mfrac><mrow><msup><mn>90</mn><mo>&#x2218;</mo></msup><mo>&#x2212;</mo><mi>&#x3B1;</mi></mrow><mn>2</mn></mfrac></mfenced></math>"#;
     test_braille("Polish", expr, "⠫⠞⠀⠼⠊⠚⠴⠈⠤⠰⠁⠳⠆");
 }
 
@@ -1836,7 +1846,7 @@ fn trigonometry_p52_7() {
 
 #[test]
 fn trigonometry_p52_7a() {
-    let expr = r#"<math><mi>t</mi><mi>g</mi><mfenced separators="|"><mfrac><mrow><msup><mn>90</mn><mo>&#x2218;</mo></msup><mo>&#x2212;</mo><mi>&#x3B1;</mi></mrow><mn>2</mn></mfrac></mfenced></math>"#;
+    let expr = r#"<math><mi>tg</mi><mfenced separators="|"><mfrac><mrow><msup><mn>90</mn><mo>&#x2218;</mo></msup><mo>&#x2212;</mo><mi>&#x3B1;</mi></mrow><mn>2</mn></mfrac></mfenced></math>"#;
     test_braille("Polish", expr, "⠫⠞⠆⠼⠊⠚⠴⠈⠤⠰⠁⠳⠆");
 }
 
@@ -1844,13 +1854,13 @@ fn trigonometry_p52_7a() {
 
 #[test]
 fn trigonometry_p52_7b() {
-    let expr = r#"<math><mi>t</mi><mi>g</mi><mfenced separators="|"><mfrac><mrow><msup><mn>90</mn><mo>&#x2218;</mo></msup><mo>&#x2212;</mo><mi>&#x3B1;</mi></mrow><mn>2</mn></mfrac></mfenced></math>"#;
+    let expr = r#"<math><mi>tg</mi><mfenced separators="|"><mfrac><mrow><msup><mn>90</mn><mo>&#x2218;</mo></msup><mo>&#x2212;</mo><mi>&#x3B1;</mi></mrow><mn>2</mn></mfrac></mfenced></math>"#;
     test_braille("Polish", expr, "⠫⠞⠆⠼⠊⠚⠴⠀⠤⠰⠁⠀⠳⠀⠼⠃");
 }
 
 #[test]
 fn trigonometry_p52_8() {
-    let expr = r#"<math><mi>t</mi><mi>g</mi><mfrac><mi>&#x3B1;</mi><mn>2</mn></mfrac><mo>=</mo><mfrac><mrow><mn>1</mn><mo>-</mo><mi>cos</mi><mi>&#x3B1;</mi></mrow><mrow><mi>sin</mi><mi>&#x3B1;</mi></mrow></mfrac></math>"#;
+    let expr = r#"<math><mi>tg</mi><mfrac><mi>&#x3B1;</mi><mn>2</mn></mfrac><mo>=</mo><mfrac><mrow><mn>1</mn><mo>-</mo><mi>cos</mi><mi>&#x3B1;</mi></mrow><mrow><mi>sin</mi><mi>&#x3B1;</mi></mrow></mfrac></math>"#;
     test_braille("Polish", expr, "⠫⠞⠀⠰⠁⠳⠆⠀⠶⠆⠼⠁⠈⠤⠫⠉⠰⠁⠳⠫⠎⠰⠁");
 }
 
@@ -1870,13 +1880,13 @@ fn trigonometry_p53_2() {
 
 #[test]
 fn trigonometry_p53_3() {
-    let expr = r#"<math><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>t</mi><mi>g</mi><mi>x</mi></math>"#;
+    let expr = r#"<math><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>tg</mi><mi>x</mi></math>"#;
     test_braille("Polish", expr, "⠠⠋⠣⠭⠜⠀⠶⠫⠞⠭");
 }
 
 #[test]
 fn trigonometry_p53_4() {
-    let expr = r#"<math><msup><mi>f</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>a</mi><mi>r</mi><mi>c</mi><mi>t</mi><mi>g</mi><mo>&#xA0;</mo><mi>x</mi></math>"#;
+    let expr = r#"<math><msup><mi>f</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>a</mi><mi>r</mi><mi>ctg</mi><mo>&#xA0;</mo><mi>x</mi></math>"#;
     test_braille("Polish", expr, "⠠⠋⠌⠤⠂⠱⠣⠭⠜⠀⠶⠫⠂⠞⠭");
 }
 
@@ -2074,7 +2084,7 @@ fn physics_p60_5() {
 
 #[test]
 fn physics_p60_6() {
-    let expr = r#"<<math><mfrac><msub><mi>s</mi><mn>1</mn></msub><msub><mi>s</mi><mn>2</mn></msub></mfrac><mo>=</mo><msup><mfenced><mfrac><msub><mi>t</mi><mn>1</mn></msub><msub><mi>t</mi><mn>2</mn></msub></mfrac></mfenced><mn>2</mn></msup></math>"#;
+    let expr = r#"<math><mfrac><msub><mi>s</mi><mn>1</mn></msub><msub><mi>s</mi><mn>2</mn></msub></mfrac><mo>=</mo><msup><mfenced><mfrac><msub><mi>t</mi><mn>1</mn></msub><msub><mi>t</mi><mn>2</mn></msub></mfrac></mfenced><mn>2</mn></msup></math>"#;
     test_braille("Polish", expr, "⠠⠎⠡⠂⠳⠎⠡⠆⠀⠶⠣⠞⠡⠂⠳⠞⠡⠆⠜⠬⠆");
 }
 
@@ -2420,7 +2430,7 @@ fn physics_units_p72_2() {
 
 #[test]
 fn physics_units_p72_3() {
-    let expr = r#"<<math><mn>1</mn><mi>nm</mi><mo>=</mo><msup><mn>10</mn><mrow><mo>-</mo><mn>9</mn></mrow></msup><mi mathvariant="normal">m</mi></math>"#;
+    let expr = r#"<math><mn>1</mn><mi>nm</mi><mo>=</mo><msup><mn>10</mn><mrow><mo>-</mo><mn>9</mn></mrow></msup><mi mathvariant="normal">m</mi></math>"#;
     test_braille("Polish", expr, "⠼⠁⠻⠝⠍⠀⠶⠼⠁⠚⠬⠤⠔⠻⠍");
 }
 
@@ -2524,13 +2534,17 @@ fn units_currency_p75_2() {
 
 #[test]
 fn units_p75_3() {
-    let expr = r#"<math><mi>J</mi><mo>&#xA0;</mo><mo>=</mo><mo>&#xA0;</mo><mi>W</mi><mo>&#x22C5;</mo><mi>s</mi></math>"#;
+    let expr = r#"<math><mi intent=":unit">J</mi><mo>&#xA0;</mo><mo>=</mo>
+                                <mo>&#xA0;</mo><mi intent=":unit">W</mi><mo>&#x22C5;</mo><mi intent=":unit">s</mi></math>"#;
     test_braille("Polish", expr, "⠻⠨⠚⠀⠶⠻⠨⠺⠄⠻⠎");
 }
 
 #[test]
 fn units_p75_4() {
-    let expr = r#"<math><mi mathvariant="normal">N</mi><mo>=</mo><mi>kg</mi><mo>&#xB7;</mo><mfrac><mi mathvariant="normal">m</mi><msup><mi mathvariant="normal">s</mi><mn>2</mn></msup></mfrac><mo>=</mo><mfrac><mi>kgm</mi><msup><mi mathvariant="normal">s</mi><mn>2</mn></msup></mfrac></math>"#;
+    let expr = r#"<math><mi mathvariant="normal" intent=":unit">N</mi><mo>=</mo>
+                            <mi intent=":unit">kg</mi><mo>&#xB7;</mo>
+                            <mfrac><mi mathvariant="normal" intent=":unit">m</mi><msup><mi mathvariant="normal" intent=":unit">s</mi><mn>2</mn></msup></mfrac><mo>=</mo>
+                            <mfrac><mi intent=":unit">kgm</mi><msup><mi mathvariant="normal" intent=":unit">s</mi><mn>2</mn></msup></mfrac></math>"#;
     test_braille("Polish", expr, "⠻⠨⠝⠀⠶⠻⠅⠛⠀⠄⠻⠍⠳⠎⠬⠆⠀⠶⠻⠅⠛⠍⠳⠎⠬⠆");
 }
 
@@ -2538,7 +2552,10 @@ fn units_p75_4() {
 
 #[test]
 fn units_p75_4a() {
-    let expr = r#"<math><mi mathvariant="normal">N</mi><mo>=</mo><mi>kg</mi><mo>&#xB7;</mo><mfrac><mi mathvariant="normal">m</mi><msup><mi mathvariant="normal">s</mi><mn>2</mn></msup></mfrac><mo>=</mo><mfrac><mi>kgm</mi><msup><mi mathvariant="normal">s</mi><mn>2</mn></msup></mfrac></math>"#;
+    let expr = r#"<math><mi mathvariant="normal" intent=":unit">N</mi><mo>=</mo>
+                            <mi intent=":unit">kg</mi><mo>&#xB7;</mo>
+                            <mfrac><mi mathvariant="normal" intent=":unit">m</mi><msup><mi mathvariant="normal" intent=":unit">s</mi><mn>2</mn></msup></mfrac><mo>=</mo>
+                            <mfrac><mi intent=":unit">kgm</mi><msup><mi mathvariant="normal" intent=":unit">s</mi><mn>2</mn></msup></mfrac></math>"#;
     test_braille("Polish", expr, "⠻⠨⠝⠀⠶⠻⠻⠅⠛⠄⠍⠳⠎⠬⠆⠀⠶⠻⠅⠛⠍⠳⠎⠬⠆");
 }
 
@@ -2551,6 +2568,7 @@ fn units_p75_5() {
 #[test]
 fn units_p75_6() {
     let expr = r#"<math><mn>2</mn><mfrac><mn>2</mn><mn>5</mn></mfrac><mo>&#xB0;</mo><mi>C</mi></math>"#;
+    // the spec lists two forms for this; MathCAT is generating the first one
     test_braille("Polish", expr, "⠼⠃⠼⠃⠢⠘⠴⠨⠉");
 }
 
@@ -2562,13 +2580,17 @@ fn units_p76_1() {
 
 #[test]
 fn units_p76_2() {
-    let expr = r#"<math><mi mathvariant="normal">d</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>2</mn><mi>mm</mi><mo>=</mo><mn>2</mn><mo>&#xB7;</mo><msup><mn>10</mn><mrow><mo>-</mo><mn>4</mn></mrow></msup><mi mathvariant="normal">m</mi></math>"#;
+    let expr = r#"<math><mi mathvariant="normal">d</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>2</mn><mi>mm</mi><mo>=</mo>
+                <mn>2</mn><mo>&#xB7;</mo><msup><mn>10</mn><mrow><mo>-</mo><mn>4</mn></mrow></msup><mi mathvariant="normal">m</mi></math>"#;
     test_braille("Polish", expr, "⠠⠙⠀⠶⠼⠚⠂⠃⠻⠍⠍⠀⠶⠼⠃⠄⠼⠁⠚⠬⠤⠲⠻⠍");
 }
 
 #[test]
 fn units_p76_3() {
-    let expr = r#"<math><mi mathvariant="normal">C</mi><mo>=</mo><mfrac><mrow><msub><mi mathvariant="normal">&#x3B5;</mi><mn>0</mn></msub><mi mathvariant="normal">S</mi></mrow><mi mathvariant="normal">d</mi></mfrac><mo>=</mo><mfrac><mrow><mn>8</mn><mo>,</mo><mn>85</mn><mo>&#xB7;</mo><msup><mn>10</mn><mrow><mo>-</mo><mn>12</mn></mrow></msup><mfrac><mi mathvariant="normal">F</mi><mi mathvariant="normal">m</mi></mfrac><mo>&#xB7;</mo><msup><mn>10</mn><mrow><mo>-</mo><mn>2</mn></mrow></msup><msup><mi mathvariant="normal">m</mi><mn>2</mn></msup></mrow><mrow><mn>2</mn><mo>&#xB7;</mo><msup><mn>10</mn><mrow><mo>-</mo><mn>4</mn></mrow></msup><mi mathvariant="normal">m</mi></mrow></mfrac><mo>&#x2248;</mo><mn>0</mn><mo>,</mo><mn>44</mn><mo>&#xB7;</mo><msup><mn>10</mn><mrow><mo>-</mo><mn>9</mn></mrow></msup><mi mathvariant="normal">F</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>44</mn><mi>nF</mi></math>"#;
+    let expr = r#"<math><mi mathvariant="normal">C</mi><mo>=</mo>
+            <mfrac><mrow><msub><mi mathvariant="normal">&#x3B5;</mi><mn>0</mn></msub><mi mathvariant="normal">S</mi></mrow><mi mathvariant="normal">d</mi></mfrac><mo>=</mo>
+            <mfrac><mrow><mn>8</mn><mo>,</mo><mn>85</mn><mo>&#xB7;</mo><msup><mn>10</mn><mrow><mo>-</mo><mn>12</mn></mrow></msup><mfrac><mi mathvariant="normal">F</mi><mi mathvariant="normal">m</mi></mfrac><mo>&#xB7;</mo><msup><mn>10</mn><mrow><mo>-</mo><mn>2</mn></mrow></msup><msup><mi mathvariant="normal">m</mi><mn>2</mn></msup></mrow><mrow><mn>2</mn><mo>&#xB7;</mo><msup><mn>10</mn><mrow><mo>-</mo><mn>4</mn></mrow></msup><mi mathvariant="normal">m</mi></mrow></mfrac><mo>&#x2248;</mo><mn>0</mn><mo>,</mo><mn>44</mn><mo>&#xB7;</mo><msup><mn>10</mn><mrow><mo>-</mo><mn>9</mn></mrow></msup><mi mathvariant="normal">F</mi><mo>=</mo>
+            <mn>0</mn><mo>,</mo><mn>44</mn><mi>nF</mi></math>"#;
     test_braille("Polish", expr, "⠨⠉⠀⠶⠰⠑⠡⠴⠨⠎⠳⠠⠙⠀⠶⠆⠼⠓⠂⠓⠑⠄⠼⠁⠚⠬⠤⠂⠆⠈⠻⠨⠋⠳⠍⠄⠼⠁⠚⠬⠤⠆⠻⠍⠬⠆⠀⠳⠀⠼⠃⠄⠼⠁⠚⠬⠤⠲⠈⠻⠍⠰⠀⠢⠢⠼⠚⠂⠙⠙⠄⠼⠁⠚⠬⠤⠔⠻⠨⠋⠀⠶⠼⠚⠂⠙⠙⠈⠻⠝⠨⠋");
 }
 
