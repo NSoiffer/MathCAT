@@ -94,6 +94,9 @@
     LaTeX:
       UseShortName: false   # Use the short form for the latex (e.g., "~a" instead of "\alpha")
 
+    Polish:
+      UseShortForm: true  # Use the short form for the Polish braille (minimizes spaces, uses drop numbers, etc.)
+
 
   Other:
     # Note: DecimalSeparator is user-facing (can be Auto), DecimalSeparators is code-facing (always a char)
