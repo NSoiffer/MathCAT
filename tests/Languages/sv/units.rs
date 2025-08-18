@@ -488,7 +488,7 @@ fn test_mtext_inference() {
                 <mn>4,5</mn><mtext>mT</mtext>
             <mo>]</mo></math>"#;
     test("sv", "SimpleSpeak", expr, 
-        "start hak-parentes; 1 tonn, komma; 2 peta-ampère, komma, 3 pascal, komma; 4,5 milli-tesla; slut hak-parentes");
+        "start hak-parentes; ett tonn, komma; 2 peta-ampère, komma, 3 pascal, komma; 4,5 milli-tesla; slut hak-parentes");
 }
 /// Tests for fractions followed by units
 
