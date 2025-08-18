@@ -81,3 +81,172 @@
     "'", ":", ",", "!", ".", "?", "’", "”", ";",                    # punctuation -- 42(i)
     ")", "]", "}", "⟩", "⟧", "⦄", "⟫", "⌉", "⌋",                      # 42(iii) close
   }
+
+
+- SIPrefixes: {
+    "Q", "R", "Y", "Z", "E", "P", "T", "G", "M", "k", "h", "da",
+    "d", "c", "m", "µ", "n", "p", "f", "a", "z", "y", "r", "q",
+  }
+
+# this is a list of all units that accept SIPrefixes
+# from www.bipm.org/documents/20126/41483022/SI-Brochure-9-EN.pdf
+#   Prefixes may be used with any of the 29 SI units with special names
+#   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
+- SIUnits: {
+    # base units
+    "A",
+    "cd",
+    "K", "K", # U+212A
+    "g",
+    "m",     # British spelling works for US also
+    "mol",
+    "s", "sec",  # "sec" not actually legal
+
+    # derived units
+    "Bq",
+    "C",
+    "°C", "℃", # should only take negative powers
+    "F",
+    "Gy",
+    "H",
+    "Hz",
+    "J",
+    "kat",
+    "lm",
+    "lx",
+    "N",
+    "Ω", "Ω",       # Greek Cap letter, U+2126 OHM SIGN
+    "Pa",
+    "S",
+    "Sv",
+    "T",
+    "V",
+    "W",
+    "Wb",
+
+    # accepted (plus a few variants) that take SI prefixes
+    "l", "L", "ℓ",  # Should only take negative powers; British spelling works for US also
+    "t",           # should only take positive powers
+    "Da",
+    "Np",               # should only take negative powers
+    "u",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
+    "eV",
+    "rad",             # should only take negative powers
+    "sr",          # should only take negative powers      
+  
+    # others that take a prefix
+    "a",               # should only take positive powers
+    "as",          # see en.wikipedia.org/wiki/Minute_and_second_of_arc
+
+    # technically wrong, but used in practice with SI Units
+    "b",               # should only take positive powers
+    "B",              # should only take positive powers
+    "Bd",             # should only take positive powers
+  }
+
+- UnitsWithoutPrefixes: {
+    # time
+    "″", "\"",
+    "′", "'","min",
+    "h", "hr", "Hr",
+    "d", "dy",
+    "w", "wk",
+    "y", "yr",    
+
+    # angles
+    "°", "deg", # should only take negative powers
+    "rad",
+    "arcmin",
+    "amin",
+    "am",
+    "MOA",
+    "arcsec",
+    "asec",
+
+    # distance
+    "au", "AU",
+    "ltyr", "ly",
+    "pc",
+    "Å", "Å",           # U+00C5 and U+212B
+    "fm",
+
+    # others
+    "ha",
+    # "B",    # "B" more commonly means bytes
+    "dB", # already logarithmic, so not used with SI prefixes
+
+    "amu",
+    "atm",
+    "bar",
+    "cal",
+    "Ci",
+    "grad",
+    "M",
+    "R",
+    "rpm",
+    "℧",
+    "dyn",
+    "erg",
+    "kWh",
+
+    # powers of 2 used with bits and bytes
+    "Kib", "Mib", "Gib", "Tib", "Pib", "Eib", "Zib", "Yib",
+    "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB",
+  }
+
+  # this will only be used if the language is English, so it can be empty for other countries
+- EnglishUnits: {
+    # length
+    "in",
+    "ft",
+    "mi",
+    "rd",
+    "li",
+    "ch",
+
+    # area
+    "sq in", "sq. in", "sq. in.",
+    "sq ft", "sq. ft", "sq. ft.",
+    "sq yd", "sq. yd", "sq. yd.",
+    "sq mi", "sq. mi", "sq. mi.",
+    "ac",
+    "FBM",
+
+    # volume
+    "cu in", "cu. in", "cu. in.",
+    "cu ft", "cu. ft", "cu. ft.",
+    "cu yd", "cu. yd", "cu. yd.",
+    "bbl", "BBL",
+    "pk",
+    "bu",
+    "tsp",
+    "tbl",
+
+    # liquid
+    "fl dr",
+    "fl oz",
+    "gi",
+    "cp", "cup",
+    "pt",
+    "qt",
+    "gal",
+
+    # weight
+    "gr",
+    "dr",
+    "oz", "℥",
+    "lb",
+    "cwt",
+    "dwt",
+    "oz t",
+    "lb t",
+
+    # energy
+    "hp",
+    "BTU",
+    "°F", "℉",
+
+    # other
+    "mph",
+    "mpg",
+  }
