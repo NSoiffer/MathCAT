@@ -2001,37 +2001,31 @@ fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> St
 }
 
 
-static MARBURG_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
+static POLISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     // "S" => "XXX",    // sans-serif -- from prefs
-    "B" => "⠔",     // bold
+    "B" => "⠨",     // bold
     "𝔹" => "⠬",     // blackboard -- from prefs
     // "T" => "⠈",     // script
-    "I" => "⠔",     // italic -- same as bold
-    // "R" => "",      // roman
-    // "E" => "⠰",     // English
-    "1" => "⠐",     // Grade 1 symbol -- used here for a-j after number
-    "L" => "⠠",     // Lower case letter left in to assist in locating letters
+    "I" => "⠸",     // italic -- same as bold
+    "l" => "⠠",     // Lower case Roman letter left in to assist in locating letters
+    "L" => "⠨",     // Upper case Roman letter left in to assist in locating letters
+    "𝐿" => "⠨",     // capital that never should get word indicator (from chemical element)
     "D" => "⠠",     // German (Gothic)
-    "G" => "⠈",     // Greek
+    "g" => "⠰",     // Greek
+    "G" => "⠸",     // Greek
     "V" => "⠈⠬",    // Greek Variants
     // "H" => "⠠⠠",    // Hebrew
     // "U" => "⠈⠈",    // Russian
-    "C" => "⠨",      // capital
-    "𝐶" => "⠨",      // capital that never should get word indicator (from chemical element)
     "N" => "⠼",      // number indicator
     "n" => "",       // drop number follows -- no need for indicator
     "𝑁" => "",       // continue number
     // "t" => "⠱",     // shape terminator
+    "U" => "⠻",     // unit indicator
+    "w" => "⠀",     // whitespace after function name
     "W" => "⠀",     // whitespace"
-    "𝐖"=> "⠀",     // whitespace
-    // "𝘄" => "⠀",    // add whitespace if char to the left has dots 1, 2, or 3 -- special rule handled separately, so commented out
-    "s" => "",     // typeface single char indicator
-    // "w" => "⠂",     // typeface word indicator
-    // "e" => "⠄",     // typeface & capital terminator 
-    // "o" => "",       // flag that what follows is an open indicator (used for standing alone rule)
-    // "c" => "",       // flag that what follows is an close indicator (used for standing alone rule)
-    // "b" => "",       // flag that what follows is an open or close indicator (used for standing alone rule)
+    "𝐖"=> "",       // whitespace for mode changes only (0xb7 -- multiplication dot)
     "," => "⠂",     // comma
+    "}" => "⠕",   // right curly brace
     "." => "⠄",     // period
     "-" => "⠤",     // hyphen
     "—" => "⠤⠤",   // normal dash (2014) -- assume all normal dashes are unified here [RUEB appendix 3]
@@ -2041,34 +2035,30 @@ static MARBURG_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 
 
 fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
-    // lazy_static! {
-    //     static ref ADD_WHITE_SPACE: Regex = Regex::new(r"𝘄(.)|𝘄$").unwrap();
-    // }
+    lazy_static! {
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([B𝔹IREDgGVHPlL𝐿MnNUwW𝐖},.])").unwrap();
+    }
 
     debug!("polish_cleanup: start={}", raw_braille);
     // let result = typeface_to_word_mode(&raw_braille);
 
-    // let result = result.replace("tW", "W");
-    let result = raw_braille.replace("CG", "⠘")
-                                .replace("𝔹C", "⠩")
-                                .replace("DC", "⠰");
-    // let result = result.replace("CC", "⠸");
-
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
-    // let double_struck = pref_manager.pref_to_string("MARBURG_DoubleStruck");
-    // let sans_serif = pref_manager.pref_to_string("MARBURG_SansSerif");
-    // let fraktur = pref_manager.pref_to_string("MARBURG_Fraktur");
+    // let double_struck = pref_manager.pref_to_string("Polish_DoubleStruck");
+    // let sans_serif = pref_manager.pref_to_string("Polish_SansSerif");
+    // let fraktur = pref_manager.pref_to_string("Polish_Fraktur");
 
-    debug!("Before remove mode changes: '{}'", &result);
     // This reuses the code just for getting rid of unnecessary "L"s and "N"s
-    let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
-    let result = result.replace("nN", "");
-    let result = result.replace("CL", "C");
+    let result = polish_remove_unneeded_mode_changes(&raw_braille);
     debug!(" After remove mode changes: '{}'", &result);
+    let result = result.replace("nN", "")
+                               .replace("𝔹C", "⠩")
+                               .replace("DC", "⠰")
+                               .replace("},", "}⠠,");       // special case: bottom of page 13
+    debug!(" After substitutions      : '{}'", &result);
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
-        match MARBURG_INDICATOR_REPLACEMENTS.get(&cap[0]) {
-            None => {error!("REPLACE_INDICATORS and MARBURG_INDICATOR_REPLACEMENTS are not in sync"); ""},
+        match POLISH_INDICATOR_REPLACEMENTS.get(&cap[0]) {
+            None => {error!("REPLACE_INDICATORS and POLISH_INDICATOR_REPLACEMENTS are not in sync"); ""},
             Some(&ch) => ch,
         }
     });
@@ -2090,7 +2080,108 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     return result.to_string();
 }
 
+#[derive(Debug, Clone, PartialEq, Display)]
+enum BrailleMode {
+    Letter,
+    CapLetter,
+    Greek,
+    CapGreek,
+    Number,
+    None,
+}
 
+fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
+    // The basic idea is that we stay in a mode until we encounter a character that requires a mode change
+    // Some entries:
+    //   lx  -- letter mode, followed by a letter
+    //   Lx, 𝐿x -- capital letter mode, followed by a letter
+    //   gx  -- Greek letter mode, followed by a letter
+    //   Gx -- capital Greek letter mode, followed by a letter
+    let mut mode = BrailleMode::None;
+    let mut unit_mode = false;
+    let mut letter_mode = BrailleMode::None; // used to determine if we need to output 'L' (etc) for letter mode
+    let mut result = String::default();
+    let chars = raw_braille.chars().collect::<Vec<char>>();
+    let mut i = 0;
+
+    while i < chars.len() {
+        let ch = chars[i];
+        // debug!(" ...mode={}, unit_mode={}, ch/next {}/{}", mode, unit_mode, ch, if i+1<chars.len() {chars[i+1]} else {' '});
+        match ch {
+            'l' | 'L' | '𝐿' => {
+                let new_mode = if ch == 'l' { BrailleMode::Letter } else { BrailleMode::CapLetter };
+                if (letter_mode != new_mode || (mode == BrailleMode::Number && LETTER_NUMBERS.contains(&chars[i+1]))) ||
+                   letter_mode == BrailleMode::None {
+                    // we only output indicator if the letter is a-j
+                    result.push(ch);
+                }
+                mode = new_mode.clone();
+                letter_mode = new_mode;
+                result.push(chars[i+1]);
+                i += 2;
+            },
+            'g' | 'G' => {
+                let new_mode = if ch == 'g' { BrailleMode::Greek } else { BrailleMode::CapGreek };
+                if mode != new_mode {
+                    result.push(ch);
+                }
+                mode = new_mode;
+                result.push(chars[i+1]);
+                i += 2;
+            },
+            'f' => {
+                // "function" indicator -- change to letter mode
+                mode = BrailleMode::Letter;
+                letter_mode = BrailleMode::Letter;
+                i += 1;
+            },
+            'U' => {
+                // It appears that if we are in letter mode, then 'U' is not output again. Consider m/s, we 's' doesn't output 'U' again
+                if !unit_mode {
+                    mode = BrailleMode::Letter;
+                    letter_mode = BrailleMode::Letter;
+                    unit_mode = true;
+                    result.push(ch);
+                }
+                i += 1;
+            },
+            'N' | 'n' => {
+                if mode != BrailleMode::Number {
+                    mode = BrailleMode::Number;
+                    result.push(ch);
+                }
+                result.push(chars[i+1]);
+                i += 2;
+            },
+            'B' | 'I' => {
+                // FIX: implement
+                // eventually there should be an 'L' to that will trigger letter mode
+                result.push(ch);
+                i += 1;
+            },
+            'W' | '𝐖' | 'w' => {
+                if mode == BrailleMode::Number {
+                    mode = BrailleMode::None;
+                }
+                unit_mode = false;
+                result.push(ch);
+                i += 1;
+            },
+            _ => {
+                if mode == BrailleMode::Number {
+                    mode = BrailleMode::None;
+                }
+                result.push(ch);
+                i += 1;
+            },
+        }
+        if mode != BrailleMode::Letter && mode != BrailleMode::Greek {
+            unit_mode = false;
+        }
+    }
+
+    return result;
+}
 
 static SWEDISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     // FIX: this needs cleaning up -- not all of these are used
@@ -3138,7 +3229,7 @@ impl Function for NeedsToBeGrouped {
         if let Node::Element(e) = node {
             let answer = match braille_code.as_str() {
                 "CMU" => NeedsToBeGrouped::needs_grouping_for_cmu(e, is_base),
-                "Polish" => NeedsToBeGrouped::needs_grouping_for_cmu(e, is_base),
+                // "Polish" doesn't use grouping chars
                 "UEB" => NeedsToBeGrouped::needs_grouping_for_ueb(e, is_base),
                 "Finnish" => NeedsToBeGrouped::needs_grouping_for_finnish(e, is_base),
                 "Swedish" => NeedsToBeGrouped::needs_grouping_for_swedish(e, is_base),
