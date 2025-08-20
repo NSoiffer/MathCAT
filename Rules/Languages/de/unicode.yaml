@@ -174,14 +174,14 @@
             then: [T: "von"]                    	# 	(en: 'by', google translation)
             else: [T: "mal"]                    	# 	(en: 'cross', MathPlayer: 'times', google: 'kreuzen') #unklar
  - "÷": [T: "geteilt durch"]                    	#  0xf7	(en: 'divided by', MathPlayer: 'divides')
- - "̀": [T: "gravis akzent verzierung"]              	#  0x300	(en: 'grave accent embellishment', google: 'grabakzentverzierung')
- - "́": [T: "akut akzent verzierung"]           	#  0x301	(en: 'acute accent embellishment', google: 'akute akzentverzierung')
- - "̂": [T: "zirkumflex verzierung"]                	#  0x302	(en: 'circumflex accent embellishment', google: 'zirma akzentverzierung')
- - "̃": [T: "tilde verzierung"]              	#  0x303	(google: 'tilde verzierung')
- - "̄": [T: "makron akzent verzierung"]                 	#  0x304	(en: 'macron embellishment', google: 'makron -verzierung')
- - "̅": [T: "überstrich verzierung"]            	#  0x305	(google: 'überbärerverzierung')
- - "̆": [T: "brevis akzent verzierung"]                  	#  0x306	(en: 'breve', google: 'breve')
- - "̇": [T: "punkt darüber verzierung"]          	#  0x307	(google: 'punkt über verzierung')
+ - "̀": [T: "gravis akzent"]              	#  0x300	(en: 'grave accent embellishment', google: 'grabakzentverzierung')
+ - "́": [T: "akut akzent"]           	#  0x301	(en: 'acute accent embellishment', google: 'akute akzentverzierung')
+ - "̂": [T: "zirkumflex"]                	#  0x302	(en: 'circumflex accent embellishment', google: 'zirma akzentverzierung')
+ - "̃": [T: "tilde"]              	#  0x303	(google: 'tilde verzierung')
+ - "̄": [T: "makron akzent"]                 	#  0x304	(en: 'macron embellishment', google: 'makron -verzierung')
+ - "̅": [T: "überstrich"]            	#  0x305	(google: 'überbärerverzierung')
+ - "̆": [T: "brevis akzent"]                  	#  0x306	(en: 'breve', google: 'breve')
+ - "̇": [T: "punkt darüber"]          	#  0x307	(google: 'punkt über verzierung')
 
    # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
  - "Α-Ω": 
