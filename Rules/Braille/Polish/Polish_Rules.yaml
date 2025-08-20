@@ -80,6 +80,19 @@
   # The invisible plus should produce an empty string
 
 -
+  # nice easy rule, but very long winded and tests show short form rules which follow
+  name: long-form
+  tag: mfrac
+  match:
+    - "not($Polish_UseShortForm)"
+  replace: 
+  - t: "⠆"
+  - x: "*[1]"
+  - t: "W⠳W"
+  - x: "*[2]"
+  - t: "⠰"
+
+-
   name: common-fraction-mixed-number
   tag: mfrac
   match:
@@ -91,27 +104,10 @@
   - x: "*[1]"
   - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
 
-# -
-#   name: numeric-slash  (includes -1/2, etc)
-#   tag: mrow
-#   match:
-#   - "(  *[1][self::m:mn][not(contains(., '.,'))] or"
-#   - "   *[1][self::m:mrow][*[1][self::m:mo][.='-'] and *[2][self::m:mn][not(contains(., '.,'))]]"
-#   - ") and"
-#   - "*[2][self::m:mo][translate(., '/:÷', '')='']  and"
-#   - "*[3][self::m:mn][not(contains(., '.,'))]"
-#   replace:
-#   - test:
-#       if: "*[1][self::m:mn]"
-#       then: [x: "*[1]"]
-#       else: [x: "*[1]/*[1]", x: "*[1]/*[2]"]
-#   # '/' not used
-#   - x: "BrailleChars(translate(*[3], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
-#   - t: "W"
 -
   name: simple-number
   tag: mfrac
-  match: "$Polish_UseShortForm and *[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]"
+  match: "*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]"
   replace:
   - x: "*[1]"
   - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
@@ -125,7 +121,7 @@
   - x: "*[1]"
   - t: "⠳"  # don't need number indicator
   - test:
-      if: "$Polish_UseShortForm and *[2][self::m:mn][not(contains(., '.,'))]"
+      if: "*[2][self::m:mn][not(contains(., '.,'))]"
       then:
       - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
       else:
@@ -135,16 +131,19 @@
   name: default
   tag: mfrac
   match: "."
-  replace: 
+  replace:
+  - with:
+      variables: [Numerator: "BrailleChars(*[1], Polish)"]
+      replace: [x: "DEBUG($Numerator)"]
+
   - t: "⠆"
-  - x: "*[1]"
   - test:
       if: "$Polish_UseShortForm and *[2][self::m:mn][not(contains(., '.,'))]"
       then:
       - t: "⠳"
       - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
       else:
-      - t: "W⠳W"
+      - t: "W⠳"
       - x: "*[2]"
       - t: "⠰"
 
@@ -290,6 +289,7 @@
   - x: "BrailleChars(., 'Polish', 1, 2)"
   - x: "BrailleChars(translate(., 'IVXLCDM', 'ivxlcdm'), 'Polish', 2, string-length(.)+1)"
 
+# FIX: these should be pulled out into a definition
 -
   name: sin
   tag: mi
@@ -340,11 +340,32 @@
   - t: "N⠅"
 
 -
+  name: log
+  tag: mi
+  match: ".='log'"
+  replace:
+  - t: "f⠫⠇"   # FIX: unsure about 'f' to set letter mode
+
+-
+  name: ln
+  tag: mi
+  match: ".='ln'"
+  replace:
+  - t: "f⠫⠦⠇"   # FIX: unsure about 'f' to set letter mode
+
+-
   name: signum
   tag: mi
   match: ".='sgn'"
   replace:
   - t: "N⠎"
+
+-
+  name: limit
+  tag: mi
+  match: ".='lim'"
+  replace:
+  - t: "⠼⠇"  # does *not* start letter mode
 
 
 -
@@ -409,208 +430,51 @@
       # else do nothing -- no content
 
 -
-  name: modified-right-arrow
+  name: line
   tag: [mover, munder]
-  match: "*[1][self::m:mo and (.='→' or .='⟶')]"
-  replace:
-  - t: "⠨⠁⠃"
-  - x: "*[2]"
-
--
-  name: over-arc
-  tag: mover
-  match: "*[2][self::m:mo and .='⏜']"  # 0x23dc
-  replace:
-  - t: "⠨⠣"
-  - x: "*[1]"
-
--
-  name: over-line
-  tag: mover
   match: "*[2][self::m:mo and .='¯']"  # 0x00AF
   replace:
-  - t: "⠨⠒"
+  - x: "IfThenElse(self::m:mover, '⠨', '⠸')"
+  - t: "⠒"
   - x: "*[1]"
-
 -
-  name: under-line
-  tag: munder
-  match: "*[2][self::m:mo and .='¯']"  # 0x00AF
+  name: double-dot
+  tag: mover
+  match: "*[2][self::m:mo and .='..']"  # 0x00AF
   replace:
-  - t: "⠨⠒⠒"
   - x: "*[1]"
-
--
-  # special hack to catch double over/under bar built from nested mover/munder
-  name: doubled-line-hack-exception 
-  tag: [mover, munder]
-  match:
-  - "*[2][self::m:mo and string-length(.) = 1 and (.='¯')] and"    # has line/bar
-  - "( (self::m:mover and *[1][self::m:mover]) or (self::m:munder and *[1][self::m:munder]) ) and"  # both mover/munder
-  - "*[1]/*[2][self::m:mo and string-length(.) = 1 and (.='¯')]"  # other mover/munder has line/bar
-  replace: 
-  - test:
-      if: "self::m:munder"
-      then: [t: "⠠⠤⠠⠤"]
-      else: [t: "⠈⠉⠈⠉"]
-  - test:
-      if: "IsBracketed(*[1], '', '') or *[1]/*[1][IsNode(., 'leaf') and string-length(.) = 1]"
-      then:
-      - x: "*[1]/*[1]"
-      else:
-      - t: "⠢"
-      - x: "*[1]/*[1]"
-      - t: "⠔"
-
--
-  # special hack to catch double over/under bar built from nested mover/munder
-  name: doubled-line-hack-exception 
-  tag: menclose
-  match:
-  - "*[1][self::m:menclose] and"   # nested
-  - "(@notation='top' and *[1][@notation='top']) or (@notation='bottom' and *[1][@notation='bottom'])"
-  replace: 
-  - test:
-      if: "@notation='bottom'"
-      then: [t: "⠠⠤⠠⠤"]
-      else: [t: "⠈⠉⠈⠉"]
-  - test:
-      if: "IsBracketed(*[1], '', '') or *[1]/*[1][IsNode(., 'leaf') and string-length(.) = 1]"
-      then:
-      - x: "*[1]/*[1]"
-      else:
-      - t: "⠢"
-      - x: "*[1]/*[1]"
-      - t: "⠔"
+  - T: "⠆⠆"
   
 -
-  name: dot-exception  # 4.3.2
+  name: diacriticals
   tag: mover
-  match: "*[2][self::m:mo and (.='˙' or .='¨' or .='⃛')]"   # 0x02d9, 0x00A8, 0x20db
+  match: "*[2][self::m:mo and translate(., '~ ^ˇ.', '')='']"
   replace:
-  - x: "*[2]"
-  - test:   # roman lower case letters need to be prefixed (1.1)
-      if: "*[1][self::m:mi and string-length(.)=1 and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']"
-      then: [t: "⠐"]
   - x: "*[1]"
-
--
-  name: shortforms  
-  tag: mover
-  match: "*[2][self::m:mo and string-length(.) = 1 and translate(., '_¯═→⟶↔⟷←⟵.˙~^ˇ̊ ⌢⌣⏜⏝','')='']"
-  replace: 
   - test:
-      if: "*[2][.='=']"  # in case someone uses this for a double bar
-      then: [t: "⠈⠉⠈⠉"]
-      else: [x: "*[2]"]
-  - test:
-      # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
-      then:
-      - x: "*[1]"
-      else:
-      - t: "⠢"
-      - x: "*[1]"
-      - t: "⠔"
-
--
-  name: shortforms-default  
-  tag: mover
-  match: "*[2][self::m:mo or self::m:mrow[*[self::m:mo]]]"
-  replace: 
-  - test:
-      # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
-      then:
-      - x: "*[1]"
-      else:
-      - t: "⠢"
-      - x: "*[1]"
-      - t: "⠔"
-  - t: "⠡⠡"
+      if: "not($Polish_UseShortForm)"
+      then: [T: "⠨"]
   - x: "*[2]"
-  - t: "⠄"
-
 
 -
-  name: shortforms  
-  tag: munder
-  match: "*[2][self::m:mo and string-length(.) = 1 and translate(., '=¯〰﹏','')='']" # 0x3030, 0xFE4F ("_" canonicalized to "¯")
-  replace: 
-  - test:
-      - if: "*[2][.='=']"  # in case someone uses this for a double bar
-        then: [t: "⠈⠉⠈⠉"]
-      - else_if: "*[2][.='¯']"
-        then: [t: "⠠⠤"]
-        else: [t: "⠂⠢"]   # wavy line
-  - test:
-      # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
-      then:
-      - x: "*[1]"
-      else:
-      - t: "⠢"
-      - x: "*[1]"
-      - t: "⠔"
-
--
-  name: shortforms-default  
-  tag: munder
-  match: "*[2][self::m:mo or self::m:mrow[not(./*[name() != 'mo'])]]"
-  # match: "*[2][self::m:mo or self::m:mrow[*[self::m:mo]]]"
-
-  replace: 
-  - test:
-      # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
-      then:
-      - x: "*[1]"
-      else:
-      - t: "⠢"
-      - x: "*[1]"
-      - t: "⠔"
-  - t: "⠌⠌"
-  - x: "*[2]"
-  - t: "⠄"
-
--
-  name: under-shortforms  
-  tag: munder
-  match: "*[2][self::m:mo and string-length(.) = 1 and translate(., '_¯═→.˙~^ˇ̊ ⌢⌣⏜⏝','')='']"
-  replace: 
-  - test:
-    - if: "self::m:munder[*[2][.='¯' or .='═']]"  # mover falls back to the unicode defs
-      then_test:
-          if: "*[2][.='═']"
-          then: [t: "⠠⠤⠠⠤"]
-          else: [t: "⠠⠤"]
-    # - else_if: "*[2][.='→']"
-    #   then: [t: "⠘⠱"]
-    # - else_if: "*[2][.='.' or .='˙']"
-    #   then: [t: "⠘⠲"]
-    - else_if: "*[2][.='~']"
-      then: [t: "⠐⠢"]
-    # - else_if: "*[2][.='^']"
-    #   then: [t: "⠐⠱ "]
-    # - else_if: "*[2][.='=']"
-    #   then: [t: "⠐⠱ "]
-      else: [x: "*[2]"]  # maybe not right, but do something
-  - test:
-      # FIX: CMUFunctionNames is a guess based on 7.2(1) and 7.1(2) which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
-      then:
-      - x: "*[1]"
-      else:
-      - t: "⠢"
-      - x: "*[1]"
-      - t: "⠔"
-
--
-  name: prime-exception    # 4.3.1
+  name: pseudo-scripts
   tag: msup
-  match: "*[2][translate(., \"′″‴⁗\",'')='']"
+  match: "*[2][translate(., \"'′″‴⁗*→⟶←⟵+-¬.˙ˇ̊°\", '')='']"
   replace:
-  - x: "*"
+  - x: "*[1]"
+  - test:
+      if: "not($Polish_UseShortForm)"
+      then: [T: "⠘"]
+  - x: "*[2]"
+
+-
+  name: limit
+  tag: munder
+  match: "*[1][self::m:mi and .='lim']"
+  replace:
+  - x: "*[1]"
+  - x: "*[2]"
+  - x: "W"
 
 -
   name: prime-exception    # 4.3.1
@@ -622,6 +486,17 @@
   - t: "⠌"
   - x: "*[2]"
 
+-
+  name: log-with-base
+  tag: msub
+  match: "*[1][self::m:mi and .='log']"
+  replace:
+  - t: "⠌"
+  - test:
+      if: "*[2][self::m:mn and not(contains(., $DecimalSeparators))]"
+      then: [x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
+      else: [x: "*[2]"]
+  - x: "*[1]"
 -
   # simple numeric scripts are written as drop numbers
   name: simple-number-exponent

@@ -2106,7 +2106,7 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
 
     while i < chars.len() {
         let ch = chars[i];
-        // debug!(" ...mode={}, unit_mode={}, ch/next {}/{}", mode, unit_mode, ch, if i+1<chars.len() {chars[i+1]} else {' '});
+        // debug!(" ...mode={}, letter_mode={}, unit_mode={}, ch/next {}/{}", mode, letter_mode, unit_mode, ch, if i+1<chars.len() {chars[i+1]} else {' '});
         match ch {
             'l' | 'L' | '𝐿' => {
                 let new_mode = if ch == 'l' { BrailleMode::Letter } else { BrailleMode::CapLetter };
@@ -2145,7 +2145,7 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 }
                 i += 1;
             },
-            'N' | 'n' => {
+            'N' => {
                 if mode != BrailleMode::Number {
                     mode = BrailleMode::Number;
                     result.push(ch);

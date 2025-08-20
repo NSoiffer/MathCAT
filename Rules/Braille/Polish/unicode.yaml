@@ -349,10 +349,10 @@
 ##### The following need translations
  - "̊ ": [T: "⠈⠴"]               # 0x0309 (Ring)
  - "ˇ": [t: "⠰⠒"]               # 0x02C7 (Caron)
- - "⌢": [T: "⠨⠣"]               #  0x2322
- - "⌣": [t: "⠤⠣"]           	#  0x2323
- - "⏜": [T: "⠨⠣"]             #  0x232DC (TOP PARENTHESIS)
- - "⏝": [t: "⠤⠣"]           	#  0x23DD (BOTTOM PARENTHESIS)
+ - "⌢": [T: "⠣"]               #  0x2322  mover -- adds a prefix
+ - "⌣": [t: "⠣"]           	   #  0x2323  munder -- adds a prefix
+ - "⏜": [T: "⠣"]                #  0x232DC (TOP PARENTHESIS)   mover -- adds a prefix
+ - "⏝": [T: "⠣"]           	    #  0x23DD (BOTTOM PARENTHESIS) munder -- adds a prefix
 
  - "⦜": [t: "⠸⠤"]                # 0x299C (ángulo recto)
  - "⦝": [t: "⠸⠤"]                # 0x299D (ángulo recto)
@@ -433,8 +433,16 @@
  - "⁇": [t: "⠹⠹"]               # 0x2047
  - "⁈": [t: "⠹⠖"]               # 0x2048
  - "⁉": [t: "⠖⠹"]               # 0x2049
- - "→": [T: "W⠒⠂"]               # 0x2192 RIGHTWARDS ARROW
- - "←": [T: "⠂⠒"]               # 0x2190 LEFTWARDS ARROW
+ - "→":                          # 0x2192 RIGHTWARDS ARROW
+    - test:
+          if: "parent::m:mrow"
+          then: [T: "W⠒⠂"]               
+          else: [T: "⠒⠂"]       # script position
+ - "←":                          # 0x2190 LEFTWARDS ARROW
+    - test:
+          if: "parent::m:mrow"
+          then: [T: "W⠂⠒"]               
+          else: [T: "⠂⠒"]       # script position
  - "∀": [T: "⠯⠂"]               # 0x2200
  - "∂": [T: "⠹"]                 # 0x2202 PARTIAL DIFFERENTIAL
  - "∃": [T: "⠯⠢"]               # 0x2203 (THERE EXISTS)
@@ -751,14 +759,14 @@
  - "⌟": [t: "⠈⠰⠾"]              # 0x231f
  - "〈": [t: "⠨⠨⠷"]              # 0x2329
  - "〉": [t: "⠨⠨⠾"]              # 0x232a
- - "⏞": [T: "⠨⠪"]              # 0x23de (TOP CURLY BRACKET)
- - "⏟": [T: "⠸⠪"]              # 0x23df (BOTTOM CURLY BRACKET)
+ - "⏞": [T: "⠪"]              # 0x23de (TOP CURLY BRACKET)  mover adds char
+ - "⏟": [T: "⠪"]              # 0x23df (BOTTOM CURLY BRACKET) munder adds char
  - "⎴": [t: "⠈⠷"]              # 0x23b4
  - "⎵": [t: "⠈⠾"]              # 0x23b5
  - "⟪": [t: "⠨⠨⠨⠷"]             # 0x27ea
  - "⟫": [t: "⠨⠨⠨⠾"]             # 0x27eb
- - "〈": [T: "⠷⠄"]              # 0x3008 (LEFT ANgE BRACKET)
- - "〉": [T: "⠠⠾"]              # 0x3009 (RIGHT ANgE BRACKET)
+ - "〈": [T: "⠷⠄"]              # 0x3008 (LEFT ANGLE BRACKET)
+ - "〉": [T: "⠠⠾"]              # 0x3009 (RIGHT ANGLE BRACKET)
  - "《": [t: "⠨⠨⠨⠷"]             # 0x300a
  - "》": [t: "⠨⠨⠨⠾"]             # 0x300b
  - "「": [t: "⠈⠘⠷"]              # 0x300c
@@ -913,8 +921,16 @@
  - "⟧": [t: "⠈⠸⠾"]              # 0x27E7 (Mathematical right white square bracket)
  - "⟨": [t: "⠨⠨⠷"]              # 0x27E8 (Mathematical left angle bracket)
  - "⟩": [t: "⠨⠨⠾"]              # 0x27E9 (Mathematical right angle bracket)
- - "⟵": [t: "⠀⠫⠪⠒⠒⠒⠀"]          # 0x27F5 (Long leftwards arrow )
- - "⟶": [t: "⠀⠫⠒⠒⠒⠕⠀"]          # 0x27F6 (Long rightwards arrow)
+ - "⟵":                         # 0x27F5 (Long leftwards arrow)   #FIX: currently same as short arrow -- is this ok?
+    - test:
+          if: "parent::m:mrow"
+          then: [T: "W⠒⠂"]               
+          else: [T: "⠒⠂"]       # script position
+ - "⟶":                          # 0x27F6 (Long rightwards arrow)  #FIX: currently same as short arrow -- is this ok?
+    - test:
+          if: "parent::m:mrow"
+          then: [T: "W⠂⠒"]               
+          else: [T: "⠂⠒"]       # script position
  - "⟷": [t: "⠀⠫⠪⠒⠒⠒⠕⠀"]         # 0x27F7 (Long left right arrow)
  - "⟸": [t: "⠀⠫⠪⠶⠶⠶⠀"]          # 0x27F8 (Long leftwards arrow )
  - "⟹": [t: "⠀⠫⠶⠶⠶⠕⠀"]          # 0x27F9 (Long rightwards arrow)
