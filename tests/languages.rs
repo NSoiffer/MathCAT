@@ -8,6 +8,7 @@ mod Languages {
     mod en;
     mod fi;
     mod sv;
+    mod nb;
     mod vi {
         mod vi;
     }

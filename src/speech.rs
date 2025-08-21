@@ -155,10 +155,10 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
 /// Converts its argument to a string that can be used in a debugging message.
 pub fn yaml_to_type(yaml: &Yaml) -> String {
     return match yaml {
-        Yaml::Real(v)=> format!("real='{:#}'", v),
-        Yaml::Integer(v)=> format!("integer='{:#}'", v),
-        Yaml::String(v)=> format!("string='{:#}'", v),
-        Yaml::Boolean(v)=> format!("boolean='{:#}'", v),
+        Yaml::Real(v)=> format!("real='{v:#}'"),
+        Yaml::Integer(v)=> format!("integer='{v:#}'"),
+        Yaml::String(v)=> format!("string='{v:#}'"),
+        Yaml::Boolean(v)=> format!("boolean='{v:#}'"),
         Yaml::Array(v)=> match v.len() {
             0 => "array with no entries".to_string(),
             1 => format!("array with the entry: {}", yaml_to_type(&v[0])),
@@ -282,7 +282,7 @@ pub fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new
         }
     }
     new_file.push(new_file_name);
-    info!("...processing include: {}...", new_file_name);
+    info!("...processing include: {new_file_name}...");
     let new_file = match crate::shim_filesystem::canonicalize_shim(new_file.as_path()) {
         Ok(buf) => buf,
         Err(msg) => bail!("-include: constructed file name '{}' causes error '{}'",
@@ -392,7 +392,7 @@ impl fmt::Display for Replacement {
         return write!(f, "{}",
             match self {
                 Replacement::Test(c) => c.to_string(),
-                Replacement::Text(t) => format!("t: \"{}\"", t),
+                Replacement::Text(t) => format!("t: \"{t}\""),
                 Replacement::XPath(x) => x.to_string(),
                 Replacement::Intent(i) => i.to_string(),
                 Replacement::TTS(t) => t.to_string(),
@@ -555,7 +555,8 @@ impl InsertChildren {
 lazy_static! {
     static ref ATTR_NAME_VALUE: Regex = Regex::new(
         // match name='value', where name is sort of an NCNAME (see CONCEPT_OR_LITERAL in infer_intent.rs)
-        r#"(?P<name>[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*)\s*=\s*'(?P<value>[^']+)'"#
+        // The quotes can be either single or double quotes 
+        r#"(?P<name>[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*)\s*=\s*('(?P<value>[^']+)'|"(?P<dqvalue>[^"]+)")"#
     ).unwrap();
 }
 
@@ -622,7 +623,8 @@ impl Intent {
         if let Some(intent_name) = &self.name {
             result.set_attribute_value(MATHML_FROM_NAME_ATTR, name(mathml));
             set_mathml_name(result, intent_name.as_str());
-        } else if let Some(my_xpath) = &self.xpath{    // self.xpath_name must be != None
+        }
+        if let Some(my_xpath) = &self.xpath{    // self.xpath_name must be != None
             let xpath_value = my_xpath.evaluate(rules_with_context.get_context(), mathml)?;
             match xpath_value {
                 Value::String(intent_name) => {
@@ -631,7 +633,8 @@ impl Intent {
                 },
                 _ => bail!("'xpath-name' value '{}' was not a string", &my_xpath),
             }
-        } else {
+        }
+        if self.name.is_none() && self.xpath.is_none() {
             panic!("Intent::replace: internal error -- neither 'name' nor 'xpath' is set");
         };
         
@@ -640,17 +643,25 @@ impl Intent {
         }
 
         if !self.attrs.is_empty() {
+            // debug!("MathML after children, before attr processing:\n{}", mml_to_string(mathml));
+            // debug!("Result after children, before attr processing:\n{}", mml_to_string(result));
             // debug!("Intent::replace attrs = \"{}\"", &self.attrs);
             for cap in ATTR_NAME_VALUE.captures_iter(&self.attrs) {
-                let value_as_xpath = MyXPath::new(cap["value"].to_string()).chain_err(||"attr value inside 'intent'")?;
-                let value = value_as_xpath.evaluate(rules_with_context.get_context(), mathml)
+                let matched_value = if cap["value"].is_empty() {&cap["dqvalue"]} else {&cap["value"]};
+                let value_as_xpath = MyXPath::new(matched_value.to_string()).chain_err(||"attr value inside 'intent'")?;
+                let value = value_as_xpath.evaluate(rules_with_context.get_context(), result)
                         .chain_err(||"attr xpath evaluation value inside 'intent'")?;
                 let mut value = value.into_string();
                 if &cap["name"] == INTENT_PROPERTY {
-                    value = simplify_fixity_properties(&value)
+                    value = simplify_fixity_properties(&value);
                 }
-                // debug!("Intent::replace  name={}, value={}, xpath value={}", &cap["name"], &cap["value"], &value);
-                result.set_attribute_value(&cap["name"], &value);
+                // debug!("Intent::replace match\n  name={}\n  value={}\n  xpath value={}", &cap["name"], &cap["value"], &value);
+                if &cap["name"] == INTENT_PROPERTY && value == ":" {
+                    // should have been an empty string, so remove the attribute
+                    result.remove_attribute(INTENT_PROPERTY);
+                } else {
+                    result.set_attribute_value(&cap["name"], &value);
+                }
             };
         }
 
@@ -661,23 +672,21 @@ impl Intent {
         /// "lift" up the children any "TEMP_NAME" child -- could short circuit when only one child
         fn lift_children(result: Element) -> Element {
             // debug!("lift_children:\n{}", mml_to_string(result));
-            result.replace_children(
-                result.children().iter()
-                    .map(|&child_of_element| {
-                        match child_of_element {
-                            ChildOfElement::Element(child) => {
-                                if name(child) == "TEMP_NAME" {
-                                    assert_eq!(child.children().len(), 1);
-                                    child.children()[0]
-                                } else {
-                                    child_of_element
-                                }
-                            },
-                            _ => child_of_element,      // text()
+            // most likely there will be the same number of new children as result has, but there could be more
+            let mut new_children = Vec::with_capacity(2*result.children().len());
+            for child_of_element in result.children() {
+                match child_of_element {
+                    ChildOfElement::Element(child) => {
+                        if name(child) == "TEMP_NAME" {
+                            new_children.append(&mut child.children());  // almost always just one
+                        } else {
+                            new_children.push(child_of_element);
                         }
-                    })
-                    .collect::<Vec<ChildOfElement>>()
-            );
+                    },
+                    _ => new_children.push(child_of_element),      // text()
+                }
+            }
+            result.replace_children(new_children);
             return result;
         }
     }    
@@ -955,7 +964,7 @@ impl ReplacementArray {
             group_string += &format!("[{}]", self.replacements[0]);
         } else {
             group_string += &self.replacements.iter()
-                    .map(|replacement| format!("\n  - {}", replacement))
+                    .map(|replacement| format!("\n  - {replacement}"))
                     .collect::<Vec<String>>()
                     .join("");
             group_string += "\n";
@@ -983,7 +992,7 @@ pub struct MyXPath {
 
 impl fmt::Display for MyXPath {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "x: \"{}\"", self.rc.string);
+        return write!(f, "\"{}\"", self.rc.string);
     }
 }
 
@@ -1103,54 +1112,66 @@ impl MyXPath {
         }
     }
 
+    /// Convert DEBUG(...) input to the internal function which is DEBUG(arg, arg_as_string)
     fn add_debug_string_arg(xpath: &str) -> Result<String> {
-        // lazy_static! {
-        //     static ref OPEN_OR_CLOSE_PAREN: Regex = Regex::new("^['\"][()]").unwrap();    // match paren that doesn't follow a quote
-        // }
-        // Find all the DEBUG(...) commands in 'xpath' and adds a string argument.
-        // The DEBUG function that is used internally takes two arguments, the second one being a string version of the DEBUG arg.
-        //   Being a string, any quotes need to be escaped, and DEBUGs inside of DEBUGs need more escaping.
-        //   This is done via recursive calls to this function.
-        // FIX: this doesn't handle parens in strings correctly -- it only catches the common case of quoted parens
-        // FIX: to do this right, one has to be careful about escape chars, so it gets ugly for nesting
+        // do a quick check to see if "DEBUG" is in the string -- this is the common case
         let debug_start = xpath.find("DEBUG(");
         if debug_start.is_none() {
             return Ok( xpath.to_string() );
         }
-        let debug_start = debug_start.unwrap();
-        let string_start = xpath[..debug_start+6].to_string();   // includes "DEBUG("
-        let mut count = 1;  // open/close count -- starting after "(" in "DEBUG("
-        let mut remainder: &str = &xpath[debug_start+6..];
-            
-        loop {
-            // debug!("  add_debug_string_arg: count={}, remainder='{}'", count, remainder);
-            let next = remainder.find(['(', ')']);
-            match next {
-                None => bail!("Did not find closing paren for DEBUG in\n{}", xpath),
-                Some(i_paren) => {
-                    let remainder_as_bytes = remainder.as_bytes();
 
-                    // if the paren is inside of quote (' or "), don't count it
-                    // FIX: this could be on a non-char boundary
-                    if i_paren == 0 || remainder_as_bytes[i_paren-1] != b'\'' ||
-                       i_paren+1 >= remainder.len() || remainder_as_bytes[i_paren+1] != b'\'' {
-                        // debug!("     found '{}'", remainder_as_bytes[i_paren].to_string());
-                        if remainder_as_bytes[i_paren] == b'(' {
+        let debug_start = debug_start.unwrap();
+        let mut before_paren = xpath[..debug_start+5].to_string();   // includes "DEBUG"
+        let chars = xpath[debug_start+5..].chars().collect::<Vec<char>>();     // begins at '('
+        before_paren.push_str(&chars_add_debug_string_arg(&chars).chain_err(|| format!("In xpath='{xpath}'"))?);
+        // debug!("add_debug_string_arg: {}", before_paren);
+        return Ok(before_paren);
+
+        fn chars_add_debug_string_arg(chars: &[char]) -> Result<String>  {
+            // Find all the DEBUG(...) commands in 'xpath' and adds a string argument.
+            // The DEBUG function that is used internally takes two arguments, the second one being a string version of the DEBUG arg.
+            //   Being a string, any quotes need to be escaped, and DEBUGs inside of DEBUGs need more escaping.
+            //   This is done via recursive calls to this function.
+            assert_eq!(chars[0], '(', "{} does not start with ')'", chars.iter().collect::<String>());
+            let mut count = 1;  // open/close count
+            let mut i = 1;
+            let mut inside_quote = false;
+            while i < chars.len() {
+                let ch = chars[i];
+                match ch {
+                    '\\' => {
+                        if i+1 == chars.len() {
+                            bail!("Syntax error in DEBUG: last char is escape char\n{}");
+                        }
+                        i += 1;
+                    },
+                    '\'' => inside_quote = !inside_quote,
+                    '(' => {
+                        if !inside_quote {
                             count += 1;
-                        } else {            // must be ')'
+                        }
+                        // FIX: it would be more efficient to spot "DEBUG" preceding this and recurse rather than matching the whole string and recursing
+                    },
+                    ')' => {
+                        if !inside_quote {
                             count -= 1;
                             if count == 0 {
-                                let i_end = xpath.len() - remainder.len() + i_paren;
-                                let escaped_arg = &xpath[debug_start+6..i_end].to_string().replace('"', "\\\"");
-                                let contents = MyXPath::add_debug_string_arg(&xpath[debug_start+6..i_end])?;
-                                return Ok( string_start + &contents + ", \"" + escaped_arg + "\" "
-                                                + &MyXPath::add_debug_string_arg(&xpath[i_end..])? );
+                                let arg = &chars[1..i].iter().collect::<String>();
+                                let escaped_arg = arg.replace('"', "\\\"");
+                                // DEBUG(...) may be inside 'arg' -- recurse
+                                let processed_arg = MyXPath::add_debug_string_arg(arg)?;
+
+                                // DEBUG(...) may be in the remainder of the string -- recurse
+                                let processed_rest = MyXPath::add_debug_string_arg(&chars[i+1..].iter().collect::<String>())?;
+                                return Ok( format!("({processed_arg}, \"{escaped_arg}\"){processed_rest}") );
                             }
-                        }    
-                    }
-                    remainder = &remainder[i_paren+1..];
+                        }
+                    },
+                    _ => (),
                 }
+                i += 1;
             }
+            bail!("Syntax error in DEBUG: didn't find matching closing paren\nDEBUG{}", chars.iter().collect::<String>());
         }
     }
 
@@ -1195,6 +1216,7 @@ impl MyXPath {
         return match result {
             Ok(val) => Ok( val ),
             Err(e) => {
+                // debug!("MyXPath::trying to evaluate:\n  '{}'\n caused the error\n'{}'", self, e.to_string().replace("OwnedPrefixedName { prefix: None, local_part:", "").replace(" }", ""));
                 bail!( "{}\n\n",
                      // remove confusing parts of error message from xpath
                     e.to_string().replace("OwnedPrefixedName { prefix: None, local_part:", "").replace(" }", "") );
@@ -1364,7 +1386,7 @@ struct TestArray {
 impl fmt::Display for TestArray {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for test in &self.tests {
-            writeln!(f, "{}", test)?;
+            writeln!(f, "{test}")?;
         }
         return Ok( () );
     }
@@ -1458,8 +1480,8 @@ impl fmt::Display for TestOrReplacements {
         }
         write!(f, ":")?;
         return match self {
-            TestOrReplacements::Test(t) => write!(f, "{}", t),
-            TestOrReplacements::Replacements(r) => write!(f, "{}", r),
+            TestOrReplacements::Test(t) => write!(f, "{t}"),
+            TestOrReplacements::Replacements(r) => write!(f, "{r}"),
         };
     }
 }
@@ -1508,13 +1530,13 @@ impl fmt::Display for Test {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "test: [ ")?;
         if let Some(if_part) = &self.condition {
-            write!(f, " if: '{}'", if_part)?;
+            write!(f, " if: '{if_part}'")?;
         }
         if let Some(then_part) = &self.then_part {
-            write!(f, " then{}", then_part)?;
+            write!(f, " then{then_part}")?;
         }
         if let Some(else_part) = &self.else_part {
-            write!(f, " else{}", else_part)?;
+            write!(f, " else{else_part}")?;
         }
         return write!(f, "]");
     }
@@ -1554,7 +1576,7 @@ impl fmt::Display for VariableValue<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let value = match &self.value {
             None => "unset".to_string(),
-            Some(val) => format!("{:?}", val)
+            Some(val) => format!("{val:?}")
         };
         return write!(f, "[name: {}, value: {}]", self.name, value);
     }   
@@ -1599,7 +1621,7 @@ struct VariableDefinitions {
 impl fmt::Display for VariableDefinitions {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for def in &self.defs {
-            write!(f, "{},", def)?;
+            write!(f, "{def},")?;
         }
         return Ok( () );
     }
@@ -1612,7 +1634,7 @@ struct VariableValues<'v> {
 impl fmt::Display for VariableValues<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for value in &self.defs {
-            write!(f, "{}", value)?;
+            write!(f, "{value}")?;
         }
         return writeln!(f);
     }
@@ -1660,7 +1682,7 @@ impl fmt::Display for ContextStack<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, " {} old_values", self.old_values.len())?;
         for values in &self.old_values {
-            writeln!(f, "  {}", values)?;
+            writeln!(f, "  {values}")?;
         }
         return writeln!(f);
     }
@@ -1818,7 +1840,7 @@ impl UnicodeDef {
                     for ch in str.chars() {     // restart the iterator
                         let ch_as_str = ch.to_string();
                         if unicode_table.insert(ch as u32, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
-                                            .chain_err(|| format!("In definition of char: '{}'", str))?.replacements).is_some() {
+                                            .chain_err(|| format!("In definition of char: '{str}'"))?.replacements).is_some() {
                             error!("*** Character '{}' (0x{:X}) is repeated", ch, ch as u32);
                         }
                     }
@@ -1848,7 +1870,7 @@ impl UnicodeDef {
             for ch in first..last+1 {
                 let ch_as_str = char::from_u32(ch).unwrap().to_string();
                 unicode_table.insert(ch, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
-                                        .chain_err(|| format!("In definition of char: '{}'", def_range))?.replacements);
+                                        .chain_err(|| format!("In definition of char: '{def_range}'"))?.replacements);
             };
 
             return Ok(None)
@@ -1923,7 +1945,7 @@ impl UnicodeDef {
             RulesFor::Navigation => "Navigation",
             RulesFor::Braille => "Braille",
         };
-       return write!(f, "{}", name);
+       return write!(f, "{name}");
     }
  }
 
@@ -2676,7 +2698,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                         .iter()
                         .map(|replacement|
                             rules_with_context.replace(replacement, mathml)
-                                    .chain_err(|| format!("Unicode replacement error: {}", replacement)) )
+                                    .chain_err(|| format!("Unicode replacement error: {replacement}")) )
                         .collect::<Result<Vec<String>>>()?
                         .join(" ");
             rules_with_context.translate_count = 0;     // found a replacement, so not in a loop
@@ -2720,7 +2742,7 @@ mod tests {
         assert_eq!(speech_pattern.tag_name, "math", "\ntag name failure");
         assert_eq!(speech_pattern.pattern.rc.string, ".", "\npattern failure");
         assert_eq!(speech_pattern.replacements.replacements.len(), 1, "\nreplacement failure");
-        assert_eq!(speech_pattern.replacements.replacements[0].to_string(), r#"x: "./*""#, "\nreplacement failure");
+        assert_eq!(speech_pattern.replacements.replacements[0].to_string(), r#""./*""#, "\nreplacement failure");
     }
 
     #[test]
@@ -2790,7 +2812,7 @@ mod tests {
         let str = r#"DEBUG(*[2]/*[3][text()='3'])"#;
         let result = MyXPath::add_debug_string_arg(str);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][text()='3'], "*[2]/*[3][text()='3']" )"#);
+        assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][text()='3'], "*[2]/*[3][text()='3']")"#);
     }
 
     #[test]
@@ -2798,7 +2820,7 @@ mod tests {
         let str = r#"DEBUG(*[2]/*[3][text()='('])"#;
         let result = MyXPath::add_debug_string_arg(str);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][text()='('], "*[2]/*[3][text()='(']" )"#);
+        assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][text()='('], "*[2]/*[3][text()='(']")"#);
     }
 
     #[test]
@@ -2806,10 +2828,12 @@ mod tests {
         let str = r#"DEBUG(ClearSpeak_Matrix = 'Combinatorics') and IsBracketed(., '(', ')')"#;
         let result = MyXPath::add_debug_string_arg(str);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), r#"DEBUG(ClearSpeak_Matrix = 'Combinatorics', "ClearSpeak_Matrix = 'Combinatorics'" ) and IsBracketed(., '(', ')')"#);
+        assert_eq!(result.unwrap(), r#"DEBUG(ClearSpeak_Matrix = 'Combinatorics', "ClearSpeak_Matrix = 'Combinatorics'") and IsBracketed(., '(', ')')"#);
     }
 
-    
+
+// zipped files do NOT include "zz", hence we need to exclude this test
+cfg_if::cfg_if! {if #[cfg(not(feature = "include-zip"))] {  
     #[test]
     fn test_up_to_date() {
         use crate::interface::*;
@@ -2850,6 +2874,7 @@ mod tests {
             });
         }    
     }
+}}
 
     // #[test]
     // fn test_nested_debug_quoted_paren() {

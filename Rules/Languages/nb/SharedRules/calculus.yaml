@@ -1,0 +1,37 @@
+---
+
+- name: divergence
+  tag: divergence
+  match: "count(*) = 1"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [T: "divergensen til"]      # phrase('divergence' from the mean)
+      else: [T: "div"]      # phrase('divergence' from the mean)
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [pause: short]
+  - x: "*[1]"
+
+- name: curl
+  tag: curl
+  match: "count(*) = 1"
+  replace:
+  - test: 
+      if: "$Verbosity='Verbose'"
+      then: [T: "curlen til"]
+      else: [T: "curl"]
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [pause: short]
+  - x: "*[1]"
+
+- name: gradient
+  tag: gradient
+  match: "count(*) = 1"
+  replace:
+  - T: "gradienten til"
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [pause: short]
+  - x: "*[1]"

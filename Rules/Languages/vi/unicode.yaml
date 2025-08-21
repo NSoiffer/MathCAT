@@ -102,14 +102,25 @@
         else: [T: ngoặc nhọn trái]                            
  - "|":                                          # 0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" in side of sets is handled at the mrow level, same for 'sets'
-     - test:
-        - if: "$SpeechStyle != 'ClearSpeak' or not(preceding-sibling::*) or not(following-sibling::*)"
-          then: [T: gạch đứng]
-        - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
-          then: [T: sao cho]
-        - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
-          then: [T: sao cho] 
-        - else: [T: sao cho]                   
+     - with:
+        variables: [DefaultToGiven: "count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and ../../../*[1][.='P']"] # P(A|B)
+        replace:
+        - test:
+            - if: "$SpeechStyle != 'ClearSpeak'"
+              then_test:
+                - if: "$DefaultToGiven"
+                  then: [T: sao cho]  # given
+                - else_if: "preceding-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))] and 
+                            following-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))]"
+                  then: [T: sao cho]    # divides
+                  else: [T: gạch đứng]  # vertical line
+            - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
+              then: [T: gạch đứng]
+            - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+              then: [T: sao cho]  # such that
+            - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
+              then: [T: sao cho]   # given
+            - else: [T: sao cho]   # divides                
 
  - "}":                                          # 0x7d
     - test:
@@ -222,7 +233,16 @@
 
  - "⁡":                                          # 0x2061
     - test:
-        if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
+        # skip saying "of" when Terse and a trig function, when it is a shape (does this happen?), or we are in :literal mode
+        if: "not(
+              ( $Verbosity='Terse' or ($SpeechStyle = 'ClearSpeak' and IsNode(following-sibling::*[1],'simple')) and
+                preceding-sibling::*[1][IfThenElse($SpeechStyle='ClearSpeak',
+                                                   IsInDefinition(., 'ClearSpeakTrigFunctionNames'),
+                                                   IsInDefinition(., 'TrigFunctionNames') )]
+              ) or
+              preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')] or
+              (@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])
+            )"
         then: [T: "của"]
  - "⁢": [T: ""]                                   # 0x2062
  - "⁣": [T: ""]                                   # 0x2063

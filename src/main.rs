@@ -1,5 +1,6 @@
 // *** MathCAT doesn't normally want to build a binary ***
 // *** This file is here because it is useful for trying out things ***
+#![allow(clippy::needless_return)]
 
 use libmathcat::interface::*;
 use log::*;
@@ -8,6 +9,20 @@ use std::time::Instant;
 
 // Maybe also have this speak to test the TTS generation.
 // There is a rust winapi crate that mirrors the WinPAI and has "Speak(...)" in it
+
+cfg_if::cfg_if! {
+    if #[cfg(feature = "include-zip")] {
+        fn get_rules_dir() -> String {
+          return "Rules".to_string();
+        }
+    } else {
+        fn get_rules_dir() -> String {
+          let rules_path = std::env::current_exe().unwrap().parent().unwrap().join("../../Rules");
+          return rules_path.as_os_str().to_str().unwrap().to_string();
+        }
+    }
+}
+
 fn main() {
   env_logger::builder()
       .format_timestamp(None)
@@ -174,26 +189,45 @@ fn main() {
   //   </math>";
 
   let expr = r#"
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-    <mrow><mi>t</mi><mrow intent=":pause-long"/><mo>+</mo><mi>a</mi>
-    </mrow></math>
-          "#;
-  // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
+                    <math xmlns="http://www.w3.org/1998/Math/MathML">
+                        <msub>
+                            <mi mathvariant="normal">Φ</mi>
+                            <mn>0</mn>
+                        </msub>
+                        <mo lspace="0" rspace="0" stretchy="false">(</mo>
+                        <msub>
+                            <mtext>a</mtext>
+                            <mn>0</mn>
+                        </msub>
+                        <mo lspace="0" rspace="0" stretchy="false">)</mo>
+                        <mo lspace="0.278em" rspace="0.278em" stretchy="false">→</mo>
+                        <msub>
+                            <mi mathvariant="normal">Φ</mi>
+                            <mn>0</mn>
+                        </msub>
+                        <mo lspace="0" rspace="0" stretchy="false">(</mo>
+                        <msub>
+                            <mtext>a</mtext>
+                            <mn>1</mn>
+                        </msub>
+                        <mo lspace="0" rspace="0" stretchy="false">)</mo>
+                    </math>
+                   "#;
   let instant = Instant::now();
-  let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../Rules");
-  let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
+
   // let rules_dir = "".to_string();    // Use MathCATRulesDir, potentially pointing to a zipped version
-  if let Err(e) = set_rules_dir(rules_dir) {
-    panic!("Error: exiting -- {}", errors_to_string(&e));  }
+  if let Err(e) = set_rules_dir(get_rules_dir()) {
+    panic!("Error: exiting -- {}", errors_to_string(&e));
+  }
 
   info!("Version = '{}'", get_version());
   set_preference("Language".to_string(), "en".to_string()).unwrap();
   set_preference("DecimalSeparator".to_string(), "Auto".to_string()).unwrap();
   set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
   set_preference("TTS".to_string(), "None".to_string()).unwrap();
-  set_preference("Verbosity".to_string(), "Verbose".to_string()).unwrap();
+  set_preference("Verbosity".to_string(), "Terse".to_string()).unwrap();
   set_preference("NavVerbosity".to_string(), "Verbose".to_string()).unwrap();
-  set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
+  set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
   set_preference("Impairment".to_string(), "Blindness".to_string()).unwrap();
   set_preference("SpeechOverrides_CapitalLetters".to_string(), "".to_string()).unwrap();
   set_preference("MathRate".to_string(), "80".to_string()).unwrap();
@@ -205,15 +239,42 @@ fn main() {
   
   set_preference("Bookmark".to_string(), "false".to_string()).unwrap();
   set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+  info!("Languages: {}", libmathcat::interface::get_supported_languages().join(", "));
+  info!("Speech styles: {}", libmathcat::interface::get_supported_speech_styles("en".to_string()).join(", "));
+  info!("BrailleCodes: {}", libmathcat::interface::get_supported_braille_codes().join(", "));
   // set_preference("DecimalSeparators".to_string(), ",".to_string()).unwrap();
   // set_preference("BlockSeparators".to_string(), ". ".to_string()).unwrap();
   if let Err(e) = set_mathml(expr.to_string()) {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
 
-  // match do_navigate_command("ZoomIn".to_string())  {
+  match do_navigate_command("ZoomIn".to_string())  {
+    Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
+    Ok(speech) => info!("\nZoomIn speech: '{speech}'"),
+  }
+  match do_navigate_command("ToggleZoomLockUp".to_string()) {
+    Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
+    Ok(speech) => info!("ToggleZoomLockUp speech: '{speech}'"),
+  }
+  match do_navigate_command("MovePrevious".to_string()) {
+    Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
+    Ok(speech) => info!("MovePrevious speech: '{speech}'"),
+  }
+  // match do_navigate_command("MovePrevious".to_string()) {
   //   Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
-  //   Ok(speech) => info!("\nZoomIn speech: '{}'", speech),
+  //   Ok(speech) => info!("MovePrevious speech: '{}'", speech),
+  // }
+  // match do_navigate_command("MovePrevious".to_string()) {
+  //   Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
+  //   Ok(speech) => info!("MovePrevious speech: '{}'", speech),
+  // }
+  // match do_navigate_command("MoveNext".to_string()) {
+  //   Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
+  //   Ok(speech) => info!("MoveNext speech: '{}'", speech),
+  // }
+  // match do_navigate_command("MoveNext".to_string()) {
+  //   Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
+  //   Ok(speech) => info!("MoveNext speech: '{}'", speech),
   // }
   // match do_navigate_command("MoveNext".to_string()) {
   //   Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
@@ -224,7 +285,7 @@ fn main() {
   //   Ok(speech) => info!("MoveNext speech: '{}'", speech),
   // }
   match get_spoken_text() {
-    Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
+    Ok(speech) => info!("Computed speech string:\n   '{speech}'"),
     Err(e) => panic!("{}", errors_to_string(&e)),
   }
   debug!("Speech language is {}", get_preference("Language".to_string()).unwrap());
@@ -245,7 +306,7 @@ fn main() {
   // info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()));
   
   match get_braille("".to_string()) {
-    Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
+    Ok(braille) => info!("Computed braille string:\n   '{braille}'"),
     Err(e) => panic!("{}", errors_to_string(&e)),
   }
   debug!("...using BrailleCode: {:?}", get_preference("BrailleCode".to_string()).unwrap());

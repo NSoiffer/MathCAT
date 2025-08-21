@@ -1,0 +1,73 @@
+---
+
+- name: line-segment
+  tag: line-segment
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: "linjestykket fra"      # phrase('the line segment from' A to B)
+      - x: "*[1]"
+      - T: "til"                         # phrase(the line segment from A 'to' B)
+      - x: "*[2]"
+      else:
+      - T: "linjestykke"               # phrase(the 'line segment' A  B)
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-ray
+  tag: ray
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: "strålen fra"             # phrase('the ray from' A to B)
+      - x: "*[1]"
+      - T: "til"                       # phrase(the ray from A 'to' B)
+      - x: "*[2]"
+      else:
+      - T: "stråle"                      # phrase(the 'ray'A  B)
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-arc
+  tag: arc
+  match: "count(*)=2"
+  replace:
+  - T: "bue"                        # phrase(the 'arc' A B C)
+  - x: "*[1]"
+  - x: "*[2]"
+
+- name: measure-of-angle
+  tag: measure-of-angle
+  match: "count(*)=3"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: "størrelsen på vinkelen"      # phrase('the measure of the angle' ABC)
+      else:
+      - T: "vinkel"      # phrase('measure of angle' ABC)
+  - x: "*[1]"
+  - x: "*[2]"
+  - x: "*[3]"
+
+#NORWEGIAN: Added from English, but not testet yet.
+- name: coordinate
+  tag: coordinate
+  match: "."
+  replace:
+  - T: "punktet"      # phrase(the 'point' at 1, 2)
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [T: "i"]      # phrase('the' point at 1, 2)
+  - pause: short
+  - insert:
+      nodes: "*"
+      replace: [T: "komma", pause: auto]      # phrase(f of x 'comma' y)
+  - pause: short
+  - test:
+      if: "($SpeechStyle='ClearSpeak' and $Verbosity='Verbose') or not(IsNode(*[last()],'leaf'))"
+      then: [T: "slutt punkt"]      # phrase(start point, 'end point')

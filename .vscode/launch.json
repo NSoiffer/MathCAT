@@ -10,10 +10,8 @@
             "request": "launch",
             "program": "${workspaceRoot}/target/debug/mathcat.exe",
             "args": [],
-            "env": {"RUST_LOG": "debug" },
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "cargo build",
-            "sourceLanguages": ["rust"],
         },
         {
             "name": "Run Test Debugger",
@@ -23,7 +21,6 @@
             "args": [],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "cargo test build",
-            "sourceLanguages": ["rust"],
         }
     ]
 }

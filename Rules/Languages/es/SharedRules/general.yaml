@@ -226,14 +226,19 @@
 # Due to this order, some things like "ft" and "cd" mean "feet" vs "femto-tonnes" and "pints" vs "pico-tonnes"
 - name: unit
   tag: unit
-  match: "$Verbosity != 'Terse' and contains(@data-intent-property, ':unit')"
+  match: "."
   variables:
-    # we need to look at preceding-sibling::*[2] because invisible times should have been added
-    # if in a fraction, only count if we are in the numerator
-  - IsSingular: "(parent::m:mrow and preceding-sibling::*[2][self::m:mn and . = 1]) or  
-                 (ancestor::*[2][self::m:mrow] and parent::m:fraction and
-                  (preceding-sibling::* or parent::*[preceding-sibling::*[2][self::m:mn and . = 1]])
-                 )"
+    # If the coefficient is singular, we don't add the plural ending. Finding the coefficient is tricky
+    # Normal case (A) "3m" (parents is mrow), but could also be (B) "3 m^2" (etc.). (parent is msup/mrow)
+    # But it might be in a fraction as (C) "3 m/s" (parent is mfrac/mrow) or (D) "3 m^2/s^2" (parent is msup/mfrac/mrow)
+    #   or even (E) {3 m^2}/s (parent is msup/mrow)
+    # If in a fraction, only look in the numerator to find the coefficient
+  - MRowForCoefficient: "IfThenElse(parent::m:mrow, parent::m:mrow,
+                         IfThenElse(parent::m:power, ancestor::*[2][self::m:mrow],
+                         IfThenElse(parent::m:fraction and not(preceding-sibling::*), ancestor::*[2][self::m:mrow],
+                         IfThenElse(parent::m:power[parent::m:fraction and not(preceding-sibling::*)], ancestor::*[3][self::m:mrow], false()) ) ) )"
+  - IsSingular: "(not($MRowForCoefficient) and parent::*[name(.)!='skip-super' or *[1][.=1]]) or
+                 ($MRowForCoefficient and $MRowForCoefficient[(count(*) = 3 and *[1][self::m:mn and .=1] and *[2]='\u2062')])"
   - Prefix: "''"
   - Word: "''"  
   replace:
@@ -419,7 +424,6 @@
   - test:
     - if: "$Verbosity!='Terse'"
       then: [T: "el"]      # phrase('the' logarithm function is used in mathematics)
-
   - test:
     - if: ".= 'log'"
       then: [T: "log"]      # phrase(the 'log' function is used in mathematics)
