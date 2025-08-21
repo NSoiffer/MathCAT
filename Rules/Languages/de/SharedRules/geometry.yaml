@@ -7,12 +7,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - T: "das liniensegment von"      # phrase('the line segment from' A to B)
+      - T: "die streck von"      # phrase('the line segment from' A to B)
       - x: "*[1]"
       - T: "zu"                         # phrase(the line segment from A 'to' B)
       - x: "*[2]"
       else:
-      - T: "liniensegment"               # phrase(the 'line segment' A  B)
+      - T: "strecke"               # phrase(the 'line segment' A  B)
       - x: "*[1]"
       - x: "*[2]"
 

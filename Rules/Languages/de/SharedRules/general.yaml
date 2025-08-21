@@ -63,7 +63,7 @@
     - else_if: ".='ℚ'"
       then: [T: "die rationalen zahlen"]      # phrase('the rational numbers' are the fraction of 2 integers)
     - else_if: ".='ℝ'"
-      then: [T: "die realen zahlen"]      # phrase('the real numbers' can be both positive and negative)
+      then: [T: "die reelen zahlen"]      # phrase('the real numbers' can be both positive and negative)
     - else_if: ".='ℤ'"
       then: [T: "die ganzzahlen"]      # phrase('the integers' are natural numbers above 0)
       else: [x: "text()"] # shouldn't happen
@@ -73,14 +73,14 @@
   match: "."
   replace:
   - bookmark: "@id"
-  - T: "der eigentliche teil"      # phrase('the real part' of a complex number does not include the imaginary part)
+  - T: "realteil"      # phrase('the real part' of a complex number does not include the imaginary part)
 
 - name: imaginary-part
   tag: imaginary-part
   match: "."
   replace:
   - bookmark: "@id"
-  - T: "der imaginäre teil"      # phrase('the imaginary part' is part of a complex number)
+  - T: "imaginärteil"      # phrase('the imaginary part' is part of a complex number)
 
 # rules on scripted vertical bars ('evaluated at')
 - name: evaluated-at-2
@@ -89,7 +89,7 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - T: "bewertet"      # phrase(results were 'evaluated at' a given point)
+  - T: "evaluiert auf"      # phrase(results were 'evaluated at' a given point)
   - pause: auto
   - x: "*[2]"
 
@@ -99,10 +99,10 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - T: "bewertet"      # phrase(results were 'evaluated at' this point)
+  - T: "evaluiert zwischen"      # phrase(results were 'evaluated at' this point)
   - pause: auto
   - x: "*[3]"
-  - T: "abzüglich des gleichen ausdrucks, der unter bewertet wurde"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
+  - T: "und"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
   - x: "*[2]"
 
 - name: permutation
@@ -172,7 +172,7 @@
       if: "$Verbosity!='Terse'"
       then: [T: "die"]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
-  - T: "over"      # phrase(2 'over' 3 equals two thirds)
+  - T: "über"      # phrase(2 'over' 3 equals two thirds)
   - x: "*[2]"
   - test:
       if: "following-sibling::*"
@@ -328,7 +328,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: [T: "cos"]      # phrase('cos' is the abbreviation for cosine)
-      else: [T: "cosinus"]      # phrase(find the 'cosine' in a right-angle triangle)
+      else: [T: "kosinus"]      # phrase(find the 'cosine' in a right-angle triangle)
 - name: tan
   tag: mi
   match: ".='tan' or .='tg'"
@@ -337,7 +337,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: [T: "tan"]      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
-      else: [T: "tangente"]      # phrase(a 'tangent' is a straight line that touches a curve)
+      else: [T: "tangens"]      # phrase(a 'tangent' is a straight line that touches a curve)
 - name: sec
   tag: mi
   match: ".='sec'"
@@ -346,7 +346,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: [T: "suchen"]      # phrase(to 'seek' a solution)
-      else: [T: "secant"]      # phrase(a 'secant' intersects a curve at two or more points)
+      else: [T: "sekans"]      # phrase(a 'secant' intersects a curve at two or more points)
 - name: csc
   tag: mi
   match: ".='csc'"
@@ -354,8 +354,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: [T: "cosecant"]      # phrase(we will 'cosecant' a solution)
-      else: [T: "cosecant"]      # phrase(the 'cosecant' is the reciprocal of the secant)
+      then: [T: "kosekans"]      # phrase(we will 'cosecant' a solution)
+      else: [T: "kosecans"]      # phrase(the 'cosecant' is the reciprocal of the secant)
 - name: cot
   tag: mi
   match: ".='cot'"
@@ -363,8 +363,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: [T: "kotangent"]      # phrase(find the 'cotangent' in a right-angle triangle)
-      else: [T: "cotangent"]      # phrase(the 'cotangent' is the reciprocal of the tangent)
+      then: [T: "kotangens"]      # phrase(find the 'cotangent' in a right-angle triangle)
+      else: [T: "kotangens"]      # phrase(the 'cotangent' is the reciprocal of the tangent)
 
 - name: sinh
   tag: mi
@@ -392,7 +392,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: [T: "tanch"]      # phrase('tanch' is shorthand for hyperbolic tangent)
-      else: [T: "hyperbolische tangente"]      # phrase('hyperbolic tangent' is a mathematical function)
+      else: [T: "hyperbolische tangens"]      # phrase('hyperbolic tangent' is a mathematical function)
 - name: sech
   tag: mi
   match: ".='sech'"
@@ -401,7 +401,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: [T: "sheck"]      # phrase('sheck' is shorthand for hyperbolic secant)
-      else: [T: "hyperbolic secant"]      # phrase('hyperbolic secant' is a mathematical function)
+      else: [T: "hyperbolic sekans"]      # phrase('hyperbolic secant' is a mathematical function)
 - name: csch
   tag: mi
   match: ".='csch'"
@@ -410,7 +410,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: [T: "cosheck"]      # phrase('cosheck' is shorthand for hyperbolic cosecant)
-      else: [T: "hyperbolisches cosecant"]      # phrase('hyperbolic cosecant' is a mathematical function)
+      else: [T: "hyperbolisches cosekans"]      # phrase('hyperbolic cosecant' is a mathematical function)
 - name: coth
   tag: mi
   match: ".='coth'"
@@ -419,7 +419,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: [T: "cotanch"]      # phrase('cotanch' is shorthand for hyperbolic cotangent)
-      else: [T: "hyperbolische kotangent"]      # phrase(the 'hyperbolic cotangent' is a mathematical function)
+      else: [T: "hyperbolische kotangens"]      # phrase(the 'hyperbolic cotangent' is a mathematical function)
 - name: exponential
   tag: mi
   match: ".='exp'"
@@ -428,7 +428,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: [T: "exp"]      # phrase('exp' means exponential function)
-      else: [T: "exponential"]      # phrase('exponential' function)
+      else: [T: "exponent"]      # phrase('exponential' function)
 - name: covariance
   tag: mi
   match: ".='Cov'"
@@ -721,7 +721,7 @@
   - x: count(*[self::m:mtr][1]/*)
   - test:
       if: "self::m:determinant"
-      then: [T: "determinante"]      # phrase(the 2 by 2 'determinant')
+      then: [T: "determinant"]      # phrase(the 2 by 2 'determinant')
       else: [T: "matrix"]      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*"
@@ -731,7 +731,7 @@
       - T: "ende"      # phrase(the 'end' of matrix has been reached)
       - test:
           if: "self::m:determinant"
-          then: [T: "determinante"]      # phrase(the 2 by 2 'determinant')
+          then: [T: "determinant"]      # phrase(the 2 by 2 'determinant')
           else: [T: "matrix"]      # phrase(the 2 by 2 'matrix')
 
 - name: default-matrix

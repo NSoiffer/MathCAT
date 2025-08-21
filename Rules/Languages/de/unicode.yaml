@@ -43,7 +43,7 @@
             else: [T: "ausrufezeichen"]           	#  0x21	(en: 'exclamation point')
         else: [T: "fakultät"]                   	#  0x21	(en: 'factorial')
           
- - "\"": [T: "umgekehrter schrägstrich"]        	#  0x22	(en: 'quotation mark') #backslash??
+ - "\"": [T: "backslash"]        	#  0x22	(en: 'quotation mark') #backslash??
  - "#": [T: "nummernzeichen"]                   	#  0x23	(en: 'number')
  - "$": [T: "dollar"]                           	#  0x24	(en: 'dollars')
  - "%": [T: "prozent"]                          	#  0x25	(en: 'percent')
@@ -174,13 +174,13 @@
             then: [T: "von"]                    	# 	(en: 'by', google translation)
             else: [T: "mal"]                    	# 	(en: 'cross', MathPlayer: 'times', google: 'kreuzen') #unklar
  - "÷": [T: "geteilt durch"]                    	#  0xf7	(en: 'divided by', MathPlayer: 'divides')
- - "̀": [T: "gravis akzent"]              	#  0x300	(en: 'grave accent embellishment', google: 'grabakzentverzierung')
- - "́": [T: "akut akzent"]           	#  0x301	(en: 'acute accent embellishment', google: 'akute akzentverzierung')
+ - "̀": [T: "accent grave"]              	#  0x300	(en: 'grave accent embellishment', google: 'grabakzentverzierung')
+ - "́": [T: "accent aigu"]           	#  0x301	(en: 'acute accent embellishment', google: 'akute akzentverzierung')
  - "̂": [T: "zirkumflex"]                	#  0x302	(en: 'circumflex accent embellishment', google: 'zirma akzentverzierung')
  - "̃": [T: "tilde"]              	#  0x303	(google: 'tilde verzierung')
- - "̄": [T: "makron akzent"]                 	#  0x304	(en: 'macron embellishment', google: 'makron -verzierung')
+ - "̄": [T: "makron"]                 	#  0x304	(en: 'macron embellishment', google: 'makron -verzierung')
  - "̅": [T: "überstrich"]            	#  0x305	(google: 'überbärerverzierung')
- - "̆": [T: "brevis akzent"]                  	#  0x306	(en: 'breve', google: 'breve')
+ - "̆": [T: "brevis"]                  	#  0x306	(en: 'breve', google: 'breve')
  - "̇": [T: "punkt darüber"]          	#  0x307	(google: 'punkt über verzierung')
 
    # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
@@ -350,7 +350,7 @@
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
                 then: [T: "nicht element von"] 	# 	(en: 'not member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [T: "kein element von"]   	# 	(en: 'not element of', google translation)
+                then: [T: "nicht element von"]   	# 	(en: 'not element of', google translation)
               - else: [T: "nicht element von"]  	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'not belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'

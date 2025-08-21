@@ -109,7 +109,7 @@
   - pause: short
   - test:
       if: "$Impairment = 'Blindness'"
-      then: [T: "beginn des fraktion x über y "]          # phrase("start of fraction x over y 'end over'")
+      then: [T: "beginn der fraktion x über y "]          # phrase("start of fraction x over y 'end over'")
   - pause: medium
 
 
@@ -285,7 +285,7 @@
               then:
               - T: "durch"      # phrase(substitute x 'with' y)
               - x: "count($Prescripts) div 2"
-              - T: "vorkripte"      # phrase(in this equation certain 'prescripts' apply)
+              - T: "vorskripte"      # phrase(in this equation certain 'prescripts' apply)
               - pause: short
           - test:
               if: "not($Prescripts[1][self::m:none])"
@@ -320,9 +320,9 @@
               - test:
                   if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
                   then:
-                  - T: "und abwechselnde vorkripte"      # phrase(in this case there are values 'and alternating prescripts')
+                  - T: "und abwechselnde vorskripte"      # phrase(in this case there are values 'and alternating prescripts')
                   - x: "$Prescripts[position() > 4]"
-                  - T: "end prescripts"      # phrase(This is where 'end prescripts' occurs)
+                  - T: "end vorskripte"      # phrase(This is where 'end prescripts' occurs)
   - test:
       if: "$Postscripts"
       then:
@@ -339,7 +339,7 @@
                   then: [T: "und"]      # phrase(10 is greater than 8 'and' less than 15)
               - T: "durch"      # phrase(substitute x 'with' y)
               - x: "count($Postscripts) div 2"
-              - T: "postscripts"      # phrase(this material includes several 'postscripts')
+              - T: "nachskripte"      # phrase(this material includes several 'postscripts')
               - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none])"
@@ -443,7 +443,7 @@
   - test:
       if: "self::m:mlabeledtr"
       then:
-      - T: "mit der etikett"      # phrase(the line 'with label' first equation)
+      - T: "mit der etikette"      # phrase(the line 'with label' first equation)
       - x: "*[1]/*"
       - pause: short
   - pause: medium

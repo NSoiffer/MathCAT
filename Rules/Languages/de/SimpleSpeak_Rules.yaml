@@ -173,7 +173,7 @@
   - test:
       if: "*[2][.=2]"
       then: [T: "quadrat"]      # phrase(5 'squared' equals 25)
-      else: [T: "chorned"]      # phrase(5 'cubed' equals 125)
+      else: [T: "zum dritten Wurzel"]      # phrase(5 'cubed' equals 125)
 - name: function-power
   tag: power
   match:
@@ -187,7 +187,7 @@
       if: "*[2][self::m:mn][not(contains(., '.'))]"
       then: [x: "ToOrdinal(*[2])"]
       else: [x: "*[2]"]
-  - T: "kraft von"      # phrase(the fourth 'power of' 2)
+  - T: "potenz von"      # phrase(the fourth 'power of' 2)
   - pause: short
   - x: "*[1]"
 
@@ -201,7 +201,7 @@
   - test:
       if: "*[2][.=2]"
       then: [T: "quadrat"]      # phrase(5 'squared' equals 25)
-      else: [T: "chorned"]      # phrase(5 'cubed' equals 125)
+      else: [T: "hoch drei"]      # phrase(5 'cubed' equals 125)
 
 - name: simple-integer
   tag: power
@@ -269,7 +269,7 @@
   - x: "*[1]"
   - T: "auf die"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
-  - T: "power"      # phrase(15 raised to the second 'power' equals 225)
+  - T: "potenz"      # phrase(15 raised to the second 'power' equals 225)
   - pause: short
 
 #
@@ -291,7 +291,7 @@
       - test:
           if: "$Verbosity!='Terse'"
           then: [T: "die"]      # phrase('the' set of all integers)
-      - T: "set aller"      # phrase(the 'set of all' positive integers less than 10)
+      - T: "Menge aller"      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
       - T: "so dass"      # phrase(x 'such that' x is less than y)
       - x: "*[1]/*[3]"
