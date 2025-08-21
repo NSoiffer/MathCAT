@@ -189,30 +189,8 @@ fn main() {
   //   </math>";
 
   let expr = r#"
-                    <math xmlns="http://www.w3.org/1998/Math/MathML">
-                        <msub>
-                            <mi mathvariant="normal">Φ</mi>
-                            <mn>0</mn>
-                        </msub>
-                        <mo lspace="0" rspace="0" stretchy="false">(</mo>
-                        <msub>
-                            <mtext>a</mtext>
-                            <mn>0</mn>
-                        </msub>
-                        <mo lspace="0" rspace="0" stretchy="false">)</mo>
-                        <mo lspace="0.278em" rspace="0.278em" stretchy="false">→</mo>
-                        <msub>
-                            <mi mathvariant="normal">Φ</mi>
-                            <mn>0</mn>
-                        </msub>
-                        <mo lspace="0" rspace="0" stretchy="false">(</mo>
-                        <msub>
-                            <mtext>a</mtext>
-                            <mn>1</mn>
-                        </msub>
-                        <mo lspace="0" rspace="0" stretchy="false">)</mo>
-                    </math>
-                   "#;
+   <math><msup><mi>y</mi><mo>..</mo></msup></math> 
+                      "#;
   let instant = Instant::now();
 
   // let rules_dir = "".to_string();    // Use MathCATRulesDir, potentially pointing to a zipped version

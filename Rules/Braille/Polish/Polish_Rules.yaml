@@ -113,10 +113,10 @@
   - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
   - t: "W"
 
--
+- # simpler (more common?) case of the next rule (no whitespace)
   name: simple-fraction
   tag: mfrac
-  match: "$Polish_UseShortForm and *[1][string-length(.)=1] and *[2][string-length(.)=1]"
+  match: "*[1][IsNode(., 'leaf') and not(contains(., 'u00a0'))] and *[2][IsNode(., 'leaf') and not(contains(., 'u00a0'))]"
   replace:
   - x: "*[1]"
   - t: "⠳"  # don't need number indicator
@@ -127,25 +127,46 @@
       else:
       - x: "*[2]"
 
+# -
+  # name: no-whitespace
+  # tag: mfrac
+  # match: "*[1][not(contains(BrailleChars(., 'Polish'), 'W'))] and *[2][not(contains(BrailleChars(., 'Polish'), 'W'))]"
+  # replace:
+  # - x: "*[1]"
+  # - t: "⠳"  # don't need number indicator
+  # - test:
+  #     if: "*[2][self::m:mn][not(contains(., '.,'))]"
+  #     then:
+  #     - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
+  #     else:
+  #     - x: "*[2]"
+
 -
+  # We have already dealt with long form
+  # Rule 1 (p25)
+  # Omit the open/close fraction indicators and no whitespace around the division sign
   name: default
   tag: mfrac
   match: "."
+  variables:
+  - Numerator: "*[1]"
+  - Denominator: "*[2]"
   replace:
-  - with:
-      variables: [Numerator: "BrailleChars(*[1], Polish)"]
-      replace: [x: "DEBUG($Numerator)"]
-
-  - t: "⠆"
+  - test:   # Rule 4c, p26
+      if: "starts-with($Numerator, '⠤')"    # minus sign -- could this be something?
+      then: [t: "⠆"]
+  - x: "DEBUG(ReplaceAll(DEBUG($Numerator), 'W', '⠈'))"
+  - t: "⠳"
   - test:
-      if: "$Polish_UseShortForm and *[2][self::m:mn][not(contains(., '.,'))]"
+      if: "*[2][self::m:mn][not(contains(., '.,'))]"
       then:
-      - t: "⠳"
       - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
       else:
-      - t: "W⠳"
-      - x: "*[2]"
-      - t: "⠰"
+      - with:
+          variables: [Denominator: "*[2]"]
+          replace: [x: "ReplaceAll($Denominator, 'W', '⠈')"]
+  - t: "W"
+
 
 #
 # Matrix/Determinant rules

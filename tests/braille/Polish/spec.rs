@@ -624,7 +624,7 @@ fn detailed_projectors_10() {
 #[test]
 fn fractions_1() {
     let expr = r#"<math><mfrac><mrow><mn>2</mn><mi>x</mi><mo>+</mo><mn>3</mn><mi>y</mi><mo>-</mo><mn>4</mn></mrow><mrow><mn>4</mn><mi>x</mi><mo>-</mo><mn>5</mn><mi>y</mi></mrow></mfrac></math>"#;
-    test_braille("Polish", expr, "⠆⠼⠃⠠⠭⠀⠖⠼⠉⠽⠀⠤⠼⠙⠀⠳⠀⠼⠙⠭⠀⠤⠼⠑⠽⠰");
+    test_braille_prefs("Polish", vec![("Polish_UseShortForm", "false")], expr, r"⠆⠼⠃⠠⠭⠀⠖⠼⠉⠽⠀⠤⠼⠙⠀⠳⠀⠼⠙⠭⠀⠤⠼⠑⠽⠰");
 }
 
 #[test]
@@ -653,7 +653,6 @@ fn fractions_3b() {
 
 #[test]
 fn fractions_4() {
-    init_logger();
     let expr = r#"<math><mfrac><mrow><mn>3</mn><mi>x</mi></mrow><mn>4</mn></mfrac></math>"#;
     test_braille("Polish", expr, "⠼⠉⠠⠭⠳⠲");
 }
@@ -696,6 +695,7 @@ fn fractions_10() {
 
 #[test]
 fn fractions_11() {
+    init_logger();
     let expr = r#"<math><mn>2</mn><mfrac><mn>3</mn><mn>4</mn></mfrac></math>"#;
     test_braille("Polish", expr, "⠼⠃⠼⠉⠲");
 }
@@ -721,7 +721,7 @@ fn fractions_14a() {
 #[test]
 fn fractions_14b() {
     let expr = r#"<math><mfrac><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mrow><mi>x</mi><mo>-</mo><mi>y</mi></mrow></mfrac></math>"#;
-    test_braille("Polish", expr, "⠆⠠⠭⠀⠖⠽⠀⠳⠀⠭⠀⠤⠽⠰");
+    test_braille_prefs("Polish", vec![("Polish_UseShortForm", "false")], expr, r"⠆⠠⠭⠀⠖⠽⠀⠳⠀⠭⠀⠤⠽⠰");
 }
 
 #[test]

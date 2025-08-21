@@ -2036,7 +2036,7 @@ static POLISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 
 fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     lazy_static! {
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([B𝔹IREDgGVHPlL𝐿MnNUwW𝐖},.])").unwrap();
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([B𝔹IREDgGVHPlL𝐿MnNUwW𝐖#},.])").unwrap();
     }
 
     debug!("polish_cleanup: start={}", raw_braille);
@@ -2152,6 +2152,12 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 }
                 result.push(chars[i+1]);
                 i += 2;
+            },
+            '#' => {
+                // force a number sign
+                mode = BrailleMode::Number;
+                result.push(ch);
+                i += 1;
             },
             'B' | 'I' => {
                 // FIX: implement
