@@ -149,21 +149,28 @@
   tag: mfrac
   match: "."
   variables:
-  - Numerator: "PatternMatch(*[1])"
+  - Numerator: "PatternMatchResult(*[1], 'Braille')"
   replace:
-  - test:   # Rule 4c, p26
-      if: "starts-with($Numerator, '⠤')"    # minus sign -- could this be something?
+  - test:   # Rule 4c, p26, mfrac test is rule at end of "b)"
+      if: "starts-with($Numerator, '⠤') or descendant::*[self::m:mfrac]"    # minus sign '--' could this be something?
       then: [t: "⠆"]
-  - x: "DEBUG(ReplaceAll(DEBUG($Numerator), '⠀', '⠈'))"
+  - x: "ReplaceAll(DEBUG($Numerator), 'W', '⠈')"
   - t: "⠳"
+  - test:
+      if: "descendant::*[self::m:mfrac]" # Rule 4b, p26, mfrac test is at end of "b"
+      then: [t: "W"]
   - test:
       if: "*[2][self::m:mn][not(contains(., '.,'))]"
       then:
       - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
       else:
       - with:
-          variables: [Denominator: "PatternMatch(*[2])"]
-          replace: [x: "ReplaceAll($Denominator, '⠀', '⠈')"]
+          variables: [Denominator: "ReplaceAll(PatternMatchResult(*[2], 'Braille'), 'W', '⠈')"]
+          replace:
+          - test:
+              if: "starts-with($Denominator, '⠠')"   # temp hack to remove lower case letter indicator caused by braille denominator separately from numerator
+              then: [x: "substring($Denominator, 2)"]
+              else: [x: "$Denominator"]
   - t: "W"
 
 

@@ -34,7 +34,7 @@ pub fn braille_mathml_with_context<'c>(mathml: Element, context: Context<'c>) ->
         let rules = rules.borrow();
         let new_package = Package::new();
         let rules_with_context = SpeechRulesWithContext::with_context(&rules, new_package.as_document(), "", context);
-        return braille_rules_internal(mathml, rules_with_context);
+        return braille_rules_internal(mathml, rules_with_context, false);
     })
 }
 
@@ -44,15 +44,19 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
         let rules = rules.borrow();
         let new_package = Package::new();
         let rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
-        return braille_rules_internal(mathml, rules_with_context);
+        return braille_rules_internal(mathml, rules_with_context, true);
     });
 }
 
-fn braille_rules_internal<'s:'m, 'm:'c, 'c>(mathml: Element<'m>, mut rules_with_context: SpeechRulesWithContext<'c, 's, 'm>) -> Result<(String, usize, usize)> {
+fn braille_rules_internal<'s:'m, 'm:'c, 'c>(mathml: Element<'m>, mut rules_with_context: SpeechRulesWithContext<'c, 's, 'm>, generate_braille_chars: bool) -> Result<(String, usize, usize)> {
     let braille_string = rules_with_context.match_pattern::<String>(mathml)
                     .chain_err(|| "Pattern match/replacement failure!")?;
-    // debug!("braille_mathml: braille string: {}", &braille_string);
     let braille_string = braille_string.replace(' ', "");
+    // debug!("braille_mathml: braille string: {}", &braille_string);
+    if !generate_braille_chars {
+        let len = braille_string.len();     // have to avoid move after use in next line
+        return Ok( (braille_string, 0, len) );
+    }
     let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
     let highlight_style = pref_manager.pref_to_string("BrailleNavHighlight");
     let braille_code = pref_manager.pref_to_string("BrailleCode");

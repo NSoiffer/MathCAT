@@ -1107,3 +1107,6 @@
 
  # SRE lists this as a custom transcription
  - "⋊": [t: "⠈⠡⠳"]                 # 0x22ca (RIGHT NORMAL FACTOR SEMIDIRECT PRODUCT)
+
+ - "⠀-⣿":    # 0x2800 - 0x28ff
+    - t: "."
