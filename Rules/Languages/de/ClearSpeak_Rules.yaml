@@ -10,7 +10,7 @@
   tag: mn
   match: "starts-with(text(), '-')"
   replace:
-  - T: "menos"
+  - T: "minus"
   - x: "translate(text(), '-_', '')"
 
 - name: default
@@ -19,7 +19,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: "der"}
+      then: {T: "die"}
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
@@ -38,7 +38,7 @@
     - if: "$ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
       then:
       - pause: short
-      - T: "end wurzel"
+      - T: "ende der wurzel"
       - pause: medium
     - else_if: "IsNode(*[1], 'simple')"
       then: [{pause: short}]
@@ -50,7 +50,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: "der"}
+      then: {T: "die"}
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
@@ -59,8 +59,8 @@
           then: [{bookmark: "parent/@id"}]
       - test:
           if: parent::m:minus
-          then: [{T: "minus"}]
-          else: [{T: "plus"}]
+          then: [{T: "negative"}]
+          else: [{T: "positive"}]
   - test:
       if: "*[2][self::m:mn]"
       then_test:
@@ -86,7 +86,7 @@
       if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - pause: short
-      - T: "end wurzel"
+      - T: "ende der wurzel"
       - pause: medium
       else_test:
         if: IsNode(*[1], 'simple')
@@ -107,8 +107,8 @@
       - bookmark: "@id"
       - test:
           if: "self::m:minus"
-          then: [{T: "minus"}]
-          else: [{T: "plus"}]
+          then: [{T: "negative"}]
+          else: [{T: "positive"}]
   - x: "*[1]"
 
 # Fraction rules
@@ -167,7 +167,7 @@
       if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
       then:
       - pause: short
-      - T: "end bruch"
+      - T: "ende des bruchs"
       - pause: short
 
 - # fraction with text or numbers followed by text in both numerator and denominator
@@ -195,7 +195,7 @@
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
       then:
       - pause: short
-      - T: "end bruch"
+      - T: "ende des bruchs"
       - pause: short
 
 - name: default
@@ -203,20 +203,20 @@
   match: "."
   replace:
   - OT: "der"
-  - T: "Bruch mit Zähler"
+  - T: "bruch mit zähler"
   - test:
       if: not(IsNode(*[1], 'simple'))
       then: {pause: medium}
   - x: "*[1]"
   - pause: medium
-  - T: "und Nenner"
+  - T: "und nenner"
   - x: "*[2]"
   - pause: long
   - test:
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='GeneralEndFrac'"
       then:
       - pause: short
-      - T: "end bruch"
+      - T: "ende des bruchs"
       - pause: short
 
 # rules for functions raised to a power
@@ -249,6 +249,7 @@
         then: [T: "hoch zwei"]
         else: [T: "quadrat"]
       else: {T: "hoch 3"}
+
 - name: function-power
   tag: power
   match:
@@ -273,7 +274,7 @@
   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
   replace:
   - x: "*[1]"
-  - T: "zum Exponent"
+  - T: "zum exponent"
   - pause: short
   - x: "*[2]"
   - pause: short
@@ -536,7 +537,7 @@
       - test:
           if: "starts-with(name(.), 'open')"
           then: [{T: "no"}]
-      - T: "inklusiv"
+      - T: "einschließlich"
       - x: "*[1]"
     # logic to deal with [not] arg #1
   - test:
@@ -558,7 +559,7 @@
           - test:
               if: "name(.) = 'open-interval' or name(.) = 'closed-open-interval'"
               then: [{T: "ohne"}]
-          - T: "inklusiv"
+          - T: "einschließlich"
       - x: "*[2]"
 
     # onto the [not] [including]... part
@@ -570,7 +571,7 @@
   replace:
   - T: "wähle"
   - x: "*[1]/*[1]/*" # mtable/mtr/mtd
-  - T: "zwischen"
+  - T: "aus"
   - x: "*[2]/*[1]/*"
 
 - name: ClearSpeak-default
@@ -578,12 +579,12 @@
   match: "parent::m:matrix or parent::m:determinant"
   replace:
   - pause: medium
-  - T: "fila"
+  - T: "zeile"
   - x: "count(preceding-sibling::*)+1"
   - test:
       if: .[self::m:mlabeledtr]
       then:
-      - T: "determinant"
+      - T: "mit bezeichnung"
       - x: "*[1]/*"
       - pause: short
   - pause: medium
@@ -660,13 +661,13 @@
         - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
           then: [{T: "zeile"}]
         - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
-          then: [{T: "beschränkung??"}]
+          then: [{T: "bedingung"}]
         - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
           then: [{T: "gleichung"}]
         - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
-          then: [{T: "reihe"}]
+          then: [{T: "zeile"}]
         - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
-          then: [{T: "stufe"}]
+          then: [{T: "schritt"}]
           # else 'None -- don't say anything'
       - test:
         - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
@@ -684,13 +685,13 @@
     - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
       then: [{T: "zeile"}]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
-      then: [{T: "beschränkung?"}]
+      then: [{T: "bedingung"}]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
       then: [{T: "gleichung"}]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
-      then: [{T: "reihe"}]
+      then: [{T: "zeile"}]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
-      then: [{T: "stufe"}]
+      then: [{T: "schritt"}]
       # else 'None -- don't say anything'
   - test:
       if: "$ClearSpeak_MultiLineLabel != 'None'"
@@ -699,7 +700,7 @@
       - test:
           if: .[self::m:mlabeledtr]
           then:
-          - T: "etikette"
+          - T: "mit der bezeichnung"
           - x: "*[1]/*"
       - pause: medium
   - test:
@@ -719,7 +720,7 @@
     test:
       if: "$ClearSpeak_ImpliedTimes = 'None'"
       then: [{T: ""}]
-      else: [{T: "multiplicado por"}]
+      else: [{T: "mal"}]
 
 - name: no-times
   tag: mo
@@ -752,7 +753,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - T: "multiplicado por"
+  - T: "mal"
 
 - name: no-say-parens
   tag: mrow
