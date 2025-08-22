@@ -112,7 +112,7 @@
 
     # accepted (plus a few variants) that take SI prefixes
     "l": "liter", "L": "liter", "ℓ": "liter",  # Should only take negative powers; British spelling works for US also
-    "t": "tonn",           # should only take positive powers
+    "t": "ton",           # should only take positive powers
     "Da": "dalton",
     "Np": "neper",               # should only take negative powers
     "u": "atommassenhet",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
@@ -299,12 +299,17 @@
 
 - NeuterUnits: {
     #SIUnits
-     "g", "t", "a", "rpm",
+    "Bq", "C", "F", "g", "Gy", "H", "Hz", "J", "kat", "lx", "m", "N", "Ω", "Pa",
+    "S", "Sv", "T", "t", "V", "W",
   }
     
 - NeuterUnitsWithoutPrefixes: {
     #UnitsWithoutPrefixes
+    "″", "\"",
+    "′", "'", "min",
     "y", "yr",
+    "arcmin", "amin", "am", "MOA":,                                    
+    "arcsec", "asec",
     "ltyr", "ly", "l.y.",
     
     #EnglishUnits
@@ -313,7 +318,7 @@
 
     # stop when regularity begins
 - OrdinalFractionalDenominatorsForUnits: {
-          "0": "", "1": "", "2": "halv", "3": "tredjedels", "4": "fjärdedels", "5": "femtedels",
+          "0": "", "1": "", "2": "halv/halvt*", "3": "tredjedels", "4": "fjärdedels", "5": "femtedels",
           "6": "sjättedels", "7": "sjundedels", "8": "åttondels", "9": "niondels", "10": "tiondels",
   }
 
