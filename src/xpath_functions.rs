@@ -19,13 +19,13 @@
 
 use sxd_document::dom::{Element, ChildOfElement};
 use sxd_xpath::{Value, Context, context, function::*, nodeset::*};
+use sxd_xpath::function::Error as XPathError;
 use crate::definitions::{Definitions, SPEECH_DEFINITIONS, BRAILLE_DEFINITIONS};
 use regex::Regex;
 use crate::pretty_print::mml_to_string;
 use std::cell::{Ref, RefCell};
 use std::thread::LocalKey;
 use phf::phf_set;
-use sxd_xpath::function::Error as XPathError;
 use crate::canonicalize::{as_element, name, get_parent, MATHML_FROM_NAME_ATTR};
 
 // useful utility functions
@@ -1417,6 +1417,97 @@ impl Function for ReplaceAll {
     }
 }
 
+use std::collections::HashMap;
+use sxd_xpath::{OwnedQName, function};
+/// A mapping of names to XPath functions.
+type Functions = HashMap<OwnedQName, Box<dyn function::Function + 'static>>;
+/// A mapping of names to XPath variables.
+type Variables<'d> = HashMap<OwnedQName, Value<'d>>;
+/// A mapping of namespace prefixes to namespace URIs.
+type Namespaces = HashMap<String, String>;
+
+#[allow(dead_code)]
+pub struct HackedContext<'d> {
+    pub functions: Functions,
+    pub variables: Variables<'d>,
+    pub namespaces: Namespaces,
+}
+
+#[allow(dead_code)]
+pub struct HackedEvaluation<'c, 'd: 'c> {
+    /// The context node
+    pub node: Node<'d>,
+    /// The context position
+    pub position: usize,
+    /// The context size
+    pub size: usize,
+    pub functions: &'c Functions,
+    pub variables: &'c Variables<'d>,
+    pub namespaces: &'c Namespaces,
+}
+
+pub struct PatternMatchResult;
+impl PatternMatchResult {
+    fn unsafe_temp_hack_get_context<'d>(evaluation: &context::Evaluation<'_, 'd>) -> Context<'d> {
+        unsafe {
+            let evaluation = std::mem::transmute::<&context::Evaluation, &HackedEvaluation>(evaluation);
+            // for (key, val) in evaluation.functions {functions.insert(key.clone(), val.clone());};
+            let mut context = Context::new();
+            add_builtin_functions(&mut context);
+            let mut hacked_context = std::mem::transmute::<Context, HackedContext>(context);
+            let mut variables: Variables = HashMap::with_capacity(evaluation.variables.capacity());
+            for (key, val) in evaluation.variables {variables.insert(key.clone(), val.clone());};
+            hacked_context.variables = variables;
+            let mut namespaces: Namespaces = HashMap::with_capacity(evaluation.variables.capacity());
+            for (key, val) in evaluation.namespaces {namespaces.insert(key.clone(), val.clone());};
+            hacked_context.namespaces = namespaces;
+            let context = std::mem::transmute::<HackedContext, Context>(hacked_context);
+            context
+        }
+    }
+}
+/// PatternMatchResult("Braille" | "Speech", xpath)
+/// Returns the result of executing the xpath (speech or braille string)
+impl Function for PatternMatchResult {
+    fn evaluate<'d>(&self,
+                        context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(2)?;
+        let braille_or_speech = args.pop_string()?.to_ascii_lowercase();
+        if braille_or_speech != "braille" && braille_or_speech != "speech" {
+            return Err(Error::Other(format!("PatternMatchResult (in rules): first arg '{}' is not 'Braille' or 'Speech'", braille_or_speech)));
+        }
+        let xpath = validate_one_node(args.pop_nodeset()?, "PatternMatchResult")?;
+        let mathml = match xpath {
+            Node::Element(e) => e,
+            _ => return Err(Error::Other(format!("PatternMatchResult (in rules): first arg '{}' is not 'Braille' or 'Speech'", braille_or_speech)))
+        };
+
+        // FIX: this should be trivial, but sxd_xpath doesn't expose a xpath evaluation function on Evaluation, just on Context despite the implementation
+        //    of evaluate creating an Evaluation and then calling 'self.0.evaluate()'.
+        // Hopefully the package author fixes this (see https://github.com/shepmaster/sxd-xpath/issues/151) or I should fork the project and make
+        //    a build with the added functionality.
+        // Once a fix is made, Evaluation (not Context) should be passed around and the ContextStack modified to store an evaluation.
+        let context = PatternMatchResult::unsafe_temp_hack_get_context(context);
+
+        let result = if braille_or_speech == "braille" {
+            match crate::braille::braille_mathml_with_context(mathml, context) {
+                Err(e) => return Err(Error::Other(format!("PatternMatchResult: {}", e.description()))),
+                Ok(answer) => answer.0,
+            }
+        } else {
+            match crate::speech::speak_mathml(mathml, "") {
+                Err(e) => return Err(Error::Other(format!("PatternMatchResult: {}", e.description()))),
+                Ok(answer) => answer,
+            }
+        };
+        return Ok( Value::String(result) );
+    }
+}
+
 /// Add all the functions defined in this module to `context`.
 pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("NestingChars", crate::braille::NemethNestingChars);
@@ -1436,6 +1527,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("SpeakIntentName", SpeakIntentName);
     context.set_function("GetBracketingIntentName", GetBracketingIntentName);
     context.set_function("GetNavigationPartName", GetNavigationPartName);
+    context.set_function("PatternMatchResult", PatternMatchResult);
     context.set_function("DEBUG", Debug);
 
     // Not used: remove??

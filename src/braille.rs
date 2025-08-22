@@ -2,6 +2,7 @@
 use strum_macros::Display;
 use sxd_document::dom::{Element, ChildOfElement};
 use sxd_document::Package;
+use sxd_xpath::Context;
 use crate::definitions::SPEECH_DEFINITIONS;
 use crate::errors::*;
 use crate::pretty_print::mml_to_string;
@@ -28,41 +29,55 @@ fn braille_at(braille: &str, index: usize) -> char {
 /// braille the MathML
 /// If 'nav_node_id' is not an empty string, then the element with that id will have dots 7 & 8 turned on as per the pref
 /// Returns the braille string (highlighted) along with the *character* start/end of the highlight (whole string if no highlight)
+pub fn braille_mathml_with_context<'c>(mathml: Element, context: Context<'c>) -> Result<(String, usize, usize)> {
+    return BRAILLE_RULES.with(|rules| {
+        let rules = rules.borrow();
+        let new_package = Package::new();
+        let rules_with_context = SpeechRulesWithContext::with_context(&rules, new_package.as_document(), "", context);
+        return braille_rules_internal(mathml, rules_with_context);
+    })
+}
+
 pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usize, usize)> {
     return BRAILLE_RULES.with(|rules| {
         rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
         let new_package = Package::new();
-        let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
-        let braille_string = rules_with_context.match_pattern::<String>(mathml)
-                        .chain_err(|| "Pattern match/replacement failure!")?;
-        // debug!("braille_mathml: braille string: {}", &braille_string);
-        let braille_string = braille_string.replace(' ', "");
-        let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
-        let highlight_style = pref_manager.pref_to_string("BrailleNavHighlight");
-        let braille_code = pref_manager.pref_to_string("BrailleCode");
-        let braille = match braille_code.as_str() {
-            "Nemeth" => nemeth_cleanup(pref_manager, braille_string),
-            "UEB" => ueb_cleanup(pref_manager, braille_string),
-            "Vietnam" => vietnam_cleanup(pref_manager, braille_string),
-            "CMU" => cmu_cleanup(pref_manager, braille_string), 
-            "Polish" => polish_cleanup(pref_manager, braille_string), 
-            "Finnish" => finnish_cleanup(pref_manager, braille_string),
-            "Swedish" => swedish_cleanup(pref_manager, braille_string),
-            "LaTeX" => LaTeX_cleanup(pref_manager, braille_string),
-            "ASCIIMath" => ASCIIMath_cleanup(pref_manager, braille_string),
-            _ => braille_string.trim_matches('⠀').to_string(),    // probably needs cleanup if someone has another code, but this will have to get added by hand
-        };
-
-        return Ok(
-            if highlight_style != "Off" {
-                highlight_braille_chars(braille, &braille_code, highlight_style == "All")
-            } else {
-                let end = braille.len()/3;
-                (braille, 0, end)
-            }
-        );
+        let rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
+        return braille_rules_internal(mathml, rules_with_context);
     });
+}
+
+fn braille_rules_internal<'s:'m, 'm:'c, 'c>(mathml: Element<'m>, mut rules_with_context: SpeechRulesWithContext<'c, 's, 'm>) -> Result<(String, usize, usize)> {
+    let braille_string = rules_with_context.match_pattern::<String>(mathml)
+                    .chain_err(|| "Pattern match/replacement failure!")?;
+    // debug!("braille_mathml: braille string: {}", &braille_string);
+    let braille_string = braille_string.replace(' ', "");
+    let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
+    let highlight_style = pref_manager.pref_to_string("BrailleNavHighlight");
+    let braille_code = pref_manager.pref_to_string("BrailleCode");
+    let braille = match braille_code.as_str() {
+        "Nemeth" => nemeth_cleanup(pref_manager, braille_string),
+        "UEB" => ueb_cleanup(pref_manager, braille_string),
+        "Vietnam" => vietnam_cleanup(pref_manager, braille_string),
+        "CMU" => cmu_cleanup(pref_manager, braille_string), 
+        "Finnish" => finnish_cleanup(pref_manager, braille_string),
+        "Swedish" => swedish_cleanup(pref_manager, braille_string),
+        "Polish" => polish_cleanup(pref_manager, braille_string),
+        "LaTeX" => LaTeX_cleanup(pref_manager, braille_string),
+        "ASCIIMath" => ASCIIMath_cleanup(pref_manager, braille_string),
+        _ => braille_string.trim_matches('⠀').to_string(),    // probably needs cleanup if someone has another code, but this will have to get added by hand
+    };
+
+    return Ok(
+        if highlight_style != "Off" {
+            highlight_braille_chars(braille, &braille_code, highlight_style == "All")
+        } else {
+            let end = braille.len()/3;
+            (braille, 0, end)
+        }
+    );
+}
 
     /// highlight with dots 7 & 8 based on the highlight style
     /// both the start and stop points will be extended to deal with indicators such as capitalization
@@ -246,7 +261,6 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
         }
         return 0;
     }
-}
 
 // FIX: if 8-dot braille is needed, perhaps the highlights can be shifted to a "highlighted" 256 char block in private space 
 //   they would need to be unshifted for the external world

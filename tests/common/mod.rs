@@ -51,23 +51,24 @@ fn check_answer(test: &str, target: &str, failure_message: &str) {
     };
 }
 
-// Compare the result of speaking the mathml input to the output 'speech'
-// This uses default preferences
-#[allow(dead_code)]     // used in testing
-pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
+fn set_default_speech_prefs() {
     set_rules_dir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
+        prefs.set_user_prefs("DecimalSeparator", "Auto").unwrap();
         prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
         prefs.set_user_prefs("MathRate", "100").unwrap();                            // makes testing simpler
         prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
         prefs.set_user_prefs("Verbosity", "Medium").unwrap();
         prefs.set_user_prefs("Impairment", "Blindness").unwrap();
-        prefs.set_user_prefs("DecimalSeparators", ".").unwrap();
-        prefs.set_user_prefs("BlockSeparators", ", ").unwrap();
     });
-
+}
+// Compare the result of speaking the mathml input to the output 'speech'
+// This uses default preferences
+#[allow(dead_code)]     // used in testing
+pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
+    set_default_speech_prefs();
     set_preference("Language".to_string(), language.to_string()).unwrap();
     set_preference("SpeechStyle".to_string(), style.to_string()).unwrap();
     check_answer(mathml, speech, &format!("{}/{}", language, style));
@@ -78,17 +79,7 @@ pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
 #[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
 pub fn test_prefs(language: &str, speech_style: &str, test_prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
-    set_rules_dir(abs_rules_dir_path()).unwrap();
-    libmathcat::speech::SPEECH_RULES.with(|rules| {
-        let rules = rules.borrow_mut();
-        let mut prefs = rules.pref_manager.borrow_mut();
-        prefs.set_user_prefs("Impairment", "Blindness").unwrap();                    // makes testing simpler
-        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
-        prefs.set_user_prefs("MathRate", "100").unwrap();                            // makes testing simpler
-        prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
-        prefs.set_user_prefs("Verbosity", "Medium").unwrap();
-    });
-
+    set_default_speech_prefs();
     set_preference("Language".to_string(), language.to_string()).unwrap();
     set_preference("SpeechStyle".to_string(), speech_style.to_string()).unwrap();
     for (pref_name, pref_value) in test_prefs.clone() {
@@ -119,6 +110,8 @@ pub fn test_ClearSpeak_prefs(language: &str, prefs: Vec<(&str, &str)>, mathml: &
 #[allow(non_snake_case)]
 pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
+    set_preference("DecimalSeparator".to_string(), "Auto".to_string()).unwrap();
+    set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
     set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
     set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
     set_preference("LaTeX_UseShortName".to_string(), "false".to_string()).unwrap();
@@ -143,6 +136,7 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
 #[allow(dead_code)]     // used in testing
 pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &str, braille: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
+    set_preference("DecimalSeparator".to_string(), "Auto".to_string()).unwrap();
     set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
 
     // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically

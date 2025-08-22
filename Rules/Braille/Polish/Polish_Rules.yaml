@@ -149,13 +149,12 @@
   tag: mfrac
   match: "."
   variables:
-  - Numerator: "*[1]"
-  - Denominator: "*[2]"
+  - Numerator: "PatternMatch(*[1])"
   replace:
   - test:   # Rule 4c, p26
       if: "starts-with($Numerator, '⠤')"    # minus sign -- could this be something?
       then: [t: "⠆"]
-  - x: "DEBUG(ReplaceAll(DEBUG($Numerator), 'W', '⠈'))"
+  - x: "DEBUG(ReplaceAll(DEBUG($Numerator), '⠀', '⠈'))"
   - t: "⠳"
   - test:
       if: "*[2][self::m:mn][not(contains(., '.,'))]"
@@ -163,8 +162,8 @@
       - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
       else:
       - with:
-          variables: [Denominator: "*[2]"]
-          replace: [x: "ReplaceAll($Denominator, 'W', '⠈')"]
+          variables: [Denominator: "PatternMatch(*[2])"]
+          replace: [x: "ReplaceAll($Denominator, '⠀', '⠈')"]
   - t: "W"
 
 

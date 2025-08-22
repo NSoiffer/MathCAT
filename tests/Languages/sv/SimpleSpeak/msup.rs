@@ -85,7 +85,7 @@ fn simple_fraction_power() {
                       <mfrac><mn>1</mn><mn>3</mn></mfrac>
                   </msup>
               </math>";
-  test("sv", "SimpleSpeak", expr, "x upphöjt till en tredjedel");
+  test("sv", "SimpleSpeak", expr, "x upphöjt till 1 tredjedel");
 }
 
 #[test]
@@ -178,7 +178,7 @@ fn nested_number_times_squared() {
         </msup>
         </mrow>
         </math>";
-  test("sv", "SimpleSpeak", expr, "e upphöjt till en halv x kvadrat");
+  test("sv", "SimpleSpeak", expr, "e upphöjt till 1 halv x kvadrat");
 }
 
 #[test]
@@ -200,7 +200,7 @@ fn nested_negative_number_times_squared() {
     </msup>
     </mrow>
     </math>";
-  test("sv", "SimpleSpeak", expr, "e upphöjt till minus en halv x kvadrat");
+  test("sv", "SimpleSpeak", expr, "e upphöjt till minus 1 halv x kvadrat");
 }
 
 #[test]
@@ -314,7 +314,7 @@ fn nested_complex_power() {
       </msup>
       </mrow>
       </math>";
-  test("sv", "SimpleSpeak", expr, "e upphöjt till minus en halv gånger; vänster-parentes; division, x minus my, genom sigma, slut division; höger-parentes kvadrat");
+  test("sv", "SimpleSpeak", expr, "e upphöjt till minus 1 halv gånger; vänster-parentes; division, x minus my, genom sigma, slut division; höger-parentes kvadrat");
 }
 
 #[test]
