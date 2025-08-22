@@ -16,7 +16,7 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple')) and $Impairment = 'Blindness'"
-      then: [T: "enddeterminante"]      # phrase('end determinant' of a matrix)
+      then: [T: "ende der determinante"]      # phrase('end determinant' of a matrix)
 
 
 - name: subscripted-norm
