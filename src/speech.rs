@@ -1569,16 +1569,16 @@ impl fmt::Display for VariableDefinition {
 #[derive(Debug)]
 struct VariableValue<'v> {
     name: String,       // name of variable
-    value: Option<Value<'v>>,   // xpath value, typically a constant like "true" or "0", but could be "*/*[1]" to store some nodes   
+    value: Value<'v>,   // xpath value, typically a constant like "true" or "0", but could be "*/*[1]" to store some nodes   
 }
 
 impl fmt::Display for VariableValue<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match &self.value {
-            None => "unset".to_string(),
-            Some(val) => format!("{val:?}")
-        };
-        return write!(f, "[name: {}, value: {}]", self.name, value);
+        // let value = match  {
+        //     None => "unset".to_string(),
+        //     Some(val) => format!("{val:?}")
+        // };
+        return write!(f, "[name: {}, value: {:?}]", self.name, &self.value);
     }   
 }
 
@@ -1689,10 +1689,13 @@ impl fmt::Display for ContextStack<'_> {
 }
 
 impl<'c, 'r> ContextStack<'c> {
-    fn new<'a,>(pref_manager: &'a PreferenceManager) -> ContextStack<'c> {
+    fn new<'a>(pref_manager: &'a PreferenceManager, context: Option<Context<'c>>) -> ContextStack<'c> {
         let prefs = pref_manager.merge_prefs();
         let mut context_stack = ContextStack {
-            base: ContextStack::base_context(prefs),
+            base: match context {
+                None => ContextStack::base_context(prefs),
+                Some(context) => context,
+            },
             old_values: Vec::with_capacity(31)      // should avoid allocations
         };
         // FIX: the list of variables to set should come from definitions.yaml
@@ -1740,8 +1743,13 @@ impl<'c, 'r> ContextStack<'c> {
         for def in &new_vars.defs {
             // get the old value (might not be defined)
             let qname = QName::new(def.name.as_str());
-            let old_value = evaluation.value_of(qname).cloned();
-            old_values.defs.push( VariableValue{ name: def.name.clone(), value: old_value} );
+            match evaluation.value_of(qname) {
+                None => {},
+                Some(old_value) => {
+                    old_values.defs.push( VariableValue{ name: def.name.clone(), value: old_value.clone()} )
+                }
+            }
+            ;
         }
 
         // use a second loop because of borrow problem with self.base and 'evaluation'
@@ -1749,7 +1757,7 @@ impl<'c, 'r> ContextStack<'c> {
             // set the new value
             let new_value = match def.value.evaluate(&self.base, mathml) {
                 Ok(val) => val,
-                Err(_) => bail!(format!("Can't evaluate variable def for {} with ContextStack {}", def, self)),
+                Err(e) => bail!(format!("Can't evaluate variable def for {} with ContextStack {}\nError is '{}'", def, self, e)),
             };
             let qname = QName::new(def.name.as_str());
             self.base.set_variable(qname, new_value);
@@ -1759,14 +1767,10 @@ impl<'c, 'r> ContextStack<'c> {
     }
 
     fn pop(&mut self) {
-        const MISSING_VALUE: &str = "-- unset value --";     // can't remove a variable from context, so use this value
         let old_values = self.old_values.pop().unwrap();
         for variable in old_values.defs {
             let qname = QName::new(&variable.name);
-            let old_value = match variable.value {
-                None => Value::String(MISSING_VALUE.to_string()),
-                Some(val) => val,
-            };
+            let old_value = variable.value;
             self.base.set_variable(qname, old_value);
         }
     }
@@ -2338,7 +2342,18 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
     pub fn new(speech_rules: &'s SpeechRules, doc: Document<'m>, nav_node_id: &'m str) -> SpeechRulesWithContext<'c, 's, 'm> {
         return SpeechRulesWithContext {
             speech_rules,
-            context_stack: ContextStack::new(&speech_rules.pref_manager.borrow()),
+            context_stack: ContextStack::new(&speech_rules.pref_manager.borrow(), None),
+            doc,
+            nav_node_id,
+            inside_spell: false,
+            translate_count: 0,
+        }
+    }
+
+    pub fn with_context(speech_rules: &'s SpeechRules, doc: Document<'m>, nav_node_id: &'m str, context: Context<'c>) -> SpeechRulesWithContext<'c, 's, 'm> {
+        return SpeechRulesWithContext {
+            speech_rules,
+            context_stack: ContextStack::new(&speech_rules.pref_manager.borrow(), Some(context)),
             doc,
             nav_node_id,
             inside_spell: false,

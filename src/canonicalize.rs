@@ -3442,7 +3442,7 @@ impl CanonicalizeContext {
 		return FunctionNameCertainty::True;
 	}
 	
-	// Try to figure out whether an <mi> is a function name or note.
+	// Try to figure out whether an <mi> is a function name or not.
 	// There are two important cases depending upon whether parens/brackets are used or not.
 	// E.g, sin x and f(x)
 	// 1. If parens follow the name, then we use a more inclusive set of heuristics as it is more likely a function
@@ -3567,7 +3567,8 @@ impl CanonicalizeContext {
 			}
 
 			// debug!("      ...didn't match options to be a function");
-			return FunctionNameCertainty::Maybe;		// didn't fit one of the above categories
+			// debug!("Right siblings:\n{}  ", right_siblings.iter().map(|&child| mml_to_string(as_element(child))).collect::<Vec<String>>().join("\n  "));
+			return if is_name_inside_parens(base_name, right_siblings) {FunctionNameCertainty::False} else {FunctionNameCertainty::Maybe};
 		});
 	
 		fn is_single_arg(open: &str, following_nodes: &[ChildOfElement]) -> bool {
@@ -3630,6 +3631,58 @@ impl CanonicalizeContext {
 			let text = as_text(node);
 			// debug!("         is_matching_right_paren: open={}, close={}", open, text);
 			return (open == "(" && text == ")") || (open == "[" && text == "]");
+		}
+
+		/// Returns true if the name of the potential function is inside the parens. In that case, it is very unlikely to be a function call
+		/// For example, "n(n+1)"
+		fn is_name_inside_parens(function_name: &str, right_siblings: &[ChildOfElement]) -> bool {
+			// the first child of right_siblings is either '(' or '['
+			// right_siblings may extend well beyond the closing parens, so we first break this into finding the contents
+			// then we search the contents for the name
+			match find_contents(right_siblings) {
+				None => return false,
+				Some(contents) => return is_name_inside_contents(function_name, contents),
+			}
+			
+
+			fn find_contents<'a>(right_siblings: &'a[ChildOfElement<'a>]) -> Option<&'a[ChildOfElement<'a>]> {
+				let open_text = as_text(as_element(right_siblings[0]));
+				let close_text = if open_text == "("  { ")" } else { "]" };
+				let mut nesting_level = 1;
+				let mut i = 1;
+				while i < right_siblings.len() {
+					let child = as_element(right_siblings[i]);
+					if name(child) == "mo" {
+						let op_text = as_text(child);
+						if op_text == open_text {
+							nesting_level += 1;
+						} else if op_text == close_text {
+							if nesting_level == 1 {
+								return Some(&right_siblings[1..i]);
+							} 
+							nesting_level -= 1;
+						}
+					}
+					i += 1;
+				}
+				return None;	// didn't find matching paren
+			}
+
+			fn is_name_inside_contents(function_name: &str, contents: &[ChildOfElement]) -> bool {
+				for &child in contents {
+					let child = as_element(child);
+					// debug!("is_name_inside_contents: child={}", mml_to_string(child));
+					if is_leaf(child) {
+						let text = as_text(child);
+						if (name(child) == "mi" || name(child) == "mtext") && text == function_name {
+							return true;
+						}
+					} else if is_name_inside_contents(function_name, &child.children()) {
+						return true;
+					}
+				}
+				return false;
+			}
 		}
 	}
 	

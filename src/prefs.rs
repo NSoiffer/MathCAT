@@ -460,6 +460,7 @@ impl PreferenceManager {
         
         // ignore regional subdirs
         let dir = PreferenceManager::get_language_dir(path, language, default_lang)?;
+        let language = if dir.ends_with(language) {language} else {dir.file_name().unwrap().to_str().unwrap()};
         let zip_file_name = language.to_string() + ".zip";
         let zip_file_path = dir.join(&zip_file_name);
         let zip_file_string = zip_file_path.to_string_lossy().to_string();
