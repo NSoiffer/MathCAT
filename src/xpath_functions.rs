@@ -1452,18 +1452,16 @@ impl PatternMatchResult {
         unsafe {
             let evaluation = std::mem::transmute::<&context::Evaluation, &HackedEvaluation>(evaluation);
             // for (key, val) in evaluation.functions {functions.insert(key.clone(), val.clone());};
-            let  functions: Functions = HashMap::with_capacity(evaluation.functions.capacity());
+            let mut context = Context::new();
+            add_builtin_functions(&mut context);
+            let mut hacked_context = std::mem::transmute::<Context, HackedContext>(context);
             let mut variables: Variables = HashMap::with_capacity(evaluation.variables.capacity());
             for (key, val) in evaluation.variables {variables.insert(key.clone(), val.clone());};
+            hacked_context.variables = variables;
             let mut namespaces: Namespaces = HashMap::with_capacity(evaluation.variables.capacity());
             for (key, val) in evaluation.namespaces {namespaces.insert(key.clone(), val.clone());};
-            let hacked_context = HackedContext {
-                functions,
-                variables,
-                namespaces,
-            };
-            let mut context = std::mem::transmute::<HackedContext, Context>(hacked_context);
-            add_builtin_functions(&mut context);
+            hacked_context.namespaces = namespaces;
+            let context = std::mem::transmute::<HackedContext, Context>(hacked_context);
             context
         }
     }
@@ -1478,11 +1476,11 @@ impl Function for PatternMatchResult {
     {
         let mut args = Args(args);
         args.exactly(2)?;
-        let xpath = validate_one_node(args.pop_nodeset()?, "PatternMatchResult")?;
         let braille_or_speech = args.pop_string()?.to_ascii_lowercase();
         if braille_or_speech != "braille" && braille_or_speech != "speech" {
             return Err(Error::Other(format!("PatternMatchResult (in rules): first arg '{}' is not 'Braille' or 'Speech'", braille_or_speech)));
         }
+        let xpath = validate_one_node(args.pop_nodeset()?, "PatternMatchResult")?;
         let mathml = match xpath {
             Node::Element(e) => e,
             _ => return Err(Error::Other(format!("PatternMatchResult (in rules): first arg '{}' is not 'Braille' or 'Speech'", braille_or_speech)))
