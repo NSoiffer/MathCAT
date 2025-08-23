@@ -94,8 +94,8 @@
   tag: mfrac
   match:
     - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
-    - "*[1][self::m:mn][not(contains(., '.,'))]   and" 
-    - "*[2][self::m:mn][not(contains(., '.,'))]"
+    - "*[1][self::m:mn][translate(., '0123456789', '') = '']   and" 
+    - "*[2][self::m:mn][translate(., '0123456789', '') = '']"
   replace: 
   - t: "#"   # need to force a number sign between the numbers
   - x: "*[1]"
@@ -106,11 +106,11 @@
   name: numeric-slash  (includes -1/2, etc)
   tag: mrow
   match:
-  - "(  *[1][self::m:mn][not(contains(., '.,'))] or"
-  - "   *[1][self::m:mrow][*[1][self::m:mo][.='-'] and *[2][self::m:mn][not(contains(., '.,'))]]"
+  - "(  *[1][self::m:mn][translate(., '0123456789', '') = ''] or"
+  - "   *[1][self::m:mrow][*[1][self::m:mo][.='-'] and *[2][self::m:mn][translate(., '0123456789', '') = '']]"
   - ") and"
   - "*[2][self::m:mo][translate(., '/:÷', '')='']  and"
-  - "*[3][self::m:mn][not(contains(., '.,'))]"
+  - "*[3][self::m:mn][translate(., '0123456789', '') = '']"
   replace:
   - test:
       if: "*[1][self::m:mn]"
@@ -122,7 +122,7 @@
 -
   name: simple-number
   tag: mfrac
-  match: "*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]"
+  match: "*[1][self::m:mn][translate(., '0123456789', '') = ''] and *[2][self::m:mn][translate(., '0123456789', '') = '']"
   replace:
   - x: "*[1]"
   - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
@@ -683,7 +683,7 @@
   # tag: msub
   # match:
   # - "*[1][self::m:mi] and"
-  # - "*[2][self::m:mn][not(contains(., '.,'))] and ..[1][not(IsNode(., 'modified'))]"
+  # - "*[2][self::m:mn][translate(., '0123456789', '') = ''] and ..[1][not(IsNode(., 'modified'))]"
   # replace:
   # - x: "*[1]"
   # - t: "𝑁"    # don't add numeric indicator
