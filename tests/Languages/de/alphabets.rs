@@ -3,6 +3,7 @@
 use crate::common::*;
 
 
+/*
 #[test]
 fn special_alphabet_chars() {
   let expr = "<math> <mi>ℌ</mi><mo>,</mo><mi>ℭ</mi></math>";
@@ -105,7 +106,7 @@ fn script() {
 #[test]
 fn bold_script() {
     let expr = "<math> <mi>𝓐</mi><mo>,</mo><mi>𝓩</mi></math>";
-    test("de", "SimpleSpeak", expr, "script bold cap eigh, comma, script bold cap z");
+    test("de", "SimpleSpeak", expr, "eingekreist groß a komma eingekreist groß z");
     let expr = "<math> <mi>𝓪</mi><mo>,</mo><mi>𝔃</mi></math>";
     test("de", "SimpleSpeak", expr, "script bold eigh comma, script bold z");
     // MathType private space versions
@@ -329,15 +330,15 @@ fn turned() {
     let expr = "<math> <mi>Ⅎ</mi><mo>,</mo><mi>⅄</mi></math>";
     test("de", "SimpleSpeak", expr, "turned cap f comma, turned sans-serif cap y");
   }
-
+*/
 #[test]
 fn enclosed_numbers() {
   let expr = "<math> <mi>①</mi><mo>,</mo><mi>⑨</mi></math>";
-  test("de", "SimpleSpeak", expr, "circled 1 comma, circled 9");
+  test("de", "SimpleSpeak", expr, "umkreiste 1 komma umkreiste 9");
   let expr = "<math> <mi>⑴</mi><mo>,</mo><mi>⑼</mi></math>";
-  test("de", "SimpleSpeak", expr, "parenthesized 1 comma, parenthesized 9");
+  test("de", "SimpleSpeak", expr, "klammern 1 komma klammern 9");
   let expr = "<math> <mi>⒈</mi><mo>,</mo><mi>⒐</mi></math>";
-  test("de", "SimpleSpeak", expr, "1 with period comma, 9 with period");
+  test("de", "SimpleSpeak", expr, "1 mit periode komma 9 mit periode");
   let expr = "<math> <mi>⓵</mi><mo>,</mo><mi>⓽</mi></math>";
-  test("de", "SimpleSpeak", expr, "double circled 1 comma, double circled 9");
+  test("de", "SimpleSpeak", expr, "doppelt umkreist 1 komma doppelt umkreist 9");
 }

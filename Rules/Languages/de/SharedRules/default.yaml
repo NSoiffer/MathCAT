@@ -593,7 +593,7 @@
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
-      then: [T: "ende der umfassung"]      # phrase(reached the 'end enclosure' point)
+      then: [T: "ende der einschliessung"]      # phrase(reached the 'end enclosure' point)
   - pause: short
 
 - name: semantics

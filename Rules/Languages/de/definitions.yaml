@@ -211,7 +211,9 @@
 
   # stop when regularity begins
 - NumbersOrdinalFractionalOnes: [
-        "null", "erste", "hälfte"
+        "null", "erste", "hälfte", "drittel", "viertel", "fünftel", "sechstel", "siebtel", "achtel", "neuntel", "zehntel",
+        "elftel", "zwölftel", "dreizehntel", "vierzehntel", "fünfzehntel", "sechzehntel",
+        "siebzehntel", "achtzehntel", "neunzehntel"
     ]
 
   # stop when regularity begins

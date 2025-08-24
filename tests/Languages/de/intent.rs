@@ -57,7 +57,7 @@ fn function_intent() {
         <mi arg='y'>y</mi>
         <mi arg='z'>z</mi>
     </mrow> </math>"#;
-    test("de", "SimpleSpeak", expr, "testing of x comma, y comma, z comma, 2");
+    test("de", "SimpleSpeak", expr, "testing von x komma y komma z komma 2");
 }
 
 #[test]
@@ -74,7 +74,7 @@ fn function_one_arg_intent() {
     let expr = r#"<math><mrow intent='testing:function($x)'>
         <mi arg='x'>x</mi>
     </mrow> </math>"#;
-    test("de", "SimpleSpeak", expr, "testing of x");
+    test("de", "SimpleSpeak", expr, "testing von x");
 }
 
 #[test]
@@ -91,8 +91,8 @@ fn silent_intent_msup() {
             <mi arg='H' mathvariant='normal'>H</mi>
             <mn arg='n'>2</mn>
         </msup></math>";
-    test("de", "SimpleSpeak", expr, "cap h 2");
-    test("de", "ClearSpeak", expr, "cap h 2");
+    test("de", "SimpleSpeak", expr, "groß h 2");
+    test("de", "ClearSpeak", expr, "groß h 2");
 }
 
 #[test]
@@ -102,8 +102,8 @@ fn silent_intent_underscore() {
             <mi arg='H' mathvariant='normal'>H</mi>
             <mn arg='n'>2</mn>
         </msup></math>";
-    test("de", "SimpleSpeak", expr, "cap h 2");
-    test("de", "ClearSpeak", expr, "cap h 2");
+    test("de", "SimpleSpeak", expr, "groß h 2");
+    test("de", "ClearSpeak", expr, "groß h 2");
 }
 
 #[test]
@@ -111,7 +111,7 @@ fn intent_prob_x() {
     let expr = "<math>
     <msup intent='$op($arg)'>
         <mi arg='arg'>x</mi>
-        <mi arg='op' intent='probability' mathvariant='normal'>P</mi>
+        <mi arg='op' intent='wahrscheinlichtkeit' mathvariant='normal'>P</mi>
     </msup></math>";
-    test("de", "ClearSpeak", expr, "probability of x");
+    test("de", "ClearSpeak", expr, "wahrscheinlichtkeit von x");
 }

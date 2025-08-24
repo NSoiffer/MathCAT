@@ -95,36 +95,36 @@ fn normal_log_with_base() {
 #[test]
 fn normal_ln() {
     let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
+    test_prefs("de", "SimpleSpeak", vec![("Verbosity", "Terse")],
                 expr, "l n, open x plus y close");
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")],
+    test_prefs("de", "SimpleSpeak", vec![("Verbosity", "Medium")],
                 expr, "the natural log of, open paren x plus y, close paren");
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")],
+    test_prefs("de", "SimpleSpeak", vec![("Verbosity", "Verbose")],
                 expr, "the natural log of, open paren x plus y, close paren");
 }
 
 #[test]
 fn simple_ln() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
+    test_prefs("de", "SimpleSpeak", vec![("Verbosity", "Terse")],
                 expr, "l n x");
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")],
+    test_prefs("de", "SimpleSpeak", vec![("Verbosity", "Medium")],
                 expr, "the natural log of x");
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")],
+    test_prefs("de", "SimpleSpeak", vec![("Verbosity", "Verbose")],
                 expr, "the natural log of x");
 }
 
 #[test]
 fn other_names() {
     let expr = "<math> <mrow><mi>Cov</mi><mi>x</mi></mrow> </math>";
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
+    test_prefs("de", "SimpleSpeak", vec![("Verbosity", "Terse")],
                 expr, "Cov x");
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")],
+    test_prefs("de", "SimpleSpeak", vec![("Verbosity", "Medium")],
                 expr, "covariance x");
     let expr = "<math> <mrow><mi>exp</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow> </math>";
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
+    test_prefs("de", "SimpleSpeak", vec![("Verbosity", "Terse")],
                 expr, "exp of x");
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")],
+    test_prefs("de", "SimpleSpeak", vec![("Verbosity", "Medium")],
                 expr, "exponential of x");
 }
 
@@ -191,7 +191,7 @@ fn no_times_sqrt() {
         </mrow></math>";
     test("de", "SimpleSpeak", expr,
             "the square root of eigh; times the square root of b; is equal to, the square root of eigh b end root");
-    test_prefs("en", "SimpleSpeak", vec![("Impairment", "LearningDisability")], expr,
+    test_prefs("de", "SimpleSpeak", vec![("Impairment", "LearningDisability")], expr,
             "the square root of eigh; times the square root of b; is equal to, the square root of eigh b");
 }
 

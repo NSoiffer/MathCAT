@@ -399,8 +399,8 @@
  - "⃘": [T: "ring -overlay -verzierung"]        	#  0x20d8	(en: 'ring overlay embellishment', google translation)
  - "⃙": [T: "ringüberlagerung im uhrzeigersinn"]	#  0x20d9	(en: 'clockwise ring overlay embellishment', google translation)
  - "⃚": [T: "ring -overlay -verschönerung gegen den uhrzeigersinn"]	#  0x20da	(en: 'anticlockwise ring overlay embellishment', google translation)
- - "⃛": [T: "three dots above embellishment"]   	#  0x20db	(en: 'triple dot', google: 'dreifacher punkt')
- - "⃜": [T: "combining four dots above"]        	#  0x20dc	(en: 'quadruple dot', google: 'vierfachpunkt punkt')
+ - "⃛": [T: "dreifacher punkt verschönerung"]   	#  0x20db	(en: 'triple dot', google: 'dreifacher punkt')
+ - "⃜": [T: "vierfacher punkt drüber"]        	#  0x20dc	(en: 'quadruple dot', google: 'vierfachpunkt punkt')
  - "⃝": [T: "kreisverzerrung einschließen"]     	#  0x20dd	(en: 'enclosing circle embellishment', google translation)
  - "⃞": [T: "quadratverzerrung einschließen"]   	#  0x20de	(en: 'enclosing square embellishment', google translation)
  - "⃟": [T: "diamantverzierung einschließen"]   	#  0x20df	(en: 'enclosing diamond embellishment', google translation)
@@ -542,7 +542,7 @@
  - "↗":                                         	#  0x2197
     - test:
         if: "ancestor::*[2][self::m:limit]"
-        then: [T: "ansätze von unten"]          	# 	(en: 'approaches from below', google translation)
+        then: [T: "annähernd von unten"]          	# 	(en: 'approaches from below', google translation)
         else: [T: "Nordostpfeil"]               	# 	(en: 'north east arrow', MathPlayer: 'north east arrow', google: 'nordostpfeil')
 
  - "↘":                                         	#  0x2198
@@ -1322,8 +1322,8 @@
  - "⋰": [T: "Diagonale Ellipse unten links nach oben rechts"]	#  0x22f0	(en: 'upwards diagonal ellipsis', MathPlayer: 'up right diagonal ellipsis', google: 'aufwärts diagonale ellipsis')
  - "⋱": [T: "Diagonale Ellipse, oben links nach unten rechts"]	#  0x22f1	(en: 'diagonal ellipsis', MathPlayer: 'down right diagonal ellipsis', google: 'diagonale ellipsis')
  - "⋲": [T: "Element mit langem horizontalen Strich"]	#  0x22f2	(en: 'element of with long horizontal stroke', MathPlayer: 'element of with long horizontal stroke', google: 'element von mit langem horizontalem schlaganfall')
- - "⋳": [T: "Element mit vertikalem Strich am Ende des horizontalen Strichs"]	#  0x22f3	(en: 'element of with vertical bar at end of horizontal stroke', MathPlayer: 'element of with vertical bar at end of horizontal stroke', google: 'element von mit vertikalem balken am ende des horizontalen schlaganfalls')
- - "⋴": [T: "kleines Element mit vertikalem Strich am Ende des horizontalen Strichs"]	#  0x22f4	(en: 'element of with vertical bar at end of horizontal stroke', MathPlayer: 'element of with vertical bar at end of horizontal stroke', google: 'element von mit vertikalem balken am ende des horizontalen schlaganfalls')
+ - "⋳": [T: "Element mit vertikalem Strich am Ende des horizontalen Strichs"]	#  0x22f3	(en: 'element of with vertical bar at end of horizontal stroke', MathPlayer: 'element of with vertical bar at end of horizontal stroke', google: 'element von mit vertikalem balken am ende des horizontalen strich')
+ - "⋴": [T: "kleines Element mit vertikalem Strich am Ende des horizontalen Strichs"]	#  0x22f4	(en: 'element of with vertical bar at end of horizontal stroke', MathPlayer: 'element of with vertical bar at end of horizontal stroke', google: 'element von mit vertikalem balken am ende des horizontalen strich')
  - "⋵": [T: "Element mit Punkt"]                	#  0x22f5	(en: 'element of with dot above', MathPlayer: 'element of with dot above', google: 'element von mit punkt oben')
  - "⋶": [T: "Element mit Überstrich"]           	#  0x22f6	(en: 'element of with overbar', MathPlayer: 'element of with overbar', google: 'element von overbar')
  - "⋷": [T: "kleines Element mit Überstrich"]   	#  0x22f7	(en: 'element of with overbar', MathPlayer: 'element of or equal to', google: 'element von overbar')
@@ -1394,7 +1394,7 @@
  - "⏞": [T: "Obere geschweifte Klammer"]        	#  0x23DE	(en: 'top brace', MathPlayer: 'top curly bracket', google: 'spitzenklammer')
  - "⏟": [T: "Untere geschweifte Klammer"]       	#  0x23DF	(en: 'bottom brace', MathPlayer: 'bottom curly bracket', google: 'bottom -klammer')
  - "①-⑨":                                       	#  0x2460 - 0x2469
-    - T: "Untere geschweifte Klammer"           	# 	(en: 'circled', MathPlayer: 'bottom curly bracket', google: 'eingekreist')
+    - T: "umkreiste"           	# 	(en: 'circled', MathPlayer: 'bottom curly bracket', google: 'eingekreist')
     - spell: "translate('.', '①②③④⑤⑥⑦⑧⑨', '123456789')"
  - "⑩": [T: "zehn umkreist"]                    	#  0x2469	(en: 'circled ten', google translation)
  - "⑪": [T: "elf umkreist"]                     	#  0x246a	(en: 'circled eleven', google translation)

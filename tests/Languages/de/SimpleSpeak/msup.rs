@@ -270,7 +270,7 @@ fn nested_end_exponent_power() {
     </msup>
   </math>";
   test("de", "SimpleSpeak", expr, "t raised to the 4 fifths raised to the n plus 1 power; end exponent");
-  test_prefs("en", "SimpleSpeak", vec![("Impairment", "LearningDisability")], expr,
+  test_prefs("de", "SimpleSpeak", vec![("Impairment", "LearningDisability")], expr,
   "t raised to the 4 fifths raised to the n plus 1 power");
 }
 

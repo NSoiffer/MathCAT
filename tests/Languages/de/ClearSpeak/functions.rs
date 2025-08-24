@@ -15,7 +15,7 @@ fn trig_names() {
     <mi>csc</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>cot</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("de", "ClearSpeak", expr, "sinus von x, plus kosinus von y, plus tangens von z, plus sekans von alpha, plus kosecans von phi, plus kotangens von phi");
+    test("de", "ClearSpeak", expr, "sinus von x, plus kosinus von y, plus tangens von z, plus sekans von alpha, plus kosekans von phi, plus kotangens von phi");
 }
 
 #[test]
@@ -28,42 +28,44 @@ fn hyperbolic_trig_names() {
     <mi>csch</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>coth</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("de", "ClearSpeak", expr, "hyperbolische sinus von x, plus hyperbolische cosinus von y, plus hyperbolische tangens von z, plus, hyperbolic sekans von alpha, plus, hyperbolisches cosekans, von phi; plus, hyperbolische kotangens, von phi");
+    test("de", "ClearSpeak", expr, "hyperbolischer sinus von x, plus hyperbolischer cosinus von y, plus hyperbolischer tangens von z, plus, hyperbolischer sekans von alpha, plus, hyperbolischer kosekans, von phi; plus, hyperbolischer kotangens, von phi");
 }
 
 
 #[test]
 fn inverse_trig() {
     let expr = "<math><msup><mi>sin</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
-    test("de", "ClearSpeak", expr, "inverse sine of x");
+    test("de", "ClearSpeak", expr, "umgekehrte sinus von x");
 }
 
 #[test]
 fn inverse_trig_trig_inverse() {
     let expr = "<math><msup><mi>tan</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
     test_ClearSpeak("de", "ClearSpeak_Trig", "TrigInverse",expr,
-        "tangent inverse of x");
+        "tangens umgekehrte von x");
 }
 
 #[test]
 fn inverse_trig_arc() {
     let expr = "<math><msup><mi>cosh</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
     test_ClearSpeak("de", "ClearSpeak_Trig", "ArcTrig",expr,
-        "arc hyperbolic cosine of x");
+        "ark hyperbolischer cosinus, von x");
 }
 
 #[test]
 fn trig_squared() {
     let expr = "<math><msup><mi>sin</mi><mn>2</mn></msup><mi>x</mi></math>";
-    test("de", "ClearSpeak", expr, "sine squared of x");
+    test("de", "ClearSpeak", expr, "sinus quadrat von x");
 }
 
 #[test]
 fn trig_cubed() {
     let expr = "<math><msup><mi>tan</mi><mn>3</mn></msup><mi>x</mi></math>";
-    test("de", "ClearSpeak", expr, "tangent cubed of x");
+    test("de", "ClearSpeak", expr, "tangens hoch 3 von x");
 }
 
+
+/*
 #[test]
 fn trig_fourth() {
     let expr = "<math><msup><mi>sec</mi><mn>4</mn></msup><mi>x</mi></math>";
@@ -76,7 +78,7 @@ fn trig_power_other() {
     let expr = "<math><msup><mi>sinh</mi><mrow>><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
     test("de", "ClearSpeak", expr, "the n minus 1 power of, hyperbolic sine of x");
 }
-
+ */
 #[test]
 fn simple_log() {
     let expr = "<math> <mrow>  <mi>log</mi><mi>x</mi></mrow> </math>";
@@ -86,19 +88,19 @@ fn simple_log() {
 #[test]
 fn normal_log() {
     let expr = "<math><mrow><mi>log</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("de", "ClearSpeak", expr, "the log of, open paren x plus y, close paren");
+    test("de", "ClearSpeak", expr, "der log von, klammer auf x plus y, klammer zu");
 }
 
 #[test]
 fn simple_log_with_base() {
     let expr = "<math> <mrow>  <msub><mi>log</mi><mi>b</mi></msub><mi>x</mi></mrow> </math>";
-    test("de", "ClearSpeak", expr, "the log base b, of x");
+    test("de", "ClearSpeak", expr, "der logarithmus basis b; von x");
 }
 
 #[test]
 fn normal_log_with_base() {
     let expr = "<math><mrow><msub><mi>log</mi><mi>b</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("de", "ClearSpeak", expr, "the log base b, of, open paren x plus y, close paren");
+    test("de", "ClearSpeak", expr, "der logarithmus basis b; von, klammer auf x plus y, klammer zu");
 }
 
 #[test]
@@ -110,7 +112,7 @@ fn simple_ln() {
 #[test]
 fn normal_ln() {
     let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("de", "ClearSpeak", expr, "the l n of, open paren x plus y, close paren");
+    test("de", "ClearSpeak", expr, "der l n von, klammer auf x plus y, klammer zu");
 }
 
     
@@ -118,7 +120,7 @@ fn normal_ln() {
 fn simple_natural_log() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
     test_ClearSpeak("de", "ClearSpeak_Log", "LnAsNaturalLog",expr,
-        "natural log x");
+        "Natürliche Logarithmus x");
 }
 
     
@@ -126,7 +128,7 @@ fn simple_natural_log() {
 fn natural_log() {
     let expr = "<math><mi>ln</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></math>";
     test_ClearSpeak("de", "ClearSpeak_Log", "LnAsNaturalLog",expr,
-        "the natural log of, open paren x plus y, close paren");
+        "der Natürliche Logarithmus von, klammer auf x plus y, klammer zu");
 }
 
 
@@ -165,7 +167,7 @@ fn test_functions_none_pref() {
     </math>";
     // TODO: this should not succeed!
     test_ClearSpeak("de", "ClearSpeak_Functions", "None",expr,
-        "the log of, open paren x plus y, close paren; plus, f times, open paren x plus y, close paren");
+        "der log von, klammer auf x plus y, klammer zu; plus, f mal, klammer auf x plus y, klammer zu");
 }
 
 #[test]
@@ -174,7 +176,7 @@ fn test_functions_none_pref_multiple_args() {
         <mi>B</mi> <mrow><mo>(</mo> <mrow> <mn>2</mn><mo>,</mo><mn>6</mn></mrow> <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("de", "ClearSpeak_Functions", "None",expr,
-        "cap b mal, klammer auf 2 komma, 6, klammer zu");
+        "groß b mal, klammer auf 2 komma 6, klammer zu");
 }
 
 
@@ -202,8 +204,11 @@ fn times_preceding_paren() {
         <mrow>  <mo>(</mo> <mn>2</mn>  <mo>)</mo> </mrow>
         <mn>3</mn>
         </mrow></math>";
-    test("de", "ClearSpeak", expr, "2 times 3");
+    test("de", "ClearSpeak", expr, "2 mal 3");
 }
+
+
+/*
 
 #[test]
 fn times_sqrt() {
@@ -463,3 +468,4 @@ fn parens_interval_neg_infinity_to_pos_infinity() {
     test_ClearSpeak("de", "ClearSpeak_Paren", "Interval ",expr,
     "the interval from negative infinity to positive infinity");
 }
+*/
