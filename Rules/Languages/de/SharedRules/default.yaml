@@ -67,7 +67,7 @@
   tag: ms
   match: "."
   replace:
-  - T: "der string"      # phrase('the string' is long)
+  - T: "die Zeichenfolge"      # phrase('the string' is long)
   - pause: short
   - x: "text()"
 
@@ -206,12 +206,12 @@
           - test:
               if: "$Verbosity='Verbose'"
               then: [T: "hochstellung"]
-              else: [T: "hoch"]
+              else: [T: "hochstellung"]
           - x: "*[last()]"
           - test:
               if: "$Verbosity='Verbose'"
               then: [T: "ende der hochstellung"]
-              else: [T: "ende der hochstellun"]
+              else: [T: "ende der hochstellung"]
 
 - name: default
   tag: munder
