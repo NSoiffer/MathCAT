@@ -604,12 +604,12 @@
 - # handle both log and ln
   name: ClearSpeak-log
   tag: mi
-  variables: [log_is_simple: "IsNode(following-sibling::*[2],'simple')"] # skip function apply
+  variables: [log_is_simple: "following-sibling::*[2] and IsNode(following-sibling::*[2],'simple')"] # skip function apply
   match: ".='log' or .='ln' or .='lg'"
   replace:
   - bookmark: "@id"
   - test:
-      if: "IsNode(following-sibling::*[2],'simple')"
+      if: "following-sibling::*[2] and IsNode(following-sibling::*[2],'simple')"
       then:
       - test:
         - if: ".='log'"
