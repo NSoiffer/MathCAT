@@ -59,7 +59,7 @@
       - if: "*[2][.='2']"
         then: [T: "quadratwurzel"]        # phrase(the 'square root' of x)
       - else_if: "*[2][.='3']"
-        then: [T: "würfelwurzel"]        # phrase(the 'cube root' of x)
+        then: [T: "kubikwurzel"]        # phrase(the 'cube root' of x)
       - else: [x: "ToOrdinal(*[2])",T: "wurzel"]      # phrase(the square 'root' of 25)
       else:
       - test:
@@ -149,7 +149,7 @@
   - pause: short
   - test:
       if: "$Impairment = 'Blindness'"
-      then: [T: "ende der fraktion"]      # phrase(start 7 over 8 'end of fraction')
+      then: [T: "ende des bruchs"]      # phrase(start 7 over 8 'end of fraction')
   - pause: medium
 
 # rules for functions raised to a power
@@ -173,7 +173,7 @@
   - test:
       if: "*[2][.=2]"
       then: [T: "quadrat"]      # phrase(5 'squared' equals 25)
-      else: [T: "zum dritten Wurzel"]      # phrase(5 'cubed' equals 125)
+      else: [T: "hoch drei"]      # phrase(5 'cubed' equals 125)
 - name: function-power
   tag: power
   match:
@@ -220,14 +220,14 @@
   - "     *[1][self::m:mn][not(contains(., '.'))]]"
   replace:
   - x: "*[1]"
-  - T: "zu dem"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "hoch"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - T: "zu dem"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "hoch"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
   - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
 
@@ -236,7 +236,7 @@
   match: "IsNode(*[2], 'leaf')"
   replace:
   - x: "*[1]"
-  - T: "zu dem"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "hoch"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
 
 - name: nested
@@ -251,7 +251,7 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - T: "auf die"      # phrase(15 'raised to the' second power equals 225)
+  - T: "hoch"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
   - pause: short
   - test:
@@ -267,7 +267,7 @@
   match: "."
   replace:
   - x: "*[1]"
-  - T: "auf die"      # phrase(15 'raised to the' second power equals 225)
+  - T: "hoch"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
   - T: "potenz"      # phrase(15 raised to the second 'power' equals 225)
   - pause: short
@@ -285,7 +285,7 @@
       - test:
           if: "$Verbosity!='Terse'"
           then: [T: "das"]      # phrase('the' empty set)
-      - T: "leeres satz"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
+      - T: "leere Menge"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
       then:
       - test:
@@ -299,7 +299,7 @@
       - test:
           if: "$Verbosity!='Terse'"
           then: [T: "die"]      # phrase('the' set of integers)
-      - T: "satz"      # phrase(here is a 'set' of numbers)
+      - T: "Menge"      # phrase(here is a 'set' of numbers)
       - x: "*[1]"
 
 - name: times
