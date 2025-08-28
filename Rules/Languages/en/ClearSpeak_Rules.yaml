@@ -610,7 +610,7 @@
   replace:
   - bookmark: "@id"
   - test:
-      if: "$Verbosity!='Terse' and not(IsNode(following-sibling::*[2],'simple'))"
+      if: "$Verbosity!='Terse' and (not(following-sibling::*[2]) or not(IsNode(following-sibling::*[2],'simple')))"
       then: [t: "the"]      # phrase('the' square root of 25)
   - test:
     - if: ".='log'"
