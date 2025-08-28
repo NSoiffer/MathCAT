@@ -1037,11 +1037,8 @@ impl DefinitionValue {
 }
 
 /**
- * Returns true if the node is a bracketed expr with the indicated left/right chars
- * element/string -- element (converted to string)/string to test
- * left -- string (like "[") or empty
- * right -- string (like "]") or empty
- * requires_comma - boolean, optional (check the top level of 'node' for commas
+ * Returns the value associated with `key` in `set_name`. If `key` is not in `set_name`, an empty string is returned
+ * Returns an error if `set_name` is not defined
  */
 // 'requiresComma' is useful for checking parenthesized expressions vs function arg lists and other lists
  impl Function for DefinitionValue {
@@ -1056,7 +1053,7 @@ impl DefinitionValue {
         let definitions = match args.pop_string()?.as_str() {
             "Speech" => &SPEECH_DEFINITIONS,
             "Braille" => &BRAILLE_DEFINITIONS,
-            _ => return Err( Error::Other("IsInDefinition:: second argument must be either 'Speech' or 'Braille'".to_string()) )
+            _ => return Err( Error::Other("DefinitionValue:: second argument must be either 'Speech' or 'Braille'".to_string()) )
         };
         match &args[0] {
             Value::String(str) => return match DefinitionValue::definition_value(str, definitions, &set_name) {
