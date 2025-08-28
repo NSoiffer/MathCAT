@@ -63,6 +63,9 @@ mod chemistry;
 
 pub mod shim_filesystem; // really just for override_file_for_debugging_rules, but the config seems to throw it off
 pub use interface::*;
+use std::convert::TryInto;
+use ext_php_rs::builders::ModuleBuilder;
+use ext_php_rs::prelude::*;
 
 #[cfg(test)]
 pub fn init_logger() {
@@ -122,5 +125,64 @@ pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, block_se
 // sets locale to be US standard
 pub fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
     return are_strs_canonically_equal_with_locale(test, target, ", \u{00A0}\u{202F}", ".");
+}
+
+#[php_function]
+pub fn mathcat_set_rules_dir(dir: String) {
+    let _ = set_rules_dir(dir);
+}
+
+#[php_function]
+pub fn mathcat_set_mathml(mathml_str: String) -> Option<String> {
+    let result = set_mathml(mathml_str);
+    let return_val = match result {
+        Ok(val) => Some(val),
+        Err(error) => {
+            php_println!("Problem with the mathml: {:?}", error);
+            return None;
+        }
+    };
+    return return_val;
+}
+
+#[php_function]
+pub fn mathcat_get_spoken_text() -> Option<String> {
+    let result = get_spoken_text();
+    let return_val = match result {
+        Ok(val) => Some(val),
+        Err(error) => {
+            php_println!("Problem with generating text: {:?}", error);
+            return None;
+        }
+    };
+    return return_val;
+}
+
+#[php_function]
+pub fn mathcat_get_overview_text() -> Option<String> {
+    let result = get_overview_text();
+    let return_val = match result {
+        Ok(val) => Some(val),
+        Err(error) => {
+            php_println!("Problem with generating text: {:?}", error);
+            return None;
+        }
+    };
+    return return_val;
+}
+
+#[php_function]
+pub fn mathcat_set_preference(name: String, value: String) {
+    let _ = set_preference(name, value);
+}
+
+#[php_module]
+pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
+    module
+       .function(wrap_function!(mathcat_set_rules_dir))
+       .function(wrap_function!(mathcat_set_mathml))
+       .function(wrap_function!(mathcat_get_spoken_text))
+       .function(wrap_function!(mathcat_get_overview_text))
+       .function(wrap_function!(mathcat_set_preference))
 }
 
