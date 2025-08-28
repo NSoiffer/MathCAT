@@ -2022,42 +2022,69 @@ fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> St
 static POLISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     // "S" => "XXX",    // sans-serif -- from prefs
     "B" => "⠨",     // bold
-    "𝔹" => "⠬",     // blackboard -- from prefs
+    "𝔹" => "⠨",     // blackboard -- spec only shows some upper case versions (encoded as 𝔹Lx) -- this is just a guess 
     // "T" => "⠈",     // script
-    "I" => "⠸",     // italic -- same as bold
+    "I" => "⠸",     // italic 
     "l" => "⠠",     // Lower case Roman letter left in to assist in locating letters
     "L" => "⠨",     // Upper case Roman letter left in to assist in locating letters
-    "𝐿" => "⠨",     // capital that never should get word indicator (from chemical element)
+    "𝐿" => "⠨",     // Chemical element: like cap, but if followed by a lower case letter (e.g., Na), no lower case letter indicator
+    "𝐶" => "⠸",     // Chemical element: run of single letter chemical elements
     "D" => "⠠",     // German (Gothic)
-    "g" => "⠰",     // Greek
-    "G" => "⠸",     // Greek
+    "g" => "⠰",     // Lower case Greek
+    "G" => "⠸",     // Upper case Greek
     "V" => "⠈⠬",    // Greek Variants
     // "H" => "⠠⠠",    // Hebrew
     // "U" => "⠈⠈",    // Russian
     "N" => "⠼",      // number indicator
     "n" => "",       // drop number follows -- no need for indicator
-    "𝑁" => "",       // continue number
     // "t" => "⠱",     // shape terminator
     "U" => "⠻",     // unit indicator
     "w" => "⠀",     // whitespace after function name
     "W" => "⠀",     // whitespace"
     "𝐖"=> "",       // whitespace for mode changes only (0xb7 -- multiplication dot)
-    "," => "⠂",     // comma
+    "P" => "",       // signal next char is punctuation
+    "p" => "",       // pseudo-script "optional" character representation where we can delete the first char sometimes (° and ′)
+    ")" => "⠜",   // right paren
+    "]" => "⠾",   // right bracket
     "}" => "⠕",   // right curly brace
-    "." => "⠄",     // period
-    "-" => "⠤",     // hyphen
-    "—" => "⠤⠤",   // normal dash (2014) -- assume all normal dashes are unified here [RUEB appendix 3]
-    // "―" => "⠐⠤⠤",  // long dash (2015) -- assume all long dashes are unified here [RUEB appendix 3]
-    "#" => "⠼",      // signals to end/restart of numeric mode (mixed fractions)
+    "#" => "⠼",      // forces numeric mode indicator even if in numeric Mode
+    "<" => "",       // start of simple projector (numerator, exponent, ...)
+    "/" => "⠳",      // fraction line
+    ">" => "",       // end of simple projector
+    "≪" => "",       // start of compound projector
+    "≫" => "",       // end of compound projector
+
 };
 
 
 fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     lazy_static! {
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([B𝔹IREDgGVHPlL𝐿MnNUwW𝐖#},.])").unwrap();
+        // Remove closing indicators before open indicators and before end of string
+        // The close fraction indicator should NOT go away nor should a ≫.. at the end of the line
+        // I don't know how to do this with one regex, so I add a second one that deals only with the end of the string
+        static ref REMOVE_CLOSE_INDICATORS: Regex =Regex::new(r"(((>[^⠰])|(≫..))+)((<[^⠆])|[/≪≫W>)\]}])").unwrap();
+        static ref REMOVE_CLOSE_INDICATORS_AT_END: Regex =Regex::new(r"((>[^⠰])|(≫..))$").unwrap();
+
+        // Also drop numbers close a projector, so we need to remove closing indicators before drop numbers (p22, f [only after scripts])
+        // The close fraction indicator should NOT go away
+        static ref REMOVE_CLOSE_INDICATORS_BEFORE_DROP_NUMBERS: Regex =Regex::new(r"((>[^⠰])|(≫..))(n.)").unwrap();
+        static ref REMOVE_CLOSE_INDICATORS_AFTER_DROP_NUMBERS: Regex =Regex::new(r"(n.)((>[^⠰])|(≫..))").unwrap();
+
+        // p51: shorter form for ° and ′ unless they follow a drop number (in which case they would also be a drop number)
+        //   also if it follows a regular number, then it might be interpreted as a numeric fraction
+        // replace rule uses dots 45 and 'p' gets replaced by nothing later on
+        static ref SCRIPT_AFTER_DROP_NUMBERS: Regex =Regex::new(r"([nN].)p").unwrap();
+
+        // p51: minutes followed by seconds keeps the 'p'
+        static ref MINUTES_SECONDS: Regex =Regex::new(r"p⠔(N.+)p⠔⠔").unwrap();
+
+        // Need to add dot-6 between a number and punctuation (see bottom of p13 for '}' reason)
+        // Also need to special case empty set which seems to act as a number without a number sign (⠯⠕)
+        static ref NUMBER_DOT6_PUNCTUATION: Regex =Regex::new(r"(N.|⠯⠕|})(P.)").unwrap();
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([B𝔹IREDgGVHlL𝐿𝐶MnNUwW𝐖Pp)\]}#</>≪≫])").unwrap();
     }
 
-    debug!("polish_cleanup: start={}", raw_braille);
+    debug!("polish_cleanup:      '{}'", raw_braille);
     // let result = typeface_to_word_mode(&raw_braille);
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
@@ -2065,14 +2092,21 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     // let sans_serif = pref_manager.pref_to_string("Polish_SansSerif");
     // let fraktur = pref_manager.pref_to_string("Polish_Fraktur");
 
-    // This reuses the code just for getting rid of unnecessary "L"s and "N"s
-    let result = polish_remove_unneeded_mode_changes(&raw_braille);
-    debug!(" After remove mode changes: '{}'", &result);
+    let result = NUMBER_DOT6_PUNCTUATION.replace_all(&raw_braille, "${1}⠠${2}");
+    let result = MINUTES_SECONDS.replace_all(&result, "⠘⠔${1}⠘⠔⠔");
+    let result = polish_remove_unneeded_mode_changes(&result);
+    debug!(" After mode changes: '{}'", &result);
     let result = result.replace("nN", "")
-                               .replace("𝔹C", "⠩")
-                               .replace("DC", "⠰")
-                               .replace("},", "}⠠,");       // special case: bottom of page 13
-    debug!(" After substitutions      : '{}'", &result);
+                            //    .replace("𝔹C", "⠩")
+                            //    .replace("DC", "⠰")
+                               .replace("}P⠂", "}⠠P⠂");       // special case: bottom of page 13
+    debug!(" After substitution: '{}'", &result);
+    let result = REMOVE_CLOSE_INDICATORS_BEFORE_DROP_NUMBERS.replace_all(&result, "${1}");
+    let result = REMOVE_CLOSE_INDICATORS_AFTER_DROP_NUMBERS.replace_all(&result, "${1}");
+    let result = REMOVE_CLOSE_INDICATORS.replace_all(&result, "${5}");
+    let result = REMOVE_CLOSE_INDICATORS_AT_END.replace_all(&result, "${5}");
+    let result = SCRIPT_AFTER_DROP_NUMBERS.replace_all(&result, "${1}⠘");
+    debug!(" After remove close: '{}'", &result);
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         match POLISH_INDICATOR_REPLACEMENTS.get(&cap[0]) {
@@ -2117,18 +2151,22 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
     //   Gx -- capital Greek letter mode, followed by a letter
     let mut mode = BrailleMode::None;
     let mut unit_mode = false;
+    let mut detailed_projector_count = 0;     // == 1 indicates exactly in "detailed" (most complex) projector but not nested more deeply
+    let mut other_projector_count = 0;     // simple and "compound"
     let mut letter_mode = BrailleMode::None; // used to determine if we need to output 'L' (etc) for letter mode
     let mut result = String::default();
     let chars = raw_braille.chars().collect::<Vec<char>>();
     let mut i = 0;
-
+    let use_short_form = PreferenceManager::get().borrow().pref_to_string("Polish_UseShortForm") == "true";
+    let repeat_indicators = PreferenceManager::get().borrow().pref_to_string("Polish_RepeatLetterIndicators") == "true";
     while i < chars.len() {
         let ch = chars[i];
-        // debug!(" ...mode={}, letter_mode={}, unit_mode={}, ch/next {}/{}", mode, letter_mode, unit_mode, ch, if i+1<chars.len() {chars[i+1]} else {' '});
+        // debug!(" ...mode={}, l_mode={}, u_mode={}, ch/next {}/{}, result='{}'", mode, letter_mode, unit_mode, ch, if i+1<chars.len() {chars[i+1]} else {' '}, &result);
         match ch {
-            'l' | 'L' | '𝐿' => {
+            'l' | 'L' => {
                 let new_mode = if ch == 'l' { BrailleMode::Letter } else { BrailleMode::CapLetter };
                 if (letter_mode != new_mode || (mode == BrailleMode::Number && LETTER_NUMBERS.contains(&chars[i+1]))) ||
+                   (repeat_indicators && ch == 'L') ||
                    letter_mode == BrailleMode::None {
                     // we only output indicator if the letter is a-j
                     result.push(ch);
@@ -2138,19 +2176,51 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 result.push(chars[i+1]);
                 i += 2;
             },
+            '𝐿' => {
+                // chemical element start (might have a lower case letter after it)
+                // if there is a run of 𝐿 with no lowercase letter or number in between, then generate 𝐶
+                let run = if use_short_form {chemical_element_run(&chars[i..])} else {None};
+                if let Some((end, run)) = run {
+                    // debug!("end={end}, run='{run}'");
+                    result.push('𝐶');
+                    result.push_str(&run);
+                    i += end;
+                } else {
+                    result.push(ch);
+                    result.push(chars[i+1]);
+                    // debug!("Found 𝐿, i={i}, len={}, result={result}", chars.len());
+                    i += 2;
+                    if i+1 < chars.len() && chars[i] == 'l' {
+                        result.push(chars[i+1]);        // skip the 'l' and just output the letter
+                        i += 2;
+                    }
+                }
+                mode = BrailleMode::None;
+            },
             'g' | 'G' => {
                 let new_mode = if ch == 'g' { BrailleMode::Greek } else { BrailleMode::CapGreek };
-                if mode != new_mode {
+                if repeat_indicators || mode != new_mode {
                     result.push(ch);
                 }
                 mode = new_mode;
+                letter_mode = BrailleMode::None;
                 result.push(chars[i+1]);
                 i += 2;
+            },
+            '𝔹' => {   // 𝔹Lx
+                // The spec only has 𝕀𝕎 as consecutive letters; if not consecutive, then the indicators are used
+                if i < 3 || chars[i-3] != '𝔹' {
+                    result.push(chars[i]);
+                    result.push(chars[i+1]);
+                }
+                mode = BrailleMode::None;
+                letter_mode = BrailleMode::None;
+                result.push(chars[i+2]);
+                i += 3;
             },
             'f' => {
                 // "function" indicator -- change to letter mode
                 mode = BrailleMode::Letter;
-                letter_mode = BrailleMode::Letter;
                 i += 1;
             },
             'U' => {
@@ -2171,10 +2241,19 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 result.push(chars[i+1]);
                 i += 2;
             },
-            '#' => {
-                // force a number sign
-                mode = BrailleMode::Number;
+            'n' => {
+                // 'n' seems to cancel Number mode 
+                mode = BrailleMode::None;
                 result.push(ch);
+                result.push(chars[i+1]);
+                i += 2;
+            },
+            '#' => {
+                // force a number sign if an 'N' follows
+                if i+1<chars.len() && chars[i+1] == 'N' {
+                    result.push(ch);
+                }
+                mode = BrailleMode::Number;
                 i += 1;
             },
             'B' | 'I' => {
@@ -2188,9 +2267,58 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                     mode = BrailleMode::None;
                 }
                 unit_mode = false;
-                result.push(ch);
+                if ch == 'W' && (detailed_projector_count > 1 || other_projector_count > 0) {
+                    result.push('⠈');               // substitute "filler" character
+                } else {
+                    result.push(ch);
+                }
                 i += 1;
             },
+            '<' => {
+                result.push(ch);
+                // Look for '<⠆⠤' -- all other patterns can drop fraction start ('⠆') -- p24, rule 4b
+                // Also want to keep '⠆' when the numerator is "long" (undefined and inconsistent in spec)
+                const LONG_NUMERATOR: usize = 12;
+                if chars[i+1] == '⠆' && use_short_form {
+                    if chars[i+2] == '⠤' ||  // always should be something after "<x"
+                       chars[i+2..].iter().position(|&ch| ch == '/').unwrap() > LONG_NUMERATOR { // should always find "/"
+                        result.push('⠆');
+                    }
+                } else {
+                    result.push(chars[i+1]);
+                }
+                if chars[i+1] != '⠆' || use_short_form {
+                    other_projector_count += 1;
+                }
+                mode = BrailleMode::None;
+                i += 2;
+            }
+            '>' => {
+                result.push(ch);
+                result.push(chars[i+1]);
+                if chars[i+1] != '⠰' || use_short_form {
+                    other_projector_count -= 1;
+                }
+                i += 2;
+            }
+            '≪' | '≫' => {
+                result.push(ch);
+                result.push(chars[i+1]);
+                result.push(chars[i+2]);
+                if chars[i+1] == '⠨' {
+                    detailed_projector_count += if ch == '≪' {1} else {-1};
+                } else {
+                    other_projector_count += if ch == '≪' {1} else {-1};
+                }
+                mode = BrailleMode::None;
+                i += 3;
+            }
+            '❎' => {  // reset back to start mode
+                unit_mode = false;
+                mode = BrailleMode::None;
+                letter_mode = BrailleMode::None;
+                i += 1;
+            }
             _ => {
                 if mode == BrailleMode::Number {
                     mode = BrailleMode::None;
@@ -2199,12 +2327,41 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 i += 1;
             },
         }
-        if mode != BrailleMode::Letter && mode != BrailleMode::Greek {
+        if mode == BrailleMode::Number || mode == BrailleMode::None {
             unit_mode = false;
         }
     }
 
     return result;
+
+    /// Return the tuple (i_stop, new_str) as long as there is more than on Chemical Element with just a single letter
+    ///   The input string  consists of the char sequence 𝐿x𝐿y...
+    ///   It can also contain a drop number (nd)
+    /// Otherwise, return None.
+    /// 'chars' should start at the first 𝐿
+    fn chemical_element_run(chars: &[char]) -> Option<(usize, String)> {
+        let mut run = chars[1].to_string();
+        let mut i = 2;
+        let mut n_letters = 1;
+        debug!("chemical_element_run: start with {run}");
+        while i < chars.len() {
+            match chars[i] {
+                '𝐿' => n_letters += 1,
+                'n' => (),
+                'l' => {
+                    // could be HCl (𝐿H𝐿Cll) -- need to make sure it is not a 2 letter element
+                    if chars[i-2] == '𝐿' {
+                        return None;
+                    }
+                    break;
+                }
+                _ => break,
+            }
+            run.push(chars[i+1]);
+            i += 2;
+        }
+        return if n_letters > 1 { Some( (i, run)) } else { None };
+    }
 }
 
 static SWEDISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {

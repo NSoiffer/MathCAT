@@ -37,42 +37,77 @@
   name: default
   tag: msqrt
   match: "."
-  replace: 
-  - t: "⠩"
-  - x: "*"
+  variables:
+  - CompoundChild: "*[1]/descendant-or-self::*[IsNode(., '2D') and
+                                               not(self::m:mfrac and
+                                                   *[1][self::m:mn and translate(., '0123456789', '') = ''] and
+                                                   *[2][self::m:mn and translate(., '0123456789', '') = '']
+                                                  )]"
+  # More than one level of nesting (note that there is a slight simplification we can do about numeric fraction testing)
+  - DetailedChild:    "$CompoundChild and
+                        (*[1]/descendant-or-self::*[IsNode(., '2D')][descendant::*[IsNode(., '2D') and
+                                               not(self::m:mfrac and
+                                                   *[1][self::m:mn and translate(., '0123456789', '') = ''] and
+                                                   *[2][self::m:mn and translate(., '0123456789', '') = '']
+                                                  )]])"                                            
+  replace:
+  - test:
+    - if: "$DetailedChild" 
+      then:
+      - t: "≪⠨⠩"
+      - x: "*[1]"
+      - t: "≫⠨⠱"
+    - else_if: "$CompoundChild" 
+      then:
+      - t: "≪⠐⠩"
+      - x: "*[1]"
+      - t: "≫⠐⠱"
+      else:
+      - t: "<⠩"
+      - x: "*[1]"
+      - t: ">⠱"
 
 -
   name: default
   tag: mroot
   match: "."
+  variables: [CompoundChild: "*[1]/descendant-or-self::*[IsNode(., '2D')]"]
   replace: 
   - t: "⠌"
   - test:
-      if: "*[2][self::m:mn][not(contains(., '.,'))]"
+      if: "*[2][self::m:mn][translate(., '0123456789', '') = '']"
       then: [x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
 
       else: [x: "*[2]"]
-  - t: "⠩"
-  - x: "*[1]"
-        
--
-  name: repeating decimal (2.3 uses a "^" over the repeating decimals)
-  tag: mrow
-  match:
-    - "count(*)=3 and *[1][self::m:mn] and *[2][self::m:mo and .='\u2062'] and"
-    - "*[3][self::m:mover and *[1][self::m:mn] and *[2][self::m:mo and .='^']]" 
-  replace: 
-  - x: "*[1]"
-  - t: "⠂"
   - test:
-      if: "string-length(*[3]/*[1]) <= 2"
-      then:             # the examples don't group the digits when there are only one or two digits
-      - t: "𝑁"
-      - x: "*[3]/*[1]" 
+      if: "$CompoundChild" 
+      then:
+      - t: "≪⠐⠩"
+      - x: "*[1]"
+      - t: "≫⠐⠱"
       else:
-      - t: "⠢𝑁"
-      - x: "*[3]/*[1]"
-      - t: "⠔"
+      - t: "<⠩"
+      - x: "*[1]"
+      - t: ">⠱"
+      
+# -
+#   name: repeating decimal (2.3 uses a "^" over the repeating decimals)
+#   tag: mrow
+#   match:
+#     - "count(*)=3 and *[1][self::m:mn] and *[2][self::m:mo and .='\u2062'] and"
+#     - "*[3][self::m:mover and *[1][self::m:mn] and *[2][self::m:mo and .='^']]" 
+#   replace: 
+#   - x: "*[1]"
+#   - t: "⠂"
+#   - test:
+#       if: "string-length(*[3]/*[1]) <= 2"
+#       then:             # the examples don't group the digits when there are only one or two digits
+#       - t: "𝑁"
+#       - x: "*[3]/*[1]" 
+#       else:
+#       - t: "⠢𝑁"
+#       - x: "*[3]/*[1]"
+#       - t: "⠔"
 
 # Fraction rules
   # The fraction part of a mixed number is always simple
@@ -80,25 +115,29 @@
   # The invisible plus should produce an empty string
 
 -
-  # nice easy rule, but very long winded and tests show short form rules which follow
+  # longer notation: use if
+  #   * user chooses long form
+  #   * nested fraction, as long as the nested fraction is not a common fraction (p30)
   name: long-form
   tag: mfrac
   match:
-    - "not($Polish_UseShortForm)"
+    - "not($Polish_UseShortForm) or
+       descendant::*[self::m:mfrac and
+                     not(*[1][self::m:mn][translate(., '0123456789', '') = ''] and *[2][self::m:mn][translate(., '0123456789', '') = ''])]"
   replace: 
-  - t: "⠆"
+  - t: "<⠆"
   - x: "*[1]"
-  - t: "W⠳W"
+  - t: "W/W"      # don't use '<W' or '>W' because W acts as terminator
   - x: "*[2]"
-  - t: "⠰"
+  - t: ">⠰"
 
 -
   name: common-fraction-mixed-number
   tag: mfrac
   match:
     - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
-    - "*[1][self::m:mn][not(contains(., '.,'))]   and" 
-    - "*[2][self::m:mn][not(contains(., '.,'))]"
+    - "*[1][self::m:mn][translate(., '0123456789', '') = '']   and" 
+    - "*[2][self::m:mn][translate(., '0123456789', '') = '']"
   replace: 
   - t: "#"   # need to force a number sign between the numbers
   - x: "*[1]"
@@ -107,11 +146,10 @@
 -
   name: simple-number
   tag: mfrac
-  match: "*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]"
+  match: "*[1][self::m:mn][translate(., '0123456789', '') = ''] and *[2][self::m:mn][translate(., '0123456789', '') = '']"
   replace:
   - x: "*[1]"
   - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
-  - t: "W"
 
 - # simpler (more common?) case of the next rule (no whitespace)
   name: simple-fraction
@@ -119,27 +157,13 @@
   match: "*[1][IsNode(., 'leaf') and not(contains(., 'u00a0'))] and *[2][IsNode(., 'leaf') and not(contains(., 'u00a0'))]"
   replace:
   - x: "*[1]"
-  - t: "⠳"  # don't need number indicator
+  - t: "/"  # don't need number indicator
   - test:
-      if: "*[2][self::m:mn][not(contains(., '.,'))]"
+      if: "*[2][self::m:mn][translate(., '0123456789', '') = '']"
       then:
       - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
       else:
       - x: "*[2]"
-
-# -
-  # name: no-whitespace
-  # tag: mfrac
-  # match: "*[1][not(contains(BrailleChars(., 'Polish'), 'W'))] and *[2][not(contains(BrailleChars(., 'Polish'), 'W'))]"
-  # replace:
-  # - x: "*[1]"
-  # - t: "⠳"  # don't need number indicator
-  # - test:
-  #     if: "*[2][self::m:mn][not(contains(., '.,'))]"
-  #     then:
-  #     - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
-  #     else:
-  #     - x: "*[2]"
 
 -
   # We have already dealt with long form
@@ -148,30 +172,30 @@
   name: default
   tag: mfrac
   match: "."
-  variables:
-  - Numerator: "PatternMatchResult(*[1], 'Braille')"
   replace:
+  - t: "<⠆"      # signal start of fraction (needed for state machine to replace spaces)
   - test:   # Rule 4c, p26, mfrac test is rule at end of "b)"
-      if: "starts-with($Numerator, '⠤') or descendant::*[self::m:mfrac]"    # minus sign '--' could this be something?
-      then: [t: "⠆"]
-  - x: "ReplaceAll(DEBUG($Numerator), 'W', '⠈')"
-  - t: "⠳"
+      if: "*[1][self::m:mrow]/*[1][self::m:mo and .='-' and not(preceding-sibling::*) or
+                                   self::m:mrow/*[1][self::m:mo and .='-' and not(preceding-sibling::*)] ] or
+           descendant::*[self::m:mfrac] or
+           *[1][string-length(.) > 5 and not(IsBracketed(., '(', ')') or IsBracketed(*[1], '(', ')'))]"         # just a guess as to what "not short" means
+      then: [t: ""]
+  - x: "*[1]"
+  - t: "/"
   - test:
-      if: "descendant::*[self::m:mfrac]" # Rule 4b, p26, mfrac test is at end of "b"
-      then: [t: "W"]
+      # Rule 4b, p26, mfrac test is at end of "b"
+      if: "descendant::*[self::m:mfrac and not(self::m:mfrac and
+                                               *[1][self::m:mn and translate(., '0123456789', '') = ''] and
+                                               *[2][self::m:mn and translate(., '0123456789', '') = '']
+                                              )]" 
+      then: [t: "w"]    # space that should go away
   - test:
-      if: "*[2][self::m:mn][not(contains(., '.,'))]"
+      if: "*[2][self::m:mn][translate(., '0123456789', '') = '']"
       then:
       - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
       else:
-      - with:
-          variables: [Denominator: "ReplaceAll(PatternMatchResult(*[2], 'Braille'), 'W', '⠈')"]
-          replace:
-          - test:
-              if: "starts-with($Denominator, '⠠')"   # temp hack to remove lower case letter indicator caused by braille denominator separately from numerator
-              then: [x: "substring($Denominator, 2)"]
-              else: [x: "$Denominator"]
-  - t: "W"
+      - x: "*[2]"
+  - t: ">W"
 
 
 #
@@ -302,6 +326,21 @@
   - t: "⠜"
   
 -
+  # Page 29 says to minimize brackets around exprs.
+  # The (1/3)^-4 example on p31 shows this, but the p52 cos(alpha/2) examples shows some limits
+  # That case shows they aren't needed for a numeric fraction
+  # I think the parent case can be msub and msubsup also, but I don't see examples of it (examples p22, 32, 34)
+  name: remove-brackets
+  tag: mrow
+  match: "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']')) and
+           *[2][(self::m:mfrac and
+                 *[1][self::m:mn and translate(., '0123456789', '') = ''] and
+                 *[2][self::m:mn and translate(., '0123456789', '') = '']) or
+                (parent::*[parent::m:msup] and (self::m:msub or self::m:subsup))
+               ]"
+  replace: [x: "*[2]"]
+  
+-
   name: default
   tag: mrow
   match: "."
@@ -316,84 +355,16 @@
   - x: "BrailleChars(., 'Polish', 1, 2)"
   - x: "BrailleChars(translate(., 'IVXLCDM', 'ivxlcdm'), 'Polish', 2, string-length(.)+1)"
 
-# FIX: these should be pulled out into a definition
--
-  name: sin
-  tag: mi
-  match: ".='sin'"
-  replace:
-  - t: "f⠫⠎"      # "f" -- for function, forces letter mode
 
 -
-  name: cos
+  name: substitute-and-for-i-hack
+  # on p18, "i" is used for '∧' inside of sets, which are {...} and (...)
+  # it puts spaces around the 'i'
   tag: mi
-  match: ".='cos'"
+  match: ".='i' and ancestor::*[self::m:mrow and
+                                (IsBracketed(., '{', '}') or IsBracketed(., '(', ')'))]"
   replace:
-  - t: "f⠫⠉"
-
--
-  name: tg
-  tag: mi
-  match: ".='tg'"
-  replace:
-  - t: f⠫⠞"
-
--
-  name: ctg
-  tag: mi
-  match: ".='ctg'"
-  replace:
-  - t: "f⠫⠳"
-
--
-  name: sec
-  tag: mi
-  match: ".='sin'"
-  replace:
-  - t: "f⠫⠤"
-
--
-  name: cosec
-  tag: mi
-  match: ".='cosec'"
-  replace:
-  - t: "f⠫⠣"
-
--
-  name: const
-  tag: mi
-  match: ".='const'"
-  replace:
-  - t: "N⠅"
-
--
-  name: log
-  tag: mi
-  match: ".='log'"
-  replace:
-  - t: "f⠫⠇"   # FIX: unsure about 'f' to set letter mode
-
--
-  name: ln
-  tag: mi
-  match: ".='ln'"
-  replace:
-  - t: "f⠫⠦⠇"   # FIX: unsure about 'f' to set letter mode
-
--
-  name: signum
-  tag: mi
-  match: ".='sgn'"
-  replace:
-  - t: "N⠎"
-
--
-  name: limit
-  tag: mi
-  match: ".='lim'"
-  replace:
-  - t: "⠼⠇"  # does *not* start letter mode
-
+  - x: "BrailleChars('\ue040', 'Polish')"
 
 -
   name: default
@@ -421,9 +392,27 @@
               IsInDefinition(substring(., 1, 1), 'Braille', 'SIPrefixes') and
               IsInDefinition(substring(., 2), 'Braille', 'SIUnits')))
            )"
-      then: [t: "U"]
-  - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
+      then:
+      - t: "U"
+      - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
+      else:
+      - with:
+          variables: [Abbreviations: "DefinitionValue(., 'Braille', 'Abbreviations')"]
+          replace:
+          - test:
+              if: "$Abbreviations != ''"
+              then:
+              - test:
+                  if: "not(.='const' or .='sgn' or .= 'lim')"
+                  then: [t: 'f']    # forces function mode (lower case Roman letter)
+              - x: "$Abbreviations"
+              else:
+              - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
+              - test:
+                  if: "string-length(.) > 4"
+                  then: [t: "❎"]    # reset the mode -- from what I can tell, words are treated as "not math" and reset the mode ('4' is a guess)
       
+
 
 -
   # 2.5b says that hex-like numbers don't reuse a numeric indicator after a letter -- here we try to catch that case.
@@ -461,7 +450,10 @@
   tag: [mover, munder]
   match: "*[2][self::m:mo and .='¯']"  # 0x00AF
   replace:
-  - x: "IfThenElse(self::m:mover, '⠨', '⠸')"
+  - test:
+      if: "self::m:mover"
+      then: [t: "⠨"]
+      else: [t: "⠸"]
   - t: "⠒"
   - x: "*[1]"
 -
@@ -474,34 +466,26 @@
   
 -
   name: diacriticals
-  tag: mover
-  match: "*[2][self::m:mo and translate(., '~ ^ˇ.', '')='']"
+  tag: [mover, msup]
+  match: "*[2][self::m:mo and DefinitionValue(., 'Braille', 'Scripts')!='']"
   replace:
   - x: "*[1]"
   - test:
-      if: "not($Polish_UseShortForm)"
-      then: [T: "⠨"]
-  - x: "*[2]"
+      if: "*[2][.='°' or .='′' or .='″' or .='\"']"
+      then: [t: "p"]
+  - x: "DefinitionValue(*[2], 'Braille', 'Scripts')"
 
 -
   name: pseudo-scripts
   tag: msup
-  match: "*[2][translate(., \"'′″‴⁗*→⟶←⟵+-¬.˙ˇ̊°\", '')='']"
+  match: "*[2][translate(., \"'‴⁗*→⟶←⟵+-¬.˙ˇ̊\", '')='']"
   replace:
   - x: "*[1]"
   - test:
-      if: "not($Polish_UseShortForm)"
-      then: [T: "⠘"]
-  - x: "*[2]"
-
--
-  name: limit
-  tag: munder
-  match: "*[1][self::m:mi and .='lim']"
-  replace:
-  - x: "*[1]"
-  - x: "*[2]"
-  - x: "W"
+      if: "@data-chem-formula and (*[2][.='+' or .='-'])"
+      then: [x: "IfThenElse(*[2]='+', '⠌⠖', '⠌⠤')"]
+      else:
+      - x: "*[2]"
 
 -
   name: prime-exception    # 4.3.1
@@ -524,115 +508,120 @@
       then: [x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
       else: [x: "*[2]"]
   - x: "*[1]"
--
-  # simple numeric scripts are written as drop numbers
-  name: simple-number-exponent
-  tag: [msub, msup]
-  match: "*[2][(self::m:mn and not(contains(., $DecimalSeparators))) or
-               (self::m:mrow and count(*)=2 and *[1]='-' and *[2][self::m:mn and not(contains(., $DecimalSeparators))])]"
-  replace:
-  - x: "*[1]"
-  - test:
-      - if: "self::m:msup"
-        then: [t: "⠬"]   # FIX: find out which is right, could be "⠌"
-        else: [t: "⠡"]
-  - test:
-      if: "*[2][self::m:mn]"
-      then:
-      - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"
-      else:
-      - x: "*[2]/*[1]"
-      - x: "BrailleChars(translate(*[2]/*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
 
 -
-  name: single-char-exceptions    # 4.3.1
-  tag: msup
-  match: "*[2][translate(., \"'*`+-ª°²³´¹º‘’“”‟‵‶‷\",'')='']"
-  replace:
-  - x: "*"
-  - test:
-      # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
-      if: "not(*[2][.='°'] and *[1][self::m:mn or @data-chem-element])" 
-      then: [t: "⠄"]
-
--
-  name: single-char-exceptions    # 4.3.1
-  tag: msubsup
-  match: "*[3][translate(., \"'*`+-ª°²³´¹º‘’“”‟‵‶‷\",'')='']"
-  replace:
-  - x: "*[1]"
-  - x: "*[3]"
-  - test:
-      # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
-      if: "not(*[3][.='°'] and *[1][self::m:mn or @data-chem-element])" 
-      then: [t: "⠄"]
-  - x: "*[2]"
-
--  # 9.2 (guessing this applies to limits written with both munder and msub)
-  name: known-functions
+  name: lim_with_script
   tag: [munder, msub]
-  match: "*[1][self::m:mi][.='log' or .='lim']"
+  match: "*[1][self::m:mi][.='lim']"
   replace: 
-  - x: "*[1]"    # trailing dot 3 handled by mi rule
+  - x: "*[1]"
+  - t: "<⠡"
   - x: "*[2]"
-  - t: "⠱"
+  - t: ">W"
 
--  # 9.4
-  name: integral-sum-product
-  tag: [msub, munder, msubsup, munderover]
-  match: "*[1][self::m:mo][translate(., '∫∬∭∮∑∏∐⋃⋂⋁⋀', '')='']"
+-
+  # use drop numbers with no subscript indicator for chemical formulae
+  name: chemical-subscript
+  tag: msub
+  match: "@data-chem-formula and
+          *[2][self::m:mn and translate(., '0123456789', '') = '']"
   replace:
   - x: "*[1]"
-  - test:   # removed parens/brackets per 5.5.1 (etc)
-      if: "*[2][IsBracketed(., '(', ')') or IsBracketed(., '[', ']')]"
-      then: [x: "*[2]/*[2]"]
-      else: [x: "*[2]"]
+  - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"
+
+# -
+#   # simple numeric scripts are written as drop numbers
+#   name: simple-number-exponent
+#   tag: [msub, msup]
+#   match: "*[2][(self::m:mn and not(contains(., $DecimalSeparators))) or
+#                (self::m:mrow and count(*)=2 and *[1]='-' and *[2][self::m:mn and not(contains(., $DecimalSeparators))])]"
+#   replace:
+#   - x: "*[1]"
+#   - test:
+#       - if: "self::m:msup"
+#         then: [t: "⠬"]   # based on the examples, this seems right; could "⠌"
+#         else: [t: "⠡"]
+#   - test:
+#       if: "*[2][self::m:mn]"
+#       then:
+#       - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"
+#       else:
+#       - x: "*[2]/*[1]"
+#       - x: "BrailleChars(translate(*[2]/*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
+
+-
+  name: nested-scripts    # one level of nesting is detailed on p32
+  tag: [msub, msup]   # FIX: need to add msubsup but they are mess because only one of the scripts might be complicated (merge with main rule???)
+  variables:
+  - CompoundScript: "*[2]/descendant-or-self::*[(IsNode(., '2D')) and
+                                               not(self::m:mfrac and
+                                                   *[1][self::m:mn and translate(., '0123456789', '') = ''] and
+                                                   *[2][self::m:mn and translate(., '0123456789', '') = '']
+                                                  )]"
+  # More than one level of nesting (note that there is a slight simplification we can do about numeric fraction testing)
+  - DetailedScript:    "$CompoundScript and
+                        (*[2]/descendant-or-self::*[IsNode(., '2D')][descendant::*[IsNode(., '2D') and
+                                               not(self::m:mfrac and
+                                                   *[1][self::m:mn and translate(., '0123456789', '') = ''] and
+                                                   *[2][self::m:mn and translate(., '0123456789', '') = '']
+                                                  )]])"                                            
+  match: "$CompoundScript or $DetailedScript"
+  replace:
+  - x: "*[1]"
+  # this is a little simpler than the base case because chemistry doesn't use nested scripts
   - test:
-      if: "self::m:msubsup or self::m:munderover"
+    - if: "$DetailedScript" 
       then:
-      - t: "⠒"
-      - test:   # removed parens/brackets per 5.5.1 (etc)
-          if: "*[3][IsBracketed(., '(', ')') or IsBracketed(., '[', ']')]"
-          then: [x: "*[3]/*[2]"]
-          else: [x: "*[3]"]
-  - t: "⠱"
-
-# - # 4.2.2 -- numeric subscripts 
-  # Feedback from Jaime Muñoz Carenas is that they are only used for 2D structures (multiline)
-  # the rule doesn't mention having a simple base, but I think that is what is meant
-  # name: numeric-subscripts
-  # tag: msub
-  # match:
-  # - "*[1][self::m:mi] and"
-  # - "*[2][self::m:mn][not(contains(., '.,'))] and ..[1][not(IsNode(., 'modified'))]"
-  # replace:
-  # - x: "*[1]"
-  # - t: "𝑁"    # don't add numeric indicator
-  # - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the subscript
+      - test:
+          if: "self::m:msub or self::m:msubsup"
+          then: [t: "≪⠨⠡"]
+          else: [t: "≪⠨⠬"]
+      - x: "*[2]"
+      - t: "≫⠨⠱"
+    - else_if: "$CompoundScript" 
+      then:
+      - test:
+          if: "self::m:msub or self::m:msubsup"
+          then: [t: "≪⠐⠡"]
+          else: [t: "≪⠐⠬"]
+      - x: "*[2]"
+      - t: "≫⠐⠱"
 
 -
-  name: nested-scripts    # this case likely should have been written as mmultiscripts, but people will use this (4.4.2)
-  tag: msub
-  match: "*[1][self::m:msup]"
-  replace:
-  - x: "*[1]/*[1]"
-  - t: "⠡"
-  - x: "*[1]/*[2]"
-  - t: "⠰⠌"
-  - x: "*[2]"
-
--
-  name: nested-scripts    # this case likely should have been written as mmultiscripts, but people will use this (2.5)
+  name: doubled-charge
   tag: msup
-  match: "*[1][self::m:msub]"
+  match: "*[2][self::m:mrow and (.='--' or .='++')]"
   replace:
-  - x: "*[1]/*[1]"
-  - t: "⠌"
-  - x: "*[1]/*[2]"
-  - t: "⠘⠡"
-  - x: "*[2]"
+  - x: "*[1]"
+  - test:
+      if: "@data-chem-formula"    # must be a superscript
+      then: [t: "⠌"]
+      else: [t: "⠬"]
+  - test:
+      if: "*[2][.='--']"
+      then: [t: "⠤⠤"]
+      else: [t: "⠖⠖"]
 
 -
+  name: doubled-charge
+  tag: msubsup
+  match: "*[3][self::m:mrow and (.='--' or .='++')]"
+  replace:
+  - x: "*[1]"
+  - t: "<⠡"
+  - x: "*[2]"
+  - test:
+      if: "@data-chem-formula"    # must be a superscript
+      then: [t: ">⠱⠌"]
+      else: [t: ">⠱⠬"]
+  - test:
+      if: "*[3][.='--']"
+      then: [t: "⠤⠤"]
+      else: [t: "⠖⠖"]
+
+-
+  # simple scripts (projectors)
+  # simple numeric scripts are written as drop numbers
   name: default
   tag: [msub, msup, msubsup]
   match: "."
@@ -640,15 +629,34 @@
   - x: "*[1]"
   - test:
       - if: "self::m:msub or self::m:msubsup"
-        then: [t: "⠡"]
-      - else_if: "self::m:msup"
-        then: [t: "⠬"]
-  - x: "*[2]"
+        then: [t: "<⠡"]
+      - else_if: "@data-chem-formula"    # must be a superscript
+        then: [t: "<⠌"]
+        else: [t: "<⠬"]
+  - test:
+      - if: "*[2][self::m:mn and translate(*[2], '0123456789', '') = '']"
+        then: [x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
+      - else_if: "*[2][self::m:mrow and count(*)=2 and *[1]='-' and *[2][self::m:mn and translate(*[2], '0123456789', '') = '']]"
+        then:
+        - x: "*[2]/*[1]"
+        - x: "BrailleChars(translate(*[2]/*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
+        else: [x: "*[2]"]
   - test:
       if: "self::m:msubsup"
       then:
-      - t: "⠬"
-      - x: "*[3]"
+      - test:
+          if: "@data-chem-formula"    # must be a superscript
+          then: [t: ">⠱<⠌"]
+          else: [t: ">⠱<⠬"]
+      - test:
+          - if: "*[3][self::m:mn and translate(*[3], '0123456789', '') = '']"
+            then: [x: "BrailleChars(translate(*[3], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
+          - else_if: "*[3][self::m:mrow and count(*)=2 and *[1]='-' and *[2][self::m:mn and translate(*[2], '0123456789', '') = '']]"
+            then:
+            - x: "*[3]/*[1]"
+            - x: "BrailleChars(translate(*[3]/*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
+            else: [x: "*[3]"]
+  - t: ">⠱"
 
 -
   # This is incredibly messy because it needs to handle all the special cases for scripts, and then repeat them for each pre/postscript

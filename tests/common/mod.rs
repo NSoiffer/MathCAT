@@ -115,14 +115,15 @@ pub fn test_ClearSpeak_prefs(language: &str, prefs: Vec<(&str, &str)>, mathml: &
 }
 
 // Compare the result of brailling the mathml input to the output (Unicode) 'braille'
-#[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
-pub fn test_braille(code: &str, mathml: &str, braille: &str) {
+fn braille_init(code: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
     set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
     set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
+    set_preference("UseSpacesAroundAllOperators".to_string(), "false".to_string()).unwrap();         // makes testing simpler
     set_preference("LaTeX_UseShortName".to_string(), "false".to_string()).unwrap();
     set_preference("Polish_UseShortForm".to_string(), "true".to_string()).unwrap();
+    set_preference("Polish_RepeatLetterIndicators".to_string(), "false".to_string()).unwrap();
     // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
     // log::debug!("\nsetting Language");
     match code {
@@ -131,6 +132,11 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
         "Polish" => set_preference("Language".to_string(), "es".to_string()).unwrap(),  // currently no "pl" language
         "UEB" | "Nemeth" | _ => set_preference("Language".to_string(), "en".to_string()).unwrap(),
     }
+}
+
+#[allow(dead_code)]     // used in testing
+pub fn test_braille(code: &str, mathml: &str, braille: &str) {
+    braille_init(code);
     if let Err(e) = set_mathml(mathml.to_string()) {
         panic!("{}", errors_to_string(&e));
     };
@@ -142,18 +148,7 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
 
 #[allow(dead_code)]     // used in testing
 pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &str, braille: &str) {
-    set_rules_dir(abs_rules_dir_path()).unwrap();
-    set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
-
-    // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
-    // log::debug!("\nsetting Language");
-    match code {
-        "Vietnam" => set_preference("Language".to_string(), "vi".to_string()).unwrap(),
-        "CMU" => set_preference("Language".to_string(), "es".to_string()).unwrap(),
-        "UEB" | "Nemeth" | _ => set_preference("Language".to_string(), "en".to_string()).unwrap(),
-    }
-
-    set_preference("UseSpacesAroundAllOperators".to_string(), "false".to_string()).unwrap();         // makes testing simpler
+    braille_init(code);
     for (pref_name, pref_value) in test_prefs.clone() {
         set_preference(pref_name.to_string(), pref_value.to_string()).unwrap();
     };

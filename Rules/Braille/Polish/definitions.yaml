@@ -17,8 +17,19 @@
     "arcsen", "arctn", "arccotg", "asin", "acos", "atan",
     "versin", "versen", "coversin", "coversen", "semiversin", "semiversen", "semicoversin", "semicoversen", 
     "argsinh", "argsenh", "argcosh", "argtanh", "argtgh", "argcoth", "argcotgh", "argsech", "argcsch", "argcosech",
-    "int", "sgn", "abs", "rg", "Adj",
+    "int", "sgn", "abs", "rg", "Adj", "rad",
   }
 
-  
+- Abbreviations: {
+    "sin": "⠫⠎", "cos": "⠫⠉", "tg": "⠫⠞", "ctg": "⠫⠳", "sec": "⠫⠤", "cosec": "⠫⠣",
+    "arcsin": "⠫⠂⠎", "arccos": "⠫⠂⠉", "arctg": "⠫⠂⠞", "arcctg": "⠫⠂⠳", "arcsec": "⠫⠂⠤", "arccosec": "⠫⠂⠣",
+    "const": "⠼⠅", "log": "⠫⠇", "ln": "⠫⠦⠇", "sgn": "⠼⠎", "lim": "⠼⠇",
+    "min": "⠼⠝", "max": "⠼⠭", "sup": "⠻⠎⠥⠏", "inf": "⠻⠊⠝⠋", "rad": "⠼⠗",
+  }
+
+- Scripts: {
+    "′": "⠔", "″": "⠔⠔", '"': "⠔⠔", "+": "⠖", "-": "⠤", "¯": "⠒",
+    "°": "⠴", "•": "", "^": "⠬", "~": "⠢", "*": "⠲",
+  }
+
 - include: "../definitions.yaml"
