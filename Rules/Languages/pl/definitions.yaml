@@ -10,9 +10,9 @@
 #   for readability, spaces can be used around any of the delimiter characters
 # Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
 - IntentMappings: {
-    "indexed-by": "infix= ; sub; end sub: end sub: end subscript",
+    "indexed-by": "infix= ; indeks dolny; koniec indeksu: koniec indeksu: koniec indeksu",
     "modified-variable": "silent= ",
-    "say-super": "infix=super: superscript: superscript",   # used with 'mo' for superscripts (e.g, "<")
+    "say-super": "infix=super: indeks górny: indeks górny",   # used with 'mo' for superscripts (e.g, "<")
     "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
 
     "absolute-value": "function= ; wartość bezwzględna: wartość bezwzględna z: wartość bezwzględna z; koniec wartośći bezwzględnej",
@@ -34,20 +34,17 @@
 
     "transpose": "postfix=transpozycja || function=transpozycja",
     "norm": "function=;norma: norma z: norma z; koniec normy",
-    "trace": "function=;trace : trace: the trace; end trace",
+    "trace": "function=;przebieg : przebieg: przebieg funkcji; end trace",
     "dimension": "function=;wymiar: wymiar: wymiar; koniec wymiaru", # to check i am not sure what it means in math context
     "homomorphism": "function= ; homomorfizm: homomorfizm: homomorfizm; koniec homomorfizmu",
     "kernel": "function= ; kernel : jądro: jądro z; koniec jądra",
     "vector": "function= ; vektor || prefix=vektor",
     "cross-product": "infix=cross: iloczyn kartezjański: iloczyn kartezjański",
     "dot-product": "infix=dot: iloczyn: iloczyn : iloczyn",
-
     "divergence": "function= ; dihv: dywergencja: dywergencja; koniec dywergencji",
-# curl to check for polish translation
-    "curl": "function= ; curl; end curl",
-    "gradient": "function= ; del: gradient: gradient; koniec gradientu",
+    "curl": "function= ; całka Riemana; koniec całki Riemana",
+    "gradient": "function= ; grad: gradjent: gradjent; koniec gradjentu",
     "laplacian": "function=laplasjan",   # speech engines don't do a good job with "laplacian"
-
     "chemistry-concentration": "function= ; stężenie: stężenie: stężenie; koniec stężenia",
   }
   # Names of functions that in terse mode don't say "of" (or it's equivalent in other languages)
@@ -58,7 +55,7 @@
 
 - NavigationParts: {
     # These are the parts of a formula that can be navigated to
-    "large-op": "podstawa; dolne ograniczenie; górne ograniczenie",
+    "large-op": "podstawa; dolna granica; górna granica",
     "mfrac": "licznik; mianownik",
     "fraction": "licznik; mianownik",
     "msqrt": "pierwiastek",
@@ -113,7 +110,7 @@
     "g": "gram",
     "m": "metr",     # polish pronouncation 
     "mol": "mol",
-    "s": "sekunda", "sec": "sekunda",  # "sec" not actually legal
+    "s": "sekunda", "sek": "sekunda",  # "sec" not actually legal
 
     # derived units
     "Bq": "bekerel",
@@ -126,7 +123,7 @@
     "J": "dżul", #pronauncation 
     "kat": "kattel",
     "lm": "lumen",
-    "lx": "luxor",
+    "lx": "luksor",
     "N": "niuton",
     "Ω": "om", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN
     "Pa": "paskal",
@@ -203,7 +200,7 @@
 
     # powers of 2 used with bits and bytes
     "Kib": "kibi-bit", "Mib": "mebi-bit", "Gib": "gibi-bit", "Tib": "tebi-bit", "Pib": "pebi-bit", "Eib": "exbi-bit", "Zib": "zebi-bit", "Yib": "yobi-bit",
-    "KiB": "kibi-byte", "MiB": "mebi-byte", "GiB": "gibi-byte", "TiB": "tebi-byte", "PiB": "pebi-byte", "EiB": "exbi-byte", "ZiB": "zebi-byte", "YiB": "yobi-byte",
+    "KiB": "kilo-bit", "MiB": "mega-bit", "GiB": "giga-bit", "TiB": "tera-bit", "PiB": "pera-bit", "EiB": "exa-bit", "ZiB": "zera-bit", "YiB": "yobi-bit",
   }
 
   # this will only be used if the language is English, so it can be empty for other countries
@@ -212,9 +209,9 @@
     "in": "cal",
     "ft": "stopa",
     "mi": "mila",
-    "rd": "rod", # to check how it in polish
-    "li": "link", #to check how it in polish
-    "ch": "kabel", # to check i suppose  it is martial unit cabble
+    "rd": "pręt", 
+    "li": "ogniwo", 
+    "ch": "kabel", 
 
     # area
     "sq in": "cal kwadratowy", "cal kwadratowy": "cal kwadratowy", "cal kwadratowy": "cal kwadratowy",
@@ -222,36 +219,36 @@
     "sq yd": "jard kwadratowy", "sq. yd": "jard kwadratowy", "sq. yd.": "jard kwadratowy",
     "sq mi": "mila kwadratowa", "sq. mi": "mila kwadratowa", "sq. mi.": "mila kwadratowa",
     "ac": "akr",
-    "FBM": "board foot", #to check in polish kond of food stopa
+    "FBM": "stopa deskowa", 
 
     # volume
     "cu in": "cal sześcienny", "cu. in": "cal sześcienny", "cu. in.": "cal sześcienny",
     "cu ft": "stopa sześcienna", "cu. ft": "stopa sześcienna", "cu. ft.": "stopa sześcienna",
     "cu yd": "jard sześcienny", "cu. yd": "jard sześcienny", "cu. yd.": "jard sześcienny",
-    "bbl": "barrel", "BBL": "barrel", # to check how it in polish
+    "bbl": "barrel", "BBL": "barrel", 
     "pk": "pek",
-    "bu": "bushel", #to check how it in polish
-    "tsp": "łyżeczka do herbaty",
+    "bu": "buszel", 
+    "tsp": "łyżeczka",
     "tbl": "łyżka stołowa",
 
     # liquid
-    "fl dr": "fluid drams",
+    "fl dr": "dram płynu",
     "fl oz": "fluid ounce",
     "gi": "gill",
-    "cp": "cup", "cup": "cup",
-    "pt": "pint",
-    "qt": "quart",
+    "cp": "filiżanka", "cup": "filiżanka",
+    "pt": "pinta",
+    "qt": "kwarta",
     "gal": "galon",
 
     # weight
-    "gr": "grain",
-    "dr": "dram",
-    "oz": "ounce", "℥": "ounce",
+    "gr": "gram",
+    "dr": "deka-gram",
+    "oz": "uncja", "℥": "uncja",
     "lb": "funt",
-    "cwt": "hundredweight",
-    "dwt": "pennyweight",
-    "oz t": "troy ounce",
-    "lb t": "troy pound",
+    "cwt": "setna-wagi",
+    "dwt": "dziesiąta-wagi",
+    "oz t": "trój-uncja",
+    "lb t": "trój-funt",
 
     # energy
     "hp": "koń mechaniczny",
@@ -267,7 +264,7 @@
   # FIX: this needs to be flushed out
     "inch": "cali", "cal kwadratowy": "cali kwadratowych", "cal sześcienny": "cali sześciennych",
     "foot": "stóp", "stopa kwadratowa": "stóp kwadratowych", "stopa sześcienna": "stóp sześciennych",
-    "board foot": "board feet", # to check what it is in polish
+    "board foot": "stopa sześcienna", 
     "stopień celsjusza": "stopni celsjusza",
     "stopień faranhaita": "stopni faranhaita",
     "herca": "herców",
@@ -352,7 +349,7 @@
     ]
 
 - NumbersOrdinalHundreds: [
-        "", "setna", "dwusetna ", "trzysetna", "czterysetna", "pięćsetna",
+        "", "setna", "dwusetna", "trzysetna", "czterysetna", "pięćsetna",
         "sześćsetna", "siedemsetna", "osiemsetna", "dziewięćsetna"
     ]
 
@@ -361,7 +358,6 @@
         "sześć setnych", "siedem setnych", "osiem setnych", "dziewięć setnych"
     ]
       
-
     # At this point, hopefully the language is regular. If not, code needs to be written
 - NumbersLarge: [
         "", "tysiąc", "milion", "miliard", "trylion", "kwadrylion",
