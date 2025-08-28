@@ -63,7 +63,7 @@
     - else_if: ".='ℚ'"
       then: [T: "die rationalen zahlen"]      # phrase('the rational numbers' are the fraction of 2 integers)
     - else_if: ".='ℝ'"
-      then: [T: "die reelen zahlen"]      # phrase('the real numbers' can be both positive and negative)
+      then: [T: "die reellen zahlen"]      # phrase('the real numbers' can be both positive and negative)
     - else_if: ".='ℤ'"
       then: [T: "die ganzen zahlen"]      # phrase('the integers' are natural numbers above 0)
       else: [x: "text()"] # shouldn't happen
@@ -454,7 +454,7 @@
       then: [T: "log"]      # phrase(the 'log' function is used in mathematics)
     - else_if: "$Verbosity='Terse'"
       then: [spell: "'ln'"]
-      else: [T: "natürliche log"]      # phrase(the 'natural log' function is used in mathematics)
+      else: [T: "natürliche logarithmus"]      # phrase(the 'natural log' function is used in mathematics)
 
 
 - name: multi-line
@@ -665,9 +665,9 @@
   - count(*[1]/*)<=3 and # at least two cols
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
-  - T: "die 1 by"      # phrase('the 1 by' 2 matrix)
+  - T: "die 1 mal"      # phrase('the 1 by' 2 matrix)
   - x: count(*/*)
-  - T: "linie"      # phrase(the 1 by 4 'row' matrix)
+  - T: "Zeile"      # phrase(the 1 by 4 'row' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: [T: "die 1 mal"]      # phrase('the 1 by' 2 row 'vector')
@@ -721,7 +721,7 @@
   - x: count(*[self::m:mtr][1]/*)
   - test:
       if: "self::m:determinant"
-      then: [T: "determinant"]      # phrase(the 2 by 2 'determinant')
+      then: [T: "determinante"]      # phrase(the 2 by 2 'determinant')
       else: [T: "matrix"]      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*"
@@ -1031,7 +1031,7 @@
     - else_if: ".='⇌' or .='\u1f8d2'"
       then: [T: "ist im gleichgewicht mit"]      # phrase(a reactant 'is in equilibrium with' a product)
     - else_if: ".='\u1f8d4'"
-      then: [T: "ist im gleichgewicht nach links vorgespannt"]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
+      then: [T: "ist im gleichgewicht nach links vorgespannt mit"]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
     - else_if: ".='\u1f8d3'"
       then: [T: "ist im gleichgewicht nach rechts vorgespannt mit"]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
       else: [x: "*"]
