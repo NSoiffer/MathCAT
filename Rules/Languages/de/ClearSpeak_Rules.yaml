@@ -278,7 +278,7 @@
   - pause: short
   - x: "*[2]"
   - pause: short
-  - T: "end exponent"
+  - T: "ende exponent"
 
 - name: AfterPower-default
   tag: power
