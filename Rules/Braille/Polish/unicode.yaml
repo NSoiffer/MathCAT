@@ -287,7 +287,7 @@
 
  - "µ": [T: "g⠍"]              # 0x00B5 (Micro (Greek mu))
  - "Ω": [T: "G⠺"]             # 0x2126 (Ohm sign (capital Greek omega))
- - "∆": [T: "G⠦"]               # 0x2206 (Increment)
+ - "∆": [T: "G⠙"]               # 0x2206 (Increment)
  - "∐": [T: "⠘⠻"]              # 0x2210 (CoProduct)
 
  - "⁡":                          # 0x2061⁡ (invisible function apply)
@@ -341,9 +341,11 @@
  - ";": [T: "P⠆W"]              # 0x003B SEMICOLON 
  - "-":                            # 0x2d
      - test:
-        if: "preceding-sibling::* and not(parent::m:msup)"
-        then: [T: "W⠤"]
-        else: [T: "⠤"]
+        - if: "@data-chem-formula-op"
+          then: [T: "⠐⠂"]
+        - else_if: "preceding-sibling::* and not(parent::m:msup)"
+          then: [T: "W⠤"]
+          else: [T: "⠤"]
  - ".":                            # 0x2e
      - test:
         if: "self::m:mn"
@@ -357,7 +359,11 @@
  - "?": [T: "P⠢W"]                    # 0x003F QUESTION MARK
  - "'": [T: "⠄"]                        # 0x0027 APOSTROPHE
  - "<": [T: "W⠪⠄"]                        # 0x003C (Less than)
- - "=": [T: "W⠶"]                           # 0x3d (equals)
+ - "=":                               # 0x3d (equals)
+    - test:
+        - if: "@data-chem-formula-op"
+          then: [T: "⠨⠅"]               # closing vertical bar for absolute value
+          else: [T: "W⠶"]               # absolute value -- opening bar of absolute value or standalone vertical bar
  - ">": [T: "W⠕⠂"]                          # 0x3e (GREATER-THAN)
  - "|":                                  # 0x007C (vertical bar)
     - test:
@@ -366,11 +372,12 @@
           else: [T: "⠈⠇"]               # absolute value -- opening bar of absolute value or standalone vertical bar
 # FIX: - "|":  may also mean "integral line" and than the Braille code is "W⠇"(see p. 57^ ^^ )
 
- - " ":                        # 0xa0 (Non-breaking Space)
+ - " ":                                  # 0xa0 (Non-breaking Space)
      - test:
         - if: "self::m:mn"
           then: [t: "N."]
           else: [t: "W"]
+ - "¯": [t: "⠒"]                         # 0x00AF (macron)
  - "±": [T: "W⠖⠤"]                      # 0xb1
  - "·":                                  # 0x00B7 (Multiplication dot (times))
     # p29, a space before the dot terminates a projector (a 2D structure)
@@ -551,8 +558,12 @@
  - "≝": [t: "⠐⠨⠅⠣⠙⠑⠋⠻"]         # 0x225d
  - "≞": [t: "⠐⠨⠅⠣⠍⠻"]           # 0x225e
  - "≟": [t: "⠐⠨⠅⠣⠸⠦⠻"]          # 0x225f
- - "≠": [T: "W⠔⠶"]              # 0x2260 (NOT EQUAL TO)
- - "≡": [T: "W⠶⠶"]              # 0x2261 (IDENTICAL TO, p. 48)
+ - "≠": [T: "W⠔⠶"]               # 0x2260 (NOT EQUAL TO)
+ - "≡":                           # 0x2261 (IDENTICAL TO, p. 48)
+    - test:
+        - if: "@data-chem-formula-op"
+          then: [T: "⠸⠇"]               # closing vertical bar for absolute value
+          else: [T: "W⠶⠶"]               # absolute value -- opening bar of absolute value or standalone vertical bar
  - "≢": [T: "W⠔⠶⠶"]             # 0x2262 (NOT IDENTICAL TO)
  - "≤": [T: "W⠪⠶"]              # 0x2264 (LESS-THAN OR EQUAL TO)
  - "≥": [T: "W⠕⠶"]              # 0x2265 (GREATER-THAN OR EQUAL TO)

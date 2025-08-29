@@ -580,7 +580,7 @@ fn detailed_projectors_p24_1() {
 
 #[test]
 fn detailed_projectors_p24_2() {
-    let expr = r#"<math><mfrac><mn>2</mn><mi>x</mi></mfrac><mi>x</mi><mo>+</mo><mn>1</mn><mfrac><mn>2</mn><mn>3</mn></mfrac></math>"#;
+    let expr = r#"<math><mfrac><mn>2</mn><mn>3</mn></mfrac><mi>x</mi><mo>+</mo><mn>1</mn><mfrac><mn>2</mn><mn>3</mn></mfrac></math>"#;
     test_braille("Polish", expr, "⠼⠃⠒⠠⠭⠀⠖⠼⠁⠼⠃⠒");
 }
 
@@ -1440,7 +1440,7 @@ fn roots_p39_9() {
 fn roots_p39_10() {
     // example shows "," at end, but braille doesn't, so I have removed it
     let expr = r#"<math><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mfrac><mrow><mo>-</mo><mi>b</mi><mo>+</mo><msqrt><msup><mi>b</mi><mn>2</mn></msup><mo>-</mo><mn>4</mn><mi>a</mi><mi>c</mi></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_UseShortForm", "false")], expr, r"⠠⠭⠡⠆⠀⠶⠆⠤⠃⠀⠖⠐⠩⠃⠬⠆⠈⠤⠼⠙⠠⠁⠉⠀⠳⠀⠼⠃⠄⠁⠰");
+    test_braille_prefs("Polish", vec![("Polish_UseShortForm", "false")], expr, r"⠠⠭⠡⠆⠀⠶⠆⠤⠃⠀⠖⠐⠩⠃⠬⠆⠈⠤⠼⠙⠠⠁⠉⠀⠳⠀⠼⠃⠠⠁⠰");
 }
 
 // Functions (page 40)
@@ -2232,7 +2232,7 @@ fn physics_p63_5() {
 #[test]
 fn physics_p64_1() {
     let expr = r#"<math><mover accent="true"><msub><mi>F</mi><mrow><mn>1</mn><mo>,</mo><mn>2</mn></mrow></msub><mo>&#x2192;</mo></mover><mo>=</mo><mo>-</mo><mover accent="true"><msub><mi>F</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow></msub><mo>&#x2192;</mo></mover></math>"#;
-    test_braille("Polish", expr, "⠨⠒⠂⠨⠋⠡⠼⠁⠠⠂⠈⠼⠃⠀⠶⠤⠨⠒⠂⠋⠡⠼⠃⠠⠂⠈⠼⠁");
+    test_braille("Polish", expr, r"⠨⠒⠂⠨⠋⠡⠼⠁⠠⠂⠈⠼⠃⠀⠶⠤⠨⠒⠂⠋⠡⠼⠃⠠⠂⠈⠼⠁");
 }
 
 #[test]
@@ -2262,19 +2262,19 @@ fn physics_p64_5() {
 #[test]
 fn physics_p64_6() {
     let expr = r#"<math><mover accent="true"><mi>E</mi><mo>&#x2192;</mo></mover><mo>=</mo><mfrac><mover accent="true"><mi>F</mi><mo>&#x2192;</mo></mover><msub><mi>q</mi><mn>0</mn></msub></mfrac></math>"#;
-    test_braille("Polish", expr, "⠨⠒⠂⠨⠑⠀⠶⠨⠒⠂⠨⠋⠳⠠⠟⠡⠴");
+    test_braille_prefs("Polish", vec![("Polish_RepeatLetterIndicators", "true")], expr, r"⠨⠒⠂⠨⠑⠀⠶⠨⠒⠂⠨⠋⠳⠠⠟⠡⠴");
 }
 
 #[test]
 fn physics_p64_7() {
     let expr = r#"<math><mover accent="true"><mi>M</mi><mo>&#x2192;</mo></mover><mo>=</mo><mover accent="true"><mi>F</mi><mo>&#x2192;</mo></mover><mo>&#xD7;</mo><mover accent="true"><mi>r</mi><mo>&#x2192;</mo></mover></math>"#;
-    test_braille("Polish", expr, "⠨⠒⠂⠨⠍⠀⠶⠨⠒⠂⠨⠋⠀⠦⠨⠒⠂⠠⠗");
+    test_braille_prefs("Polish", vec![("Polish_RepeatLetterIndicators", "true")], expr, r"⠨⠒⠂⠨⠍⠀⠶⠨⠒⠂⠨⠋⠀⠦⠨⠒⠂⠠⠗");
 }
 
 #[test]
 fn physics_p64_8() {
     let expr = r#"<math><mi>W</mi><mo>=</mo><mover accent="true"><mi>F</mi><mo>&#x2192;</mo></mover><mo>&#xB7;</mo><mover accent="true"><mi>s</mi><mo>&#x2192;</mo></mover></math>"#;
-    test_braille("Polish", expr, "⠨⠺⠀⠶⠨⠒⠂⠨⠋⠀⠄⠨⠒⠂⠠⠎");
+    test_braille_prefs("Polish", vec![("Polish_RepeatLetterIndicators", "true")], expr, r"⠨⠺⠀⠶⠨⠒⠂⠨⠋⠀⠄⠨⠒⠂⠠⠎");
 }
 
 #[test]
@@ -2288,7 +2288,7 @@ fn physics_p64_9() {
 #[test]
 fn physics_p65_1() {
     let expr = r#"<math><msub><mi>N</mi><mn>0</mn></msub><mover><mo>&#x2192;</mo><msub><mi>T</mi><mrow><mn>1</mn><mo>/</mo><mn>2</mn></mrow></msub></mover><mfrac><msub><mi>N</mi><mn>0</mn></msub><mn>2</mn></mfrac><mover><mo>&#x2192;</mo><msub><mi>T</mi><mrow><mn>1</mn><mo>/</mo><mn>2</mn></mrow></msub></mover><mfrac><msub><mi>N</mi><mn>0</mn></msub><mn>4</mn></mfrac><mover><mo>&#x2192;</mo><msub><mi>T</mi><mrow><mn>1</mn><mo>/</mo><mn>2</mn></mrow></msub></mover><mfrac><msub><mi>N</mi><mn>0</mn></msub><mn>8</mn></mfrac></math>"#;
-    test_braille("Polish", expr, "⠨⠝⠡⠴⠀⠰⠒⠂⠠⠨⠞⠡⠼⠁⠆⠄⠀⠨⠝⠡⠴⠳⠆⠀⠰⠒⠂⠠⠨⠞⠈⠡⠼⠁⠆⠄⠀⠨⠝⠡⠴⠳⠲⠀⠰⠒⠂⠠⠨⠞⠡⠼⠁⠆⠄⠀⠨⠝⠡⠴⠳⠦");
+    test_braille_prefs("Polish", vec![("Polish_RepeatLetterIndicators", "true")], expr, r"⠨⠝⠡⠴⠀⠰⠒⠂⠠⠨⠞⠡⠼⠁⠆⠄⠀⠨⠝⠡⠴⠳⠆⠀⠰⠒⠂⠠⠨⠞⠡⠼⠁⠆⠄⠀⠨⠝⠡⠴⠳⠲⠀⠰⠒⠂⠠⠨⠞⠡⠼⠁⠆⠄⠀⠨⠝⠡⠴⠳⠦");
 }
 
 #[test]

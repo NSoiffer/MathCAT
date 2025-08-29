@@ -2097,7 +2097,7 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     let result = polish_remove_unneeded_mode_changes(&result);
     debug!(" After mode changes: '{}'", &result);
     let result = result.replace("nN", "")
-                            //    .replace("𝔹C", "⠩")
+                               .replace("BI", "B")
                             //    .replace("DC", "⠰")
                                .replace("}P⠂", "}⠠P⠂");       // special case: bottom of page 13
     debug!(" After substitution: '{}'", &result);
@@ -2151,17 +2151,21 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
     //   Gx -- capital Greek letter mode, followed by a letter
     let mut mode = BrailleMode::None;
     let mut unit_mode = false;
-    let mut detailed_projector_count = 0;     // == 1 indicates exactly in "detailed" (most complex) projector but not nested more deeply
-    let mut other_projector_count = 0;     // simple and "compound"
+    let mut projector_depth = 0;     // none = 0, simple = 1, "compound" = 2, "detailed" >= 3
+    let mut nesting_depth = 0;
     let mut letter_mode = BrailleMode::None; // used to determine if we need to output 'L' (etc) for letter mode
     let mut result = String::default();
     let chars = raw_braille.chars().collect::<Vec<char>>();
     let mut i = 0;
     let use_short_form = PreferenceManager::get().borrow().pref_to_string("Polish_UseShortForm") == "true";
     let repeat_indicators = PreferenceManager::get().borrow().pref_to_string("Polish_RepeatLetterIndicators") == "true";
+    let projector_depths = max_nesting_depths(&chars);
+    let mut i_projector_depths = 0;
+    debug!("Projector depths = {:?}", projector_depths);
     while i < chars.len() {
         let ch = chars[i];
-        // debug!(" ...mode={}, l_mode={}, u_mode={}, ch/next {}/{}, result='{}'", mode, letter_mode, unit_mode, ch, if i+1<chars.len() {chars[i+1]} else {' '}, &result);
+        // debug!(" ...mode={}, l_mode={}, u_mode={}, p/n depth = {}/{}, ch/next {}/{}, result='{}'",
+        //         mode, letter_mode, unit_mode, projector_depth, nesting_depth, ch, if i+1<chars.len() {chars[i+1]} else {' '}, &result);
         match ch {
             'l' | 'L' => {
                 let new_mode = if ch == 'l' { BrailleMode::Letter } else { BrailleMode::CapLetter };
@@ -2267,7 +2271,8 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                     mode = BrailleMode::None;
                 }
                 unit_mode = false;
-                if ch == 'W' && (detailed_projector_count > 1 || other_projector_count > 0) {
+                debug!("ch=W, projector_depth={projector_depth}, nesting_depth={nesting_depth}");
+                if ch == 'W' && (projector_depth < 3 && nesting_depth > 0) {
                     result.push('⠈');               // substitute "filler" character
                 } else {
                     result.push(ch);
@@ -2275,43 +2280,44 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 i += 1;
             },
             '<' => {
-                result.push(ch);
+                nesting_depth += 1;
+                projector_depth = projector_depths[i_projector_depths];
+                i_projector_depths += 1;
+                if projector_depth <= 1 || chars[i+1] == '⠆' {  // fractions aren't projectors
+                    result.push('<');
+                } else {
+                    // compound or detailed projector
+                    result.push('≪');
+                    result.push( if projector_depth == 2 {'⠐'} else {'⠨'} );
+                }
+
                 // Look for '<⠆⠤' -- all other patterns can drop fraction start ('⠆') -- p24, rule 4b
                 // Also want to keep '⠆' when the numerator is "long" (undefined and inconsistent in spec)
                 const LONG_NUMERATOR: usize = 12;
                 if chars[i+1] == '⠆' && use_short_form {
                     if chars[i+2] == '⠤' ||  // always should be something after "<x"
-                       chars[i+2..].iter().position(|&ch| ch == '/').unwrap() > LONG_NUMERATOR { // should always find "/"
+                       chars[i+2..].iter().position(|&ch| ch == '/').unwrap() > LONG_NUMERATOR { // should always find "/" because of '⠆'
                         result.push('⠆');
                     }
                 } else {
                     result.push(chars[i+1]);
                 }
-                if chars[i+1] != '⠆' || use_short_form {
-                    other_projector_count += 1;
-                }
                 mode = BrailleMode::None;
                 i += 2;
-            }
+            },
             '>' => {
-                result.push(ch);
-                result.push(chars[i+1]);
-                if chars[i+1] != '⠰' || use_short_form {
-                    other_projector_count -= 1;
-                }
-                i += 2;
-            }
-            '≪' | '≫' => {
-                result.push(ch);
-                result.push(chars[i+1]);
-                result.push(chars[i+2]);
-                if chars[i+1] == '⠨' {
-                    detailed_projector_count += if ch == '≪' {1} else {-1};
+                nesting_depth -= 1;
+                if projector_depth == 1 {
+                    result.push('>');
                 } else {
-                    other_projector_count += if ch == '≪' {1} else {-1};
+                    // compound or detailed projector
+                    result.push('≫');
+                    result.push( if projector_depth == 1 {'⠐'} else {'⠨'} );
                 }
-                mode = BrailleMode::None;
-                i += 3;
+                result.push(chars[i+1]);
+                projector_depth = projector_depths[i_projector_depths]; // revert to previous depth
+                i_projector_depths += 1;
+                i += 2;
             }
             '❎' => {  // reset back to start mode
                 unit_mode = false;
@@ -2362,7 +2368,50 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
         }
         return if n_letters > 1 { Some( (i, run)) } else { None };
     }
-}
+
+    /// Return a vector whose ith entry is the nesting depth of the ith '<' or '>'
+    fn max_nesting_depths(chars: &[char]) -> Vec<usize> {
+        let mut result = Vec::new();
+        let mut i = 0;
+        while i < chars.len() {
+            if chars[i] == '<' {
+                i += 1;
+                let depths = parse(chars, &mut i);
+                let new_depth = depths.iter().copied().max().unwrap_or(0) + 1;
+                result.push(new_depth);
+                result.extend(depths);
+                result.push(new_depth);
+            } else {
+                i += 1;
+            }
+        }
+        return result;
+
+        /// Recursive call that returns depths up to the matching close.
+        fn parse(chars: &[char], i: &mut usize) -> Vec<usize> {
+            let mut depths = Vec::new();
+            while *i < chars.len() {
+                match chars[*i] {
+                    '<' => {
+                        *i += 1;
+                        let inner = parse(chars, i);
+                        let max_inner = inner.iter().copied().max().unwrap_or(0) + 1;
+                        depths.push(max_inner);
+                        depths.extend(inner);
+                        depths.push(max_inner);
+                    }
+                    '>' => {
+                        *i += 1;
+                        return depths;
+                    }
+                    _ => {
+                        *i += 1;
+                    }
+                }
+            }
+            return depths;
+        }
+    }}
 
 static SWEDISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     // FIX: this needs cleaning up -- not all of these are used
