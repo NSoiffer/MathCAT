@@ -41,8 +41,8 @@
  - "ʱ": [T: "modifikator klein h mit haken"]    	#  0x2b1	(en: 'modifier small h with hook', google translation)
  - "ʲ": [T: "modifikator klein j"]              	#  0x2b2	(en: 'modifier small j', google translation)
  - "ʳ": [T: "modifikator klein r"]              	#  0x2b3	(en: 'modifier small r', google translation)
- - "ʴ": [T: "modifikator small dreh r"]         	#  0x2b4	(en: 'modifier small turned r', google translation)
- - "ʵ": [T: "modifikator small rum r mit haken"]	#  0x2b5	(en: 'modifier small turned r with hook', google translation)
+ - "ʴ": [T: "modifikator gedrehtes kleines r"]         	#  0x2b4	(en: 'modifier small turned r', google translation)
+ - "ʵ": [T: "modifikator gedrehtes kleines r mit haken"]	#  0x2b5	(en: 'modifier small turned r with hook', google translation)
  - "ʶ":                                         	#  0x2b6
     - T: "modifikator klein invertiert"         	# 	(en: 'modifier small inverted', google translation)
     - spell: "translate('R', 'R', 'R')"
@@ -50,10 +50,10 @@
  - "ʷ": [T: "modifikator klein w"]              	#  0x2b7	(en: 'modifier small w', google translation)
  - "ʸ": [T: "modifikator klein y"]              	#  0x2b8	(en: 'modifier small y', google translation)
  - "ʹ": [T: "Strich"]                           	#  0x2b9	(en: 'modifier prime', google: 'modifikator prime')
- - "ʺ": [T: "zwei Strich"]                      	#  0x2ba	(en: 'modifier double prime', google: 'modifikator double prime')
+ - "ʺ": [T: "zwei Striche"]                      	#  0x2ba	(en: 'modifier double prime', google: 'modifikator double prime')
  - "ʻ": [T: "modifikator wurde komma"]          	#  0x2bb	(en: 'modifier turned comma', google translation)
  - "ʼ": [T: "modifikator apostroph"]            	#  0x2bc	(en: 'modifier apostrophe', google translation)
- - "ʽ": [T: "modifikator umgekehrt comma"]      	#  0x2bd	(en: 'modifier reversed comma', google translation)
+ - "ʽ": [T: "modifikator umgekehrtes Komma"]      	#  0x2bd	(en: 'modifier reversed comma', google translation)
  - "ʾ": [T: "modifier letter right half ring"]  	#  0x2be	(en: 'modifier right half ring', google: 'modifikator rechts halbe ring')
  - "ʿ": [T: "modifier letter left half ring"]   	#  0x2bf	(en: 'modifier left half ring', google: 'modifikator verließ den halben ring')
  - "ˀ": [T: "modifikator glottal stop"]         	#  0x2c0	(en: 'modifier glottal stop', google translation)
