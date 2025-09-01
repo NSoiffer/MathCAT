@@ -2039,11 +2039,15 @@ static POLISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "n" => "",       // drop number follows -- no need for indicator
     // "t" => "⠱",     // shape terminator
     "U" => "⠻",     // unit indicator
+    "u" => "",      // signal end of unit mode (it could be several chars long)
     "w" => "⠀",     // whitespace after function name
     "W" => "⠀",     // whitespace"
     "𝐖"=> "",       // whitespace for mode changes only (0xb7 -- multiplication dot)
     "P" => "",       // signal next char is punctuation
     "p" => "",       // pseudo-script "optional" character representation where we can delete the first char sometimes (° and ′)
+    "(" => "⠣",   // lef paren
+    "[" => "⠷",   // left bracket
+    "{" => "⠪",   // left curly brace
     ")" => "⠜",   // right paren
     "]" => "⠾",   // right bracket
     "}" => "⠕",   // right curly brace
@@ -2062,13 +2066,13 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
         // Remove closing indicators before open indicators and before end of string
         // The close fraction indicator should NOT go away nor should a ≫.. at the end of the line
         // I don't know how to do this with one regex, so I add a second one that deals only with the end of the string
-        static ref REMOVE_CLOSE_INDICATORS: Regex =Regex::new(r"(((>[^⠰])|(≫..))+)((<[^⠆])|[/≪≫W>)\]}])").unwrap();
-        static ref REMOVE_CLOSE_INDICATORS_AT_END: Regex =Regex::new(r"((>[^⠰])|(≫..))$").unwrap();
+        static ref REMOVE_CLOSE_INDICATORS: Regex =Regex::new(r"(((>[^⠰])|(≫⠐.))+)((<[^⠆])|[/≪≫W>)\]}])").unwrap();
+        static ref REMOVE_CLOSE_INDICATORS_AT_END: Regex =Regex::new(r"((>[^⠰])|(≫⠐.))$").unwrap();
 
         // Also drop numbers close a projector, so we need to remove closing indicators before drop numbers (p22, f [only after scripts])
         // The close fraction indicator should NOT go away
-        static ref REMOVE_CLOSE_INDICATORS_BEFORE_DROP_NUMBERS: Regex =Regex::new(r"((>[^⠰])|(≫..))(n.)").unwrap();
-        static ref REMOVE_CLOSE_INDICATORS_AFTER_DROP_NUMBERS: Regex =Regex::new(r"(n.)((>[^⠰])|(≫..))").unwrap();
+        static ref REMOVE_CLOSE_INDICATORS_BEFORE_DROP_NUMBERS: Regex =Regex::new(r"(>[^⠰])(n.)").unwrap();
+        static ref REMOVE_CLOSE_INDICATORS_AFTER_DROP_NUMBERS: Regex =Regex::new(r"(n.)(>[^⠰])").unwrap();
 
         // p51: shorter form for ° and ′ unless they follow a drop number (in which case they would also be a drop number)
         //   also if it follows a regular number, then it might be interpreted as a numeric fraction
@@ -2081,7 +2085,7 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
         // Need to add dot-6 between a number and punctuation (see bottom of p13 for '}' reason)
         // Also need to special case empty set which seems to act as a number without a number sign (⠯⠕)
         static ref NUMBER_DOT6_PUNCTUATION: Regex =Regex::new(r"(N.|⠯⠕|})(P.)").unwrap();
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([B𝔹IREDgGVHlL𝐿𝐶MnNUwW𝐖Pp)\]}#</>≪≫])").unwrap();
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([B𝔹IREDgGVHlL𝐿𝐶MnNUuwW𝐖Pp(\[{)\]}#</>≪≫])").unwrap();
     }
 
     debug!("polish_cleanup:      '{}'", raw_braille);
@@ -2104,7 +2108,7 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     let result = REMOVE_CLOSE_INDICATORS_BEFORE_DROP_NUMBERS.replace_all(&result, "${1}");
     let result = REMOVE_CLOSE_INDICATORS_AFTER_DROP_NUMBERS.replace_all(&result, "${1}");
     let result = REMOVE_CLOSE_INDICATORS.replace_all(&result, "${5}");
-    let result = REMOVE_CLOSE_INDICATORS_AT_END.replace_all(&result, "${5}");
+    let result = REMOVE_CLOSE_INDICATORS_AT_END.replace_all(&result, "");
     let result = SCRIPT_AFTER_DROP_NUMBERS.replace_all(&result, "${1}⠘");
     debug!(" After remove close: '{}'", &result);
 
@@ -2150,17 +2154,19 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
     //   gx  -- Greek letter mode, followed by a letter
     //   Gx -- capital Greek letter mode, followed by a letter
     let mut mode = BrailleMode::None;
-    let mut unit_mode = false;
-    let mut projector_depth = 0;     // none = 0, simple = 1, "compound" = 2, "detailed" >= 3
-    let mut nesting_depth = 0;
     let mut letter_mode = BrailleMode::None; // used to determine if we need to output 'L' (etc) for letter mode
+    let mut unit_mode = false;
+    let mut text_mode = false;      // in text mode, mode changes only last for the next character
+    let mut bracket_nesting_depth = 0;
     let mut result = String::default();
     let chars = raw_braille.chars().collect::<Vec<char>>();
     let mut i = 0;
     let use_short_form = PreferenceManager::get().borrow().pref_to_string("Polish_UseShortForm") == "true";
     let repeat_indicators = PreferenceManager::get().borrow().pref_to_string("Polish_RepeatLetterIndicators") == "true";
     let projector_depths = max_nesting_depths(&chars);
+    let mut projector_depth = 0;
     let mut i_projector_depths = 0;
+    let mut projector_depth_stack = vec![0]; // keep track of current project depth (push on '<', pop on '>')
     debug!("Projector depths = {:?}", projector_depths);
     while i < chars.len() {
         let ch = chars[i];
@@ -2168,22 +2174,30 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
         //         mode, letter_mode, unit_mode, projector_depth, nesting_depth, ch, if i+1<chars.len() {chars[i+1]} else {' '}, &result);
         match ch {
             'l' | 'L' => {
-                let new_mode = if ch == 'l' { BrailleMode::Letter } else { BrailleMode::CapLetter };
-                if (letter_mode != new_mode || (mode == BrailleMode::Number && LETTER_NUMBERS.contains(&chars[i+1]))) ||
-                   (repeat_indicators && ch == 'L') ||
-                   letter_mode == BrailleMode::None {
-                    // we only output indicator if the letter is a-j
-                    result.push(ch);
+                if unit_mode || text_mode {
+                    if ch == 'L' || mode != BrailleMode::Letter {
+                        result.push(ch);
+                    }
+                    mode = BrailleMode::Letter;
+                    letter_mode = BrailleMode::Letter;
+                } else {
+                    let new_mode = if ch == 'l' { BrailleMode::Letter } else { BrailleMode::CapLetter };
+                    if (letter_mode != new_mode || (mode == BrailleMode::Number && LETTER_NUMBERS.contains(&chars[i+1]))) ||
+                    (repeat_indicators && ch == 'L') ||
+                    letter_mode == BrailleMode::None {
+                        // we only output indicator if the letter is a-j
+                        result.push(ch);
+                    }
+                    mode = new_mode.clone();
+                    letter_mode = new_mode;
                 }
-                mode = new_mode.clone();
-                letter_mode = new_mode;
                 result.push(chars[i+1]);
                 i += 2;
             },
             '𝐿' => {
                 // chemical element start (might have a lower case letter after it)
                 // if there is a run of 𝐿 with no lowercase letter or number in between, then generate 𝐶
-                let run = if use_short_form {chemical_element_run(&chars[i..])} else {None};
+                let run = if !repeat_indicators {chemical_element_run(&chars[i..])} else {None};
                 if let Some((end, run)) = run {
                     // debug!("end={end}, run='{run}'");
                     result.push('𝐶');
@@ -2202,12 +2216,17 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 mode = BrailleMode::None;
             },
             'g' | 'G' => {
-                let new_mode = if ch == 'g' { BrailleMode::Greek } else { BrailleMode::CapGreek };
-                if repeat_indicators || mode != new_mode {
+                if unit_mode || text_mode {
                     result.push(ch);
+                    mode = BrailleMode::Greek;      // doesn't matter whether lower or cap
+                } else {
+                    let new_mode = if ch == 'g' { BrailleMode::Greek } else { BrailleMode::CapGreek };
+                    if repeat_indicators || mode != new_mode {
+                        result.push(ch);
+                    }
+                    mode = new_mode;
+                    letter_mode = BrailleMode::None;
                 }
-                mode = new_mode;
-                letter_mode = BrailleMode::None;
                 result.push(chars[i+1]);
                 i += 2;
             },
@@ -2228,13 +2247,29 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 i += 1;
             },
             'U' => {
-                // It appears that if we are in letter mode, then 'U' is not output again. Consider m/s, we 's' doesn't output 'U' again
+                // If we are in units mode, then 'U' is not output again. Consider m/s, we 's' doesn't output 'U' again
+                // Units mode sets lower case mode. Unit mode only last until the end of unit mode, in which case we revert to lower case mode
+                // Units mode also means that cap/greek indicators only last for the next char
                 if !unit_mode {
                     mode = BrailleMode::Letter;
                     letter_mode = BrailleMode::Letter;
                     unit_mode = true;
                     result.push(ch);
                 }
+                i += 1;
+            },
+            'u' => {
+                // end units mode, sort of. We don't want to output another 'U', but we do want to reset to lower case mode (p74)
+                // Units mode also apparently doesn't follow caps mode rules and caps only apply to that unit
+                mode = BrailleMode::Letter;
+                letter_mode = BrailleMode::Letter;
+                result.push(ch);        // FIX: do we need to include this
+                i += 1;
+            },
+            'T' | 't' => {
+                // no reason to keep 'T'/'t' in the output
+                text_mode = ch == 'T';
+                unit_mode = false;
                 i += 1;
             },
             'N' => {
@@ -2271,8 +2306,8 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                     mode = BrailleMode::None;
                 }
                 unit_mode = false;
-                debug!("ch=W, projector_depth={projector_depth}, nesting_depth={nesting_depth}");
-                if ch == 'W' && (projector_depth < 3 && nesting_depth > 0) {
+                debug!("ch=W, projector_depth={projector_depth}, bracket_nesting_depth={bracket_nesting_depth}");
+                if ch == 'W' && (projector_depth == 1 || projector_depth == 2) && bracket_nesting_depth == 0 {
                     result.push('⠈');               // substitute "filler" character
                 } else {
                     result.push(ch);
@@ -2280,8 +2315,9 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 i += 1;
             },
             '<' => {
-                nesting_depth += 1;
+                // debug!("@<: i={i}, i_projector_depths={i_projector_depths}, @i_proj={}", projector_depths[i_projector_depths] );
                 projector_depth = projector_depths[i_projector_depths];
+                projector_depth_stack.push(projector_depth);
                 i_projector_depths += 1;
                 if projector_depth <= 1 || chars[i+1] == '⠆' {  // fractions aren't projectors
                     result.push('<');
@@ -2306,28 +2342,32 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 i += 2;
             },
             '>' => {
-                nesting_depth -= 1;
+                // debug!("@>: i={i}, i_projector_depths={i_projector_depths}, @i_proj={}", projector_depths[i_projector_depths] );
                 if projector_depth == 1 {
                     result.push('>');
                 } else {
                     // compound or detailed projector
                     result.push('≫');
-                    result.push( if projector_depth == 1 {'⠐'} else {'⠨'} );
+                    result.push( if projector_depth == 2 {'⠐'} else {'⠨'} );
                 }
+                projector_depth_stack.pop().unwrap_or_default();  // back to previous depth
+                projector_depth = projector_depth_stack[projector_depth_stack.len()-1];
                 result.push(chars[i+1]);
-                projector_depth = projector_depths[i_projector_depths]; // revert to previous depth
-                i_projector_depths += 1;
                 i += 2;
-            }
-            '❎' => {  // reset back to start mode
-                unit_mode = false;
-                mode = BrailleMode::None;
-                letter_mode = BrailleMode::None;
-                i += 1;
             }
             _ => {
                 if mode == BrailleMode::Number {
                     mode = BrailleMode::None;
+                }
+                if ch != '/' {
+                    unit_mode = false;
+                    if projector_depth == 1 || projector_depth == 2 {
+                        if ch == '(' || ch == '[' || ch == '{' {
+                            bracket_nesting_depth += 1;
+                        } else if ch == ')' || ch == ']' || ch == '}' {
+                            bracket_nesting_depth -= 1;
+                        }
+                    }
                 }
                 result.push(ch);
                 i += 1;
@@ -2376,29 +2416,28 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
         while i < chars.len() {
             if chars[i] == '<' {
                 i += 1;
-                let depths = parse(chars, &mut i);
+                let depths = depth_of_indicators(chars, &mut i);
                 let new_depth = depths.iter().copied().max().unwrap_or(0) + 1;
                 result.push(new_depth);
                 result.extend(depths);
-                result.push(new_depth);
             } else {
                 i += 1;
             }
         }
         return result;
 
-        /// Recursive call that returns depths up to the matching close.
-        fn parse(chars: &[char], i: &mut usize) -> Vec<usize> {
+        /// Recursive call that returns depths of the open and close up to the matching close.
+        /// Starts at character after '<' and returns after processing '>'
+        fn depth_of_indicators(chars: &[char], i: &mut usize) -> Vec<usize> {
             let mut depths = Vec::new();
             while *i < chars.len() {
                 match chars[*i] {
                     '<' => {
                         *i += 1;
-                        let inner = parse(chars, i);
+                        let inner = depth_of_indicators(chars, i);
                         let max_inner = inner.iter().copied().max().unwrap_or(0) + 1;
                         depths.push(max_inner);
                         depths.extend(inner);
-                        depths.push(max_inner);
                     }
                     '>' => {
                         *i += 1;

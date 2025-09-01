@@ -75,10 +75,49 @@
 #       - x: "*[3]/*[1]"
 #       - t: "⠔"
 
-# Fraction rules
-  # The fraction part of a mixed number is always simple
-  # They also differ because a two character sequence is needed to bracket the fraction
-  # The invisible plus should produce an empty string
+
+# -
+#   name: binomial-coef
+#   tag: mfrac
+#   match:
+#     - "@linethickness=0 "
+#   replace: 
+#   - x: "*[1]"
+#   - t: "⠰⠳"
+#   - x: "*[2]"
+
+# -
+#   name: binomial-coef
+#   tag: mtable
+#   match:
+#     - "contains(@intent, 'binomial-coefficient(')"
+#   replace: 
+#   - x: "*[1]/*[1]"
+#   - t: "⠰⠳"
+#   - x: "*[2]/*[1]"
+-
+  # 7.5.1 defines special rule for binomial
+  name: binomial
+  tag: mrow
+  match: "IsBracketed(., '(', ')') and
+          *[2][(self::m:mfrac and @linethickness=0) or
+               (self::m:mtable and count(*)=2 and count(*[1])=1 and contains(@intent, 'binomial-coefficient('))]"
+  replace: 
+  - t: "("
+  - x: "*[2]/*[1]"
+  - t: "⠰⠳"
+  - x: "*[2]/*[2]"
+  - t: ")"
+
+# - name: binomial-table
+#   tag: mtable
+#   match: "IsBracketed(., '(', ')') and *[2][self::m:mtable][count(*)=2 and count(*[1])=1] and contains(@intent, 'binomial-coefficient(')"
+#   replace:
+#   - t: "⠨⠣"
+#   - x: "*[2]/*[1]/*[1]/*[1]"
+#   - t: "⠒"
+#   - x: "*[2]/*[2]/*[1]/*[1]"
+#   - t: "⠜"
 
 -
   # longer notation: use if
@@ -280,28 +319,6 @@
   # replace:
   # - x: "*"
   # - t: "W"
-
--
-  # 7.5.1 defines special rule for binomial
-  name: binomial-frac
-  tag: mrow
-  match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
-  replace: 
-  - t: "⠨⠣"
-  - x: "*[2]/*[1]"
-  - t: "⠒"
-  - x: "*[2]/*[2]"
-  - t: "⠜"
-
-- name: binomial-table
-  tag: mrow
-  match: "IsBracketed(., '(', ')') and *[2][self::m:mtable][count(*)=2 and count(*[1])=1] and contains(@intent, 'binomial(')"
-  replace:
-  - t: "⠨⠣"
-  - x: "*[2]/*[1]/*[1]/*[1]"
-  - t: "⠒"
-  - x: "*[2]/*[2]/*[1]/*[1]"
-  - t: "⠜"
   
 -
   # Page 29 says to minimize brackets around exprs.
@@ -336,11 +353,12 @@
 
 -
   name: substitute-and-for-i-hack
-  # on p18, "i" is used for '∧' inside of sets, which are {...} and (...)
-  # it puts spaces around the 'i'
+  # on p18, " i " (with the spaces) is used for '∧' 
+  # canonicalization moves the spaces into attrs. This only checks for a space which comes from the preceding space.
+  #   to check for the following space, we have to skip over a (likely) invisible times
+  # for the output, we need to put spaces around the 'i', but we don't want a lower case indicator, so we use private space char hack
   tag: mi
-  match: ".='i' and ancestor::*[self::m:mrow and
-                                (IsBracketed(., '{', '}') or IsBracketed(., '(', ')'))]"
+  match: ".='i' and @data-previous-space-width >= 0.7"
   replace:
   - x: "BrailleChars('\ue040', 'Polish')"
 
@@ -373,6 +391,7 @@
       then:
       - t: "U"
       - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
+      - t: "u"
       else:
       - with:
           variables: [Abbreviations: "DefinitionValue(., 'Braille', 'Abbreviations')"]
@@ -385,10 +404,14 @@
                   then: [t: 'f']    # forces function mode (lower case Roman letter)
               - x: "$Abbreviations"
               else:
+              - test:
+                  # words have different rules from math. Guessing that strings of length 4 or more are words
+                  if: "self::m:mtext and string-length(.) > 3"
+                  then: [t: "T"] 
               - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
               - test:
-                  if: "string-length(.) > 4"
-                  then: [t: "❎"]    # reset the mode -- from what I can tell, words are treated as "not math" and reset the mode ('4' is a guess)
+                  if: "self::m:mtext and string-length(.) > 3"
+                  then: [t: "t"] 
       
 
 
@@ -445,7 +468,8 @@
 -
   name: diacriticals
   tag: [mover, msup]
-  match: "*[2][self::m:mo and DefinitionValue(., 'Braille', 'Scripts')!='']"
+  # ions don't use the shortened form
+  match: "not(@data-chem-formula) and *[2][self::m:mo and DefinitionValue(., 'Braille', 'Scripts')!='']"
   replace:
   - x: "*[1]"
   - test:
@@ -488,7 +512,7 @@
   - x: "*[1]"
 
 -
-  name: lim_with_script
+  name: lim-with-script
   tag: [munder, msub]
   match: "*[1][self::m:mi][.='lim']"
   replace: 
@@ -496,6 +520,18 @@
   - t: "<⠡"
   - x: "*[2]"
   - t: ">W"
+
+-
+  # function inverse is not considered an exponent
+  name: inverse-function
+  tag: msup
+  match: "*[1][IsInDefinition(., 'Braille', 'PolishFunctionName') or .='f' or .='g' or .='h'] and
+          *[2][.='-1']"
+  replace: 
+  - x: "*[1]"
+  - t: "<⠌"     # I think these count as projectors even though they always go away
+  - t: "⠤n⠂"
+  - t: ">⠱"
 
 -
   # use drop numbers with no subscript indicator for chemical formulae
@@ -507,36 +543,13 @@
   - x: "*[1]"
   - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"
 
-# -
-#   # simple numeric scripts are written as drop numbers
-#   name: simple-number-exponent
-#   tag: [msub, msup]
-#   match: "*[2][(self::m:mn and not(contains(., $DecimalSeparators))) or
-#                (self::m:mrow and count(*)=2 and *[1]='-' and *[2][self::m:mn and not(contains(., $DecimalSeparators))])]"
-#   replace:
-#   - x: "*[1]"
-#   - test:
-#       - if: "self::m:msup"
-#         then: [t: "⠬"]   # based on the examples, this seems right; could "⠌"
-#         else: [t: "⠡"]
-#   - test:
-#       if: "*[2][self::m:mn]"
-#       then:
-#       - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"
-#       else:
-#       - x: "*[2]/*[1]"
-#       - x: "BrailleChars(translate(*[2]/*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
-
 -
   name: doubled-charge
   tag: msup
-  match: "*[2][self::m:mrow and (.='--' or .='++')]"
+  match: "@data-chem-formula and *[2][self::m:mrow and (.='--' or .='++')]"
   replace:
   - x: "*[1]"
-  - test:
-      if: "@data-chem-formula"    # must be a superscript
-      then: [t: "⠌"]
-      else: [t: "⠬"]
+  - t: "⠌"
   - test:
       if: "*[2][.='--']"
       then: [t: "⠤⠤"]
@@ -545,15 +558,17 @@
 -
   name: doubled-charge
   tag: msubsup
-  match: "*[3][self::m:mrow and (.='--' or .='++')]"
+  match: "@data-chem-formula and *[3][self::m:mrow and (.='--' or .='++')]"
   replace:
   - x: "*[1]"
-  - t: "<⠡"
-  - x: "*[2]"
   - test:
-      if: "@data-chem-formula"    # must be a superscript
-      then: [t: ">⠱⠌"]
-      else: [t: ">⠱⠬"]
+      - if: "*[2][self::m:mn and translate(*[2], '0123456789', '') = '']"
+        then: [x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
+        else:
+        - t: "<⠡"
+        - x: "*[2]"
+        - t: ">⠱"
+  - t: "⠌"
   - test:
       if: "*[3][.='--']"
       then: [t: "⠤⠤"]
@@ -565,12 +580,14 @@
   name: default
   tag: [msub, msup, msubsup]
   match: "."
+  # the examples all use superscripts, not exponents for cap letters these (for example p39 and p55)
+  variables: [BaseIsCapLetter: "*[1][.='C']"]
   replace:
   - x: "*[1]"
   - test:
       - if: "self::m:msub or self::m:msubsup"
         then: [t: "<⠡"]
-      - else_if: "@data-chem-formula"    # must be a superscript
+      - else_if: "@data-chem-formula or $BaseIsCapLetter"    # must be a superscript
         then: [t: "<⠌"]
         else: [t: "<⠬"]
   - test:
@@ -585,7 +602,7 @@
       if: "self::m:msubsup"
       then:
       - test:
-          if: "@data-chem-formula"    # must be a superscript
+          if: "@data-chem-formula or $BaseIsCapLetter"    # must be a superscript
           then: [t: ">⠱<⠌"]
           else: [t: ">⠱<⠬"]
       - test:
@@ -979,7 +996,7 @@
               if: "$IsCancellation"
               then: [t: "⠻"]                   # cancellation
           - test:
-              if: "*[1][(IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))) or IsBracketed(., '', '')]"
+              if: "*[1][(IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'PolishFunctionName'))) or IsBracketed(., '', '')]"
               then: [x: "*[1]"]
               else:
               - t: "⠢"

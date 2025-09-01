@@ -1,7 +1,7 @@
 ---
 
   # These get a '.' after them (an abbreviation). From 7.2, 7.5.2, 7.5.3
-- CMUFunctionNames: {
+- PolishFunctionName: {
     "Dom", "Or", "Img", "Im", "conc", "conv", "crec", "dec", "arg", "rot",
     "div", "grad", "Re", "Rec",
     "máx", "mín", "mcd", "mcm", "ínf", "sup",   # from 5.5.3

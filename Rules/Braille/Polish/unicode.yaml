@@ -55,7 +55,7 @@
  - "\ue01F": [T: "N⠨N⠋"]               # F 
 
 
- - "\ue040": [T: "W⠊W"]        # this is used for a hack for "i" that stands for logical and (p18 and 19)  
+ - "\ue040": [T: "W⠊W"]        # this is used for a hack for "i" that stands for logical and (p18 and 19) -- it avoids lower case indicators being used
 
  - "a": [T: "l⠁"]               # 0x61
  - "ą": [T: "l⠡"]               # 0x0105 LATIN SMALL LETTER A WITH OGONEK
@@ -306,22 +306,25 @@
         then: [T: "W"]      # 
         else: [T: ""]
 
- - "!": [T: "P⠖W"]             # 0x21
-# FIX:  - "!": [T: "⠫W"]              # 0x21 (when used as factorial)
+ - "!":                     # 0x21 (either punctuation or factorial)
+    - test:
+        if: "ancestor::*[2][self::m:math]"   # ony consider it a factorial if at end -- wrong for something simple "5!" but ok for "1+ 5!"
+        then: [T: "P⠖W"]
+        else: [T: "⠫W"]
 
  - "$": [T: "⠸⠈⠎"]            # 0x24
  - "%": [T: "⠼⠚⠴"]           # 0x25 (percent)
  - "‰": [T: "⠼⠚⠴⠴"]          # 0x2030 PER MILLE SIGN 
- - "(": [T: "⠣"]               # 0x0028 (Math left parenthesis)
+ - "(": [T: "("]               # 0x0028 (Math left parenthesis)
 # FIX: - "(": [T: "⠶"]               # 0x0028 (Left AND right parentheses in regular Polish texts)
 
  - ")": [T: ")"]               # 0x0029 (Math right parenthesis)
 # FIX: - "(": [T: "⠶"]               # 0x0028 (Left AND right parentheses in regular Polish texts)
 
- - "[": [T: "⠷"]               # 0x005B (Left square bracket)
+ - "[": [T: "["]               # 0x005B (Left square bracket)
  - "]": [T: "]"]               # 0x005D (Right square bracket)
  - "}": [T: "}"]                # 0x007D (RIGHT CURLY BRACKET) -- special cased in braille.rs due to "}," special handling (bottom p13)
- - "{": [T: "⠪"]                # 0x007B (LEFT CURLY BRACKET)
+ - "{": [T: "{"]                # 0x007B (LEFT CURLY BRACKET)
  - "*": [T: "⠔"]                # 0x2a (ASTERISK)
 # FIX: - "*": [T: "⠐⠦"]           # 0x2a (sometimes used as multiplication sign)
 
@@ -352,9 +355,13 @@
         then: [T: "N⠄"]
         else: [T: "P⠄"]
 
- - ":": [T: "P⠒W"]                # 0x3a  
-                # 0x3a
-# FIX: - ":" [T: "W⠲"]                # when ":" serves as a division sign; see p. 10
+ - ":":                           # 0x3a  
+# FIX:               # when ":" serves as a division sign; see p. 10
+    - test:
+        if: "@data-chem-equation-op or ancestor::*[2][self::m:mrow and IsBracketed(., '{', '}')]"
+        then: [T: "P⠒W"]                     # in chemistry (p84), sets (such that)
+        else: [T: "W⠲"]                      # division, time, others?
+
  - "/": [T: "/"]                      # 0x002F SOLIDUS (Slash)
  - "?": [T: "P⠢W"]                    # 0x003F QUESTION MARK
  - "'": [T: "⠄"]                        # 0x0027 APOSTROPHE
@@ -375,7 +382,7 @@
  - " ":                                  # 0xa0 (Non-breaking Space)
      - test:
         - if: "self::m:mn"
-          then: [t: "N."]
+          then: [t: "N⠄"]
           else: [t: "W"]
  - "¯": [t: "⠒"]                         # 0x00AF (macron)
  - "±": [T: "W⠖⠤"]                      # 0xb1
@@ -514,8 +521,8 @@
  - "∟": [T: "⠻⠦"]               # 0x221f (RIGHT ANGLE)
  - "∠": [t: "⠫⠪"]               # 0x2220
  - "∢": [T: "⠻⠪"]               # 0x2222 (SPHERICAL ANGLE)
- - "∣": [T: "⠈⠇"]                # 0x2223 (DIVIDES; Polish Braille symbol the same as for modulo; p. 12)
- - "∤": [T: "⠔⠈⠇"]               # 0x2224 (DOES NOT DIVIDE)
+ - "∣": [T: "W⠈⠇"]                # 0x2223 (DIVIDES; Polish Braille symbol the same as for modulo; p. 12)
+ - "∤": [T: "W⠔⠈⠇"]               # 0x2224 (DOES NOT DIVIDE)
  - "∥": [T: "W⠈⠇⠇"]               # 0x2225 (PARALLEL TO)
  - "∦": [T: "W⠔⠈⠇⠇"]             # 0x2226 (NOT PARALLEL TO)
  - "∧": [T: "W⠬⠂"]              # 0x2227 (LOGICAL AND)
