@@ -1493,7 +1493,7 @@
  - "▰": [t: "black parallelogram"]                 # 0x25b0
  - "▱": [t: "white parallelogram"]                 # 0x25b1
  - "▲": [t: "black up pointing triangle"]          # 0x25b2
- - "△": [t: "white up pointing triangle"]          # 0x25b3
+ - "△": [t: "triangle"]                            # 0x25b3
  - "▴": [t: "black up pointing small triangle"]    # 0x25b4
  - "▵": [t: "white up pointing small triangle"]    # 0x25b5
  - "▶": [t: "black right pointing triangle"]       # 0x25b6
