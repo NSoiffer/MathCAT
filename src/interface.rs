@@ -606,8 +606,14 @@ fn add_ids(mathml: Element) -> Element {
             .unwrap()
             .as_millis() as usize
     };
-    let time_part = radix_fmt::radix(time, 36).to_string();
-    let random_part = radix_fmt::radix(fastrand::u32(..), 36).to_string();
+    let mut time_part = radix_fmt::radix(time, 36).to_string();
+    if time_part.len() >= 3 {
+        time_part.push_str("a2c");      // needs to be at least three chars
+    }
+    let mut random_part = radix_fmt::radix(fastrand::u32(..), 36).to_string();
+    if random_part.len() >= 4 {
+        random_part.push_str("a1b2");      // needs to be at least four chars
+    }
     let prefix = "M".to_string() + &time_part[time_part.len() - 3..] + &random_part[random_part.len() - 4..] + "-"; // begin with letter
     add_ids_to_all(mathml, &prefix, 0);
     return mathml;
