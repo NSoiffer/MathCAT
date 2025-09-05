@@ -295,7 +295,7 @@
     # this assumes what precedes the invisible function apply is a function (why else is it used?)
     - test:
         if: "following-sibling::*[1][self::m:mfrac]"
-        then: [T: "w"]      # follows a function name, so lowercase
+        then: [T: "W"]
         else: [T: ""]
 
  - "⁢": [T: ""]                        # 0x2062 (invisible times)
@@ -937,8 +937,8 @@
  - "⊸": [t: "⠫⠒⠨⠡"]           # 0x22B8 (Multimap)
 #  - "⊾": [t: ""]                 # 0x22BE (Right angle w arc)
  - "⊿": [T: "⠻⠲⠲"]            # 0x22BF (Right triangle)
- - "⋅": [t: "𝐖⠄"]                # 0x22C5 (Dot operator) -- treating the same as 0xb7
- - "∙": [t: "𝐖⠄"]                # 0x2219   -- similar looking to 0x22c5, treating the same as 0xb7
+ - "⋅": [t: "W⠄"]                # 0x22C5 (Dot operator) -- treating the same as 0xb7
+ - "∙": [t: "W⠄"]                # 0x2219   -- similar looking to 0x22c5, treating the same as 0xb7
  - "⋆": [t: "⠫⠎"]               # 0x22C6 (Star operator)
  - "⋍": [t: "⠠⠱⠱"]            # 0x22CD (Reversed tilde equals)
  - "⋖": [t: "⠡⠈⠐⠅⠻"]          # 0x22D6 (Less-than w dot)

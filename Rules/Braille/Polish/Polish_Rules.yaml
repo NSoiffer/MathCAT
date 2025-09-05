@@ -76,27 +76,7 @@
 #       - t: "⠔"
 
 
-# -
-#   name: binomial-coef
-#   tag: mfrac
-#   match:
-#     - "@linethickness=0 "
-#   replace: 
-#   - x: "*[1]"
-#   - t: "⠰⠳"
-#   - x: "*[2]"
-
-# -
-#   name: binomial-coef
-#   tag: mtable
-#   match:
-#     - "contains(@intent, 'binomial-coefficient(')"
-#   replace: 
-#   - x: "*[1]/*[1]"
-#   - t: "⠰⠳"
-#   - x: "*[2]/*[1]"
--
-  # 7.5.1 defines special rule for binomial
+-   # p43 gives rule for binomial
   name: binomial
   tag: mrow
   match: "IsBracketed(., '(', ')') and
@@ -119,28 +99,28 @@
 #   - x: "*[2]/*[2]/*[1]/*[1]"
 #   - t: "⠜"
 
--
-  # longer notation: use if
-  #   * user chooses long form
-  #   * nested fraction, as long as the nested fraction is not a common fraction (p30)
-  name: long-form
-  tag: mfrac
-  match:
-    - "not($Polish_UseShortForm) or
-       descendant::*[self::m:mfrac and
-                     not(*[1][self::m:mn][translate(., '0123456789', '') = ''] and *[2][self::m:mn][translate(., '0123456789', '') = ''])]"
-  replace: 
-  - t: "⠆"        # not a projector, so no "<"
-  - x: "*[1]"
-  - t: "W/W"      # don't use '<W' or '>W' because W acts as terminator
-  - x: "*[2]"
-  - t: "⠰"       # not a projector, so no ">"
+# -
+#   longer notation: use if
+#     * user chooses long form
+#     * nested fraction, as long as the nested fraction is not a common fraction (p30)
+#   name: long-form
+#   tag: mfrac
+#   match:
+#     - "not($Polish_UseShortForm) or
+#        descendant::*[self::m:mfrac and
+#                      not(*[1][self::m:mn][translate(., '0123456789', '') = ''] and *[2][self::m:mn][translate(., '0123456789', '') = ''])]"
+#   replace: 
+#   - t: "<⠆"
+#   - x: "*[1]"
+#   - t: "W/W"      # don't use '<W' or '>W' because W acts as terminator
+#   - x: "*[2]"
+#   - t: ">⠰"
 
 -
   name: common-fraction-mixed-number
   tag: mfrac
   match:
-    - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
+    - "$Polish_BrailleLevel = 'Advanced' and preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
     - "*[1][self::m:mn][translate(., '0123456789', '') = '']   and" 
     - "*[2][self::m:mn][translate(., '0123456789', '') = '']"
   replace: 
@@ -151,7 +131,7 @@
 -
   name: simple-number
   tag: mfrac
-  match: "*[1][self::m:mn][translate(., '0123456789', '') = ''] and *[2][self::m:mn][translate(., '0123456789', '') = '']"
+  match: "$Polish_BrailleLevel = 'Advanced' and *[1][self::m:mn][translate(., '0123456789', '') = ''] and *[2][self::m:mn][translate(., '0123456789', '') = '']"
   replace:
   - x: "*[1]"
   - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
@@ -159,21 +139,20 @@
 - # simpler (more common?) case of the next rule (no whitespace)
   name: simple-fraction
   tag: mfrac
-  match: "*[1][IsNode(., 'leaf') and not(contains(., 'u00a0'))] and *[2][IsNode(., 'leaf') and not(contains(., 'u00a0'))]"
+  match: "$Polish_BrailleLevel != 'Beginner' and *[1][IsNode(., 'leaf') and not(contains(., 'u00a0'))] and *[2][IsNode(., 'leaf') and not(contains(., 'u00a0'))]"
   replace:
-  - t: "<⠆" # signal start of fraction (needed for state machine to replace spaces)
+  - t: "<⠆-" # signal start of fraction (needed for fraction depth count -- '-' says to delete the start/end)
   - x: "*[1]"
   - t: "/"  # don't need number indicator
   - test:
-      if: "*[2][self::m:mn][translate(., '0123456789', '') = '']"
+      if: "$Polish_BrailleLevel = 'Advanced' and *[2][self::m:mn][translate(., '0123456789', '') = '']"
       then:
       - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
       else:
       - x: "*[2]"
-  - t: ">W"
+  - t: ">⠰-"
 
 -
-  # We have already dealt with long form
   # Rule 1 (p25)
   # no whitespace around the division sign
   name: default
@@ -181,34 +160,22 @@
   match: "."
   replace:
   - t: "<⠆" # signal start of fraction (needed for state machine to replace spaces)
-  - test:   # Rule 4c, p26, mfrac test is rule at end of "b)"
-      if: "*[1][self::m:mrow]/*[1][self::m:mo and .='-' and not(preceding-sibling::*) or
-                                   self::m:mrow/*[1][self::m:mo and .='-' and not(preceding-sibling::*)] ] or
-           descendant::*[self::m:mfrac] or
-           *[1][string-length(.) > 5 and not(IsBracketed(., '(', ')') or IsBracketed(*[1], '(', ')'))]"         # just a guess as to what "not short" means
-      then: [t: ""]
   - x: "*[1]"
-  - t: "/"
+  - t: "W/"
   - test:
-      # Rule 4b, p26, mfrac test is at end of "b"
-      if: "descendant::*[self::m:mfrac and not(self::m:mfrac and
-                                               *[1][self::m:mn and translate(., '0123456789', '') = ''] and
-                                               *[2][self::m:mn and translate(., '0123456789', '') = '']
-                                              )]" 
-      then: [t: "w"]    # space that should go away
-  - test:
-      if: "*[2][self::m:mn][translate(., '0123456789', '') = '']"
+      if: "$Polish_BrailleLevel = 'Advanced' and *[2][self::m:mn][translate(., '0123456789', '') = '']"
       then:
       - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
       else:
+      - t: "W"
       - x: "*[2]"
-  - t: ">W"
+  - t: ">⠰"
 
 
 -
   name: linear-numeric-fraction
   tag: mrow
-  match: "count(*)=3 and *[2][self::m:mo and .='/'] and
+  match: "$Polish_BrailleLevel = 'Advanced' and count(*)=3 and *[2][self::m:mo and .='/'] and
           *[1][self::m:mn][translate(., '0123456789', '') = ''] and *[3][self::m:mn][translate(., '0123456789', '') = '']"
   replace:
   - x: "*[1]"
@@ -449,7 +416,8 @@
 -
   name: modifiers
   tag: [mover, munder]
-  match: "*[2][IsInDefinition(., 'Braille', 'Modifiers')]"
+  # overbar can also be a script -- it seems the distinguishing feature is whether is it over a single char or something "bigger"
+  match: "*[2][IsInDefinition(., 'Braille', 'Modifiers')] and not(*[1][self::m:mi and string-length(.)=1] and *[2][.='¯'])"
   replace:
   - test:
       if: "self::m:mover"
@@ -475,7 +443,7 @@
   - test:
       if: "*[2][.='°' or .='′' or .='″' or .='\"']"
       then: [t: "p"]
-  - x: "DEBUG(DefinitionValue(*[2], 'Braille', 'Scripts'))"
+  - x: "DefinitionValue(*[2], 'Braille', 'Scripts')"
 
 -
   name: pseudo-scripts
@@ -487,7 +455,7 @@
       if: "@data-chem-formula and (*[2][.='+' or .='-'])"
       then: [x: "IfThenElse(*[2]='+', '⠌⠖', '⠌⠤')"]
       else:
-      - x: "DEBUG(*[2])"
+      - x: "*[2]"
 
 -
   name: prime-exception    # 4.3.1
@@ -496,8 +464,9 @@
   replace:
   - x: "*[1]"
   - x: "*[3]"
-  - t: "⠌"
+  - t: "<⠡"
   - x: "*[2]"
+  - t: ">⠱"
 
 -
   name: log-with-base
@@ -506,7 +475,7 @@
   replace:
   - t: "⠌"
   - test:
-      if: "*[2][self::m:mn and not(contains(., $DecimalSeparators))]"
+      if: "$Polish_BrailleLevel = 'Advanced' and *[2][self::m:mn and not(contains(., $DecimalSeparators))]"
       then: [x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
       else: [x: "*[2]"]
   - x: "*[1]"
@@ -581,7 +550,7 @@
   tag: [msub, msup, msubsup]
   match: "."
   # the examples all use superscripts, not exponents for cap letters these (for example p39 and p55)
-  variables: [BaseIsCapLetter: "*[1][.='C']"]
+  variables: [BaseIsCapLetter: "BaseNode(*[1])[.='C']"]
   replace:
   - x: "*[1]"
   - test:
@@ -634,6 +603,7 @@
   # This is incredibly messy because it needs to handle all the special cases for scripts, and then repeat them for each pre/postscript
   # FIX: So far, I have only dealt with one prescript to handle atomic numbers
   # At least for chemistry, superscripts, then subscripts, with the base after prescripts
+  # The number indicator is not needed for drop numbers
   name: default
   tag: mmultiscripts
   match: "."
@@ -680,7 +650,10 @@
           #     - else_if: "$Prescripts[2][((self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')) or self::m:mfrac]"
           #       then:
           - t: "<⠌"   # not an exponent
-          - x: "$Prescripts[2]"
+          - test:
+              if: "$Polish_BrailleLevel = 'Advanced' and $Prescripts[2][self::m:mn][translate(., '0123456789', '') = '']"
+              then: [x: "BrailleChars(translate($Prescripts[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
+              else: [x: "$Prescripts[2]"]
           - t: ">⠱"
       - test:
           if: "not($Prescripts[1][self::m:none])"
@@ -708,74 +681,80 @@
           #     - else_if: "$Prescripts[1][((self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')) or self::m:mfrac]"
           #       then:
           - t: "<⠡"
-          - x: "$Prescripts[1]"
+          - test:
+              if: "$Polish_BrailleLevel = 'Advanced' and $Prescripts[1][self::m:mn][translate(., '0123456789', '') = '']"
+              then: [x: "BrailleChars(translate($Prescripts[1], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
+              else: [x: "$Prescripts[1]"]
           - t: ">⠱"
-      - test:
-          if: "count($Prescripts)>2"
-          then:
-          - test:
-              if: "not($Prescripts[3][self::m:none])"
-              then:
-              - t: "⠠⠌"
-              - test:
-                  - if:
-                    - "$Prescripts[3][self::m:mrow[not(./*[name() != 'mo'])]] and" # script consists of all mo's
-                    - "count($Prescripts[3]/*) > 3 and string-length($Prescripts[3]/*[1])=1 and"    # at least four mo's, the first of which has a single char
-                    - "$Prescripts[3][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
-                    then:
-                    - x: "BrailleChars(count($Prescripts[3]/*), 'Polish')"
-                    - x: "$Prescripts[3]/*[1]"
-                    - test:
-                        # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
-                        if: "not($Prescripts[3][.='°'] and *[1][self::m:mn or @data-chem-element])" 
-                        then: [t: "⠄"]
-                  - else_if: "$Prescripts[3][translate(., \"'*`+-ª°²³´¹º‘’“”‟‵‶‷\",'')='']"
-                    then:
-                    - x: "$Prescripts[3]"
-                    - test:
-                        # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
-                        if: "not($Prescripts[3][.='°'] and *[1][self::m:mn or @data-chem-element])" 
-                        then: [t: "⠄"]
-                  - else_if: "$Prescripts[3][((self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')) or self::m:mfrac]"
-                    then:
-                    - t: "⠢"
-                    - x: "$Prescripts[3]"
-                    - t: "⠔"
-                    else:
-                    - x: "$Prescripts[3]"
-          - test:
-              if: "not($Prescripts[4][self::m:none])"
-              then:
-              - t: "⠈⠡"
-              - test:
-                  - if:
-                    - "$Prescripts[4][self::m:mrow[not(./*[name() != 'mo'])]] and" # script consists of all mo's
-                    - "count($Prescripts[4]/*) > 3 and string-length($Prescripts[4]/*[1])=1 and"    # at least four mo's, the first of which has a single char
-                    - "$Prescripts[4][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
-                    then:
-                    - x: "BrailleChars(count($Prescripts[4]/*), 'Polish')"
-                    - x: "$Prescripts[4]/*[1]"
-                    - test:
-                        # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
-                        if: "not($Prescripts[4][.='°'] and *[1][self::m:mn or @data-chem-element])" 
-                        then: [t: "⠄"]
-                  - else_if: "$Prescripts[4][translate(., \"'*`+-ª°²³´¹º‘’“”‟‵‶‷\",'')='']"
-                    then:
-                    - x: "$Prescripts[4]"
-                    - test:
-                        # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
-                        if: "not($Prescripts[4][.='°'] and *[1][self::m:mn or @data-chem-element])" 
-                        then: [t: "⠄"]
-                  - else_if: "$Prescripts[4][((self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')) or self::m:mfrac]"
-                    then:
-                    - t: "⠢"
-                    - x: "$Prescripts[4]"
-                    - t: "⠔"
-                    else:
-                    - x: "$Prescripts[4]"
-          - test:
-              if: "count($Prescripts) > 4"   # give up and just dump them out so at least the content is there
-              then: [x: "$Prescripts[position() > 4]"]
+          - test: # hack to force output of the terminator
+              if: "$Polish_BrailleLevel = 'Advanced' and @data-chem-formula"
+              then: [t: "!"]
+      # - test:
+      #     if: "count($Prescripts)>2"
+      #     then:
+      #     - test:
+      #         if: "not($Prescripts[3][self::m:none])"
+      #         then:
+      #         - t: "⠠⠌"
+      #         - test:
+      #             - if:
+      #               - "$Prescripts[3][self::m:mrow[not(./*[name() != 'mo'])]] and" # script consists of all mo's
+      #               - "count($Prescripts[3]/*) > 3 and string-length($Prescripts[3]/*[1])=1 and"    # at least four mo's, the first of which has a single char
+      #               - "$Prescripts[3][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
+      #               then:
+      #               - x: "BrailleChars(count($Prescripts[3]/*), 'Polish')"
+      #               - x: "$Prescripts[3]/*[1]"
+      #               - test:
+      #                   # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
+      #                   if: "not($Prescripts[3][.='°'] and *[1][self::m:mn or @data-chem-element])" 
+      #                   then: [t: "⠄"]
+      #             - else_if: "$Prescripts[3][translate(., \"'*`+-ª°²³´¹º‘’“”‟‵‶‷\",'')='']"
+      #               then:
+      #               - x: "$Prescripts[3]"
+      #               - test:
+      #                   # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
+      #                   if: "not($Prescripts[3][.='°'] and *[1][self::m:mn or @data-chem-element])" 
+      #                   then: [t: "⠄"]
+      #             - else_if: "$Prescripts[3][((self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')) or self::m:mfrac]"
+      #               then:
+      #               - t: "⠢"
+      #               - x: "$Prescripts[3]"
+      #               - t: "⠔"
+      #               else:
+      #               - x: "$Prescripts[3]"
+      #     - test:
+      #         if: "not($Prescripts[4][self::m:none])"
+      #         then:
+      #         - t: "⠈⠡"
+      #         - test:
+      #             - if:
+      #               - "$Prescripts[4][self::m:mrow[not(./*[name() != 'mo'])]] and" # script consists of all mo's
+      #               - "count($Prescripts[4]/*) > 3 and string-length($Prescripts[4]/*[1])=1 and"    # at least four mo's, the first of which has a single char
+      #               - "$Prescripts[4][ not(./*[text()] != *[1][text()]) ]" # they are all have the same text (we know it is an mrow)
+      #               then:
+      #               - x: "BrailleChars(count($Prescripts[4]/*), 'Polish')"
+      #               - x: "$Prescripts[4]/*[1]"
+      #               - test:
+      #                   # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
+      #                   if: "not($Prescripts[4][.='°'] and *[1][self::m:mn or @data-chem-element])" 
+      #                   then: [t: "⠄"]
+      #             - else_if: "$Prescripts[4][translate(., \"'*`+-ª°²³´¹º‘’“”‟‵‶‷\",'')='']"
+      #               then:
+      #               - x: "$Prescripts[4]"
+      #               - test:
+      #                   # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
+      #                   if: "not($Prescripts[4][.='°'] and *[1][self::m:mn or @data-chem-element])" 
+      #                   then: [t: "⠄"]
+      #             - else_if: "$Prescripts[4][((self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')) or self::m:mfrac]"
+      #               then:
+      #               - t: "⠢"
+      #               - x: "$Prescripts[4]"
+      #               - t: "⠔"
+      #               else:
+      #               - x: "$Prescripts[4]"
+      #     - test:
+      #         if: "count($Prescripts) > 4"   # give up and just dump them out so at least the content is there
+      #         then: [x: "$Prescripts[position() > 4]"]
 
   - x: "*[1]"
 

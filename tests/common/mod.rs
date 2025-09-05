@@ -122,8 +122,7 @@ fn braille_init(code: &str) {
     set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
     set_preference("UseSpacesAroundAllOperators".to_string(), "false".to_string()).unwrap();         // makes testing simpler
     set_preference("LaTeX_UseShortName".to_string(), "false".to_string()).unwrap();
-    set_preference("Polish_UseShortForm".to_string(), "true".to_string()).unwrap();
-    set_preference("Polish_RepeatLetterIndicators".to_string(), "false".to_string()).unwrap();
+    set_preference("Polish_BrailleLevel".to_string(), "Advanced".to_string()).unwrap();
     // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
     // log::debug!("\nsetting Language");
     match code {

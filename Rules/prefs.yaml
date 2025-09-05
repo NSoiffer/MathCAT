@@ -95,8 +95,7 @@
       UseShortName: false   # Use the short form for the latex (e.g., "~a" instead of "\alpha")
 
     Polish:
-      UseShortForm: true  # Use the short form for the Polish braille (minimizes spaces, uses drop numbers, etc.)
-      RepeatLetterIndicators: false  # For non-lower case Latin letters, repeat the indicators (e.g., for Greek and capital Letters)
+      BrailleLevel: "Beginner" # Intermediate, Advanced (shorted code)
 
 
   Other:
