@@ -622,9 +622,9 @@
  - "⇏": [t: "rightwards double arrow with stroke"] # 0x21cf
  - "⇐": [t: "leftwards double arrow"]              # 0x21d0
  - "⇑": [t: "upwards double arrow"]                # 0x21d1
- - "⇒": [t: "rightwards double arrow"]             # 0x21d2
+ - "⇒": [t: "implies"]             # 0x21d2
  - "⇓": [t: "downwards double arrow"]              # 0x21d3
- - "⇔": [t: "left right double arrow"]             # 0x21d4
+ - "⇔": [t: "if and only if"]             # 0x21d4
  - "⇕": [t: "up down double arrow"]                # 0x21d5
  - "⇖": [t: "north west double arrow"]             # 0x21d6
  - "⇗": [t: "north east double arrow"]             # 0x21d7
@@ -1773,8 +1773,8 @@
  - "⟶": [t: "long rightwards arrow"]               # 0x27f6
  - "⟷": [t: "long left right arrow"]               # 0x27f7
  - "⟸": [t: "long leftwards double arrow"]         # 0x27f8
- - "⟹": [t: "long rightwards double arrow"]        # 0x27f9
- - "⟺": [t: "long left right double arrow"]        # 0x27fa
+ - "⟹": [t: "implies"]        # 0x27f9
+ - "⟺": [t: "if and only if"]        # 0x27fa
  - "⟻": [t: "long leftwards arrow from bar"]       # 0x27fb
  - "⟼": [t: "long rightwards arrow from bar"]      # 0x27fc
  - "⟽": [t: "long leftwards double arrow from bar"] # 0x27fd
