@@ -614,7 +614,7 @@
   name: ClearSpeak-log
   tag: mi
   match: ".='log' or .='lg' or .='ln'"
-  variables: [log_is_simple: "IsNode(following-sibling::*[2],'simple')"]
+  variables: [log_is_simple: "following-sibling::*[2] and IsNode(following-sibling::*[2],'simple')"]
   replace:
   - test:
       if: "$log_is_simple"
