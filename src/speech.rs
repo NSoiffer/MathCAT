@@ -1749,7 +1749,7 @@ impl<'c, 'r> ContextStack<'c> {
             // set the new value
             let new_value = match def.value.evaluate(&self.base, mathml) {
                 Ok(val) => val,
-                Err(_) => bail!(format!("Can't evaluate variable def for {} with ContextStack {}", def, self)),
+                Err(_) => Value::Nodeset(sxd_xpath::nodeset::Nodeset::new()),
             };
             let qname = QName::new(def.name.as_str());
             self.base.set_variable(qname, new_value);
