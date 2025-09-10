@@ -607,14 +607,8 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
         let mut answer = false;
         for child in mathml.children() {
             let child = as_element(child);
-            if name(child) == "mtd" {
-                assert_eq!(child.children().len(), 1);
-                // let mtd_child = as_element(child.children()[0]);
-                // if mtd_child.attribute(CHEM_FORMULA).is_none() && mtd_child.attribute(CHEM_EQUATION).is_none() {
-                // } else {
-
-                // }
-                answer = true;
+            if name(child) == "mtd" && child.attribute(MAYBE_CHEMISTRY).is_some() {
+                answer = true;  // each mtd acts as a potential island for chemistry, so don't clear it
             } else {
                 answer |= is_changed_after_unmarking_chemistry(child);
             }
@@ -3165,6 +3159,69 @@ mod chem_tests {
                 </mrow>
             </math>
            ";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+    
+    #[test]
+    fn mtd_assert_bug_393() {
+        let test = r#"
+        <math display="block">
+            <mtable>
+                <mtr>
+                <mtd>
+                    <mrow>
+                    <mi>A</mi>
+                    <mi>c</mi>
+                    </mrow>
+                </mtd>
+                <mtd>
+                    <mi>A</mi>
+                    <mfenced>
+                    <mtable>
+                        <mtr>
+                        <mtd>
+                            <mrow>
+                            <mi>c</mi>
+                            <mi>n</mi>
+                            </mrow>
+                        </mtd>
+                        </mtr>
+                    </mtable>
+                    </mfenced>
+                </mtd>
+                </mtr>
+            </mtable>
+        </math>"#;
+        let target = "
+        <math display='block'>
+            <mtable>
+            <mtr>
+                <mtd>
+                <mi>A</mi>
+                <mi>c</mi>
+                </mtd>
+                <mtd>
+                <mrow data-changed='added'>
+                    <mi>A</mi>
+                    <mrow>
+                    <mo data-changed='from_mfenced'>(</mo>
+                    <mtable>
+                        <mtr>
+                        <mtd>
+                            <mrow>
+                            <mi>c</mi>
+                            <mi>n</mi>
+                            </mrow>
+                        </mtd>
+                        </mtr>
+                    </mtable>
+                    <mo data-changed='from_mfenced'>)</mo>
+                    </mrow>
+                </mrow>
+                </mtd>
+            </mtr>
+            </mtable>
+        </math>";
         assert!(are_strs_canonically_equal(test, target));
     }
 
