@@ -330,3 +330,13 @@ fn vertical_line_evaluated_at_both_given() {
     test_ClearSpeak("de", "ClearSpeak_VerticalLine", "Given", expr,
         "x quadrat plus x, ausgewertet zwischen 1 und 0");
 }
+
+
+#[test]
+fn supset() {
+    let expr = "<math>
+  <mi>A</mi><mo>&supset;</mo><mi>B</mi>
+    </math>";
+    test_ClearSpeak("de", "ClearSpeak_VerticalLine", "Given", expr,
+                    "groß a ist ein obermenge von, groß b");
+}
