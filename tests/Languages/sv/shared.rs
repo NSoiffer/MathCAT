@@ -109,8 +109,8 @@ fn prime() {
 #[test]
 fn given() {
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
-    test("sv", "SimpleSpeak", expr, "versal p; vänster-parentes; versal a lodstreck versal b; höger-parentes");
-    test("sv", "ClearSpeak", expr,  "versal p; vänster-parentes; versal a delar versal b; höger-parentes");  // not good, but follows the spec
+    test("sv", "SimpleSpeak", expr, "versal p; vänster-parentes; versal a givet versal b; höger-parentes");
+    test("sv", "ClearSpeak", expr,  "versal p; vänster-parentes; versal a givet versal b; höger-parentes");
 }
 
 #[test]

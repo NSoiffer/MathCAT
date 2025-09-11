@@ -168,9 +168,9 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
             }
 
             let preceding_ch = highlight(preceding_ch);
-            braille.replace_range(start_index-3..start_index+3, format!("{}{}", preceding_ch, first_ch).as_str());
+            braille.replace_range(start_index-3..start_index+3, format!("{preceding_ch}{first_ch}").as_str());
             let following_ch = highlight(following_ch);
-            braille.replace_range(end_index-3..end_index+3, format!("{}{}", last_ch, following_ch).as_str());
+            braille.replace_range(end_index-3..end_index+3, format!("{last_ch}{following_ch}").as_str());
             return Some( (start_index-3, end_index + 3) );
         }
     }
@@ -893,7 +893,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
             "D" => &fraktur,
             "V" => &greek_variant,
             _ => match UEB_INDICATOR_REPLACEMENTS.get(matched_char) {
-                None => {error!("REPLACE_INDICATORS and UEB_INDICATOR_REPLACEMENTS are not in sync: missing '{}'", matched_char); ""},
+                None => {error!("REPLACE_INDICATORS and UEB_INDICATOR_REPLACEMENTS are not in sync: missing '{matched_char}'"); ""},
                 Some(&ch) => ch,
             },
         }
@@ -1534,7 +1534,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                     },
                     '𝟙' => {
                         // '𝟙' should have forced G1 Word mode
-                        error!("Internal error: '𝟙' found in G2 mode: index={} in '{}'", i, raw_braille);
+                        error!("Internal error: '𝟙' found in G2 mode: index={i} in '{raw_braille}'");
                         i += 1;
                     }
                     'N' => {
@@ -1893,7 +1893,7 @@ fn vietnam_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
             "D" => &fraktur,
             "V" => &greek_variant,
             _ => match VIETNAM_INDICATOR_REPLACEMENTS.get(matched_char) {
-                None => {error!("REPLACE_INDICATORS and VIETNAM_INDICATOR_REPLACEMENTS are not in sync: missing '{}'", matched_char); ""},
+                None => {error!("REPLACE_INDICATORS and VIETNAM_INDICATOR_REPLACEMENTS are not in sync: missing '{matched_char}'"); ""},
                 Some(&ch) => ch,
             },
         }
@@ -2130,7 +2130,7 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
             "D" => &fraktur,
             "V" => &greek_variant,
             _ => match FINNISH_INDICATOR_REPLACEMENTS.get(matched_char) {
-                None => {error!("REPLACE_INDICATORS and SWEDISH_INDICATOR_REPLACEMENTS are not in sync: missing '{}'", matched_char); ""},
+                None => {error!("REPLACE_INDICATORS and SWEDISH_INDICATOR_REPLACEMENTS are not in sync: missing '{matched_char}'"); ""},
                 Some(&ch) => ch,
             },
         }
@@ -2180,7 +2180,7 @@ fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
             "D" => &fraktur,
             "V" => &greek_variant,
             _ => match SWEDISH_INDICATOR_REPLACEMENTS.get(matched_char) {
-                None => {error!("REPLACE_INDICATORS and SWEDISH_INDICATOR_REPLACEMENTS are not in sync: missing '{}'", matched_char); ""},
+                None => {error!("REPLACE_INDICATORS and SWEDISH_INDICATOR_REPLACEMENTS are not in sync: missing '{matched_char}'"); ""},
                 Some(&ch) => ch,
             },
         }
@@ -2360,7 +2360,7 @@ impl BrailleChars {
             "Vietnam" => BrailleChars:: get_braille_vietnam_chars(node, text_range),
             "Swedish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
             "Finnish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
-            _ => return Err(sxd_xpath::function::Error::Other(format!("get_braille_chars: unknown braille code '{}'", code)))
+            _ => return Err(sxd_xpath::function::Error::Other(format!("get_braille_chars: unknown braille code '{code}'")))
         };
         return match result {
             Ok(string) => Ok(make_quoted_string(string)),
@@ -2708,7 +2708,7 @@ impl Function for BrailleChars {
         use crate::canonicalize::create_mathml_element;
         let mut args = Args(args);
         if let Err(e) = args.exactly(2).or_else(|_| args.exactly(4)) {
-            return Err( XPathError::Other(format!("BrailleChars requires 2 or 4 args: {}", e)));
+            return Err( XPathError::Other(format!("BrailleChars requires 2 or 4 args: {e}")));
         };
 
         let range = if args.len() == 4 {
@@ -3049,12 +3049,12 @@ impl Function for NeedsToBeGrouped {
                 "UEB" => NeedsToBeGrouped::needs_grouping_for_ueb(e, is_base),
                 "Finnish" => NeedsToBeGrouped::needs_grouping_for_finnish(e, is_base),
                 "Swedish" => NeedsToBeGrouped::needs_grouping_for_swedish(e, is_base),
-                _ => return Err(XPathError::Other(format!("NeedsToBeGrouped: braille code arg '{:?}' is not a known code ('UEB', 'CMU', or 'Swedish')", braille_code))),
+                _ => return Err(XPathError::Other(format!("NeedsToBeGrouped: braille code arg '{braille_code:?}' is not a known code ('UEB', 'CMU', or 'Swedish')"))),
             };
             return Ok( Value::Boolean( answer ) );
         }
 
-        return Err(XPathError::Other(format!("NeedsToBeGrouped: first arg '{:?}' is not a node", node)));
+        return Err(XPathError::Other(format!("NeedsToBeGrouped: first arg '{node:?}' is not a node")));
     }
 }
     

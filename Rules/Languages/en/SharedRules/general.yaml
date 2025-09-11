@@ -228,6 +228,13 @@
   - x: "*[3]"
   - pause: short
 
+# in terse mode, we just say "m" or "s", etc., not meters or seconds
+- name: unit-terse
+  tag: unit
+  match: "$Verbosity = 'Terse' and string-length(.)=1"
+  replace:
+  - bookmark: "@id"
+  - spell: "text()"
 
 # the order of matching is
 # 1. does it match the base of an SI unit
@@ -236,7 +243,7 @@
 # Due to this order, some things like "ft" and "cd" mean "feet" vs "femto-tonnes" and "pints" vs "pico-tonnes"
 - name: unit
   tag: unit
-  match: "$Verbosity != 'Terse' and contains(@data-intent-property, ':unit')"
+  match: "."
   variables:
     # If the coefficient is singular, we don't add the plural ending. Finding the coefficient is tricky
     # Normal case (A) "3m" (parents is mrow), but could also be (B) "3 m^2" (etc.) (parent is power/mrow)
@@ -250,7 +257,7 @@
                          IfThenElse(parent::m:power, ancestor::*[2][self::m:mrow],
                          IfThenElse(parent::m:fraction and not(preceding-sibling::*), ancestor::*[2][self::m:mrow],
                          IfThenElse(parent::m:power[parent::m:fraction and not(preceding-sibling::*)], ancestor::*[3][self::m:mrow], false()) ) ) )"
-  - IsSingular: "(not(DEBUG($MRowForCoefficient)) and parent::*[name(.)!='skip-super' or *[1][.=1]]) or
+  - IsSingular: "(not($MRowForCoefficient) and parent::*[name(.)!='skip-super' or *[1][.=1]]) or
                  ($MRowForCoefficient and $MRowForCoefficient[(count(*) = 3 and *[1][self::m:mn and .=1] and *[2]='\u2062')])"
   - Prefix: "''"
   - Word: "''"  
@@ -448,7 +455,6 @@
   - test:
     - if: "$Verbosity!='Terse'"
       then: [t: "the"]      # phrase('the' logarithm function is used in mathematics)
-
   - test:
     - if: ".= 'log'"
       then: [t: "log"]      # phrase(the 'log' function is used in mathematics)

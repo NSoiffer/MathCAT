@@ -18,7 +18,7 @@ pub static ZIPPED_RULE_FILES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"),"/r
 
 
 cfg_if! {
-    if #[cfg(target_family = "wasm")] {
+    if #[cfg(any(target_family = "wasm", feature = "include-zip"))] {
         // For the WASM build, we build a fake file system based on ZIPPED_RULE_FILES.
         // That stream encodes other zip files that must be unzipped.
 
@@ -39,8 +39,8 @@ cfg_if! {
         }
         thread_local! {
             // mapping the file names to whether they are are directory or a file (if a file, where to find it in the zip archive)
-            static DIRECTORIES: RefCell<HashSet<String>> = RefCell::new(HashSet::with_capacity(31));
-            static FILES: RefCell<HashMap< String, FilesEntry >> = RefCell::new(HashMap::with_capacity(511));
+            static DIRECTORIES: RefCell<HashSet<String>> = RefCell::new(HashSet::with_capacity(63));
+            static FILES: RefCell<HashMap< String, FilesEntry >> = RefCell::new(HashMap::with_capacity(1023));
         }
         
         fn read_zip_file(containing_dir: &Path, zip_file: Option<Vec<u8>>) -> Result<()> {
@@ -79,12 +79,12 @@ cfg_if! {
                             if parent == containing_dir {
                                 break;
                             }
-                            dirs.insert(parent.to_str().unwrap_or_default().to_string());
+                            dirs.insert(parent.to_str().unwrap_or_default().replace("/", std::path::MAIN_SEPARATOR_STR));
                         }
                         if file.is_file() {
-                            files.insert(path.to_str().unwrap_or_default().to_string(), FilesEntry{ data: zip_file.clone(), index: i});
+                            files.insert(path.to_str().unwrap_or_default().replace("/", std::path::MAIN_SEPARATOR_STR), FilesEntry{ data: zip_file.clone(), index: i});
                         } else if file.is_dir() {
-                            dirs.insert(path.to_str().unwrap_or_default().to_string());
+                            dirs.insert(path.to_str().unwrap_or_default().replace("/", std::path::MAIN_SEPARATOR_STR));
                         } else {
                             bail!("read_zip_file: {} is neither a file nor a directory", path.display());
                         }
@@ -112,22 +112,40 @@ cfg_if! {
             return DIRECTORIES.with(|dirs| dirs.borrow().contains(path.to_str().unwrap_or_default()) );
         }
 
-        pub fn find_file_in_dir_that_ends_with_shim(dir: &Path, ending: &str) -> Option<String> {
+        pub fn find_files_in_dir_that_ends_with_shim(dir: &Path, ending: &str) -> Vec<String> {
             // FIX: this is very inefficient -- maybe gather up all the info in read_zip_file()?
             // look for files that have 'path' as a prefix
             return FILES.with(|files| {
                 let files = files.borrow();
+                let mut answer = Vec::new();
 
                 let dir_name = dir.to_str().unwrap_or_default();
                 for file_name in files.keys() {
-                    if file_name.strip_prefix(dir_name).is_some() && file_name.ends_with(ending) {
-                        return Some(file_name.clone());
-                    };
+                    if let Some(dir_relative_name) = file_name.strip_prefix(dir_name) {
+                        if file_name.ends_with(ending) {
+                            // this could be (e.g.) xxx_Rules.yaml or it could be subdir/xxx_Rules.yaml
+                            let file_name = dir_relative_name.split_once(std::path::MAIN_SEPARATOR).map(|(_, after)| after).unwrap_or(dir_relative_name);
+                            answer.push( file_name.to_string() );
+                        }
+                    }
                 }
-                return None;
+                return answer;
             });
         }
         
+        pub fn find_all_dirs_shim(dir: &Path, found_dirs: &mut Vec<PathBuf> ) {
+            return DIRECTORIES.with(|dirs| {
+                let dirs = dirs.borrow();
+
+                let common_dir_name = dir.to_str().unwrap_or_default();
+                for dir_name in dirs.iter() {
+                    if dir_name.starts_with(common_dir_name) && !dir_name.contains("SharedRules") {
+                        found_dirs.push(PathBuf::from(dir_name));
+                    };
+                }
+            });
+        }
+
         
         pub fn canonicalize_shim(path: &Path) -> std::io::Result<PathBuf> {
             use std::ffi::OsStr;
@@ -196,12 +214,12 @@ cfg_if! {
 
         pub fn zip_extract_shim(dir: &Path, zip_file_name: &str) -> Result<bool> {
             let zip_file_path = dir.join(zip_file_name);
-            let full_zip_file_name = zip_file_path.to_str().unwrap_or_default();
+            let full_zip_file_name = zip_file_path.to_str().unwrap_or_default().replace(std::path::MAIN_SEPARATOR_STR, "/");
 
             // first, extract full_zip_file_name from ZIPPED_RULE_FILES
             let buf_reader = Cursor::new(ZIPPED_RULE_FILES);
             let mut archive = zip::ZipArchive::new(buf_reader).unwrap();
-            let mut file = match archive.by_name(full_zip_file_name) {
+            let mut file = match archive.by_name(&full_zip_file_name) {
                 Ok(file) => file,
                 Err(..) => {
                     bail!("Didn't find {} in dir {} in zip archive", zip_file_name, dir.display());
@@ -237,18 +255,46 @@ cfg_if! {
             return path.is_dir();
         }
         
-        pub fn find_file_in_dir_that_ends_with_shim(dir: &Path, ending: &str) -> Option<String> {
+        pub fn find_files_in_dir_that_ends_with_shim(dir: &Path, ending: &str) ->  Vec<String> {
             match dir.read_dir() {
-                Err(_) => return None,    // empty
+                Err(_) => return vec![],    // empty
                 Ok(read_dir) => {
+                    let mut answer = Vec::new();
                     for dir_entry in read_dir.flatten() {
                         let file_name = dir_entry.file_name();
-                        let file_name = file_name.to_string_lossy();  // avoid temp value being dropped
+                        let file_name = file_name.to_string_lossy().to_string();
                         if file_name.ends_with(ending) {
-                            return Some(file_name.to_string());
+                            // this could be (e.g.) xxx_Rules.yaml or it could be subdir/xxx_Rules.yaml
+                            let file_name = file_name.split_once(std::path::MAIN_SEPARATOR).map(|(_, after)| after).unwrap_or(&file_name);
+                            answer.push( file_name.to_string() );
                         }
                     }
-                    return None;
+                    return answer;
+                }
+            }
+        }
+
+        pub fn find_all_dirs_shim(dir: &Path, found_dirs: &mut Vec<PathBuf> ) {
+            // FIX: this doesn't work for subdirectories that haven't been unzipped yet
+            assert!(dir.is_dir(), "find_all_dirs_shim called with non-directory path: {}", dir.display());
+            let mut found_rules_file = false;
+            if let Ok(entries) = std::fs::read_dir(dir) {
+                for entry in entries.flatten() {
+                    let path = entry.path();
+                    if path.is_dir() {
+                        // skip "SharedRules" directory
+                        if let Some(dir_name) = path.file_name() {
+                            if dir_name.to_str().unwrap_or_default() != "SharedRules" {
+                                find_all_dirs_shim(&path, found_dirs);
+                            }
+                        }
+                    } else {
+                        let file_name = path.file_name().unwrap_or_default().to_str().unwrap_or_default();
+                        if !found_rules_file && (file_name.starts_with("unicode") || file_name.ends_with("_Rules.yaml") || file_name.ends_with(".zip")) {
+                            found_dirs.push(path.parent().unwrap().to_path_buf());
+                            found_rules_file = true;
+                        }
+                    }
                 }
             }
         }
@@ -274,9 +320,11 @@ cfg_if! {
             return match std::fs::read(zip_file) {
                 Err(e) => {
                     // no zip file? -- maybe started out with all the files unzipped? See if there is a .yaml file
-                    match find_file_in_dir_that_ends_with_shim(dir, ".yaml") {
-                        None => bail!("{}", e),
-                        Some(_file_name) => Ok(false),
+                    let yaml_files = find_files_in_dir_that_ends_with_shim(dir, ".yaml");
+                    if yaml_files.is_empty() {
+                        bail!("{}", e)
+                    } else {
+                        Ok(false)
                     }
                 },
                 Ok(contents) => {
