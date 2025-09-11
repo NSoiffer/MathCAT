@@ -611,7 +611,7 @@ impl PreferenceManager {
         // return 'Rules/Language/fr', 'Rules/Language/en/gb', etc, if they exist.
         // fall back to main language, and then to default_dir if language dir doesn't exist
         let mut full_path = rules_dir.to_path_buf();
-        full_path.push(lang.replace('-', "\\"));
+        full_path.push(lang.replace('-', std::path::MAIN_SEPARATOR_STR));
         for parent in full_path.ancestors() {
             if parent == rules_dir {
                 break;
