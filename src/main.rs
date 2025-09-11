@@ -10,6 +10,7 @@ use std::time::Instant;
 // Maybe also have this speak to test the TTS generation.
 // There is a rust winapi crate that mirrors the WinPAI and has "Speak(...)" in it
 
+// env RUST_LOG=DEBUG cargo run --features "include-zip"
 cfg_if::cfg_if! {
     if #[cfg(feature = "include-zip")] {
         fn get_rules_dir() -> String {
@@ -189,29 +190,7 @@ fn main() {
   //   </math>";
 
   let expr = r#"
-                    <math xmlns="http://www.w3.org/1998/Math/MathML">
-                        <msub>
-                            <mi mathvariant="normal">Φ</mi>
-                            <mn>0</mn>
-                        </msub>
-                        <mo lspace="0" rspace="0" stretchy="false">(</mo>
-                        <msub>
-                            <mtext>a</mtext>
-                            <mn>0</mn>
-                        </msub>
-                        <mo lspace="0" rspace="0" stretchy="false">)</mo>
-                        <mo lspace="0.278em" rspace="0.278em" stretchy="false">→</mo>
-                        <msub>
-                            <mi mathvariant="normal">Φ</mi>
-                            <mn>0</mn>
-                        </msub>
-                        <mo lspace="0" rspace="0" stretchy="false">(</mo>
-                        <msub>
-                            <mtext>a</mtext>
-                            <mn>1</mn>
-                        </msub>
-                        <mo lspace="0" rspace="0" stretchy="false">)</mo>
-                    </math>
+<math xmlns="http://www.w3.org/1998/Math/MathML"><mo>(</mo><mn>1</mn><mo>)</mo></math>
                    "#;
   let instant = Instant::now();
 
@@ -220,12 +199,14 @@ fn main() {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   }
 
-  info!("Version = '{}'", get_version());
-  set_preference("Language".to_string(), "en".to_string()).unwrap();
+  #[cfg(feature = "include-zip")]
+  info!("***********include-zip is present**********");
+  info!("Version = '{}' using Rules dir {}", get_version(), get_rules_dir());
+  set_preference("Language".to_string(), "en-gb".to_string()).unwrap();
   set_preference("DecimalSeparator".to_string(), "Auto".to_string()).unwrap();
   set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
   set_preference("TTS".to_string(), "None".to_string()).unwrap();
-  set_preference("Verbosity".to_string(), "Terse".to_string()).unwrap();
+  set_preference("Verbosity".to_string(), "Verbose".to_string()).unwrap();
   set_preference("NavVerbosity".to_string(), "Verbose".to_string()).unwrap();
   set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
   set_preference("Impairment".to_string(), "Blindness".to_string()).unwrap();
@@ -240,7 +221,7 @@ fn main() {
   set_preference("Bookmark".to_string(), "false".to_string()).unwrap();
   set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
   info!("Languages: {}", libmathcat::interface::get_supported_languages().join(", "));
-  info!("Speech styles: {}", libmathcat::interface::get_supported_speech_styles("en".to_string()).join(", "));
+  info!("Speech styles: {}", libmathcat::interface::get_supported_speech_styles("ClearSpeak".to_string()).join(", "));
   info!("BrailleCodes: {}", libmathcat::interface::get_supported_braille_codes().join(", "));
   // set_preference("DecimalSeparators".to_string(), ",".to_string()).unwrap();
   // set_preference("BlockSeparators".to_string(), ". ".to_string()).unwrap();
@@ -248,18 +229,18 @@ fn main() {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
 
-  match do_navigate_command("ZoomIn".to_string())  {
-    Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
-    Ok(speech) => info!("\nZoomIn speech: '{speech}'"),
-  }
-  match do_navigate_command("ToggleZoomLockUp".to_string()) {
-    Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
-    Ok(speech) => info!("ToggleZoomLockUp speech: '{speech}'"),
-  }
-  match do_navigate_command("MovePrevious".to_string()) {
-    Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
-    Ok(speech) => info!("MovePrevious speech: '{speech}'"),
-  }
+  // match do_navigate_command("ZoomIn".to_string())  {
+  //   Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
+  //   Ok(speech) => info!("\nZoomIn speech: '{speech}'"),
+  // }
+  // match do_navigate_command("ToggleZoomLockUp".to_string()) {
+  //   Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
+  //   Ok(speech) => info!("ToggleZoomLockUp speech: '{speech}'"),
+  // }
+  // match do_navigate_command("MovePrevious".to_string()) {
+  //   Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
+  //   Ok(speech) => info!("MovePrevious speech: '{speech}'"),
+  // }
   // match do_navigate_command("MovePrevious".to_string()) {
   //   Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
   //   Ok(speech) => info!("MovePrevious speech: '{}'", speech),
@@ -294,8 +275,6 @@ fn main() {
   debug!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
   debug!("Verbosity: {:?}", get_preference("Verbosity".to_string()).unwrap());
  
-  #[cfg(feature = "include-zip")]
-  info!("***********include-zip is present**********");
   // info!("Time taken for loading+speech+braille: {}ms", instant.elapsed().as_millis());
   // let instant = Instant::now();
   // match get_spoken_text() {
