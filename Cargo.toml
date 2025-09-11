@@ -1,6 +1,6 @@
 [package]
 name = "mathcat"
-version = "0.7.0"
+version = "0.7.1"
 authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
 license = "MIT"
 description = "MathCAT: Math Capable Assistive Technology ('Speech and braille from MathML')"
@@ -40,9 +40,9 @@ cfg-if = "1.0.1"
 fastrand = { version = "2.3.0" }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-zip = { version = "4.3", default-features = false, features = ["deflate"] }
+zip = { version = "5.1", default-features = false, features = ["deflate"] }
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-zip = { version = "4.3", default-features = false, features = ["bzip2"] }
+zip = { version = "5.1", default-features = false, features = ["bzip2"] }
 
 android_logger = {version = "0.15.1", optional = true}
 
@@ -52,9 +52,9 @@ android_logger = {version = "0.15.1", optional = true}
 bitflags = "2.6"
 error-chain = "0.12.4"
 [target.'cfg(target_family = "wasm")'.build-dependencies]
-zip = { version = "4.3", default-features = false, features = ["deflate"] }
+zip = { version = "5.1", default-features = false, features = ["deflate"] }
 [target.'cfg(not(target_family = "wasm"))'.build-dependencies]
-zip = { version = "4.3", default-features = false, features = ["bzip2"] }
+zip = { version = "5.1", default-features = false, features = ["bzip2"] }
 
 [lib]
 name = "libmathcat"
