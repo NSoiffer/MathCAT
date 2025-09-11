@@ -143,7 +143,7 @@
   - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"    #NORWEGIAN: Changed decimal point to $DecimalSeparators
   - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and (2<= text() and text()<=10)]"                             #NORWEGIAN: Removed $ClearSpeak_Fractions='Ordinal', cause the pattern for ordinal fractions is not right. 
   variables:
-  - IsPlural: "DEBUG(not(*[1]=1 or preceding-sibling::*[1][self::m:mo and .='\u2064']))"     # '\u2064' is invisible plus and is used in mixed fractions
+  - IsPlural: "not(*[1]=1 or preceding-sibling::*[1][self::m:mo and .='\u2064'])"     # '\u2064' is invisible plus and is used in mixed fractions
     # set right level for the location of the common fraction/mixed fraction
   - IsMixedFraction: "preceding-sibling::*[1][.='\u2064']"
   - UnitSibling: "IfThenElse($IsMixedFraction, .., .)"
