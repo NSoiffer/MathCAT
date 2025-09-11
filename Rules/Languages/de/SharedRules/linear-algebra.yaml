@@ -7,16 +7,16 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "die"      # phrase('the' square root of 25 equals 5)
-  - t: "determinante"      # phrase(the 'determinant' of a matrix)
+      - T: "die"      # phrase('the' square root of 25 equals 5)
+  - T: "determinante"      # phrase(the 'determinant' of a matrix)
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "von"      # phrase(systems 'of' linear equations)
+      - T: "von"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple')) and $Impairment = 'Blindness'"
-      then: [t: "enddeterminante"]      # phrase('end determinant' of a matrix)
+      then: [T: "ende der determinante"]      # phrase('end determinant' of a matrix)
 
 
 - name: subscripted-norm
@@ -26,11 +26,11 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "die"      # phrase('the' square root of 25 equals 5)
+      - T: "die"      # phrase('the' square root of 25 equals 5)
   - x: "*[2]"
-  - t: "norm"      # phrase(the 'norm' can be a measure of distance)
+  - T: "norm"      # phrase(the 'norm' can be a measure of distance)
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "von"      # phrase(systems 'of' linear equations)
+      - T: "von"      # phrase(systems 'of' linear equations)
   - x: "*[1]"

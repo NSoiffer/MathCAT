@@ -37,7 +37,7 @@ use crate::shim_filesystem::read_to_string_shim;
 ///
 /// Having a Rc<RefCell<FromFileVariable>> seems a bit complicated in terms of types but...
 /// 1. The rust book seems to endorse the Rc<RefCell<...>>> approach when there are multiple owners of mutable date.
-///     See <https://doc.rust-lang.org/book/ch15-05-interior-mutability.html> towards the end
+///    See <https://doc.rust-lang.org/book/ch15-05-interior-mutability.html> towards the end
 /// 2. When a file is read, we need to clear and add data to the structure being read (reassigning could work for clearing).
 ///    When we use the data, we either want to index into it or test if an item is there.
 ///    The structures we use are either a Vec or a HashMap, so we need to abstract that away in `FromFileVariable`.
@@ -45,7 +45,7 @@ use crate::shim_filesystem::read_to_string_shim;
 ///    *  Vec implements extends (`add`), but there is no test/contains
 ///    *  Hashmap implements `index`, but panics if the item isn't there
 ///
-///    Because of the above limitations, we introduce the enum [`Contains`] which dispatches appropriately to Vec/Hashmap
+/// Because of the above limitations, we introduce the enum [`Contains`] which dispatches appropriately to Vec/Hashmap
 #[derive(Debug, Clone)]
 pub enum Contains {
     Vec(Rc<RefCell<Vec<String>>>),
@@ -98,7 +98,7 @@ impl Definitions {
         }
     }
 
-    pub fn get_hashset(&self, name: &str) -> Option<Ref<HashSet<String>>> {
+    pub fn get_hashset(&self, name: &str) -> Option<Ref<'_, HashSet<String>>> {
         let names = self.name_to_var_mapping.get(name);
         if let Some(Contains::Set(set)) = names {
             return Some(set.borrow());
@@ -106,7 +106,7 @@ impl Definitions {
         return None;
     }
 
-    pub fn get_hashmap(&self, name: &str) ->  Option<Ref<HashMap<String, String>>> {
+    pub fn get_hashmap(&self, name: &str) ->  Option<Ref<'_, HashMap<String, String>>> {
         let names = self.name_to_var_mapping.get(name);
         if let Some(Contains::Map(map)) = names {
             return Some(map.borrow());
@@ -114,7 +114,7 @@ impl Definitions {
         return None;
     }
 
-    pub fn get_vec(&self, name: &str) -> Option<Ref<Vec<String>>> {
+    pub fn get_vec(&self, name: &str) -> Option<Ref<'_, Vec<String>>> {
         let names = self.name_to_var_mapping.get(name);
         if let Some(Contains::Vec(vec)) = names {
             return Some(vec.borrow());
@@ -250,16 +250,16 @@ fn build_values(definition: &Yaml, use_speech_defs: bool, path: &Path) -> Result
             let (_, entry_value) = dict.iter().next().unwrap();
             if entry_value.is_null() {
                 result = Contains::Set( Rc::new( RefCell::new( get_set_values(dict)
-                            .chain_err(||format!("while reading value '{}'", def_name))? ) ) );
+                            .chain_err(||format!("while reading value '{def_name}'"))? ) ) );
             } else {
                 // peak and see if this is a set or a map
                 let (_, entry_value) = dict.iter().next().unwrap();
                 if entry_value.is_null() {
                     result = Contains::Set( Rc::new( RefCell::new( get_set_values(dict)
-                                .chain_err(||format!("while reading value '{}'", def_name))? ) ) );
+                                .chain_err(||format!("while reading value '{def_name}'"))? ) ) );
                 } else {
                     result = Contains::Map( Rc::new( RefCell::new( get_map_values(dict)
-                                .chain_err(||format!("while reading value '{}'", def_name))? ) ) );
+                                .chain_err(||format!("while reading value '{def_name}'"))? ) ) );
                 }
             }
         }

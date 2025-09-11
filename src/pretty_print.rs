@@ -325,7 +325,7 @@ impl<'a> YamlEmitter<'a> {
                 if need_quotes(v) {
                     escape_str(self.writer, v)?;
                 } else {
-                    write!(self.writer, "{}", v)?;
+                    write!(self.writer, "{v}")?;
                 }
                 Ok(())
             }
@@ -338,11 +338,11 @@ impl<'a> YamlEmitter<'a> {
                 Ok(())
             }
             Yaml::Integer(v) => {
-                write!(self.writer, "{}", v)?;
+                write!(self.writer, "{v}")?;
                 Ok(())
             }
             Yaml::Real(ref v) => {
-                write!(self.writer, "{}", v)?;
+                write!(self.writer, "{v}")?;
                 Ok(())
             }
             Yaml::Null | Yaml::BadValue => {

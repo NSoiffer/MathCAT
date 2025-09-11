@@ -446,20 +446,26 @@
       - x: "text()"
 
 - # this is attempt to catch units when some has created a non-italic word that matches a unit
-  # other mtext unit cases were caught above
-  # would like to use forced mathvariant='normal', but it captures things it shouldn't in the tests like "H" and "F" (calculus)
-  # or (self::m:mi and string-length(.)=1 and @mathvariant='normal' and DefinitionValue(., 'Speech', 'SIUnits') != '')"
+  # other mtext unit cases were caught above.
+  # This has a guard to make sure it is positionally a unit.
+  #   Currently only checking for a simple mrow like "3 s or 3/4 km"
+  #   Other checks would be an mfrac with a unit in both parts (complicated to check) or msup with a unit in the base and that inside an mrow
   name: mtext-inference-unit
-  tag: mtext
-  match: "DefinitionValue(., 'Speech', 'SIUnits') != '' or
-          DefinitionValue(., 'Speech', 'UnitsWithoutPrefixes') != '' or 
-          DefinitionValue(., 'Speech', 'EnglishUnits') != '' or
-          (string-length(.) >= 3 and
-           substring(., 1, 2) = 'da' and 
-           DefinitionValue(substring(., 3), 'Speech', 'SIUnits') != '') or
-          (string-length(.) >= 2 and
-           DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != '' and
-           DefinitionValue(substring(., 2), 'Speech', 'SIUnits') != '')"
+  tag: [mtext, mi]
+  match: "not(@data-chem-element) and
+          (self::m:mtext or string-length(.) > 1 or @mathvariant='normal') and
+          (parent::*[1][self::m:mrow and count(*)=3 and *[2][.='\u2062'] and
+                        *[1][self::m:mn or (self::m:mfrac and *[1][self::m:mn] and *[2][self::m:mn])]]) and
+          count(preceding-sibling::*) = 2 and 
+          (DefinitionValue(., 'Speech', 'SIUnits') != '' or
+           DefinitionValue(., 'Speech', 'UnitsWithoutPrefixes') != '' or 
+           DefinitionValue(., 'Speech', 'EnglishUnits') != '' or
+           (string-length(.) >= 3 and
+            substring(., 1, 2) = 'da' and 
+            DefinitionValue(substring(., 3), 'Speech', 'SIUnits') != '') or
+           (string-length(.) >= 2 and
+            DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != '' and
+            DefinitionValue(substring(., 2), 'Speech', 'SIUnits') != ''))"
   replace:
   - intent:
       name: "unit"
@@ -659,12 +665,17 @@
       - x: "*[2]"
 
 -
+  # this adds a :unit property to the fraction if its children are units -- simplifies things downstream
+  # we have to this is the attr calculation because at that point, the children have been replaced so they will be marked as units if there are units
+  # at the point of 'match', the replacement has yet to be done so they may not have inferred units.
+  # this catches s^2 as in m/s^2
   name: default
   tag: msup
   match: "."
   replace:
   - intent:
       name: "power"
+      attrs: "data-intent-property='IfThenElse(*[1][contains(@data-intent-property, \":unit:\")], \":unit:\", \"\")'"
       children:
       - x: "*[1]"
       - x: "*[2]"
@@ -687,12 +698,19 @@
       - x: "*[3]"
 
 -
+  # this adds a :unit property to the fraction if its children are units -- simplifies things downstream
+  # we have to this is the attr calculation because at that point, the children have been replaced so they will be marked as units if there are units
+  # at the point of 'match', the replacement has yet to be done so they may not have inferred units.
   name: default
   tag: mfrac
   match: "."
   replace:
   - intent:
       name: "fraction"
+      attrs: "data-intent-property='IfThenElse(*[1][contains(@data-intent-property, \":unit:\")] and
+                                               DEBUG(*[2])[contains(@data-intent-property, \":unit:\")],
+                                               \":unit:\",
+                                               \"\")'"
       children:
       - x: "*[1]"
       - x: "*[2]"

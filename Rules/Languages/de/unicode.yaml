@@ -2,22 +2,17 @@
  # Note to translators:
  #   most languages don't have two ways to pronounce 'a' -- if not need, remove the rules and change "B-Z" to "A-Z"
  #   some languages say the word for "uppercase" after the letter. Make sure to change that where appropriate by moving some code around
- - "a": 
-    - test: 
+ - "a-z":
+    - test:
         if: "$TTS='none'"
-        then: [t: "a"]                          	#  long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,	(en: 'eigh', google translation)
-        else: [spell: "'a'"]                    	#     AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
- - "b-z": 
-    - test: 
-        if: "$TTS='none'"
-        then: [t: "a"]                          	# 	(en: '.', google translation)
-        else: [spell: "'.'"]                       
+        then: [ T: "." ]                           # (en: '.', google translation)
+        else: [ spell: "'.'" ]
 
- # Capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
+# Capital letters are a little tricky: users can pick their favorite word (something that was requested) and
  # screen readers have options to use pitch changes or beeps instead of or in addition to say "cap"
  # Also, if a user can see the screen, they probably don't need to hear "cap", but if they specified an override, they must want to hear the override.
 
- - "A":
+ - "A-Z":
     - test: 
         if: "$CapitalLetters_Beep"
         then:
@@ -30,30 +25,7 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [T: "großbuchstabe"]         	# 	(en: 'cap', google translation)
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace:
-        - test:
-            if: "$TTS='none'"
-            then: [T: "A"]                      	# 	(en: 'eigh', google translation)
-            else: [spell: "'a'"]
-            
- - "B-Z":
-    - test: 
-        if: "$CapitalLetters_Beep"
-        then:
-        - audio:
-            value: "beep.mp4"
-            replace: []
-    - test: 
-        if: "$CapitalLetters_UseWord"
-        then_test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [T: "großbuchstabe"]         	# 	(en: 'cap', google translation)
+            then: [T: "groß"]         	# 	(en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
@@ -71,7 +43,7 @@
             else: [T: "ausrufezeichen"]           	#  0x21	(en: 'exclamation point')
         else: [T: "fakultät"]                   	#  0x21	(en: 'factorial')
           
- - "\"": [T: "umgekehrter schrägstrich"]        	#  0x22	(en: 'quotation mark') #backslash??
+ - "\"": [T: "backslash"]        	#  0x22	(en: 'quotation mark') #backslash??
  - "#": [T: "nummernzeichen"]                   	#  0x23	(en: 'number')
  - "$": [T: "dollar"]                           	#  0x24	(en: 'dollars')
  - "%": [T: "prozent"]                          	#  0x25	(en: 'percent')
@@ -127,18 +99,18 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "ist"]                       	# 	(en: 'is', google translation)
-     - t: "kleiner als"                         	# 	(en: 'less than')
+     - T: "kleiner als"                         	# 	(en: 'less than')
  - "=":                                         	#  0x3d
     - test: 
         if: "$Verbosity!='Terse'"
-        then: [t: "ist gleich"]                 	# 	(en: 'is equal to', google translation)
-        else: [t: "ist gleich"]                 	# 	(en: 'equals')
+        then: [T: "ist gleich"]                 	# 	(en: 'is equal to', google translation)
+        else: [T: "ist gleich"]                 	# 	(en: 'equals')
 
  - ">":                                         	#  0x3e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "ist"]                       	# 	(en: 'is', google translation)
-     - t: "größer als"                          	# 	(en: 'greater than')
+         then: [T: "ist"]                       	# 	(en: 'is', google translation)
+     - T: "größer als"                          	# 	(en: 'greater than')
  - "?": [T: "fragezeichen"]                     	#  0x3f	(en: 'question mark', MathPlayer: 'Frgezeichen', google: 'fragezeichen')
  - "@": [T: "ät-zeichen"]                      	#  0x40	(en: 'at sign')
  - "[":                                         	#  0x5b
@@ -146,7 +118,7 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: "offene eckige klammer"]             	# 	(en: 'open bracket', google translation)  #unklar
         else: [T: "eckige klammer auf"]         	# 	(en: 'left bracket', MathPlayer: 'eckig Klammer auf', google: 'linke klammer')
- - "\\": [t: "eckige klammer auf"]              	#  0x5c	(en: 'back slash', MathPlayer: 'eckig Klammer auf', google: 'rückenstrich')
+ - "\\": [T: "eckige klammer auf"]              	#  0x5c	(en: 'back slash', MathPlayer: 'eckig Klammer auf', google: 'rückenstrich')
  - "]":                                         	#  0x5d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
@@ -177,7 +149,7 @@
         then: [T: "schließende geschweifte klammer"]             	# 	(en: 'close brace', google translation)
         else: [T: "geschweifte klammer zu"]    	# 	(en: 'right brace')
 
- - "~": [t: "tilde"]                            	#  0x7e
+ - "~": [T: "tilde"]                            	#  0x7e
  - " ":                                         	#  0xa0
     - test:
         if: "@data-empty-in-2D and ../../../../*[name(.)!='equations']"
@@ -202,14 +174,14 @@
             then: [T: "von"]                    	# 	(en: 'by', google translation)
             else: [T: "mal"]                    	# 	(en: 'cross', MathPlayer: 'times', google: 'kreuzen') #unklar
  - "÷": [T: "geteilt durch"]                    	#  0xf7	(en: 'divided by', MathPlayer: 'divides')
- - "̀": [T: "gravis akzent verzierung"]              	#  0x300	(en: 'grave accent embellishment', google: 'grabakzentverzierung')
- - "́": [T: "akut akzent verzierung"]           	#  0x301	(en: 'acute accent embellishment', google: 'akute akzentverzierung')
- - "̂": [T: "zirkumflex verzierung"]                	#  0x302	(en: 'circumflex accent embellishment', google: 'zirma akzentverzierung')
- - "̃": [t: "tilde verzierung"]              	#  0x303	(google: 'tilde verzierung')
- - "̄": [t: "makron akzent verzierung"]                 	#  0x304	(en: 'macron embellishment', google: 'makron -verzierung')
- - "̅": [t: "überstrich verzierung"]            	#  0x305	(google: 'überbärerverzierung')
- - "̆": [t: "brevis akzent verzierung"]                  	#  0x306	(en: 'breve', google: 'breve')
- - "̇": [t: "punkt darüber verzierung"]          	#  0x307	(google: 'punkt über verzierung')
+ - "̀": [T: "accent grave"]              	#  0x300	(en: 'grave accent embellishment', google: 'grabakzentverzierung')
+ - "́": [T: "accent aigu"]           	#  0x301	(en: 'acute accent embellishment', google: 'akute akzentverzierung')
+ - "̂": [T: "zirkumflex"]                	#  0x302	(en: 'circumflex accent embellishment', google: 'zirma akzentverzierung')
+ - "̃": [T: "tilde"]              	#  0x303	(google: 'tilde verzierung')
+ - "̄": [T: "makron"]                 	#  0x304	(en: 'macron embellishment', google: 'makron -verzierung')
+ - "̅": [T: "überstrich"]            	#  0x305	(google: 'überbärerverzierung')
+ - "̆": [T: "brevis"]                  	#  0x306	(en: 'breve', google: 'breve')
+ - "̇": [T: "punkt darüber"]          	#  0x307	(google: 'punkt über verzierung')
 
    # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
  - "Α-Ω": 
@@ -378,7 +350,7 @@
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
                 then: [T: "nicht element von"] 	# 	(en: 'not member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [T: "kein element von"]   	# 	(en: 'not element of', google translation)
+                then: [T: "nicht element von"]   	# 	(en: 'not element of', google translation)
               - else: [T: "nicht element von"]  	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'not belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
@@ -419,9 +391,12 @@
  - "∗": [T: "mal"]                    	#  0x2217	(en: 'times', MathPlayer: 'asterisk operator', google: 'mal')
  - "∘": [T: "verknüpft mit"]                    	#  0x2218	(en: 'composed with')
  - "√":                                         	#  0x221a
+<<<<<<< HEAD
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "die"]                       	# 	(en: 'the', google translation)
+=======
+>>>>>>> 2a2157c1f21e828e4d827022e1e0fc5490837efe
      - T: "quadratwurzel"                       	# 	(en: 'square root of', MathPlayer: 'radical', google: 'quadratwurzel von')
  - "∝":                                         	#  0x221d
      - test: 
@@ -519,4 +494,4 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "ist eine"]                   	# 	(en: 'is a', google translation)
-     - t: "obermenge oder gleich"               	# 	(en: 'superset of or equal to', MathPlayer: 'Obermenge von oder gleich', google: 'superset von oder gleich')
+     - T: "obermenge oder gleich"               	# 	(en: 'superset of or equal to', MathPlayer: 'Obermenge von oder gleich', google: 'superset von oder gleich')

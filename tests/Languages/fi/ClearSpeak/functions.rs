@@ -15,7 +15,7 @@ fn trig_names() {
     <mi>csc</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>cot</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("fi", "ClearSpeak", expr, "sini arvolla x, plus kosini arvolla y, plus tangentti arvolla z, plus sekantti arvolla alfa, plus, kosekantti arvolla suora fii, plus kotangentti arvolla fii");
+    test("fi", "ClearSpeak", expr, "sini x plus kosini y plus tangentti z, plus sekantti alfa, plus kosekantti suora fii, plus kotangentti fii");
 }
 
 #[test]
@@ -115,7 +115,7 @@ fn normal_ln() {
     let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
     test("fi", "ClearSpeak", expr, "l n arvolla, auki sulku x plus y, kiinni sulku");
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-            "luonnollinen logaritmi arvolla, auki sulku x plus y, kiinni sulku");
+            "luonnollinen logaritmi, arvolla, auki sulku x plus y, kiinni sulku");
 }
 
 #[test]
@@ -129,7 +129,7 @@ fn normal_lg() {
     let expr = "<math><mrow><mi>lg</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
     test("fi", "ClearSpeak", expr, "l g arvolla, auki sulku x plus y, kiinni sulku");
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-            "kymmenkantainen logaritmi arvolla, auki sulku x plus y, kiinni sulku");
+            "kymmenkantainen logaritmi, arvolla, auki sulku x plus y, kiinni sulku");
 }
     
 #[test]
@@ -144,7 +144,7 @@ fn simple_natural_log() {
 fn natural_log() {
     let expr = "<math><mi>ln</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></math>";
     test_ClearSpeak("fi", "ClearSpeak_Log", "LnAsNaturalLog",expr,
-        "luonnollinen logaritmi arvolla, auki sulku x plus y, kiinni sulku");
+        "luonnollinen logaritmi, arvolla, auki sulku x plus y, kiinni sulku");
         
 }
 

@@ -89,8 +89,8 @@ fn si_base() {
                 1 metri, pilkku, 2 metriä, pilkku, \
                 1 mooli, pilkku; 2 moolia, pilkku, \
                 1 sekunti, pilkku; 2 sekuntia, pilkku, \
-                1 sekunti, pilkku, 2 sekuntia; pilkku, \
-                1 sekunti, pilkku, 2 sekuntia; pilkku, \
+                1 sekunti, pilkku; 2 sekuntia, pilkku, \
+                1 sekunti, pilkku; 2 sekuntia, pilkku, \
                 1 sekunti, pilkku; 2 sekuntia");
 }
 
@@ -330,10 +330,10 @@ fn without_prefix_time() {
         <mn>1</mn><mi intent=":unit">yr</mi><mo>,</mo><mn>2</mn><mi intent=":unit">yr</mi>
     </math>"#;
     test("fi", "SimpleSpeak", expr, 
-        "1 sekunti, pilkku, 2 sekuntia; pilkku, \
-                1 sekunti, pilkku, 2 sekuntia; pilkku, \
-                1 minuutti, pilkku, 2 minuuttia; pilkku, \
-                1 minuutti, pilkku, 2 minuuttia; pilkku, \
+        "1 sekunti, pilkku; 2 sekuntia, pilkku, \
+                1 sekunti, pilkku; 2 sekuntia, pilkku, \
+                1 minuutti, pilkku; 2 minuuttia, pilkku, \
+                1 minuutti, pilkku; 2 minuuttia, pilkku, \
                 1 minuutti, pilkku; 2 minuuttia, pilkku, \
                 1 tunti, pilkku; 2 tuntia, pilkku, \
                 1 tunti, pilkku; 2 tuntia, pilkku, \

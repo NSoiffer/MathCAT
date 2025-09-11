@@ -89,8 +89,8 @@ fn si_base() {
 				1 meter koma 2 meter koma \
 				1 mole koma 2 mole koma \
 				1 detik koma 2 detik koma \
-				1 detik, koma 2 detik, koma \
-				1 detik, koma 2 detik, koma \
+				1 detik koma 2 detik koma \
+				1 detik koma 2 detik koma \
                 1 sec koma 2 sec");
 }
 
@@ -328,10 +328,10 @@ fn without_prefix_time() {
         <mn>1</mn><mi intent=":unit">yr</mi><mo>,</mo><mn>2</mn><mi intent=":unit">yr</mi>
     </math>"#;
     test("id", "SimpleSpeak", expr, 
-        "1 detik, koma 2 detik, koma \
-				1 detik, koma 2 detik, koma \
-				1 menit, koma 2 menit, koma \
-				1 menit, koma 2 menit, koma \
+        "1 detik koma 2 detik koma \
+				1 detik koma 2 detik koma \
+				1 menit koma 2 menit koma \
+				1 menit koma 2 menit koma \
 				1 menit koma 2 menit koma \
 				1 jam koma 2 jam koma \
 				1 jam koma 2 jam koma \

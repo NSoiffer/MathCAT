@@ -1,0 +1,346 @@
+---
+- name: pause
+  tag: "!*"
+  match: "not(self::m:math) and not($MatchingPause) and @data-intent-property[contains(., ':pause')]"
+  replace:
+   - with:
+      variables: [MatchingPause: "true()"]
+      replace:
+      - test:
+        - if: "contains(@data-intent-property, ':pause-long')"
+          then: [pause: long]
+        - else_if: "contains(@data-intent-property, ':pause-short')"
+          then: [pause: short]
+          else: [pause: medium]
+      - x: "."
+      
+- name: intent-literal-silent
+  tag: [mi, mo, mn]
+  match: "contains(@data-intent-property, ':silent:')"
+  # say nothing
+  replace: []
+
+# handling of negative numbers that come from 'intent' is hard -- we do something that is close to right here 
+- name: intent-literal-negative-number
+  tag: mn
+  match: "starts-with(text(), '-')"
+  replace:
+  - T: "minus"        # phrase(x 'minus' y)
+  - x: "translate(text(), '-_', '')"
+
+- name: default
+  tag: square-root
+  match: "."
+  replace:
+  - T: "kvadratroten av"      # phrase(the 'square root' of x)
+  # NORWEGIAN: Removed test for Verbosity
+  - x: "*[1]"
+  - test:
+      if: IsNode(*[1], 'leaf')
+      then: [pause: short]
+      else: [pause: short, T: "slutt rot", pause: short]  # phrase(start the square root of x 'end of root')
+
+- name: default
+  tag: root
+  match: "."
+  replace:
+  - test:
+      if: "*[2][self::m:mn and not(contains(., $DecimalSeparators))]"     #NORWEGIAN: Changed decimal point to $DecimalSeparators
+      then_test:
+      - if: "*[2][.='2']"
+        then: [T: "kvadratroten"]        # phrase(the 'square root' of x)
+      - else_if: "*[2][.='3']"
+        then: [T: "kubikkroten"]        # phrase(the 'cube root' of x)
+      - else: [x: "ToOrdinal(*[2])", T: "roten"]        # phrase(the square 'root' of x)
+      else:
+      - T: "roten av grad"      # phrase(the square 'root' of 36)
+      - x: "*[2]"
+      - pause: short
+  # SWEDISH: Removed verbosity settings.
+  - T: "av"      # phrase(the square root 'of' 36)
+  - x: "*[1]"
+  - test:
+      if: IsNode(*[1], 'leaf')
+      then: [pause: short]
+      else: [pause: short, T: "slutt rot", pause: short]      # phrase(start the fifth root of x 'end of root')
+
+# Fraction rules
+# Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
+# Note: if the bounds change for what is a common fraction, change them in general.yaml for units
+- name: common-fraction
+  tag: fraction
+  match:
+  - "*[1][self::m:mn][not(contains(., $DecimalSeparators)) and text()<20]   and"                               #NORWEGIAN: Changed decimal point to $DecimalSeparators
+  - "*[2][self::m:mn][not(contains(., $DecimalSeparators)) and 2<= text() and text()<=10]"
+  variables:
+  - IsPlural: "not(*[1]=1 or preceding-sibling::*[1][self::m:mo and .='\u2064'])"     # '\u2064' is invisible plus and is used in mixed fractions
+  - UnitSibling: "IfThenElse(preceding-sibling::*[1][.='\u2064'],  .., .)"
+    # set the potential unit node -- otherwise set it to a empty node set (use a made up name)
+  - UnitNodeLocation: "IfThenElse($UnitSibling/..[self::m:mrow and count(*)=3 and *[2][.='\u2062']],
+                                  $UnitSibling/following-sibling::*[2],
+                                  self::m:select-no-nodes)"
+    # pick out the right node to test for being a neuter unit
+  - UnitNode: "IfThenElse($UnitNodeLocation[self::m:unit],
+                          $UnitNodeLocation[self::m:unit],
+                          $UnitNodeLocation[self::m:fraction[contains(@data-intent-property, ':unit:')]]/*[1])"
+    # test the node for being a neuter unit
+    # note: bias ha->hektar and Pa->Pascal, not si-prefix "a" (annum)
+  - NeuterUnitFollows: "$UnitNode[DEBUG(IsInDefinition(., 'Speech', 'NeuterUnits')) or 
+                                  IsInDefinition(., 'Speech', 'NeuterUnitsWithoutPrefixes') or
+                                  (string-length(.) >= 2 and
+                                    .!='ha' and .!='Pa' and
+                                    DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != '' and
+                                    IsInDefinition(substring(., 2), 'Speech', 'NeuterUnits') != ''
+                                  ) ]"  
+  replace:
+  - test:
+    - if: "not($UnitNode)"
+      then:
+      - x: "*[1]"
+      - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
+    # unit follows the fraction -- special cases
+    - else:
+      - test:
+          if: "*[1]=1 and $NeuterUnitFollows"
+          then: [T: "ett"]
+          else: [x: "*[1]"]
+      - test:
+        - if: "*[1]=1 and *[2]=2"
+          then_test:
+          - if: "$NeuterUnitFollows"
+            then: [T: "halvt"]
+            else: [T: "halv"]
+        - else_if: "*[2] <= 10"
+          then: [x: "DefinitionValue(*[2], 'Speech', 'OrdinalFractionalDenominatorsForUnits')"]
+          else: [x: "*[2]", CT: "dels"]   # this is wrong but shouldn't occur normally -- need to write a function to compute cardinal numbers as words
+
+
+# Units (e.g., meters per second, m^2/s^2, (3m^2)/s)
+#NORWEGIAN: Added rule for t="time"
+- name: per-fraction
+  tag: fraction
+  match:
+  - "BaseNode(*[1])[contains(@data-intent-property, ':unit') or"
+  - "               ( self::m:mrow and count(*)=3 and"  # maybe a bit paranoid checking the structure...
+  - "                 *[1][self::m:mn] and *[2][.='\u2062'] and BaseNode(*[3])[contains(@data-intent-property, ':unit')] ) ] and"
+  - "BaseNode(*[2])[contains(@data-intent-property, ':unit') or (contains(@data-intent-property, ':unit') and .='t')] "
+  replace:
+  - x: "*[1]"
+  - T: "per"      # phrase('5 meters 'per' second)
+  - test: 
+      if: "*[2]='t'"
+      then: [T: "time"]
+      else: 
+       - x: "*[2]"
+  
+- name: simple
+  # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
+  # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
+  # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
+  tag: fraction
+  match:
+  - "(IsNode(*[1],'leaf') and IsNode(*[2],'leaf')) and"
+  - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
+  replace:
+  - x: "*[1]"
+  - T: "over"      # phrase(the fraction 3 'over' 4)
+  - x: "*[2]"
+  - pause: short
+
+- name: default
+  tag: fraction
+  match: "."
+  replace:
+  - T: "brøk"      # phrase(the 'fraction' 3 over 4)
+  - pause: short
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1],'leaf'))"
+      then: [pause: short]
+  - T: "over"      # phrase(the fraction 3 'over' 4)
+  - test:
+      if: "not(IsNode(*[2],'leaf'))"
+      then: [pause: short]
+  - x: "*[2]"
+  - pause: short
+  - T: "slutt brøk"      # phrase(start 7 over 8 'end of fraction')
+  - pause: medium
+
+# rules for functions raised to a power
+# these could have been written on 'mrow' but putting them on msup seems more specific
+# to see if it is a function, we look right to see if the following sibling is apply-function
+- name: inverse-function
+  tag: inverse-function
+  match: "."
+  replace:
+  - T: "invers"      # phrase(the 'inverse' of f)
+  - x: "*[1]"
+
+- name: function-squared-or-cubed
+  tag: power
+  match:
+  - "*[2][self::m:mn][.='2' or .='3'] and"
+  - "following-sibling::*[1][self::m:mo][.='⁡']" #invisible function apply
+  replace:
+  - x: "*[1]"
+  - bookmark: "*[2]/@id"
+  - test:
+      if: "*[2][.=2]"
+      then: [T: "i andre"]      # phrase(5 'squared' equals 25)
+      else: [T: "i tredje"]      # phrase(5 'cubed' equals 125)
+
+- name: function-power
+  tag: power
+  match:
+  - "following-sibling::*[1][self::m:mo][.='⁡']" #invisible function apply
+  replace:
+  - x: "*[1]"
+  - T: "opphøyd i"
+  - bookmark: "*[2]/@id"
+  - x: "*[2]"
+  - pause: short
+
+# non-function rules for power
+- name: squared-or-cubed
+  tag: power
+  match: "*[2][self::m:mn][.='2' or .='3']"
+  replace:
+  - x: "*[1]"
+  - bookmark: "*[2]/@id"
+  - test:
+      if: "*[2][.=2]"
+      then: [T: "i andre"]      # phrase(5 'squared' equals 25)
+      else: [T: "i tredje"]      # phrase(5 'cubed' equals 125)
+
+- name: simple-integer
+  tag: power
+  match: "*[2][self::m:mn][not(contains(., $DecimalSeparators))]" #NORWEGIAN: Changed decimal point to $DecimalSeparators
+  replace:
+  - x: "*[1]"
+  - T: "opphøyd i"
+  - x: "*[2]"
+  - pause: short
+
+- name: simple-negative-integer
+  tag: power
+  match:
+  - "*[2][self::m:minus and count(*)=1 and"
+  - "     *[1][self::m:mn][not(contains(., $DecimalSeparators))]]" #NORWEGIAN: Changed decimal point to $DecimalSeparators
+  replace:
+  - x: "*[1]"
+  - T: "opphøyd i"
+  - x: "*[2]"
+  - pause: short
+
+- name: simple-var
+  tag: power
+  match: "*[2][self::m:mi][string-length(.)=1]"
+  replace:
+  - x: "*[1]"
+  - T: "opphøyd i"
+  - x: "*[2]"
+  - pause: short
+
+- name: simple
+  tag: power
+  match: "IsNode(*[2], 'leaf')"
+  replace:
+  - x: "*[1]"
+  - T: "opphøyd i"
+  - x: "*[2]"
+  - pause: short
+
+- name: nested
+  # it won't end in "power" if the exponent is simple enough
+  # FIX: not that important, but this misses the case where the nested exp is a negative integer (change test if this is fixed)
+  # ending nested exponents with "...power power" sounds bad
+  tag: power
+  match:
+  - "*[2]["
+  - "     (self::m:power and not(IsNode(*[2], 'leaf'))) or" # non-simple nested superscript
+  - "     self::m:mrow[*[last()][self::m:power[not(IsNode(*[2], 'leaf'))]]]" # same as above but at the end of an mrow # FIX: need to figure out linear replacement
+  - "    ]"
+  replace:
+  - x: "*[1]"
+  - T: "opphøyd i"      # phrase(15 'raised to the' second power equals 225)
+  - x: "*[2]"
+  - pause: short
+  - T: "slutt eksponent"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+
+- name: default
+  tag: power
+  match: "."
+  replace:
+  - x: "*[1]"
+  - T: "opphøyd i"      # phrase(15 'raised to the' second power equals 225)
+  - x: "*[2]"
+
+#
+# Some rules on mrows
+#
+- name: set
+  tag: set
+  match: "."
+  replace:
+  - test:
+    - if: "count(*)=0"
+      then:
+      - T: "den tomme mengden"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
+    - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
+      then:
+      - T: "mengden av alle"      # phrase(the 'set of all' positive integers less than 10)
+      - x: "*[1]/*[1]"
+      - T: "slik at"      # phrase(x 'such that' x is less than y)
+      - x: "*[1]/*[3]"
+      else:
+      - T: "mengden"      # phrase(here is a 'set' of numbers)
+      - x: "*[1]"
+
+# NORWEGIAN: Added sqrt, so it, for example, says "sqrt a times sqrt b"
+- name: times
+  tag: mo
+  match:
+  # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s
+  # added: say times is the superscript is not simple
+  # if we aren't sure if it is times or not, don't say anything
+  - ".='⁢' and"
+  - "not(@data-function-guess) and ("
+  - "not(ancestor-or-self::*[contains(@data-intent-property, ':literal:')]) and "
+  - "  following-sibling::*[1]["
+  - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|') or "
+  - "    self::m:matrix or self::m:determinant or self::m:binomial or" # followed by parens
+  - "    self::m:square-root or self::m:msqrt or self::m:root or self::m:mroot or"
+  - "    (self::m:msub or self::m:msubsup or"
+  - "    ((self::m:msup or self::m:power) and not(IsNode(*[1], 'leaf') and *[2][self::m:mn and (.=2 or '.=3')]))) and " # followed by msup, etc.
+  - "     (*[1][self::m:mrow[IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')] or "
+  - "           self::m:matrix or self::m:determinant] or" # base has parens
+  - "      not(IsNode(*[2], 'simple')) or "
+  - "      (self::m:msubsup and not(IsNode(*[3], 'simple')))"
+  - "     )"
+  - "  ]"  # other possibility is the preceding element has parens (but not the following)
+  - " or "
+  - "  preceding-sibling::*[1]["
+  - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
+  - " )"
+  replace:
+  - T: "ganger"      # phrase(7 'times' 5 equals 35)
+
+- name: no-say-parens
+  tag: mrow
+  match:
+  - "parent::*[not(self::m:msup) and not(self::m:msub) and not(self::m:msubsup) and not(self::m:power) and"
+  - "          not(self::m:math) ] and "       # rule out [x] standing alone
+  - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
+  - "( IsNode(*[2], 'simple')  ) and"
+  - "not(preceding-sibling::*[1][.='\u2062' and @data-function-guess]) and"
+  - "not(ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
+  # missing clause: 'a positive fraction that is spoken as an ordinal
+  #   (either by the Ordinal preference or by the default rules_'
+  replace:
+  - x: "*[2]"
+
+- include: "SharedRules/geometry.yaml"
+- include: "SharedRules/linear-algebra.yaml"
+- include: "SharedRules/calculus.yaml"
+- include: "SharedRules/general.yaml"
+- include: "SharedRules/default.yaml"

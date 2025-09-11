@@ -8,13 +8,14 @@
 //!  Note: no range is specified by the spec
 //! ### SAPI5: Relative pitch
 //! From https://documentation.help/SAPI-5/sapi.xsd
-//!   A value of +10 sets a voice to speak at four-thirds (or 4/3) of its default pitch.
-//!   Each increment between –10 and +10 is logarithmically distributed such that
-//!     incrementing/decrementing by 1 is multiplying/dividing the pitch by the 24th root of 2 (about 1.03).
-//!   Values more extreme than –10 and 10 will be passed to an engine but SAPI 5compliant engines may not support
-//!     such extremes and instead may clip the pitch to the maximum or minimum pitch it supports.
-//!   Values of –24 and +24 must lower and raise pitch by 1 octave respectively.
+//! * A value of +10 sets a voice to speak at four-thirds (or 4/3) of its default pitch.
+//! * Each increment between –10 and +10 is logarithmically distributed such that
+//!   incrementing/decrementing by 1 is multiplying/dividing the pitch by the 24th root of 2 (about 1.03).
+//! * Values more extreme than –10 and 10 will be passed to an engine but SAPI 5compliant engines may not support
+//!   such extremes and instead may clip the pitch to the maximum or minimum pitch it supports.
+//! * Values of –24 and +24 must lower and raise pitch by 1 octave respectively.
 //!   All incrementing/decrementing by 1 must multiply/divide the pitch by the 24th root of 2.
+//! 
 //! Note: an octave is a doubling of frequency, so pitch change of 100% should turn into +/- 24
 //! ### SSML: Relative pitch
 //! * pitch in hertz (default/current man's voice is about 100hz, woman's 180hz)
@@ -41,10 +42,10 @@
 //! * * Window-Eyes only seems to give values in range 1 - 150.
 //! * On the low end, 1 ~= 72words/min
 //! * On the high end, I can't tell, but 80 seems to be a bit over twice normal (~400 words/min?)
-//!    250 ~= 1297 words/min based on supported "sapi" values
+//!   250 ~= 1297 words/min based on supported "sapi" values
 //!
-//!  Note: this means words/min = 4.18 * Eloquence rate + 66
-//!  So the relative pause rate is 180/computed value
+//! Note: this means words/min = 4.18 * Eloquence rate + 66
+//! So the relative pause rate is 180/computed value
 //!
 //!
 //! ## Volume (default 100 \[full])
@@ -233,7 +234,7 @@ impl fmt::Display for TTSCommandRule {
             TTSCommandValue::Pronounce(p) => p.to_string(),
         };
         if self.command == TTSCommand::Pause {
-            return write!(f, "pause: {}", value);
+            return write!(f, "pause: {value}");
         } else {
             return write!(f, "{}: {}{}", self.command, value, self.replacements);
         };
@@ -310,14 +311,14 @@ impl TTS {
                     Err(_) => {
                         // let's try as an xpath (e.g., could be '$CapitalLetters_Pitch')
                         TTSCommandValue::XPath(
-                            MyXPath::build(tts_value).chain_err(|| format!("while trying to evaluate value of '{}:'", tts_enum))?
+                            MyXPath::build(tts_value).chain_err(|| format!("while trying to evaluate value of '{tts_enum}:'"))?
                         )
                     }
                 }
             },
             TTSCommand::Bookmark | TTSCommand::Spell => {
                 TTSCommandValue::XPath(
-                    MyXPath::build(values).chain_err(|| format!("while trying to evaluate value of '{}:'", tts_enum))?
+                    MyXPath::build(values).chain_err(|| format!("while trying to evaluate value of '{tts_enum}:'"))?
                 )
             },
             TTSCommand::Pronounce => {
@@ -475,7 +476,7 @@ impl TTS {
             match value {
                 TTSCommandValue::XPath(xpath) => {
                     let id = xpath.replace::<String>(rules_with_context, mathml)?;
-                    return Ok( format!("<{}='{}'/>", tag_and_attr, id) );
+                    return Ok( format!("<{tag_and_attr}='{id}'/>") );
                 },
                 _ => bail!("Implementation error: found bookmark value that did not evaluate to a string"),
             }
@@ -684,7 +685,7 @@ impl TTS {
             static ref CONSECUTIVE_BREAKS: Regex = Regex::new(r"(<silence msec[^>]+?> *){2,}").unwrap();   // two or more pauses
             static ref PAUSE_AMOUNT: Regex = Regex::new(r"msec=.*?(\d+)").unwrap();   // amount after 'time'
         }
-        let replacement = |amount: usize| format!("<silence msec=='{}ms'/>", amount);
+        let replacement = |amount: usize| format!("<silence msec=='{amount}ms'/>");
         return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
     }
 
@@ -693,7 +694,7 @@ impl TTS {
             static ref CONSECUTIVE_BREAKS: Regex = Regex::new(r"(<break time=[^>]+?> *){2,}").unwrap();   // two or more pauses
             static ref PAUSE_AMOUNT: Regex = Regex::new(r"time=.*?(\d+)").unwrap();   // amount after 'time'
         }
-        let replacement = |amount: usize| format!("<break time='{}ms'/>", amount);
+        let replacement = |amount: usize| format!("<break time='{amount}ms'/>");
         return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
     }
 }

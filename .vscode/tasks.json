@@ -21,8 +21,16 @@
         },
         {
             "label": "cargo build",
-            "type": "shell",
-            "command": "cargo build",
+            "type": "cargo",
+            "command": "build",
+            "args": [
+                "--features",
+                "include-zip" // Replace with your actual feature name
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": [
                 "$rustc"
             ]
@@ -49,7 +57,6 @@
             ],
             "group": {
                 "kind": "test",
-                "isDefault": true
             }
         }
     ]

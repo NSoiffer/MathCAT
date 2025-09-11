@@ -92,6 +92,12 @@
       "f", "g", "h", "F", "G", "H"
   }
 
+- ClearSpeakTrigFunctionNames: {
+    "sin", "cos", "tan", "sec", "csc", "cot",
+    "log", "ln",
+    "tang", "tg", "lg",       # these aren't listed in the ClearSpeak, but they are equivalents
+  }
+
   # Names of functions that in terse mode don't say "of" (or it's equivalent in other languages)
   # make sure it is defined -- override in the language-specific file
 - TerseFunctionNames: {

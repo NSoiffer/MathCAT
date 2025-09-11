@@ -96,6 +96,7 @@
 
 
   Other:
-    DecimalSeparators: "." # [default]
-    BlockSeparators: ", \u00A0\u202F" # [default -- includes two forms of non-breaking spaces]
-    DecimalSeparator: "Auto" # Auto, '.', ',', Custom
+    # Note: DecimalSeparator is user-facing (can be Auto), DecimalSeparators is code-facing (always a char)
+    DecimalSeparator: "Auto" # Auto, '.', ','
+    DecimalSeparators: "." # [will be set based on DecimalSeparator, but can be overridden]
+    BlockSeparators: ", \u00A0\u202F" # [will be set based on DecimalSeparator, but can be overridden]

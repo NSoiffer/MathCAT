@@ -138,14 +138,25 @@
     - pause: short
  - "|":                                          #  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
-     - test:
-        - if: "$SpeechStyle != 'ClearSpeak' or not(preceding-sibling::*) or not(following-sibling::*)"
-          then: [T: "lodstreck"]                 #  (en: 'vertical line', google translation)
-        - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
-          then: [T: "sådana att"]                #  (en: 'such that', google translation)
-        - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
-          then: [T: "givet"]                     #  (google translation)
-        - else: [T: "delar"]                     #  (en: 'divides')
+     - with:
+        variables: [DefaultToGiven: "count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and ../../../*[1][.='P']"] # P(A|B)
+        replace:
+        - test:
+            - if: "$SpeechStyle != 'ClearSpeak'"
+              then_test:
+                - if: "$DefaultToGiven"
+                  then: [T: "givet"]     # given
+                - else_if: "preceding-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))] and 
+                            following-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))]"
+                  then: [T: "delar"]    # divides
+                  else: [T: "lodstreckl"]  # vertical line
+            - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
+              then: [T: "lodstreckl"]   # vertical line
+            - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+              then: [T: "sådana att"]   # such that
+            - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
+              then: [T: "givet"]        # given
+            - else: [T: "delar"]        # divides
 
  - "}":                                          #  0x7d
     - pause: short
@@ -256,10 +267,24 @@
             then: [T: "och så vidare"]           #  (en: 'and so on', google translation)
             else: [T: "och så vidare upp till"]       #  (en: 'and so on up to')
 
- - "⁡":                                          #  0x2061
+ - "⁡":                                          # 0x2061
     - test:
-        if: "not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
-             not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
+        # skip saying "of" when Terse and a trig function, when it is a shape (does this happen?), or we are in :literal mode
+        # log is treated differently than trig functions
+        # Note: this differs from 'en' because the ClearSpeak and default rules are different from 'en'
+        if: "not(
+              ( ( $SpeechStyle='ClearSpeak' or preceding-sibling::*[1][.='log' or .='ln' or .='lg'] and
+                  IfThenElse(IsNode(following-sibling::*[1],'simple'),
+                                   true(),
+                                   $SpeechStyle='ClearSpeak' and $Verbosity!='Verbose')
+                ) and
+                preceding-sibling::*[1][IfThenElse($SpeechStyle='ClearSpeak',
+                                                   IsInDefinition(., 'ClearSpeakTrigFunctionNames'),
+                                                   IsInDefinition(., 'TrigFunctionNames') )]
+              ) or
+              preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')] or
+              (@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])
+            )"
         then: [T: "av"]                          #  (en: 'of', google translation)
  - "⁢": [T: ""]                                  #  0x2062
  - "⁣": [T: ""]                                  #  0x2063

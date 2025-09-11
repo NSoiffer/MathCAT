@@ -8,6 +8,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-Dwarnings"
 
 jobs:
   build:
@@ -27,3 +28,49 @@ jobs:
     - uses: actions/checkout@v3
     - name: run clippy
       run: cargo clippy
+
+  zip-rules:
+    name: zip up the rules directory
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Remove empty Rules directories
+      run:  find Rules -type d -empty -delete
+    - name: Remove test directory
+      run:  rm -r Rules/Languages/zz
+    - name: create rules.zip
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: 'zip'
+        filename: 'Rules.zip'
+        directory: '.'
+        path: 'Rules'
+    - name: Upload Rules.zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: 'Rules.zip'
+        path: 'Rules.zip'
+        compression-level: 0
+        retention-days: 1
+  
+  pre-release:
+    name: Pre Release
+    continue-on-error: false
+    needs: [zip-rules]
+    runs-on: ubuntu-latest
+    steps:
+    # download the previous build artifacts and put them in their proper places
+    - name: download Rules.zip
+      uses: actions/download-artifact@v4
+      with:
+        name: Rules.zip
+    # put the files into the release
+    - name: Automatic release
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        automatic_release_tag: latest
+        prerelease: true
+        title: Development Build
+        files: |
+          Rules.zip

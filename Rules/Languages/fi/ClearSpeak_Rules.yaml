@@ -602,52 +602,47 @@
   - pause: medium
   - test:
       if: .[self::m:mlabeledtr]
-      then: [{x: "*[position()>1]"}]
-      else: {x: "*"}
+      then: [x: "*[position()>1]"]
+      else: [x: "*"]
 
 - # handle log, lg and ln
   name: ClearSpeak-log
-  tag: mrow
-  variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
-  match:
-  - "count(*)=3 and"
-  - "*[1][self::m:mi][.='log' or .='lg' or .='ln'] and"
-  - "*[2][self::m:mo][.='⁡']"
+  tag: mi
+  match: ".='log' or .='lg' or .='ln'"
+  variables: [log_is_simple: "IsNode(following-sibling::*[2],'simple')"] # skip over U+2061
   replace:
+  - bookmark: "@id"
   - test:
       if: "$log_is_simple"
       then_test:
-      - if: "*[1][.='log']"
-        then: [{T: "log"}]      # phrase(the 'log' of x)
-      - else_if: "*[1][.='lg']"
-        then: [{SPELL: "'lg'"}] # phrase(the 'lg' of x)
+      - if: ".='log'"
+        then: [T: "log"]      # phrase(the 'log' of x)
+      - else_if: ".='lg'"
+        then: [SPELL: "'lg'"] # phrase(the 'lg' of x)
       - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
-        then: [{T: "luonnollinen log"}]      # phrase(the 'natural log' of the product of 2 numbers)
-        else: [{SPELL: "'ln'"}]
+        then: [T: "luonnollinen log"]      # phrase(the 'natural log' of the product of 2 numbers)
+        else: [SPELL: "'ln'"]
       else:
       # FI: not needed
       # - test:
       #     if: "$Verbosity!='Terse' and not(log_is_simple)"
-      #     then: {T: ""}      # phrase('the' square root of 25)
+      #     then: [T: ""]      # phrase('the' square root of 25)
       - test:
-        - if: "*[1][.='log']"
+        - if: ".='log'"
           then:
           - test:
             - if: "$Verbosity='Verbose'"
-              then: [{T: "logaritmi"}]
-              else: [{T: "log"}]
-        - else_if: "*[1][text()]='lg'"
+              then: [T: "logaritmi"]
+              else: [T: "log"]
+        - else_if: ".='lg'"
           then:
           - test:
             - if: "$Verbosity='Verbose'"
-              then: [{T: "kymmenkantainen logaritmi"}]
-              else: [{SPELL: "'lg'"}]
+              then: [T: "kymmenkantainen logaritmi"]
+              else: [SPELL: "'lg'"]
         - else_if: $ClearSpeak_Log = 'LnAsNaturalLog' or $Verbosity='Verbose'
-          then: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' of x)
-          else: [{SPELL: "'ln'"}]
-      - T: "arvolla"      # phrase(the natural log 'of' x)
-      - pause: short
-  - x: "*[3]"
+          then: [T: "luonnollinen logaritmi"]      # phrase(the 'natural log' of x)
+          else: [SPELL: "'ln'"]
 
 - name: ClearSpeak-multi-line
   tag: [piecewise, system-of-equations, lines] # these are ignored in favor of the ClearSpeak prefs
