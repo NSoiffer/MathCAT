@@ -35,19 +35,9 @@ roman-numerals-rs = "3.1.0"
 radix_fmt = "1.0"
 unicode-script = "0.5"
 log = "0.4"
-<<<<<<< HEAD
-env_logger = "0.11"
-cfg-if = "1.0"
-fastrand = { version = "2.3.0" }
-[target.'cfg(target_family = "wasm")'.dependencies]
-zip = { version = "4.1", default-features = false, features = ["deflate"] }
-[target.'cfg(not(target_family = "wasm"))'.dependencies]
-zip = { version = "4.1", default-features = false, features = ["deflate"] }
-=======
 env_logger = "0.11.8"
 cfg-if = "1.0.1"
 fastrand = { version = "2.3.0" }
->>>>>>> main
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 zip = { version = "5.1", default-features = false, features = ["deflate"] }
@@ -64,11 +54,7 @@ error-chain = "0.12.4"
 [target.'cfg(target_family = "wasm")'.build-dependencies]
 zip = { version = "5.1", default-features = false, features = ["deflate"] }
 [target.'cfg(not(target_family = "wasm"))'.build-dependencies]
-<<<<<<< HEAD
-zip = { version = "4.1", default-features = false, features = ["deflate"] }
-=======
 zip = { version = "5.1", default-features = false, features = ["bzip2"] }
->>>>>>> main
 
 [lib]
 name = "libmathcat"
