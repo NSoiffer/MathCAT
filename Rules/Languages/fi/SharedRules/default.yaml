@@ -603,8 +603,9 @@
   match: .
   replace:
   - x: "*[1]"
-  - T: "arvolla"      # phrase(the function sine 'applied to' x plus y) # FI: could also be 'sovelletaan'
-  - x: "*[2]"
+  - T: ""
+  - pause: auto
+  - x: "*[position() > 1]"
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent

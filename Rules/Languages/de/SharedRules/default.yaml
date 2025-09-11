@@ -613,8 +613,9 @@
   match: .
   replace:
   - x: "*[1]"
-  - T: "angewandt auf"      # phrase(the function sine 'applied to' x plus y)
-  - x: "*[2]"
+  - T: "von"
+  - pause: auto
+  - x: "*[position() > 1]"
 
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
