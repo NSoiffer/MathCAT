@@ -452,28 +452,27 @@ impl PreferenceManager {
 
     /// Unzip the files if needed
     /// Returns true if it unzipped them
-    pub fn unzip_files(path: &Path, language: &str, default_lang: Option<&str>) -> Result<bool> {
+    pub fn unzip_files(path: &Path, lang: &str, default_lang: Option<&str>) -> Result<bool> {
         thread_local!{
             /// when a language/braille code dir is unzipped, it is recorded here
             static UNZIPPED_FILES: RefCell<HashSet<String>> = RefCell::new( HashSet::with_capacity(31));
         }
-        
         // ignore regional subdirs
-        let dir = PreferenceManager::get_language_dir(path, language, default_lang)?;
-        let language = if dir.ends_with(language) {language} else {dir.file_name().unwrap().to_str().unwrap()};
+        let dir = PreferenceManager::get_language_dir(path, lang, default_lang)?;
+        let language = if dir.ends_with(lang) {lang} else {dir.file_name().unwrap().to_str().unwrap()};
         let zip_file_name = language.to_string() + ".zip";
         let zip_file_path = dir.join(&zip_file_name);
         let zip_file_string = zip_file_path.to_string_lossy().to_string();
-        // debug!("unzip_files: dir: {}, zip_file_name: {}, zip_file_path: {}", dir.to_string_lossy(), zip_file_name, zip_file_string);
+        // debug!("unzip_files: dir: {}, zip_file_name: {}, zip_file_path: {}", dir.display(), zip_file_name, zip_file_string);
         if UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow().contains(&zip_file_string)) {
             return Ok(false);
         }
 
         let result = match zip_extract_shim(&dir, &zip_file_name) {
             Err(e) => {
-                if language.contains('-') {
+                if lang.contains('-') {
                     // try again in parent dir of regional language
-                    let language = language.split_once('-').unwrap_or((language, "")).0; // get the parent language
+                    let language = lang.split_once('-').unwrap_or((lang, "")).0; // get the parent language
                     // debug!("unzip_files: trying again in parent language: {}", language);
                     PreferenceManager::unzip_files(path, language, default_lang)
                                                 .chain_err(|| format!("Couldn't open zip file {zip_file_string} in parent {language}: {e}."))?
@@ -612,7 +611,7 @@ impl PreferenceManager {
         // return 'Rules/Language/fr', 'Rules/Language/en/gb', etc, if they exist.
         // fall back to main language, and then to default_dir if language dir doesn't exist
         let mut full_path = rules_dir.to_path_buf();
-        full_path.push(lang.replace('-', "/"));
+        full_path.push(lang.replace('-', "\\"));
         for parent in full_path.ancestors() {
             if parent == rules_dir {
                 break;
