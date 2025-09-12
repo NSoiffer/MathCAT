@@ -189,9 +189,12 @@ Several people helped out in various ways with the project. I am very grateful f
 Translators:
 
 * Chinese (Traditional) -- Hon-Jang Yang
+* Finnish -- Sami Määttä, Accessibility Library Celia, and Essi Viippola, freelancer
 * German --Nazli Andjic, Robert Graf and Paul Libbrecht (IU International University of Applied Sciences)
 * Indonesian -- Dr. Pinta Deniyanti Sampoerno, M.Si; Dr. Meiliasari, S.Pd., M.Sc; and Ari Hendarno, S.Pd., M.kom
+* Norwegian -- Marthe Gjelstad, National Library of Norway
 * Spanish -- Noelia Ruiz Martínez (also help with NVDA addon development) and María Allo Roldán
+* Swedish -- Tim Arborealis Lötberg, Swedish Agency for Accessible Media (MTM) and Anders Eklund, SPSM
 * Vietnamese -- Dang Hoai Phúc and Trang Pham
 * Others??? -- please volunteer so I can list you here...
 
