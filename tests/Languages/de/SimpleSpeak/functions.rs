@@ -15,7 +15,7 @@ fn trig_names() {
     <mi>csc</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>cot</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("de", "SimpleSpeak", expr, "sine of x plus cosine of y plus tangent of z plus secant of alpha, plus cosecant of phi, plus cotangent of phi");
+    test("de", "SimpleSpeak", expr, "sinus von x, plus kosinus von y, plus tangens von z, plus sekans von alpha, plus kosekans von phi, plus kotangens von phi");
 }
 
 #[test]
@@ -28,19 +28,14 @@ fn hyperbolic_trig_names() {
     <mi>csch</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>coth</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("de", "SimpleSpeak", expr, "hyperbolic sine of x, plus \
-                                hyperbolic cosine of y, plus \
-                                hyperbolic tangent of z, plus \
-                                hyperbolic secant of alpha, plus \
-                                hyperbolic cosecant of phi, plus \
-                                hyperbolic cotangent of phi");
+    test("de", "SimpleSpeak", expr, "hyperbolischer sinus von x, plus hyperbolischer cosinus von y, plus hyperbolischer tangens von z, plus, hyperbolischer sekans von alpha, plus, hyperbolischer kosekans, von phi; plus, hyperbolischer kotangens, von phi");
 }
 
 
 #[test]
 fn inverse_trig() {
     let expr = "<math><msup><mi>sin</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
-    test("de", "SimpleSpeak", expr, "inverse sine of x");
+    test("de", "SimpleSpeak", expr, "umgekehrte sinus von x");
 }
 
 #[test]
