@@ -186,7 +186,7 @@ fn integral_under() {
         <mrow><mi>f</mi><mrow><mo>(</mo><mi>x</mi> <mo>)</mo></mrow></mrow>
         <mi>d</mi><mi>x</mi>
         </math>";
-    test("de", "ClearSpeak", expr, "die integral durch die reelen zahlen von; f von x d x");
+    test("de", "ClearSpeak", expr, "die integral durch die reellen zahlen von; f von x d x");
 }
 
 #[test]

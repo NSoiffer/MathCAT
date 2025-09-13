@@ -20,7 +20,7 @@ fn modified_vars() {
         <mover> <mi>t</mi> <mo>→</mo> </mover>
         </mrow> </math>";
     test("de", "SimpleSpeak", expr,
-        "a gravis akzent; b tilde, c brevis, b combining caron; c gravis akzent; plus r caron plus; x punkt, y Überpunkt, z diaeresis; u dreifacher punkt verschönerung; v vierfacher punkt drüber; plus x zirkumflex, plus vektor t");
+        "a gravis akzent; b tilde, c brevis, b combining caron; c gravis akzent; plus r caron plus; x punkt, y Punkt oberhalb; z diaeresis, u dreifacher punkt; v vierfacher punkt; plus x zirkumflex, plus vektor t");
 }
 
 #[test]
@@ -37,7 +37,7 @@ fn limit() {
             </mfrac>
             </mrow>
         </math>";
-    test("de", "SimpleSpeak", expr, "der grenzwert bei x gegen 0; von, bruch, sinus von x, über x, ende der fraktion");
+    test("de", "SimpleSpeak", expr, "der grenzwert bei x gegen 0; von, bruch, sinus von x, über x, ende des bruchs");
     test_prefs("de", "SimpleSpeak", vec![("Impairment", "LearningDisability")], expr,
             "der grenzwert bei x gegen 0; von; sinus von x, über x");
 }
