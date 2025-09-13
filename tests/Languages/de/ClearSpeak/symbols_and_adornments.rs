@@ -338,5 +338,5 @@ fn supset() {
   <mi>A</mi><mo>&supset;</mo><mi>B</mi>
     </math>";
     test_ClearSpeak("de", "ClearSpeak_VerticalLine", "Given", expr,
-                    "groß a ist ein obermenge von, groß b");
+                    "groß a ist eine obermenge von, groß b");
 }
