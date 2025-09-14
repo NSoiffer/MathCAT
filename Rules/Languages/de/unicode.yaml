@@ -467,7 +467,7 @@
  - "⊃":                                         	#  0x2283
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "ist ein"]                   	# 	(en: 'is a', google translation)
+         then: [T: "ist eine"]                   	# 	(en: 'is a', google translation)
      - T: "obermenge von"                 	# 	(en: 'superset of', MathPlayer: 'Obermenge von', google: 'superset von')
  - "⊄":                                         	#  0x2284
      - test: 

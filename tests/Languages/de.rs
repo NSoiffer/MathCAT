@@ -12,7 +12,7 @@ mod ClearSpeak {
     mod multiline;
 }
 
-mod SimpleSpeak {
+/* mod SimpleSpeak {
     mod functions;
     mod large_ops;
     // mod menclose;
@@ -24,7 +24,7 @@ mod SimpleSpeak {
     mod linear_algebra;
     mod multiline;
     mod subscripts;
-}
+} */
 mod shared;
 mod units;
 mod chemistry;

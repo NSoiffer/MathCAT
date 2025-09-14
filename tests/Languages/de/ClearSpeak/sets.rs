@@ -29,7 +29,7 @@ fn reals() {
     let expr = "<math>
                     <mi>ℝ</mi>
                 </math>";
-    test("de", "ClearSpeak", expr, "die reelen zahlen");
+    test("de", "ClearSpeak", expr, "die reellen zahlen");
 }
 
 #[test]
@@ -186,7 +186,7 @@ fn element_alone() {
     let expr = "<math>
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
-    test("de", "ClearSpeak", expr, "3 plus 2 i, ist kein element von, die reelen zahlen");
+    test("de", "ClearSpeak", expr, "3 plus 2 i, ist kein element von, die reellen zahlen");
 }
 
 #[test]
@@ -261,7 +261,7 @@ fn element_alone_member() {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("de", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "3 plus 2 i, ist kein element von, die reelen zahlen");
+                expr, "3 plus 2 i, ist kein element von, die reellen zahlen");
 }
 
 #[test]
@@ -304,7 +304,7 @@ fn element_alone_element() {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("de", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "3 plus 2 i, ist kein element von, die reelen zahlen");
+                expr, "3 plus 2 i, ist kein element von, die reellen zahlen");
 }
 
 #[test]
@@ -346,7 +346,7 @@ fn element_alone_in() {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("de", "ClearSpeak_SetMemberSymbol", "In",
-                expr, "3 plus 2 i, ist nicht in die reelen zahlen");
+                expr, "3 plus 2 i, ist nicht in die reellen zahlen");
 }
 
 #[test]
@@ -388,7 +388,7 @@ fn element_alone_belongs() {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("de", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "3 plus 2 i, nicht element von, die reelen zahlen");
+                expr, "3 plus 2 i, nicht element von, die reellen zahlen");
 }
 
 #[test]
