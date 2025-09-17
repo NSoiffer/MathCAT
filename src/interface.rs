@@ -539,6 +539,7 @@ pub fn get_supported_languages() -> Vec<String> {
         file_name.truncate(file_name.len() - "_Rules.yaml".len())
     }
     speech_styles.sort();
+    // remove duplicates -- shouldn't be any, but just in case
     let mut i = 1;
     while i < speech_styles.len() {
         if speech_styles[i-1] == speech_styles[i] {
