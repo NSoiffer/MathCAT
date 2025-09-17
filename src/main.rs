@@ -18,6 +18,8 @@ cfg_if::cfg_if! {
         }
     } else {
         fn get_rules_dir() -> String {
+          // for testing with zipped rules dir
+          // let rules_path = std::env::current_exe().unwrap().parent().unwrap().join("../../../MathCATForPython/addon/globalPlugins/MathCAT/Rules");
           let rules_path = std::env::current_exe().unwrap().parent().unwrap().join("../../Rules");
           return rules_path.as_os_str().to_str().unwrap().to_string();
         }
@@ -192,17 +194,18 @@ fn main() {
   let expr = r#"
 <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>(</mo><mn>1</mn><mo>)</mo></math>
                    "#;
-  let instant = Instant::now();
+  // let instant = Instant::now();
 
   // let rules_dir = "".to_string();    // Use MathCATRulesDir, potentially pointing to a zipped version
   if let Err(e) = set_rules_dir(get_rules_dir()) {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   }
+  debug!("Languages: {}", libmathcat::interface::get_supported_languages().join(", "));
 
   #[cfg(feature = "include-zip")]
   info!("***********include-zip is present**********");
   info!("Version = '{}' using Rules dir {}", get_version(), get_rules_dir());
-  set_preference("Language".to_string(), "en-gb".to_string()).unwrap();
+  set_preference("Language".to_string(), "en".to_string()).unwrap();
   set_preference("DecimalSeparator".to_string(), "Auto".to_string()).unwrap();
   set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
   set_preference("TTS".to_string(), "None".to_string()).unwrap();
@@ -291,7 +294,7 @@ fn main() {
   debug!("...using BrailleCode: {:?}", get_preference("BrailleCode".to_string()).unwrap());
   // let xpath_counts = libmathcat::speech::xpath_count();
   // info!("#xpath = {}; duplicates = {}", xpath_counts.0, xpath_counts.1);
-  info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
+  // info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
   // debug!("Hashmap sizes:\n{}", libmathcat::speech::SpeechRules::print_sizes());
   timing_test(expr, 0);
 
