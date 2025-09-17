@@ -398,7 +398,8 @@ impl PreferenceManager {
     fn set_style_file(&mut self, language_dir: &Path, language: &str, style_file_name: &str) -> Result<()> {
         let style_file_name = style_file_name.to_string() + "_Rules.yaml";
         self.speech = PreferenceManager::find_file(language_dir, language, Some("en"), &style_file_name)?;
-      
+        // debug!("set_style_file: language_dir: {}, language: {}, style_file_name: {}, self.speech: {}",
+        //        language_dir.display(), language, style_file_name, self.speech.display());
         return Ok( () );
     }
 
@@ -477,6 +478,16 @@ impl PreferenceManager {
                     PreferenceManager::unzip_files(path, language, default_lang)
                                                 .chain_err(|| format!("Couldn't open zip file {zip_file_string} in parent {language}: {e}."))?
                 } else {
+                    // maybe just regional dialects
+                    let mut regional_dirs = Vec::new();
+                    find_all_dirs_shim(&dir, &mut regional_dirs);
+                    for dir in regional_dirs {
+                        // debug!("unzip_files: trying again in subdir: {}", dir.display());
+                        let language = format!("{}-{}", lang, dir.file_name().unwrap().to_str().unwrap());
+                        if let Ok(result) =PreferenceManager::unzip_files(path, &language, default_lang) {
+                            return Ok(result);
+                        }
+                    }
                     bail!("Couldn't open zip file {}: {}.", zip_file_string, e)
                 }
             },
@@ -569,6 +580,7 @@ impl PreferenceManager {
             };
             if looking_for_style_file && alternative_style_file.is_none() {
                 if let Ok(alt_file_path) = find_any_style_file(os_path) {
+                    // debug!("find_file: found alternative style file '{}'", alt_file_path.display());
                     alternative_style_file = Some(alt_file_path);
                 }
             }
@@ -578,9 +590,24 @@ impl PreferenceManager {
             }
         }
 
+
         if let Some(result) = alternative_style_file {
             // debug!("find_file: found alternative_style_file '{}'", result.to_string_lossy());
             return Ok(result);     // found an alternative style file in the same lang dir
+        }
+
+        // try a subdir (regional dialect) of the language dir
+        let mut regional_dirs = Vec::new();
+        find_all_dirs_shim(&lang_dir, &mut regional_dirs);
+        for dir in regional_dirs {
+            // debug!("find_file: trying again in subdir: {}", dir.display());
+            // debug!(" ... files found = {:?}", find_files_in_dir_that_ends_with_shim(&dir, file_name));
+            if find_files_in_dir_that_ends_with_shim(&dir, ".yaml").contains(&file_name.to_string()) {
+                let path = dir.join(file_name);
+                if is_file_shim(&path) {
+                    return Ok(path);
+                }
+            }
         }
 
         if let Some(default_lang) = default_lang {
@@ -594,7 +621,8 @@ impl PreferenceManager {
                Looking for file: {}",
             rules_dir.to_str().unwrap(), lang, file_name);
 
-        // try to find a xxx_Rules.yaml file -- returns an error if none is found ()
+
+        /// try to find a xxx_Rules.yaml file -- returns an error if none is found ()
         fn find_any_style_file(path: &Path) -> Result<PathBuf> {    
             // try to find a xxx_Rules.yaml file
             // we find the first file because this is the deepest (most language specific) speech rule file
