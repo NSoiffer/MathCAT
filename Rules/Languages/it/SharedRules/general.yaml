@@ -532,10 +532,10 @@
   - x: "$LineCount"
   - test:
     - if: "self::m:cases"
-      then: [t: "caso"]      # phrase(this is the first 'case' of three cases)
+      then: [T: "caso"]      # phrase(this is the first 'case' of three cases)
     - else_if: "self::m:equations"
-      then: [t: "equazione"]      # phrase(this is the first 'equation' of three equations)
-      else: [t: "linea"]      # phrase(this is the first 'line' of three lines)
+      then: [T: "equazione"]      # phrase(this is the first 'equation' of three equations)
+      else: [T: "riga"]      # phrase(this is the first 'line' of three lines)
   - test:
     - if: "$LineCount != 1"
       then: [ct: "s"] # plural
@@ -556,10 +556,10 @@
         then:
         - test:
           - if: "parent::m:cases"
-            then: [t: "case"]     # phrase('case' 1 of 10 cases)
+            then: [T: "caso"]     # phrase('case' 1 of 10 cases)
           - else_if: "parent::m:equations"
-            then: [t: "equazione"] # phrase('equation' 1 of 10 equations)
-            else: [t: "linea"]     # phrase('line 1 of 10 lines)
+            then: [T: "equazione"] # phrase('equation' 1 of 10 equations)
+            else: [T: "riga"]     # phrase('line 1 of 10 lines)
         - x: "count(preceding-sibling::*)+1"
 
   - test:
@@ -1044,7 +1044,7 @@
   tag: none
   match: "../../*[self::m:chemical-formula or self::m:chemical-nuclide]"
   replace:
-  - t: "" # don't say anything
+  - T: "" # don't say anything
 
 - name: ignore-intent-wrapper
   tag: intent-wrapper
