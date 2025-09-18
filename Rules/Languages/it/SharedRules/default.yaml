@@ -38,7 +38,8 @@
   match: "."
   replace:
   - bookmark: "@id"
-  - x: "translate(., $BlockSeparators, '')"   # remove digit block separators
+  # FIX: removing the digit block separators is likely locale dependent
+  - x: "translate(., ' ,`', '')"   # remove digit block separators
 
 - name: default
   tag: [mo, mtext]
@@ -71,7 +72,7 @@
   replace: [x: "*"]
 
 
-- name: literal-simple
+- name: structure-simple
   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
   # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
   # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
@@ -85,7 +86,7 @@
   - x: "*[2]"
   - pause: short
 
-- name: literal-default
+- name: structure-default
   tag: mfrac
   match: "."
   replace:
@@ -108,7 +109,7 @@
 
 
 # not sure what really should be said for these since we should not assume they are square roots
-- name: literal-default
+- name: structure-default
   tag: msqrt
   match: "."
   replace:
@@ -126,7 +127,7 @@
       then: [T: "radice di x "] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
-- name: literal-default
+- name: structure-default
   tag: mroot
   match: "."
   replace:
@@ -171,7 +172,7 @@
   - pause: short
 
 
-- name: literal
+- name: structure
   tag: msub
   match: "."
   replace:
@@ -179,7 +180,7 @@
   - T: "pedice"              # phrase(x 'sub' 2)
   - x: "*[2]"
 
-- name: literal
+- name: structure
   tag: [msup, msubsup]
   match: "."
   replace:
@@ -193,7 +194,7 @@
       if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
       then:  [x: "*[last()]"]
       else_test:
-          if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"  # FIX: is this test necessary?
+          if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
           then:
           - T: "apice"      # phrase(x 'super' 2)
           - x: "*[last()]"

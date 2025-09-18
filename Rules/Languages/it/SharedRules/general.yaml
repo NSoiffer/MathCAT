@@ -522,19 +522,18 @@
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
   # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
-  tag: [piecewise, system-of-equations, lines]
+  tag: [cases, equations, lines]
   match: "."
   variables:
     # Wikipedia has some tables where all the entire first column is empty (e.g., https://en.wikipedia.org/wiki/List_of_trigonometric_identities)
   - LineCountTry: "count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']])"
   - LineCount: "IfThenElse($LineCountTry=0, count(*/*[1]), $LineCountTry)"
-  - IsColumnSilent: true()
   replace:
   - x: "$LineCount"
   - test:
-    - if: "self::m:piecewise"
+    - if: "self::m:cases"
       then: [T: "caso"]      # phrase(this is the first 'case' of three cases)
-    - else_if: "self::m:system-of-equations"
+    - else_if: "self::m:equations"
       then: [T: "equazione"]      # phrase(this is the first 'equation' of three equations)
       else: [T: "riga"]      # phrase(this is the first 'line' of three lines)
   - test:
@@ -545,10 +544,10 @@
 
 - name: default-multiline
   tag: [mtr, mlabeledtr]
-  match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
+  match: "parent::m:cases or parent::m:equations or parent::m:lines"
   replace:
   - test:
-      if: "parent::m:system-of-equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
+      if: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
            count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']]) != 0"
       then:
       - T: "riga successiva"
@@ -556,9 +555,9 @@
         if: "$LineCount != 1"
         then:
         - test:
-          - if: "parent::m:piecewise"
+          - if: "parent::m:cases"
             then: [T: "caso"]     # phrase('case' 1 of 10 cases)
-          - else_if: "parent::m:system-of-equations"
+          - else_if: "parent::m:equations"
             then: [T: "equazione"] # phrase('equation' 1 of 10 equations)
             else: [T: "riga"]     # phrase('line 1 of 10 lines)
         - x: "count(preceding-sibling::*)+1"
@@ -576,7 +575,7 @@
 
 - name: default-multiline
   tag: mtd
-  match: "parent::*[parent::m:piecewise or parent::m:system-of-equations or parent::m:lines]"
+  match: "parent::*[parent::m:cases or parent::m:equations or parent::m:lines]"
   variables: [LongPause: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultiLinePausesBetweenColumns = 'Long'"]
   replace:
   - x: "*"
@@ -1021,7 +1020,7 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
-    - if: ".='→' or .='⟶'"
+    - if: "DEBUG(.)='→' or .='⟶'"
       then_test:
         if: "$Verbosity='Terse'"
         then: [T: "forma"]      # phrase(hydrogen and oxygen 'forms' water )

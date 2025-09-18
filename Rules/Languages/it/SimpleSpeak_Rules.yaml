@@ -283,7 +283,7 @@
   # if we aren't sure if it is times or not, don't say anything
   - "text()='⁢' and"
   - "not(@data-function-guess) and ("
-  - "not(ancestor-or-self::*[contains(@data-intent-property, ':literal:')]) and "
+  - "not(ancestor-or-self::*[contains(@data-intent-property, ':structure:')]) and "
   - "  following-sibling::*[1]["
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|') or self::m:binomial or" # followed by parens
   - "    ( (self::m:msup or self::m:msub or self::m:msubsup or self::m:power) and " # followed by msup, etc.
@@ -305,7 +305,7 @@
   - "          not(self::m:math) ] and "       # rule out [x] standing alone
   - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
   - "( IsNode(*[2], 'simple')  ) and"
-  - "not(ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
+  - "not(ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
   # missing clause: 'a positive fraction that is spoken as an ordinal
   #   (either by the Ordinal preference or by the default rules_'
   replace:
@@ -313,6 +313,5 @@
 
 - include: "SharedRules/geometry.yaml"
 - include: "SharedRules/linear-algebra.yaml"
-- include: "SharedRules/calculus.yaml"
 - include: "SharedRules/general.yaml"
 - include: "SharedRules/default.yaml"

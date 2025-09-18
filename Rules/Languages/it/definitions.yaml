@@ -35,23 +35,23 @@
 - NumbersOrdinalOnes: [
          "zero", "primo", "secondo", "terzo", "quarto", "quinto", "sesto", "settimo", "ottavo", "nono",
          "decimo", "undicesimo", "dodicesimo", "tredicesimo", "quattordicesimo", "quindicesimo", "sedicesimo",
-         "diciassettesimo", "diciottesimo", "diciannove"
+         "diciassettesimo", "diciottesimo", "diciannovesimo"
     ]
 
 - NumbersOrdinalPluralOnes: [
-         "zero", "primo", "secondi", "terzi", "quarti", "quinti", "sesti", "settimi", "otto", "noni",
-         "decimi", "undicesimi", "dodicesimi", "tredici", "quattordici", "quindici", "sedicesimi",
-         "diciassettesimi", "diciassettesimi", "diciassettesimi"
+         "zero", "primi", "secondi", "terzi", "quarti", "quinti", "sesti", "settimi", "ottavi", "noni",
+         "decimi", "undicesimi", "dodicesimi", "tredicesimi", "quattordicesimi", "quindicesimi", "sedicesimi",
+         "diciassettesimi", "diciottesimi", "diciannovesimi"
     ]
 
 # stop when regularity begins
 - NumbersOrdinalFractionalOnes: [
-         "zero", "primo", "metà"
+         "zero", "primo", "mezzo"
     ]
 
 # stop when regularity begins
 - NumbersOrdinalFractionalPluralOnes: [
-         "zeri", "primi", "metà"
+         "zeri", "primi", "mezzi"
     ]
 
 
@@ -61,11 +61,11 @@
     ]
 
 - NumbersOrdinalTens: [
-         "", "decimo", "ventesimo", "trentesimo", "quarantesimo", "cinquantesimo", "sessantesimo", "settanta", "ottantesimo", "novantesimo"
+         "", "decimo", "ventesimo", "trentesimo", "quarantesimo", "cinquantesimo", "sessantesimo", "settantesimo", "ottantesimo", "novantesimo"
     ]
 
 - NumbersOrdinalPluralTens: [
-         "", "decimi", "ventesimo", "trentesimo", "quaranta", "cinquantesimo", "sessantesimo", "settanta", "ottantesimo", "novantesimo"
+         "", "decimi", "ventesimi", "trentesimi", "quarantesimi", "cinquantesimi", "sessantesimi", "settantesimi", "ottantesimi", "novantesimi"
     ]
 
 
@@ -87,16 +87,16 @@
 
 # At this point, hopefully the language is regular. If not, code needs to be written
 - NumbersLarge: [
-         "", "migliaia", "milione", "miliardi", "trilioni", "quadrilioni",
-         "quintillion", "sestillion", "septillion", "octillion", "nonillion",
+         "", "migliaia", "milioni", "miliardi", "trilioni", "quadrilioni",
+         "quintilioni", "sestilioni", "settilioni", "ottilioni", "nonilioni",
     ]
       
 - NumbersOrdinalLarge: [
          "", "millesimo", "milionesimo", "miliardesimo", "trilionesimo", "quadrilionesimo",
-         "quintillionesimo", "sestilionesimo", "settilionesimo", "ottalionesimo", "nonillionesimo"
+         "quintilionesimo", "sestilionesimo", "settilionesimo", "ottilionesimo", "nonillionesimo"
     ]
       
 - NumbersOrdinalPluralLarge: [
-         "", "millesimi", "milionesimi", "miliardesi", "trilionesimi", "quadrilionesimi",
-         "quintillionesimi", "sestilionesimi", "settilionesimi", "ottalionesimi", "nonlionesimi"
+         "", "millesimi", "milionesimi", "miliardesimi", "trilionesimi", "quadrilionesimi",
+         "quintilionesimi", "sestilionesimi", "settilionesimi", "ottilionesimi", "nonilionesimi"
     ]
