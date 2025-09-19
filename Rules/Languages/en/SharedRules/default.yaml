@@ -109,7 +109,7 @@
   - pause: short
   - test:
       if: "$Impairment = 'Blindness'"
-      then: [t: "end over"]          # phrase("start of fraction x over y 'end over'")
+      then: [t: "end"]          # phrase("start of fraction x over y 'end over'")
   - pause: medium
 
 
