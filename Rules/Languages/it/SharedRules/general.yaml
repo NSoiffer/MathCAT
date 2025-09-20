@@ -17,15 +17,15 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
-      then: [T: "numeri complessi"]      # phrase('complex numbers' consist of two parts)
+      then: [T: "numeri complessi"]       # phrase('complex numbers' consist of two parts)
     - else_if: "*[1][text()='ℕ']"
-      then: [T: "numeri naturali"]      # phrase('natural numbers' are numbers from 1 to infinity)
+      then: [T: "numeri naturali"]        # phrase('natural numbers' are numbers from 1 to infinity)
     - else_if: "*[1][text()='ℚ']"
-      then: [T: "numeri razionali"]      # phrase('rational numbers' are the fraction of 2 integers)
+      then: [T: "numeri razionali"]       # phrase('rational numbers' are the fraction of 2 integers)
     - else_if: "*[1][text()='ℝ']"
-      then: [T: "numeri reali"]      # phrase('real numbers' can be both positive and negative)
+      then: [T: "numeri reali"]           # phrase('real numbers' can be both positive and negative)
     - else_if: "*[1][text()='ℤ']"
-      then: [T: "numeri interi"]      # phrase(positive 'integers' are natural numbers above 0)
+      then: [T: "numeri interi"]          # phrase(positive 'integers' are natural numbers above 0)
       else: [x: "*[1][text()]"] # shouldn't happen
 
 - name: dimension-number-sets
@@ -150,7 +150,7 @@
       if: "$Verbosity!='Terse'"
       then:
       - T: "la"      # phrase('the' square root of 25 equals 5)
-  - T: "punto"      # phrase(a decimal 'point' indicates the fraction component of a number)
+  - T: "punto"       # phrase(a decimal 'point' indicates the fraction component of a number)
   - x: "*[1]"
   - T: "virgola"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
   - x: "*[2]"
@@ -162,12 +162,12 @@
   - test:
       if: "$Verbosity='Terse'"
       then: [T: "valore assoluto"]      # phrase(the 'absolute value' of a number represents its distance from 0)
-      else: [t: "il valore assoluto di"]      # phrase('the absolute value of' a number represents its distance from 0)
+      else: [T: "il valore assoluto di"]      # phrase('the absolute value of' a number represents its distance from 0)
   - x: "*[1]"
   - test:
       if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
       then: [pause: short]
-      else: [pause: short, t: "end assolute value", pause: short]      # phrase(show 'end absolute value' position)
+      else: [pause: short, T: "fine valore assoluto", pause: short]      # phrase(show 'end absolute value' position)
 
 - name: negative
   tag: negative
@@ -261,7 +261,7 @@
       then_test:
           if: "$Verbosity='Terse'"
           then: [T: "lim inf"]
-          else: [T: "limite inferio"]
+          else: [T: "limite inferiore"]
     - else: [x: "*[1]"]
   - T: "per"                      # phrase(the limit 'as' x approaches 1)
   - x: "*[2]"
@@ -315,7 +315,7 @@
       - test:
           if: "$Verbosity='Verbose'"
           then: [T: "fine pedice"]      # phrase(this is the 'end subscript' position)
-          else: [T: "fine apice"]      # phrase(this is the 'end sub' position)
+          else: [T: "fine pedice"]      # phrase(this is the 'end sub' position)
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -325,7 +325,7 @@
       then_test:
         if: "$Verbosity='Verbose'"
         then: [T: "apice"]      # phrase(a 'superscript' number indicates raised to a power)
-        else: [t: "super"]      # phrase(this is a 'super' set of numbers)
+        else: [T: "sopra"]      # phrase(this is a 'super' set of numbers)
   - x: "*[3]"
   - pause: short
 
@@ -351,7 +351,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: [T: "tan è il rapporto tra l"]      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
+      then: [T: "tan"]      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
       else: [T: "tangente"]      # phrase(a 'tangent' is a straight line that touches a curve)
 - name: sec
   tag: mi
@@ -433,7 +433,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: [T: "fcotangH"]      # phrase('cotanch' is shorthand for hyperbolic cotangent)
+      then: [T: "cotanH"]      # phrase('cotanch' is shorthand for hyperbolic cotangent)
       else: [T: "cotangente iperbolica"]      # phrase(the 'hyperbolic cotangent' is a mathematical function)
 - name: exponential
   tag: mi
@@ -442,7 +442,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: [T: "esp"]      # phrase('exp' means exponential function)
+      then: [T: "exp"]      # phrase('exp' means exponential function)
       else: [T: "esponenziale"]      # phrase('exponential' function)
 - name: covariance
   tag: mi
@@ -471,7 +471,7 @@
         then: [T: "log"]      # phrase(the 'log' function is used in mathematics)
       - else_if: "$Verbosity='Terse'"
         then: [spell: "'ln'"]
-        else: [T: "log naturale"]      # phrase(the 'natural log' function is used in mathematics)
+        else: [T: "logaritmo naturale"]      # phrase(the 'natural log' function is used in mathematics)
       else:
       - test:
           if: "$Verbosity!='Terse' and not(log_is_simple)"
@@ -481,7 +481,7 @@
           then: [T: "log"]      # phrase(the 'log' function is used in mathematics)
         - else_if: "$Verbosity='Terse'"
           then: [spell: "'ln'"]
-          else: [t: "log natural"]      # phrase(the 'natural log' function is used in mathematics)
+          else: [T: "logaritmo naturale"]      # phrase(the 'natural log' function is used in mathematics)
       - T: "di"      # phrase(5 is the square root 'of' 25)
       - pause: short
   - x: "*[3]"
@@ -494,7 +494,7 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: "la"]      # phrase('the' square root of 25 equals 5)
-  - T: "base log"      # phrase(the 'log base' is often base 10)
+  - T: "base del logaritmo"      # phrase(the 'log base' is often base 10)
   - x: "*[1]"
 
 - name: log-base-power
@@ -505,7 +505,7 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: "la"]      # phrase('the' square root of 25 equals 5)
-  - T: "log base"      # phrase(the 'log base' is often base 10)
+  - T: "base del logaritmo"      # phrase(the 'log base' is often base 10)
   - x: "*[1]"
   - pause: medium
   - test:
@@ -516,7 +516,7 @@
         else:  # don't bother with special cases as this isn't likely to happen
         - T: "elevato alla"      # phrase(x 'raised to the' second power)
         - x: "*[2]"
-        - T: "potenza"      # phrase(x raised to the second 'power')
+        - T: "potenza"           # phrase(x raised to the second 'power')
   - pause: short
 
 - name: multi-line
@@ -627,7 +627,7 @@
   - T: "per 1 colonna"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: [T: "vettoriale"]      # phrase(the 2 by 2 'vector')
+      then: [T: "vettore"]      # phrase(the 2 by 2 'vector')
       else: [T: "matrice"]      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*/*"
@@ -645,7 +645,7 @@
   variables: [IsColumnSilent: true()]
   match: "*[self::m:mtr][count(*) = 1]"
   replace:
-  - T: "the"      # phrase('the' 2 by 2 matrix M)
+  - T: "la"      # phrase('the' 2 by 2 matrix M)
   - x: "count(*)"
   - T: "per 1 colonna"      # phrase(the 2 'by 1 column' matrix)
   - test:
@@ -667,13 +667,13 @@
   - count(*[1]/*)<=3 and # at least two cols
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
-  - T: "la matrice 1 di"      # phrase('the 1 by' 2 matrix)
+  - T: "1 per"      # phrase('the 1 by' 2 matrix)
   - x: count(*/*)
   - T: "righe"      # phrase(the 1 by 4 'row' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: [T: "il 1 per"]      # phrase('the 1 by' 2 row 'vector')
-      else: [T: "la 1 per"]      # phrase('the 1 by' 2 'matrix')
+      then: [T: "il vettore 1 per"]      # phrase('the 1 by' 2 row 'vector')
+      else: [T: "la matrice 1 per"]      # phrase('the 1 by' 2 'matrix')
   - pause: long
   - x: "*/*"
   - test:
@@ -683,7 +683,7 @@
       - test:
           if: $ClearSpeak_Matrix = 'EndMatrix'
           then: [T: "matrice"]      # phrase(the 2 by 2 'matrix')
-          else: [T: "vettoriale"]      # phrase(the 2 by 1 'vector')
+          else: [T: "vettore"]      # phrase(the 2 by 1 'vector')
 
 - name: default-row-matrix
   tag: matrix
@@ -743,7 +743,7 @@
   replace:
   - T: "la"      # phrase('the' 1 by 2 matrix M)
   - x: "count(*)"
-  - T: "di"      # phrase(the 1 'by' 2 matrix)
+  - T: "per"      # phrase(the 1 'by' 2 matrix)
   - x: "count(*[self::m:mtr][1]/*)"
   - test:
       if: "self::m:determinant"
@@ -984,9 +984,9 @@
     - if: ".='s'"
       then: [T: "solido"]      # phrase(Boron is a 'solid' in its natural state)
     - else_if: ".='l'"
-      then: [T: "acqua è un "]      # phrase(water is a 'liquid')
+      then: [T: "liquido"]      # phrase(water is a 'liquid')
     - else_if: ".='g'"
-      then: [T: "idrogeno è un "]      # phrase(hydrogen is a 'gas' )
+      then: [T: "gas"]      # phrase(hydrogen is a 'gas' )
       else: [T: "acquosa"]      # phrase(an 'aqueous' solution is contained in water)
   - pause: short
 
@@ -1024,7 +1024,7 @@
       then_test:
         if: "$Verbosity='Terse'"
         then: [T: "forma"]      # phrase(hydrogen and oxygen 'forms' water )
-        else: [T: "idrogeno e "]      # phrase(hydrogen and oxygen 'reacts to form' water)
+        else: [T: "reagisce a formare"]      # phrase(hydrogen and oxygen 'reacts to form' water)
     - else_if: ".='⇌' or .='\u1f8d2'"
       then: [T: "è in equilibrio con"]      # phrase(a reactant 'is in equilibrium with' a product)
     - else_if: ".='\u1f8d4'"

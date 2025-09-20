@@ -67,7 +67,7 @@
       if: "$Verbosity='Verbose'"
       then:
       - T: "la"      # phrase('the' square root of 25 equals 5)
-  - T: "trace"      # phrase('trace' of a matrix)
+  - T: "traccia"      # phrase('trace' of a matrix)
   - test:
       if: "$Verbosity!='Terse'"
       then:
@@ -97,7 +97,7 @@
       if: "$Verbosity='Verbose'"
       then:
       - T: "la"      # phrase('the' square root of 25 equals 5)
-  - T: "l"      # phrase('homomorphism' indicates similarity of form)
+  - T: "omomorfismo"      # phrase('homomorphism' indicates similarity of form)
   - test:
       if: "$Verbosity!='Terse'"
       then:

@@ -20,7 +20,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [T: ""]    # phrase('the' square root of x)
+      then: [T: "la"]    # phrase('the' square root of x)
   - T: "radice quadrata"      # phrase(the 'square root' of x)
   - test:
       if: "$Verbosity!='Terse'"
@@ -38,7 +38,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [T: ""]
+      then: [T: "la"]
   - test:
       if: "*[2][self::m:mn]"
       then_test:
@@ -109,7 +109,7 @@
   replace:
   - test:
       if: "$Impairment = 'Blindness'"
-      then: [T: "Inizio frazione"]      # phrase(the 'fraction' 3 over 4)
+      then: [T: "inizio frazione"]      # phrase(the 'fraction' 3 over 4)
   - pause: short
   - x: "*[1]"
   - test:
@@ -231,7 +231,7 @@
   - test:
       if: "$Impairment = 'Blindness'"
       then:
-      - T: "esponente 4 "      # phrase(start 2 raised to the exponent 4 'end of exponent')
+      - T: "fine esponente"      # phrase(start 2 raised to the exponent 4 'end of exponent')
       - pause: short
       else:
       - pause: medium
@@ -258,13 +258,13 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [T: ""]      # phrase('the' empty set)
+          then: [T: "l'"]      # phrase('the' empty set)
       - T: "insieme vuoto"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [T: ""]      # phrase('the' set of all integers)
+          then: [T: "l'"]      # phrase('the' set of all integers)
       - T: "insieme degli interi positivi "      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
       - T: "tale che"      # phrase(x 'such that' x is less than y)
@@ -272,7 +272,7 @@
       else:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [T: ""]      # phrase('the' set of integers)
+          then: [T: "l'"]      # phrase('the' set of integers)
       - T: "insieme"      # phrase(here is a 'set' of numbers)
       - x: "*[1]"
 

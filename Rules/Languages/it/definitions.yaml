@@ -32,14 +32,16 @@
          "diciassette", "diciotto", "diciannove"
     ]
 
+# 'zeresimo' is kind of akward, but it documented in Italian, see for example:
+# https://www.treccani.it/vocabolario/esimo/
 - NumbersOrdinalOnes: [
-         "zero", "primo", "secondo", "terzo", "quarto", "quinto", "sesto", "settimo", "ottavo", "nono",
+         "zeresimo", "primo", "secondo", "terzo", "quarto", "quinto", "sesto", "settimo", "ottavo", "nono",
          "decimo", "undicesimo", "dodicesimo", "tredicesimo", "quattordicesimo", "quindicesimo", "sedicesimo",
          "diciassettesimo", "diciottesimo", "diciannovesimo"
     ]
 
 - NumbersOrdinalPluralOnes: [
-         "zero", "primi", "secondi", "terzi", "quarti", "quinti", "sesti", "settimi", "ottavi", "noni",
+         "zeresimi", "primi", "secondi", "terzi", "quarti", "quinti", "sesti", "settimi", "ottavi", "noni",
          "decimi", "undicesimi", "dodicesimi", "tredicesimi", "quattordicesimi", "quindicesimi", "sedicesimi",
          "diciassettesimi", "diciottesimi", "diciannovesimi"
     ]
@@ -75,13 +77,13 @@
     ]
 
 - NumbersOrdinalHundreds: [
-       "", "un centesimo", "duecentesimo", "trecentesimo", "quattrocentesimo", "cinquecentesimo",
+       "", "centesimo", "duecentesimo", "trecentesimo", "quattrocentesimo", "cinquecentesimo",
          "seicentesimo", "settecentesimo", "ottocentesimo", "novecentesimo"
     ]
 
 - NumbersOrdinalPluralHundreds: [
-       "", "un centesimo", "due centesimi", "tre centesimi", "quattro centesimi", "cinque centesimi",
-         "sei centesimi", "sette centesimi", "otto centesimi", "nove centesimi"
+       "", "centesimo", "duecentesimi", "trecentesimi", "quattrocentesimi", "cinquecentesimi",
+         "seicentesimi", "settecentesimi", "ottocentesimi", "novecentesimi"
     ]
       
 

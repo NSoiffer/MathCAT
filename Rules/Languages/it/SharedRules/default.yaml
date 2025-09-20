@@ -135,17 +135,17 @@
       if: "$Verbosity!='Terse'"
       then: [T: ""]   # phrase("'the' root of x")
   - T: "simbolo di radice"
-  - T: "radice di x "      # phrase("the root of x 'with index' 5")
+  - T: "con indice"      # phrase("the root of x 'with index' 5")
   - x: "*[1]"
   - pause: short
   - test:
       if: "$Verbosity!='Terse'"
-      then: [T: "radice"]   # phrase("the root 'of' x")
+      then: [T: "di"]   # phrase("the root 'of' x")
   - x: "*[2]"
   - pause: short
   - test:
       if: "not(IsNode(*[2],'leaf'))"
-      then: [T: "radice di x "] # phrase("root of x 'end root symbol'")
+      then: [T: "fine simbolo di radice"] # phrase("root of x 'end root symbol'")
 
 
 - name: simple-sub
@@ -413,7 +413,7 @@
       if: count(*)=1
       then: [T: "riga"]      # phrase(the table with 1 'row')
       else: [T: "righe"]      # phrase(the table with 3 'rows')
-  - T: "e "      # phrase(the table with 3 rows 'and' 4 columns)
+  - T: "e"      # phrase(the table with 3 rows 'and' 4 columns)
   - x: "count(*[1]/*)"
   - test:
       if: "count(*[1]/*)=1"
@@ -484,7 +484,7 @@
       then: [T: "rettangolo", pause: short]      # phrase(the 'box' around the expression)
   - test:
       if: ".[contains(@notation,'roundedbox')]"
-      then: [T: "ellisse", pause: short]      # phrase(the 'round box' around the expression)
+      then: [T: "rettangolo arrotondato", pause: short]      # phrase(the 'round box' around the expression)
   - test:
       if: ".[contains(@notation,'circle')]"
       then: [T: "cerchio", pause: short]      # phrase(the 'circle' around the expression)
@@ -509,11 +509,11 @@
       then:
       - test:
           if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
-          then: [spell: "'x'", pause: short] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+          then: [spell: "x", pause: short] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
           else:
           - test:
               if: ".[contains(@notation,'updiagonalstrike')]"
-              then: [T: "diagonale", pause: short]      # phrase(the line runs 'up diagonal')
+              then: [T: "diagonale verso l'alto", pause: short]      # phrase(the line runs 'up diagonal')
           - test:
               if: ".[contains(@notation,'downdiagonalstrike')]"
               then: [T: "diagonale verso il basso", pause: short]      # phrase(the line runs 'down diagonal')
@@ -527,16 +527,16 @@
       - pause: short
   - test:
       if: ".[contains(@notation,'uparrow')]"
-      then: [T: "freccia in alto", pause: short]      # phrase(direction is shown by the 'up arrow')
+      then: [T: "freccia verso l'alto", pause: short]      # phrase(direction is shown by the 'up arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
-      then: [T: "freccia in basso", pause: short]      # phrase(the trend is shown by the 'down arrow')
+      then: [T: "freccia verso il basso", pause: short]      # phrase(the trend is shown by the 'down arrow')
   - test:
       if: ".[contains(@notation,'leftarrow')]"
-      then: [T: "freccia a sinistra", pause: short]      # phrase(the 'left arrow' indicates going back)
+      then: [T: "freccia verso sinistra", pause: short]      # phrase(the 'left arrow' indicates going back)
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
-      then: [T: "freccia a destra", pause: short]      # phrase(the 'right arrow' indicates moving forward)
+      then: [T: "freccia verso destra", pause: short]      # phrase(the 'right arrow' indicates moving forward)
   - test:
       if: ".[contains(@notation,'northeastarrow')]"
       then: [T: "freccia verso nord -est", pause: short]      # phrase(direction is indicated by the 'northeast arrow')
@@ -545,22 +545,22 @@
       then: [T: "freccia verso sud -est", pause: short]      # phrase(direction is shown by the 'southeast arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
-      then: [T: "freccia verso sud -ovest", pause: short]      # phrase(direction is shown by the 'southwest arrow')
+      then: [T: "freccia verso sud-ovest", pause: short]      # phrase(direction is shown by the 'southwest arrow')
   - test:
       if: ".[contains(@notation,'northwestarrow')]"
       then: [T: "freccia verso nord -ovest", pause: short]      # phrase(direction is shown by the 'northwest arrow')
   - test:
       if: ".[contains(@notation,'updownarrow')]"
-      then: [T: "alto è indicato dalla ", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
+      then: [T: "freccia verticale a doppia estremità", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
   - test:
       if: ".[contains(@notation,'leftrightarrow')]"
       then: [T: "freccia orizzontale a doppia estremità", pause: short]      # phrase(progress is indicated by the 'double ended horizontal arrow')
   - test:
       if: ".[contains(@notation,'northeastsouthwestarrow')]"
-      then: [T: "freccia diagonale a doppia estremità", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
+      then: [T: "freccia diagonale verso l'alto a doppia estremità", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
   - test:
       if: ".[contains(@notation,'northwestsoutheastarrow')]"
-      then: [T: "freccia diagonale a doppia estremità", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
+      then: [T: "freccia diagonale verso il basso a doppia estremità", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
   - test:
       if: ".[contains(@notation,'actuarial')]"
       then: [T: "simbolo attuariale", pause: short]      # phrase(the 'actuarial symbol' represents a specific quantity)
@@ -569,7 +569,7 @@
       then: [T: "simbolo fattoriale arabo", pause: short]      # phrase(the 'arabic factorial symbol' represents a factorial operation)
   - test:
       if: ".[contains(@notation,'phasorangle')]"
-      then: [T: "angolo di phasor", pause: short]      # phrase(the 'phasor angle' is used to measure electrical current)
+      then: [T: "angolo di fase", pause: short]      # phrase(the 'phasor angle' is used to measure electrical current)
   - test:
       if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']" # default
       then: [T: "simbolo della divisione lunga", pause: short]      # phrase(the 'long division symbol' indicates  a long division calculation)
@@ -579,7 +579,7 @@
   - T: "racchiudono"      # phrase(parentheses are 'enclosing' part of the equation)
   - test:
       if: "*[self::m:mtext and text()=' ']"
-      then: [T: "c'è uno "]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
+      then: [T: "spazio"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
@@ -656,7 +656,7 @@
   - pause: short
   - insert:
       nodes: "*"
-      replace: [t: "virma", pause: auto]      # phrase(f of x 'comma' y)
+      replace: [T: "virgola", pause: auto]      # phrase(f of x 'comma' y)
 
 - name: default-text
   # unknown leaf -- just speak the text -- could be a literal intent
