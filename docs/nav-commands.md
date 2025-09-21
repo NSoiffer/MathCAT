@@ -301,22 +301,20 @@ Note: while navigating an expression, "control+c" copies the math content of the
 
 ## Navigation Modes
 
-<b>Enhanced mode</b>: &nbsp;navigation is by mathematically
-meaningful pieces (operators, delimiters, and operands)
+MathCAT supports three different navigation modes: enhanced, simple, and character. The first two modes of navigation follow the semantics of what was read for the entire expression except if LiteralSpeech is selected. For example $|x+y| > 0$ will not read the vertical bars that are used for the absolute value notation, but instead will say "absolute value". In contrast, character mode will read this as "vertical line", "x", "plus", "y" "vertical line", "is greater than", "zero" as you move through the expression.
 
-
-<b>Simple mode</b>: this moves by words except when you get to a
-2D notation (fractions, roots, ...), then it speaks the entire notation.
-Zooming in lets you explore the 2D notation in the same mode. Zooming out or
-moving out of the 2D notation brings you back to the outer/higher level of
-navigation.
-
-
-<b>Character mode</b>: &nbsp;this is actually two useful modes --
-word mode and character mode (zoom in to get &quot;real&quot; character mode).
-&nbsp;Moves by words/characters. &nbsp;This differs for numbers of more than
-one digit and function names such as &quot;sin&quot; that are multiple
-characters. Otherwise, word and character navigation is the same.
+* _Enhanced mode_: navigation is by mathematically meaningful pieces (operators, delimiters, and operands)
+* _Simple mode_: this moves by words except when you get to a
+    2D notation (fractions, roots, ...), then it speaks the entire notation.
+    Zooming in lets you explore the 2D notation in the same mode. Zooming out or
+    moving out of the 2D notation brings you back to the outer/higher level of
+    navigation.
+* _Character mode_: this is actually two useful modes --
+    word mode and character mode (zoom in to get &quot;real&quot; character mode).
+    &nbsp;Moves by words/characters. &nbsp;This differs for numbers of more than
+    one digit and function names such as &quot;sin&quot; that are multiple
+    characters. Otherwise, word and character navigation is the same. Both will
+    automatically zoom into fractions, etc.
 
 ## Typical Use
 
