@@ -303,6 +303,7 @@ Note: while navigating an expression, "control+c" copies the math content of the
 
 <b>Enhanced mode</b>: &nbsp;navigation is by mathematically
 meaningful pieces (operators, delimiters, and operands)
+MathCAT supports three different navigation modes: enhanced, simple, and character. The first two modes of navigation follow the semantics of what was read for the entire expression except if LiteralSpeech is selected. For example $|x+y| > 0$ will not read the vertical lines that are used for the absolute value notation, but instead will say "absolute value". Zooming in will move directly saying "x plus y". In contrast, character mode will read this as "vertical line", "x", "plus", "y" "vertical line", "is greater than", "zero" as you move through the expression.
 
 
 <b>Simple mode</b>: this moves by words except when you get to a
