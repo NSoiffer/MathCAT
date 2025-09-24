@@ -1,4 +1,4 @@
-// Marburg tests
+// Polish tests
 // Most of these tests come from 
 //   https://ore.edu.pl/images/files/pdf/Brajlowska%20notacja%20matematyczna%20fizyczna%20chemiczna%20wyd%20II.pdf
 use crate::common::*;
@@ -868,7 +868,7 @@ fn fractions_p29_4() {
 #[test]
 fn fractions_p30_1() {
     let expr = r#"<math><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mrow><mi>a</mi><mo>-</mo><mi>b</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>1</mn><mo>+</mo><mstyle displaystyle="true"><mfrac><mi>b</mi><mi>a</mi></mfrac></mstyle></mrow><mrow><mn>1</mn><mo>-</mo><mstyle displaystyle="true"><mfrac><mi>b</mi><mi>a</mi></mfrac></mstyle></mrow></mfrac></math>"#;
-    test_braille("Polish", expr, r"⠠⠁⠈⠖⠃⠳⠁⠈⠤⠃⠀⠶⠆⠼⠁⠀⠖⠆⠃⠳⠈⠀⠳⠀⠼⠁⠀⠤⠆⠃⠳⠁⠰");
+    test_braille("Polish", expr, r"⠠⠁⠈⠖⠃⠳⠁⠈⠤⠃⠀⠶⠆⠼⠁⠀⠖⠆⠃⠳⠁⠀⠳⠀⠼⠁⠀⠤⠆⠃⠳⠁⠰");
 }
 
 #[test]
@@ -881,7 +881,7 @@ fn fractions_p30_2() {
                 </mrow>
                     <mstyle displaystyle="true"><mfrac><mi>x</mi><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mfrac></mstyle>
             </mfrac></math>"#;
-    test_braille("Polish", expr, "⠆⠆⠠⠁⠳⠒⠀⠤⠆⠃⠳⠲⠀⠳⠀⠰⠭⠳⠭⠈⠖⠽⠰");
+    test_braille("Polish", expr, "⠆⠆⠠⠁⠳⠒⠀⠤⠆⠃⠳⠲⠀⠳⠀⠆⠭⠳⠭⠈⠖⠽⠰");
 }
 
 #[test]
@@ -1626,49 +1626,49 @@ fn functions_p43_4() {
 #[test]
 fn cases_p43_1() {
     let expr = r#"<math><mo>&#x2223;</mo><mi>x</mi><mo>&#x2223;=</mo><mfenced open="{" close="" separators="|"><mtable columnspacing="1em" columnalign="left left"><mtr><mtd><mo>&#x2212;</mo><mi>x</mi><mo>&#xA0;</mo><mi>dla</mi><mo>&#xA0;</mo><mi>x</mi><mo>&lt;</mo><mn>0</mn><mo>,</mo></mtd></mtr><mtr><mtd><mspace width="1em"/><mn>0</mn><mo>&#xA0;</mo><mi>dla</mi><mo>&#xA0;</mo><mi>x</mi><mo>=</mo><mn>0</mn><mo>,</mo></mtd></mtr><mtr><mtd><mspace width="1em"/><mi>x</mi><mo>&#xA0;</mo><mi>dla</mi><mo>&#xA0;</mo><mi>x</mi><mo>&gt;</mo><mn>0.</mn><mo>&#x2005;&#x2005;&#x2005;&#x2005;</mo></mtd></mtr></mtable></mfenced></math>"#;
-    test_braille("Marburg", expr, "⠈⠇⠠⠭⠸⠀⠶⠪⠀⠤⠭⠀⠙⠇⠁⠀⠠⠭⠀⠪⠄⠼⠚⠠⠂⠀⠰⠳⠀⠼⠚⠀⠙⠇⠁⠀⠠⠭⠀⠶⠼⠚⠠⠂⠀⠰⠳⠀⠭⠀⠙⠇⠁⠀⠠⠭⠀⠕⠂⠼⠚⠄");
+    test_braille("Polish", expr, "⠈⠇⠠⠭⠸⠀⠶⠪⠀⠤⠭⠀⠙⠇⠁⠀⠠⠭⠀⠪⠄⠼⠚⠠⠂⠀⠰⠳⠀⠼⠚⠀⠙⠇⠁⠀⠠⠭⠀⠶⠼⠚⠠⠂⠀⠰⠳⠀⠭⠀⠙⠇⠁⠀⠠⠭⠀⠕⠂⠼⠚⠄");
 }
 
 #[test]
 fn cases_p43_2() {
     let expr = r#"<math><mi>sgn</mi><mi>x</mi><mo>=</mo><mfenced open="{" close="" separators="|"><mtable columnspacing="1em" columnalign="left left"><mtr><mtd><mo>&#x2212;</mo><mn>1</mn><mo>&#xA0;</mo><mi>dla</mi><mo>&#xA0;</mo><mi>x</mi><mo>&lt;</mo><mn>0</mn><mo>,</mo></mtd></mtr><mtr><mtd><mn>0</mn><mo>&#xA0;</mo><mi>dla</mi><mo>&#xA0;</mo><mi>x</mi><mo>=</mo><mn>0</mn><mo>,</mo></mtd></mtr><mtr><mtd><mn>1</mn><mo>&#xA0;</mo><mi>dla</mi><mo>&#xA0;</mo><mi>x</mi><mo>&gt;</mo><mn>0.</mn><mo>&#x2005;&#x2005;&#x2005;&#x2005;</mo></mtd></mtr></mtable></mfenced></math>"#;
-    test_braille("Marburg", expr, "⠈⠼⠎⠠⠭⠀⠶⠪⠀⠤⠼⠁⠀⠙⠇⠁⠀⠠⠭⠀⠪⠄⠼⠚⠠⠂⠀⠰⠳⠀⠼⠚⠀⠙⠇⠁⠀⠠⠭⠀⠶⠼⠚⠠⠂⠀⠰⠳⠀⠼⠁⠀⠙⠇⠁⠀⠠⠭⠀⠕⠂⠼⠚⠄");
+    test_braille("Polish", expr, "⠈⠼⠎⠠⠭⠀⠶⠪⠀⠤⠼⠁⠀⠙⠇⠁⠀⠠⠭⠀⠪⠄⠼⠚⠠⠂⠀⠰⠳⠀⠼⠚⠀⠙⠇⠁⠀⠠⠭⠀⠶⠼⠚⠠⠂⠀⠰⠳⠀⠼⠁⠀⠙⠇⠁⠀⠠⠭⠀⠕⠂⠼⠚⠄");
 }
 
 #[test]
 fn cases_p43_3() {
     let expr = r#"<math><mfenced><mtable><mtr><mtd><mi>n</mi></mtd></mtr><mtr><mtd><mi>k</mi></mtd></mtr></mtable></mfenced></math>"#;
-    test_braille("Marburg", expr, "⠣⠠⠝⠰⠳⠅⠜");
+    test_braille("Polish", expr, "⠣⠠⠝⠰⠳⠅⠜");
 }
 
 #[test]
 fn cases_p43_4() {
     let expr = r#"<math><msubsup><mover><mi>C</mi><mo>&#xAF;</mo></mover><mi>n</mi><mi>k</mi></msubsup><mo>=</mo><mfenced><mtable><mtr><mtd><mi>n</mi><mo>+</mo><mi>k</mi><mo>-</mo><mn>1</mn></mtd></mtr><mtr><mtd><mi>k</mi></mtd></mtr></mtable></mfenced></math>"#;
-    test_braille("Marburg", expr, "⠨⠉⠒⠌⠠⠅⠡⠝⠀⠶⠣⠝⠈⠖⠅⠈⠤⠼⠁⠰⠳⠅⠜");
+    test_braille("Polish", expr, "⠨⠉⠒⠌⠠⠅⠡⠝⠀⠶⠣⠝⠈⠖⠅⠈⠤⠼⠁⠰⠳⠅⠜");
 }
 
 #[test]
 fn systems_of_equations_p44_1() {
     let expr = r#"<math><mfenced open="{" close="" separators="|"><mtable columnspacing="1em" columnalign="left left"><mtr><mtd><mo>&#x2005;&#x2005;&#x2005;&#x2005;</mo><mrow><mn>2</mn><mi>x</mi><mo>+</mo><mn>3</mn><mo>(</mo><mi>x</mi><mo>&#x2212;</mo><mn>2</mn><mo>)</mo><mo>=</mo><mi>x</mi><mo>&#x2212;</mo><mn>10</mn></mrow></mtd></mtr><mtr><mtd><mo>&#x2005;&#x2005;&#x2005;&#x2005;</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>3</mn><mi>x</mi><mo>&#x2212;</mo><mn>6</mn><mo>=</mo><mi>x</mi><mo>&#x2212;</mo><mn>10</mn></mtd></mtr><mtr><mtd><mo>&#x2005;&#x2005;&#x2005;&#x2005;</mo><mn>5</mn><mi>x</mi><mo>&#x2212;</mo><mn>6</mn><mo>=</mo><mi>x</mi><mo>&#x2212;</mo><mn>10</mn></mtd></mtr><mtr><mtd><mo>&#x2005;&#x2005;&#x2005;&#x2005;</mo><mn>5</mn><mi>x</mi><mo>&#x2212;</mo><mi>x</mi><mo>=</mo><mn>6</mn><mo>&#x2212;</mo><mn>10</mn></mtd></mtr><mtr><mtd><mo>&#x2005;&#x2005;&#x2005;&#x2005;</mo><mn>4</mn><mi>x</mi><mo>=</mo><mo>&#x2212;</mo><mn>4</mn><mo>&#x2223;:</mo><mn>4</mn></mtd></mtr><mtr><mtd><mo>&#x2005;&#x2005;&#x2005;&#x2005;</mo><mi>x</mi><mo>=</mo><mo>&#x2212;</mo><mn>1</mn></mtd></mtr></mtable></mfenced></math>"#;
-    test_braille("Marburg", expr, "⠼⠃⠄⠭⠀⠖⠼⠉⠣⠭⠀⠤⠼⠃⠜⠀⠶⠭⠀⠤⠼⠁⠚⠀⠐⠶⠂⠼⠃⠠⠭⠀⠖⠼⠉⠭⠀⠤⠼⠋⠀⠶⠭⠀⠤⠼⠁⠚⠀⠐⠶⠂⠼⠑⠠⠭⠀⠤⠼⠋⠀⠶⠭⠀⠤⠼⠁⠚⠀⠐⠶⠂⠼⠑⠠⠭⠀⠤⠭⠀⠶⠼⠋⠀⠤⠼⠁⠚⠀⠐⠶⠂⠼⠙⠠⠭⠀⠶⠤⠼⠙⠀⠸⠀⠲⠼⠙⠀⠐⠶⠂⠠⠭⠀⠶⠤⠼⠁");
+    test_braille("Polish", expr, "⠼⠃⠄⠭⠀⠖⠼⠉⠣⠭⠀⠤⠼⠃⠜⠀⠶⠭⠀⠤⠼⠁⠚⠀⠐⠶⠂⠼⠃⠠⠭⠀⠖⠼⠉⠭⠀⠤⠼⠋⠀⠶⠭⠀⠤⠼⠁⠚⠀⠐⠶⠂⠼⠑⠠⠭⠀⠤⠼⠋⠀⠶⠭⠀⠤⠼⠁⠚⠀⠐⠶⠂⠼⠑⠠⠭⠀⠤⠭⠀⠶⠼⠋⠀⠤⠼⠁⠚⠀⠐⠶⠂⠼⠙⠠⠭⠀⠶⠤⠼⠙⠀⠸⠀⠲⠼⠙⠀⠐⠶⠂⠠⠭⠀⠶⠤⠼⠁");
 }
 
 #[test]
 fn systems_of_equations_p45_1() {
     let expr = r#"<math><mfenced open="{" close="" separators="|"><mtable columnspacing="1em" columnalign="left left"><mtr><mtd><mi>x</mi><mo>+</mo><mn>5</mn><mi>y</mi><mo>=</mo><mn>3</mn><mo>+</mo><mn>3</mn><mi>y</mi></mtd></mtr><mtr><mtd><mo>&#x2212;</mo><mn>4</mn><mi>x</mi><mo>+</mo><mi>y</mi><mo>+</mo><mn>2</mn><mo>=</mo><mn>9</mn><mo>&#x2212;</mo><mn>6</mn><mi>x</mi><mo>+</mo><mn>2</mn><mi>y</mi><mo>&#x2005;&#x2005;&#x2005;&#x2005;</mo></mtd></mtr></mtable></mfenced><mspace linebreak="newline"/><mfenced open="{" close="" separators="|"><mtable columnspacing="1em" columnalign="left left"><mtr><mtd><mi>x</mi><mo>+</mo><mn>2</mn><mi>y</mi><mo>=</mo><mn>3</mn></mtd></mtr><mtr><mtd><mn>2</mn><mi>x</mi><mo>&#x2212;</mo><mi>y</mi><mo>=</mo><mn>7</mn><mo>&#x2005;&#x2005;&#x2005;&#x2005;</mo></mtd></mtr></mtable></mfenced></math>"#;
-    test_braille("Marburg", expr, "⠪⠀⠠⠭⠀⠖⠼⠑⠽⠀⠶⠼⠉⠀⠖⠼⠉⠽⠀⠰⠳⠀⠤⠼⠙⠭⠀⠖⠽⠀⠖⠼⠃⠀⠶⠼⠊⠀⠤⠼⠋⠭⠀⠖⠼⠃⠽⠪⠀⠠⠭⠀⠖⠼⠃⠽⠀⠶⠼⠉⠀⠰⠳⠀⠼⠃⠭⠀⠤⠽⠀⠶⠼⠛");
+    test_braille("Polish", expr, "⠪⠀⠠⠭⠀⠖⠼⠑⠽⠀⠶⠼⠉⠀⠖⠼⠉⠽⠀⠰⠳⠀⠤⠼⠙⠭⠀⠖⠽⠀⠖⠼⠃⠀⠶⠼⠊⠀⠤⠼⠋⠭⠀⠖⠼⠃⠽⠪⠀⠠⠭⠀⠖⠼⠃⠽⠀⠶⠼⠉⠀⠰⠳⠀⠼⠃⠭⠀⠤⠽⠀⠶⠼⠛");
 }
 
 #[test]
 fn matrices_p46_1() {
     let expr = r#"<math><mi mathvariant="bold">W</mi><mo>=</mo><mfenced open="|" close="|"><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd><mtd><mo>-</mo><mn>1</mn></mtd></mtr></mtable></mfenced><mo>=</mo><mn>1</mn><mo>&#xB7;</mo><mo>(</mo><mo>-</mo><mn>1</mn><mo>)</mo><mo>-</mo><mn>2</mn><mo>&#xB7;</mo><mn>2</mn><mo>=</mo><mo>-</mo><mn>5</mn></math>"#;
-    test_braille("Marburg", expr, "⠻⠙⠑⠞⠣⠼⠁⠀⠼⠃⠰⠳⠼⠃⠀⠤⠼⠁⠜⠀⠶⠼⠁⠄⠣⠤⠼⠁⠜⠀⠤⠼⠃⠄⠼⠃⠀⠶⠤⠼⠑");
+    test_braille("Polish", expr, "⠻⠙⠑⠞⠣⠼⠁⠀⠼⠃⠰⠳⠼⠃⠀⠤⠼⠁⠜⠀⠶⠼⠁⠄⠣⠤⠼⠁⠜⠀⠤⠼⠃⠄⠼⠃⠀⠶⠤⠼⠑");
 }
 
 #[test]
 fn matrices_p46_2() {
     let expr = r#"<math><mfenced open="|" close="|"><mtable><mtr><mtd><mi mathvariant="bold">W</mi></mtd></mtr></mtable></mfenced><mo>=</mo><mo>|</mo><mfenced open="|" close="|"><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd><mtd><mo>-</mo><mn>1</mn></mtd></mtr></mtable></mfenced><mo>|</mo><mo>=</mo><mo>|</mo><mn>1</mn><mo>&#xB7;</mo><mo>(</mo><mo>-</mo><mn>1</mn><mo>)</mo><mo>-</mo><mn>2</mn><mo>&#xB7;</mo><mn>2</mn><mo>|</mo><mo>=</mo><mo>|</mo><mo>-</mo><mn>5</mn><mo>|</mo><mo>=</mo><mn>5</mn></math>"#;
-    test_braille("Marburg", expr, "⠈⠇⠻⠙⠑⠞⠣⠼⠁⠀⠼⠃⠰⠳⠼⠃⠀⠤⠼⠁⠜⠸⠀⠶⠈⠇⠼⠁⠄⠣⠈⠤⠼⠁⠜⠀⠤⠼⠃⠄⠼⠃⠸⠀⠶⠈⠇⠤⠼⠑⠸⠀⠶⠼⠑");
+    test_braille("Polish", expr, "⠈⠇⠻⠙⠑⠞⠣⠼⠁⠀⠼⠃⠰⠳⠼⠃⠀⠤⠼⠁⠜⠸⠀⠶⠈⠇⠼⠁⠄⠣⠈⠤⠼⠁⠜⠀⠤⠼⠃⠄⠼⠃⠸⠀⠶⠈⠇⠤⠼⠑⠸⠀⠶⠼⠑");
 }
 
 // Logarithms p. 47

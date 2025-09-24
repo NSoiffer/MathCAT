@@ -139,7 +139,10 @@
 - # simpler (more common?) case of the next rule (no whitespace)
   name: simple-fraction
   tag: mfrac
-  match: "$Polish_BrailleLevel != 'Beginner' and *[1][IsNode(., 'leaf') and not(contains(., 'u00a0'))] and *[2][IsNode(., 'leaf') and not(contains(., 'u00a0'))]"
+  match: "$Polish_BrailleLevel != 'Beginner' and
+          *[1][IsNode(., 'leaf') and not(contains(., 'u00a0'))] and
+          *[2][IsNode(., 'leaf') and not(contains(., 'u00a0'))] and
+          not(ancestor::*[self::m:mfrac])"
   replace:
   - t: "<⠆-" # signal start of fraction (needed for fraction depth count -- '-' says to delete the start/end)
   - x: "*[1]"

@@ -2437,18 +2437,20 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
             },
             '<' => {
                 // debug!("@<: i={i}, depth={projector_depth}, {projector_depths}, use_long={use_long_fraction_form}");
+                 // group felt should always announce internal fractions except numeric ones (they aren't marked with '<')
+                let parent_fraction_depth = fraction_depth; 
                 projector_depth = projector_depths.push();
                 if chars[i+1] == '⠆' { // fractions aren't projectors
                     fraction_depth = fraction_depths.push();
                     use_long_fraction_form = fraction_lengths.push() > SHORT_FRACTION_MAX_LENGTH;
-                    debug!("@<: i={i}, frac depth={fraction_depth}, {fraction_depths}, use_long={use_long_fraction_form}");
+                    // debug!("(@<: i={i} (after), frac parent/depth={parent_fraction_depth}/{fraction_depth}, {fraction_depths}, use_long={use_long_fraction_form}");
                     let has_keep_fraction_start_char = chars[i+2] == '+';
                     // Look for '<⠆⠤' -- all other patterns can drop fraction start ('⠆') -- p24, rule 4b
                     // Also want to keep '⠆' when the numerator is "long" (undefined and inconsistent in spec)
                     const LONG_NUMERATOR: usize = 4;  // # of letters or digits in numerator to be considered long
                     if chars[i+2] == '-' {      // hack to signal not to use start fraction indicator (for open, always more chars)
                         i += 1;
-                    } else if fraction_depth < 2 {
+                    } else if fraction_depth < 2 && parent_fraction_depth < 2 {
                         if chars[i+2] == '⠤' || use_long_fraction_form || has_keep_fraction_start_char {
                             result.push('⠆');
                         } else {
