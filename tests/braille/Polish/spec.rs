@@ -272,6 +272,7 @@ fn number_separation_p13_2() {
 }
 
 #[test]
+#[ignore = "there is no way to tell this is not a factorial"]
 fn number_separation_p13_3() {
     let expr = r#"<math><mn>12</mn><mo>!</mo></math>"#;
     test_braille("Polish", expr, "⠼⠁⠃⠠⠖");
@@ -352,6 +353,7 @@ fn algebraic_expressions_7() {
 }
 
 #[test]
+#[ignore = "decided that we should always generate Greek letter indicators"]
 fn algebraic_expressions_8() {
     let expr = r#"<math><mn>2</mn><mi>a</mi><mi>b</mi><mi>c</mi><mo>-</mo><mn>3</mn><mi>&#x3B1;</mi><mi>&#x3B2;</mi><mi>&#x3B3;</mi></math>"#;
     test_braille("Polish", expr, "⠼⠃⠠⠁⠃⠉⠀⠤⠼⠉⠰⠁⠃⠛");
@@ -386,13 +388,13 @@ fn sets_p17_4() {
 #[test]
 fn sets_p17_5() {
     let expr = r#"<math><mi>C</mi><mo>=</mo><mi>A</mi><mo>&#x222A;</mo><mi>C</mi></math>"#;
-    test_braille("Polish", expr, "⠨⠉⠀⠶⠁⠀⠩⠄⠉");
+    test_braille("Polish", expr, "⠨⠉⠀⠶⠨⠁⠀⠩⠄⠨⠉");
 }
 
 #[test]
 fn sets_p17_6() {
     let expr = r#"<math><mi>B</mi><mo>=</mo><mi>D</mi><mo>&#x2216;</mo><mi>C</mi></math>"#;
-    test_braille("Polish", expr, "⠨⠃⠀⠶⠙⠀⠡⠄⠉");
+    test_braille("Polish", expr, "⠨⠃⠀⠶⠨⠙⠀⠡⠄⠨⠉");
 }
 
 #[test]
@@ -668,7 +670,7 @@ fn fractions_p25_5() {
 fn fractions_p25_6() {
     let expr = r#"<math><mfrac><mrow><mi>a</mi><mi>b</mi><mo>+</mo><mi>c</mi><mi>d</mi></mrow><mn>4</mn></mfrac></math>"#;
     // test_braille("Polish", expr, "⠆⠠⠁⠃⠀⠖⠉⠙⠀⠳⠲");
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Beginner")], expr, r"⠆⠠⠁⠃⠀⠖⠉⠙⠀⠳⠲");
+    test_braille("Polish", expr, r"⠆⠠⠁⠃⠀⠖⠉⠙⠀⠳⠲");
 }
 
 #[test]
@@ -866,7 +868,7 @@ fn fractions_p29_4() {
 #[test]
 fn fractions_p30_1() {
     let expr = r#"<math><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mrow><mi>a</mi><mo>-</mo><mi>b</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>1</mn><mo>+</mo><mstyle displaystyle="true"><mfrac><mi>b</mi><mi>a</mi></mfrac></mstyle></mrow><mrow><mn>1</mn><mo>-</mo><mstyle displaystyle="true"><mfrac><mi>b</mi><mi>a</mi></mfrac></mstyle></mrow></mfrac></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠠⠁⠈⠖⠃⠳⠁⠈⠤⠃⠀⠶⠆⠼⠁⠀⠖⠆⠃⠳⠈⠀⠳⠀⠼⠁⠀⠤⠆⠃⠳⠁⠰");
+    test_braille("Polish", expr, r"⠠⠁⠈⠖⠃⠳⠁⠈⠤⠃⠀⠶⠆⠼⠁⠀⠖⠆⠃⠳⠈⠀⠳⠀⠼⠁⠀⠤⠆⠃⠳⠁⠰");
 }
 
 #[test]
@@ -1097,7 +1099,7 @@ fn scripts_p32_10() {
 #[test]
 fn scripts_p33_1() {
     let expr = r#"<math><msub><mi>P</mi><mn>1</mn></msub><mo>,</mo><mo>&#xA0;</mo><msub><mi>P</mi><mn>4</mn></msub><mo>,</mo><mo>&#xA0;</mo><msub><mi>P</mi><mn>9</mn></msub><mo>,</mo><mo>&#xA0;</mo><mo>.</mo><mo>.</mo><mo>.</mo><mo>,</mo><mo>&#xA0;</mo><msub><mi>P</mi><msup><mi>n</mi><mn>2</mn></msup></msub></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠨⠏⠡⠂⠠⠂⠀⠨⠏⠡⠲⠠⠂⠀⠨⠏⠡⠔⠠⠂⠀⠄⠄⠄⠂⠠⠀⠨⠏⠐⠡⠠⠝⠬⠆⠐⠱");
+    test_braille("Polish", expr, r"⠨⠏⠡⠂⠠⠂⠀⠨⠏⠡⠲⠠⠂⠀⠨⠏⠡⠔⠠⠂⠀⠄⠄⠄⠂⠠⠀⠨⠏⠐⠡⠠⠝⠬⠆⠐⠱");
 }
 
 #[test]
@@ -1412,6 +1414,7 @@ fn roots_p39_5() {
 }
 
 #[test]
+#[ignore = "uses superscript not exponent -- no way to know why"]
 fn roots_p39_6() {
     let expr = r#"<math><msup><mi>C</mi><mi>k</mi></msup></math>"#;
     test_braille("Polish", expr, "⠨⠉⠌⠠⠅");
@@ -1740,7 +1743,7 @@ fn geometry_p49_3() {
 
 #[test]
 fn geometry_p49_4() {
-    let expr = r#"<math><mo>&#x2206;</mo><mi>A</mi><mi>B</mi><mi>C</mi><mo>~</mo><mo>&#x2206;</mo><msub><mi>A</mi><mn>1</mn></msub><msub><mi>B</mi><mn>1</mn></msub><msub><mi>C</mi><mn>1</mn></msub><mo>~</mo><mo>&#x2206;</mo><msup><mi>A</mi><mo>'</mo></msup><msup><mi>B</mi><mo>'</mo></msup><msup><mi>C</mi><mo>'</mo></msup></math>"#;
+    let expr = r#"<math><mo>△</mo><mi>A</mi><mi>B</mi><mi>C</mi><mo>~</mo><mo>△</mo><msub><mi>A</mi><mn>1</mn></msub><msub><mi>B</mi><mn>1</mn></msub><msub><mi>C</mi><mn>1</mn></msub><mo>~</mo><mo>△</mo><msup><mi>A</mi><mo>'</mo></msup><msup><mi>B</mi><mo>'</mo></msup><msup><mi>C</mi><mo>'</mo></msup></math>"#;
     test_braille("Polish", expr, "⠻⠲⠨⠁⠃⠉⠀⠢⠻⠲⠨⠁⠡⠂⠃⠡⠂⠉⠡⠂⠀⠢⠻⠲⠨⠁⠔⠃⠔⠉⠔");
 }
 
@@ -1753,18 +1756,19 @@ fn geometry_p49_5() {
 #[test]
 fn geometry_p49_6() {
     let expr = r#"<math><mi>C</mi><mo>&#x2208;</mo><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>&#xAF;</mo></mover></math>"#;
-    test_braille("Polish", expr, "⠨⠉⠀⠈⠑⠨⠒⠁⠃");
+    // alternative version
+    test_braille("Polish", expr, "⠨⠉⠀⠈⠑⠨⠒⠨⠁⠃");
 }
 
 #[test]
 fn geometry_p49_7() {
     let expr = r#"<math><mover><mrow><mi>A</mi><mi>C</mi></mrow><mo>&#xAF;</mo></mover><mo>&#x22A5;</mo><mover><mrow><mi>D</mi><mi>B</mi></mrow><mo>&#xAF;</mo></mover></math>"#;
-    test_braille("Polish", expr, "⠨⠒⠨⠁⠉⠀⠼⠄⠨⠒⠙⠃");
+    test_braille("Polish", expr, "⠨⠒⠨⠁⠉⠀⠼⠄⠨⠒⠨⠙⠃");
 }
 
 #[test]
 fn geometry_p49_8() {
-    let expr = r#"<math><mover accent="true"><mrow><mi>A</mi><mi>B</mi></mrow><mo>&#x2192;</mo></mover><mo>=</mo><mover><mrow><mo>-</mo><mi>D</mi><mi>C</mi></mrow><mo>&#x2192;</mo></mover></math>"#;
+    let expr = r#"<math><mover accent="true"><mrow><mi>A</mi><mi>B</mi></mrow><mo>&#x2192;</mo></mover><mo>=</mo><mo>-</mo><mover><mrow><mi>D</mi><mi>C</mi></mrow><mo>&#x2192;</mo></mover></math>"#;
     test_braille("Polish", expr, "⠨⠒⠂⠨⠁⠃⠀⠶⠤⠨⠒⠂⠨⠙⠉");
 }
 
@@ -1790,11 +1794,12 @@ fn geometry_p49_11() {
 
 #[test]
 fn geometry_p50_1() {
-    let expr = r#"<math><mi>l</mi><mo>:</mo><mi>A</mi><mi>x</mi><mo>+</mo><mi>B</mi><mi>y</mi><mo>+</mo><mi>C</mi><mo>=</mo><mn>0</mn><mo>,</mo><mo>&#xA0;</mo><mi>P</mi><mo>=</mo><mo>(</mo><msub><mi>x</mi><mi>p</mi></msub><mo>,</mo><msub><mi>y</mi><mi>p</mi></msub><mo>)</mo></math>"#;
+    let expr = r#"<math><mi>l</mi><mo>:</mo><mi>A</mi><mi>x</mi><mo>+</mo><mi>B</mi><mi>y</mi><mo>+</mo><mi>C</mi><mo>=</mo><mn>0</mn><mo>,</mo><mi>P</mi><mo>=</mo><mo>(</mo><msub><mi>x</mi><mi>p</mi></msub><mo>,</mo><msub><mi>y</mi><mi>p</mi></msub><mo>)</mo></math>"#;
     test_braille("Polish", expr, "⠠⠇⠒⠀⠨⠁⠠⠭⠀⠖⠨⠃⠠⠽⠀⠖⠨⠉⠀⠶⠼⠚⠠⠂⠨⠏⠀⠶⠣⠠⠭⠡⠏⠂⠀⠽⠡⠏⠜");
 }
 
 #[test]
+#[ignore = "alternative form"]
 fn geometry_p50_2() {
     let expr = r#"<math><mi>d</mi><mo>=</mo><mfrac><mfenced open="|" close="|"><mrow><mi>A</mi><msub><mi>x</mi><mi>p</mi></msub><mo>+</mo><mi>B</mi><msub><mi>y</mi><mi>p</mi></msub><mo>+</mo><mi>C</mi></mrow></mfenced><msqrt><msup><mi>A</mi><mn>2</mn></msup><mo>+</mo><msup><mi>B</mi><mn>2</mn></msup></msqrt></mfrac></math>"#;
     test_braille("Polish", expr, "⠠⠙⠀⠶⠆⠈⠇⠨⠁⠠⠭⠡⠏⠀⠖⠨⠃⠠⠽⠡⠏⠀⠖⠨⠉⠸⠀⠳⠀⠐⠩⠁⠬⠆⠈⠖⠃⠬⠆⠰");
@@ -2076,18 +2081,18 @@ fn limits_p56_4() {
 #[test]
 fn limits_p56_5() {
     let expr = r#"<math><munder><mi>lim</mi><mrow><mi>&#x394;</mi><mi>x</mi><mo>&#x2192;</mo><mn>0</mn></mrow></munder><mfrac><mrow><mi>f</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>&#x394;</mi><mi>x</mi><mo>)</mo><mo>-</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mrow><mi>&#x394;</mi><mi>x</mi></mrow></mfrac></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠼⠇⠡⠸⠙⠠⠭⠈⠒⠂⠼⠚⠀⠆⠋⠣⠭⠀⠖⠸⠙⠠⠭⠜⠀⠤⠋⠣⠭⠜⠀⠳⠀⠸⠙⠠⠭⠰");
+    test_braille("Polish", expr, r"⠼⠇⠡⠸⠙⠠⠭⠈⠒⠂⠼⠚⠀⠆⠋⠣⠭⠀⠖⠸⠙⠠⠭⠜⠀⠤⠋⠣⠭⠜⠀⠳⠀⠸⠙⠠⠭⠰");
 }
 
 #[test]
 fn limits_p56_6() {
     let expr = r#"<math><munder><mi>lim</mi><mrow><mi>x</mi><mo>&#x2192;</mo><mn>2</mn></mrow></munder><mfrac><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>-</mo><mn>4</mn></mrow><mrow><mi>x</mi><mo>-</mo><mn>2</mn></mrow></mfrac><mo>=</mo><munder><mi>lim</mi><mrow><mi>x</mi><mo>&#x2192;</mo><mn>2</mn></mrow></munder><mo>(</mo><mi>x</mi><mo>+</mo><mn>2</mn><mo>)</mo><mo>=</mo><mn>4</mn></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠼⠇⠡⠠⠭⠈⠒⠂⠼⠃⠀⠆⠭⠬⠆⠀⠤⠼⠙⠀⠳⠀⠭⠀⠤⠼⠃⠰⠀⠶⠼⠇⠡⠠⠭⠈⠒⠂⠼⠃⠀⠣⠭⠀⠖⠼⠃⠜⠀⠶⠼⠙");
+    test_braille("Polish", expr, r"⠼⠇⠡⠠⠭⠈⠒⠂⠼⠃⠀⠆⠭⠬⠆⠀⠤⠼⠙⠀⠳⠀⠭⠀⠤⠼⠃⠰⠀⠶⠼⠇⠡⠠⠭⠈⠒⠂⠼⠃⠀⠣⠭⠀⠖⠼⠃⠜⠀⠶⠼⠙");
 }
 
 #[test]
 fn limits_p56_7() {
-    let expr = r#"<math><munder><mi>lim</mi><msup><mi>e</mi><mrow><mi>x</mi><mo>&#x2192;</mo><msub><mi>x</mi><mn>0</mn></msub></mrow></msup></munder><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></math>"#;
+    let expr = r#"<math><msup><mi>e</mi><mrow><munder><mi>lim</mi><mrow><mi>x</mi><mo>&#x2192;</mo><msub><mi>x</mi><mn>0</mn></msub></mrow></munder><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></msup></math>"#;
     test_braille("Polish", expr, "⠠⠑⠨⠬⠼⠇⠐⠡⠭⠈⠒⠂⠭⠡⠴⠀⠋⠣⠭⠜⠨⠱");
 }
 
@@ -2119,7 +2124,7 @@ fn integrals_p57_2() {
 
 #[test]
 fn integrals_p57_3() {
-    let expr = r#"<math><msubsup><mo>&#x222B;</mo><mn>0</mn><mn>3</mn></msubsup><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup><mi>d</mi><mi>x</mi><mo>=</mo><msup><mi>x</mi><mn>3</mn></msup><msubsup><mi mathvariant="normal">|</mi><mn>0</mn><mn>2</mn></msubsup><mo>=</mo><msup><mn>2</mn><mn>3</mn></msup><mo>&#x2212;</mo><msup><mn>0</mn><mn>3</mn></msup><mo>=</mo><mn>8</mn></math>"#;
+    let expr = r#"<math><msubsup><mo>&#x222B;</mo><mn>0</mn><mn>2</mn></msubsup><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup><mi>d</mi><mi>x</mi><mo>=</mo><msup><mi>x</mi><mn>3</mn></msup><msubsup><mi mathvariant="normal">|</mi><mn>0</mn><mn>2</mn></msubsup><mo>=</mo><msup><mn>2</mn><mn>3</mn></msup><mo>&#x2212;</mo><msup><mn>0</mn><mn>3</mn></msup><mo>=</mo><mn>8</mn></math>"#;
     test_braille("Polish", expr, "⠮⠡⠴⠌⠆⠀⠼⠉⠠⠭⠬⠆⠀⠙⠭⠀⠶⠭⠬⠒⠀⠸⠡⠴⠌⠆⠀⠶⠼⠃⠬⠒⠀⠤⠼⠚⠬⠒⠀⠶⠼⠓");
 }
 
@@ -2138,6 +2143,7 @@ fn physics_p60_2() {
 }
 
 #[test]
+#[ignore = "alternative version that does not use capital letter redundancy"]
 fn physics_p60_3() {
     let expr = r#"<math><msub><mi>C</mi><mn>0</mn></msub><mo>=</mo><mfrac><mi>Q</mi><msub><mi>V</mi><mn>0</mn></msub></mfrac></math>"#;
     test_braille("Polish", expr, "⠨⠉⠡⠴⠀⠶⠟⠳⠧⠡⠴");
@@ -2148,7 +2154,7 @@ fn physics_p60_3() {
 #[test]
 fn physics_p60_3a() {
     let expr = r#"<math><msub><mi>C</mi><mn>0</mn></msub><mo>=</mo><mfrac><mi>Q</mi><msub><mi>V</mi><mn>0</mn></msub></mfrac></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠨⠉⠡⠴⠀⠶⠨⠟⠳⠨⠧⠡⠴");
+    test_braille("Polish", expr, r"⠨⠉⠡⠴⠀⠶⠨⠟⠳⠨⠧⠡⠴");
 }
 
 #[test]
@@ -2220,6 +2226,7 @@ fn physics_p61_2b() {
 }
 
 #[test]
+#[ignore = "alternative version that does not use capital letter redundancy"]
 fn physics_p61_3() {
     let expr = r#"<math><msub><mi>W</mi><mrow><mi>A</mi><mi>B</mi></mrow></msub><mo>=</mo><mo>-</mo><mi>G</mi><mi>M</mi><mi>m</mi><mfenced><mrow><mfrac><mn>1</mn><msub><mi>r</mi><mi>A</mi></msub></mfrac><mo>-</mo><mfrac><mn>1</mn><msub><mi>r</mi><mi>B</mi></msub></mfrac></mrow></mfenced></math>"#;
     test_braille("Polish", expr, "⠨⠺⠡⠁⠃⠀⠶⠤⠛⠍⠠⠍⠣⠼⠁⠳⠗⠡⠨⠁⠀⠤⠼⠁⠳⠠⠗⠡⠨⠃⠜");
@@ -2228,7 +2235,6 @@ fn physics_p61_3() {
 // or
 
 #[test]
-#[ignore = "alternative version that uses some capital letter redundancy"]
 fn physics_p61_3a() {
     let expr = r#"<math><msub><mi>W</mi><mrow><mi>A</mi><mi>B</mi></mrow></msub><mo>=</mo><mo>-</mo><mi>G</mi><mi>M</mi><mi>m</mi><mfenced><mrow><mfrac><mn>1</mn><msub><mi>r</mi><mi>A</mi></msub></mfrac><mo>-</mo><mfrac><mn>1</mn><msub><mi>r</mi><mi>B</mi></msub></mfrac></mrow></mfenced></math>"#;
     test_braille("Polish", expr, "⠨⠺⠡⠨⠁⠃⠀⠶⠤⠨⠛⠨⠍⠠⠍⠣⠼⠁⠳⠗⠡⠨⠁⠀⠤⠼⠁⠳⠠⠗⠡⠨⠃⠜");
@@ -2287,13 +2293,14 @@ fn physics_p63_4() {
 fn physics_p63_5() {
     let expr = r#"<math><mover><msub><mi>F</mi><mrow><mi>A</mi><mi>B</mi></mrow></msub><mo>&#x2192;</mo></mover><mo>=</mo><mo>-</mo><mover><msub><mi>F</mi><mrow><mi>B</mi><mi>A</mi></mrow></msub><mo>&#x2192;</mo></mover></math>"#;
     // redundant cap letters
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠨⠒⠂⠨⠋⠡⠨⠁⠃⠀⠶⠤⠨⠒⠂⠨⠋⠡⠨⠃⠁");
+    test_braille("Polish", expr, r"⠨⠒⠂⠨⠋⠡⠨⠁⠃⠀⠶⠤⠨⠒⠂⠨⠋⠡⠨⠃⠁");
 }
 
 #[test]
 fn physics_p64_1() {
     let expr = r#"<math><mover accent="true"><msub><mi>F</mi><mrow><mn>1</mn><mo>,</mo><mn>2</mn></mrow></msub><mo>&#x2192;</mo></mover><mo>=</mo><mo>-</mo><mover accent="true"><msub><mi>F</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow></msub><mo>&#x2192;</mo></mover></math>"#;
-    test_braille("Polish", expr, r"⠨⠒⠂⠨⠋⠡⠼⠁⠠⠂⠈⠼⠃⠀⠶⠤⠨⠒⠂⠋⠡⠼⠃⠠⠂⠈⠼⠁");
+    // added second cap indicator for F as per discussion
+    test_braille("Polish", expr, r"⠨⠒⠂⠨⠋⠡⠼⠁⠠⠂⠈⠼⠃⠀⠶⠤⠨⠒⠂⠨⠋⠡⠼⠃⠠⠂⠈⠼⠁");
 }
 
 #[test]
@@ -2323,19 +2330,19 @@ fn physics_p64_5() {
 #[test]
 fn physics_p64_6() {
     let expr = r#"<math><mover accent="true"><mi>E</mi><mo>&#x2192;</mo></mover><mo>=</mo><mfrac><mover accent="true"><mi>F</mi><mo>&#x2192;</mo></mover><msub><mi>q</mi><mn>0</mn></msub></mfrac></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠨⠒⠂⠨⠑⠀⠶⠨⠒⠂⠨⠋⠳⠠⠟⠡⠴");
+    test_braille("Polish", expr, r"⠨⠒⠂⠨⠑⠀⠶⠨⠒⠂⠨⠋⠳⠠⠟⠡⠴");
 }
 
 #[test]
 fn physics_p64_7() {
     let expr = r#"<math><mover accent="true"><mi>M</mi><mo>&#x2192;</mo></mover><mo>=</mo><mover accent="true"><mi>F</mi><mo>&#x2192;</mo></mover><mo>&#xD7;</mo><mover accent="true"><mi>r</mi><mo>&#x2192;</mo></mover></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠨⠒⠂⠨⠍⠀⠶⠨⠒⠂⠨⠋⠀⠦⠨⠒⠂⠠⠗");
+    test_braille("Polish", expr, r"⠨⠒⠂⠨⠍⠀⠶⠨⠒⠂⠨⠋⠀⠦⠨⠒⠂⠠⠗");
 }
 
 #[test]
 fn physics_p64_8() {
     let expr = r#"<math><mi>W</mi><mo>=</mo><mover accent="true"><mi>F</mi><mo>&#x2192;</mo></mover><mo>&#xB7;</mo><mover accent="true"><mi>s</mi><mo>&#x2192;</mo></mover></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠨⠺⠀⠶⠨⠒⠂⠨⠋⠀⠄⠨⠒⠂⠠⠎");
+    test_braille("Polish", expr, r"⠨⠺⠀⠶⠨⠒⠂⠨⠋⠀⠄⠨⠒⠂⠠⠎");
 }
 
 #[test]
@@ -2467,12 +2474,12 @@ fn physics_p68_3() {
 }
 
 #[test]
+#[ignore="alternative that doesn't repeat cap indicators"]
 fn physics_p68_4() {
     let expr = r#"<math><msub><mi>U</mi><mn>0</mn></msub><mo>=</mo><msub><mi>U</mi><msub><mi>R</mi><mn>1</mn></msub></msub><mo>+</mo><msub><mi>U</mi><msub><mi>R</mi><mn>2</mn></msub></msub></math>"#;
     test_braille("Polish", expr, "⠨⠥⠡⠴⠀⠶⠥⠐⠡⠗⠡⠂⠀⠖⠥⠐⠡⠗⠡⠆");
 }
 
-// or
 
 #[test]
 fn physics_p68_4a() {

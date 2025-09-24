@@ -298,7 +298,11 @@
         then: [T: "W"]
         else: [T: ""]
 
- - "⁢": [T: ""]                        # 0x2062 (invisible times)
+ - "⁢":                          # 0x2062 (invisible times) -- no written rule, but 'dx' has a space before it
+    - test:
+        if: "following-sibling::*[1][self::m:mi and .='d'] and following-sibling::*[2][self::m:mo and .='\u2062'] and following-sibling::*[3][self::m:mi and .='x']"
+        then: [T: "W"]      # 
+        else: [T: ""]
  - "⁣": [T: ""]                 # 0x2063⁡ (invisible separator)
  - "⁤":                         # 0x2064 (invisible plus)
     - test:
@@ -306,11 +310,7 @@
         then: [T: "W"]      # 
         else: [T: ""]
 
- - "!":                     # 0x21 (either punctuation or factorial)
-    - test:
-        if: "ancestor::*[2][self::m:math]"   # ony consider it a factorial if at end -- wrong for something simple "5!" but ok for "1+ 5!"
-        then: [T: "P⠖W"]
-        else: [T: "⠫W"]
+ - "!": [T: "!"]             # 0x21 (either punctuation or factorial ["⠫W"] -- a string rule in braille.rs handles this)
 
  - "$": [T: "⠸⠈⠎"]            # 0x24
  - "%": [T: "⠼⠚⠴"]           # 0x25 (percent)
@@ -346,7 +346,8 @@
      - test:
         - if: "@data-chem-formula-op"
           then: [T: "⠐⠂"]
-        - else_if: "preceding-sibling::* and not(parent::m:msup)"
+          # binary minus or unary minus in the denominator (fractions_p26_10)
+        - else_if: "(preceding-sibling::* and parent::m:mrow) or ancestor::*[2][self::m:mfrac and *[2]/*[1][.='-']]"
           then: [T: "W⠤"]
           else: [T: "⠤"]
  - ".":                            # 0x2e
@@ -376,6 +377,8 @@
     - test:
         - if: "parent::*[self::m:mrow and count(*)=3 and *[1]='|'and *[3]='|'] and not(following-sibling::*[1])"
           then: [T: "⠸W"]               # closing vertical bar for absolute value
+        - else_if: "parent::*[1][self::m:msubsup]"  
+          then: [T: "W⠸"]               # evaluated at notation
           else: [T: "⠈⠇"]               # absolute value -- opening bar of absolute value or standalone vertical bar
 # FIX: - "|":  may also mean "integral line" and than the Braille code is "W⠇"(see p. 57^ ^^ )
 
@@ -540,7 +543,7 @@
  - "∶": [T: "W⠲"]               # 0x2236
  - "∷": [t: "⠰⠆"]               # 0x2237
  - "∸": [t: "⠨⠤"]               # 0x2238
- - "∼": [T: "W⠔"]               # 0x223c (TILDE OPERATOR, not, proportional to)
+ - "∼": [T: "W⠢"]               # 0x223c (TILDE OPERATOR, not, proportional to)
  - "≁": [T: "W⠔⠢"]              # 0x2241
  - "≂": [t: "⠱⠈⠱"]              # 0x2242
  - "≃": [t: "⠈⠱⠱"]              # 0x2243
@@ -613,15 +616,15 @@
  - "⊉": [t: "⠌⠸⠨⠂⠱"]            # 0x2289
  - "⊊": [t: "⠸⠐⠅⠌⠨⠅"]           # 0x228a
  - "⊋": [t: "⠸⠨⠂⠌⠨⠅"]           # 0x228b
- - "⊥": [t: "⠫⠏"]               # 0x22a5 (UP TACK)
+ - "⊥": [T: "W⠼⠄"]               # 0x22a5 (UP TACK)
  - "⋀": [T: "⠯⠂"]               # 0x22c0 (N-ARY LOGICAL AND)
  - "⋁": [T: "⠯⠢"]               # 0x22c1 (N-ARY LOGICAL OR)
  - "⋂": [T: "⠯⠬"]               # 0x22c2 (N-ARY INTERSECTION, p. 17)
  - "⋃": [T: "⠯⠩"]               # 0x22c3 (N-ARY UNION, p. 17)
  - "⋜": [t: "⠱⠐⠅"]              # 0x22dc
  - "⋝": [t: "⠱⠨⠂"]              # 0x22dd
- - "⟂": [T: "⠼⠄"]               #  0x27c2 (PERPENDICULAR)
-# - "⟂̷": [T: "⠔⠼⠄"]            # (NOT PERPENDICULAR)
+ - "⟂": [T: "W⠼⠄"]               #  0x27c2 (PERPENDICULAR)
+#  - "⟂̷": [T: "W⠔⠼⠄"]            # (NOT PERPENDICULAR)
  - "⦀": [t: "⠳⠳⠳"]              # 0x2980
  - "⦶": [t: "⠫⠉⠸⠫⠳⠻"]           # 0x29b6
  - "⦷": [t: "⠫⠉⠸⠫⠫⠇⠻"]          # 0x29b7

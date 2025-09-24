@@ -36,4 +36,11 @@
     "⏞", "⏟", "→", "⟶", "←", "⟵", "⏜", "⏝", "¯", 
   }
 
+# words that might show up in math
+# chars like ":" that have a different representation if punctuation use their punctuation form after these words
+# also, the capitalization rules differ -- subsequent letters don't need a lower case indicator because this isn't math
+- MathWords: {
+    "Jeżeli", "jeśli", "wtedy", "i tylko wtedy gdy", "to", "lub", "albo", "oraz", "dla", "dla każdego", "istnieje", "należy do", "nie należy do",
+  }
+
 - include: "../definitions.yaml"

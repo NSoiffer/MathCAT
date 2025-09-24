@@ -160,6 +160,10 @@
   match: "."
   replace:
   - t: "<⠆" # signal start of fraction (needed for state machine to replace spaces)
+  - test:
+      # FIX: it seems like this should be more general, but examples break when it is more general
+      if: "not(IsNode(*[1], 'leaf')) and preceding-sibling::*[1][self::m:mo and (.='-' or .='+')]"
+      then: [t: "+"]   # "+" says to keep the indicator -- need to make sure the "numerator" appears to be in the fraction
   - x: "*[1]"
   - t: "W/"
   - test:
@@ -308,14 +312,14 @@
   match: "."
   replace: [x: "*"]
 
--
-  name: roman_numeral
-  tag: mn
-  match: "@data-roman-numeral or contains(@intent, ':roman-numeral')"
-  replace:
-  # for uppercase, need to only have one as uppercase
-  - x: "BrailleChars(., 'Polish', 1, 2)"
-  - x: "BrailleChars(translate(., 'IVXLCDM', 'ivxlcdm'), 'Polish', 2, string-length(.)+1)"
+# -
+#   name: roman_numeral
+#   tag: mn
+#   match: "@data-roman-numeral or contains(@intent, ':roman-numeral')"
+#   replace:
+#   # for uppercase, need to only have one as uppercase
+#   - x: "BrailleChars(., 'Polish')"
+#   - x: "BrailleChars(translate(., 'IVXLCDM', 'ivxlcdm'), 'Polish', 2, string-length(.)+1)"
 
 
 -
@@ -545,22 +549,55 @@
 
 -
   # scripts
+  # for some reason, the spec reverses the order of sub and sup for cap letters that are not chemistry
+  name: cap-letter-scripts
+  tag: msubsup
+  match: "not(@data-chem-element) and BaseNode(*[1])[translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '']"
+  # the examples all use superscripts, not exponents for cap letters these (for example p39 and p55)
+  # also, for some reason, the cap letters use superscripts first
+  replace:
+  - x: "*[1]"
+  - t: "<⠌"
+  - test:
+      - if: "*[3][self::m:mn and translate(., '0123456789', '') = '']"
+        then: [x: "BrailleChars(translate(*[3], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
+      - else_if: "*[3][self::m:mrow and count(*)=2 and *[1]='-' and *[2][self::m:mn and translate(*[2], '0123456789', '') = '']]"
+        then:
+        - x: "*[3]/*[1]"
+        - x: "BrailleChars(translate(*[3]/*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
+        else: [x: "*[3]"]
+  - t: ">⠱<⠡"
+  - test:
+      - if: "*[2][self::m:mn and translate(., '0123456789', '') = '']"
+        then: [x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
+      - else_if: "*[2][self::m:mrow and count(*)=2 and *[1]='-' and *[2][self::m:mn and translate(*[2], '0123456789', '') = '']]"
+        then:
+        - x: "*[2]/*[1]"
+        - x: "BrailleChars(translate(*[2]/*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
+        else: [x: "*[2]"]
+  - t: ">⠱"
+
+-
+  # scripts
   # simple numeric scripts are written as drop numbers
   name: default
   tag: [msub, msup, msubsup]
   match: "."
   # the examples all use superscripts, not exponents for cap letters these (for example p39 and p55)
-  variables: [BaseIsCapLetter: "BaseNode(*[1])[.='C']"]
+  # also, for some reason, the cap letters use superscripts first
+  variables:
+  - IsCapLetter: "BaseNode(*[1])[translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '']"
+  - BaseNeedsSuperscript: "self::m:msubsup and BaseNode(*[1])[self::m:mo or .='lim' or $IsCapLetter]"
   replace:
   - x: "*[1]"
   - test:
       - if: "self::m:msub or self::m:msubsup"
         then: [t: "<⠡"]
-      - else_if: "@data-chem-formula or $BaseIsCapLetter"    # must be a superscript
+      - else_if: "@data-chem-formula or $BaseNeedsSuperscript"    # must be a superscript
         then: [t: "<⠌"]
         else: [t: "<⠬"]
   - test:
-      - if: "*[2][self::m:mn and translate(*[2], '0123456789', '') = '']"
+      - if: "*[2][self::m:mn and translate(., '0123456789', '') = '']"
         then: [x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
       - else_if: "*[2][self::m:mrow and count(*)=2 and *[1]='-' and *[2][self::m:mn and translate(*[2], '0123456789', '') = '']]"
         then:
@@ -571,18 +608,21 @@
       if: "self::m:msubsup"
       then:
       - test:
-          if: "@data-chem-formula or $BaseIsCapLetter"    # must be a superscript
+          if: "@data-chem-formula or $BaseNeedsSuperscript"    # must be a superscript
           then: [t: ">⠱<⠌"]
           else: [t: ">⠱<⠬"]
       - test:
-          - if: "*[3][self::m:mn and translate(*[3], '0123456789', '') = '']"
+          - if: "*[3][self::m:mn and translate(., '0123456789', '') = '']"
             then: [x: "BrailleChars(translate(*[3], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
           - else_if: "*[3][self::m:mrow and count(*)=2 and *[1]='-' and *[2][self::m:mn and translate(*[2], '0123456789', '') = '']]"
             then:
             - x: "*[3]/*[1]"
             - x: "BrailleChars(translate(*[3]/*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"   # drop numbers for the numerator
             else: [x: "*[3]"]
-  - t: ">⠱"
+  - test:
+      if: "*[1][.='lim' or .='∫' or .='∬' or .='∭' or .='|']"
+      then: [t: ">W"]  # p56 and p57 say to terminate these with a space
+      else: [t: ">⠱"]
 
 
 -
@@ -688,7 +728,7 @@
           - t: ">⠱"
           - test: # hack to force output of the terminator
               if: "$Polish_BrailleLevel = 'Advanced' and @data-chem-formula"
-              then: [t: "!"]
+              then: [t: "+"]
       # - test:
       #     if: "count($Prescripts)>2"
       #     then:

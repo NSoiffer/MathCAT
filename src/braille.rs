@@ -2039,6 +2039,7 @@ impl BrailleLevel {
 }
 
 static POLISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
+    // '+' and '-' are used in state machine -- don't use them here
     // "S" => "XXX",    // sans-serif -- from prefs
     "B" => "⠨",     // bold
     "𝔹" => "⠨",     // blackboard -- spec only shows some upper case versions (encoded as 𝔹Lx) -- this is just a guess 
@@ -2065,6 +2066,7 @@ static POLISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "𝐖"=> "",       // whitespace for mode changes only (0xb7 -- multiplication dot)
     "P" => "",       // signal next char is punctuation
     "p" => "",       // pseudo-script "optional" character representation where we can delete the first char sometimes (° and ′)
+    "!" => "⠫W",    // '!' is either punctuation or factorial -- we use the default of factorial and a regex will change it to punctuation when needed
     "(" => "⠣",   // lef paren
     "[" => "⠷",   // left bracket
     "{" => "⠪",   // left curly brace
@@ -2116,12 +2118,12 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
         // Detailed projectors: p23 -- they end with a detailed close projector, so no remove rule
 
         // I don't see it mentioned, but it seems that the end of the expression is a terminator for simple and compound projectors
-        static ref REMOVE_CLOSE_INDICATORS_AT_END: Regex =Regex::new(r"((>[^⠰])|(≫⠐.))$").unwrap();
+        static ref REMOVE_CLOSE_INDICATORS_AT_END: Regex =Regex::new(r"(⠈?(>[^⠰])|(≫⠐.))$").unwrap();
 
         // Also drop numbers close a projector, so we need to remove closing indicators before drop numbers (p22, f [only after scripts])
-        // The close fraction indicator should NOT go away
+        // The close fraction indicator should NOT go away nor should a 'W' (used after lim, integral, etc)
         static ref REMOVE_CLOSE_INDICATORS_BEFORE_DROP_NUMBERS: Regex =Regex::new(r"(>[^⠰])(n.)").unwrap();
-        static ref REMOVE_CLOSE_INDICATORS_AFTER_DROP_NUMBERS: Regex =Regex::new(r"(n.)(>[^⠰])").unwrap();
+        static ref REMOVE_CLOSE_INDICATORS_AFTER_DROP_NUMBERS: Regex =Regex::new(r"(n.)(>[^W⠰])").unwrap();
 
         // p51: shorter form for ° and ′ unless they follow a drop number (in which case they would also be a drop number)
         //   also if it follows a regular number, then it might be interpreted as a numeric fraction
@@ -2131,10 +2133,15 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
         // p51: minutes followed by seconds keeps the 'p'
         static ref MINUTES_SECONDS: Regex =Regex::new(r"p⠔(N.+)p⠔⠔").unwrap();
 
+
+        // "!" is either punctuation or factorial -- we only use the punctuation form when it follows two letters
+        static ref EXCLAMATION_MARK_IS_PUNCTUATION: Regex =Regex::new(r"(L.L.)!").unwrap();
+    
         // Need to add dot-6 between a number and punctuation (see bottom of p13 for '}' reason)
         // Also need to special case empty set which seems to act as a number without a number sign (⠯⠕)
         static ref NUMBER_DOT6_PUNCTUATION: Regex =Regex::new(r"([Nn].(>[^⠰]|≫⠐.)*|⠯⠕|})(P.)").unwrap();
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([B𝔹IREDgGVHlL𝐿𝐶MnNUuwW𝐖Pp(\[{)\]}#</>≪≫])").unwrap();
+
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([B𝔹IREDgGVHlL𝐿𝐶MnNUuwW𝐖Pp!(\[{)\]}#</>≪≫])").unwrap();
     }
 
     let braille_level = BrailleLevel::from(&PreferenceManager::get().borrow().pref_to_string("Polish_BrailleLevel"));
@@ -2148,6 +2155,10 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     // let fraktur = pref_manager.pref_to_string("Polish_Fraktur");
 
     let result = MINUTES_SECONDS.replace_all(&raw_braille, "⠘⠔${1}⠘⠔⠔");
+
+    // we have to do one or the other replacement for "!" because of the white space
+    let result = EXCLAMATION_MARK_IS_PUNCTUATION.replace_all(&result, "${1}P⠖W")
+                                                        .replace('!', "⠫W"); // factorial
     let result = NUMBER_DOT6_PUNCTUATION.replace_all(&result, "${1}⠠${3}");
     debug!(" After dot6 punc:    '{}'", &result);
     let result = polish_remove_unneeded_mode_changes(&result);
@@ -2166,7 +2177,7 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     } else {
         result
     };
-let result = SCRIPT_AFTER_DROP_NUMBERS.replace_all(&result, "${1}⠘");
+    let result = SCRIPT_AFTER_DROP_NUMBERS.replace_all(&result, "${1}⠘");
     debug!(" After remove close: '{}'", &result);
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
@@ -2197,8 +2208,8 @@ let result = SCRIPT_AFTER_DROP_NUMBERS.replace_all(&result, "${1}⠘");
 enum BrailleMode {
     Letter,
     CapLetter,
-    Greek,
-    CapGreek,
+    // Greek,
+    // CapGreek,
     Number,
     None,
 }
@@ -2245,6 +2256,10 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
     //   Lx, 𝐿x -- capital letter mode, followed by a letter
     //   gx  -- Greek letter mode, followed by a letter
     //   Gx -- capital Greek letter mode, followed by a letter
+    // Based on conversations with the Polish team:
+    //   Restate cap letter mode if not in a run of cap letters (not if scripted or subscripted)
+    //   Always restart Greek letters
+    const SHORT_FRACTION_MAX_LENGTH: usize = 40; // fractions longer this this (~20 cells) always use the long form
     let mut mode = BrailleMode::None;
     let mut letter_mode = BrailleMode::None; // used to determine if we need to output 'L' (etc) for letter mode
     let mut unit_mode = false;
@@ -2258,14 +2273,17 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
     // let braille_level_intermediate = braille_level == "Intermediate";
     let mut projector_depths = Projectors::new(max_nesting_depths(&chars, true));
     let mut projector_depth = 0;
+    debug!("Projector depths = {}", projector_depths);
     let mut fraction_depths = Projectors::new(max_nesting_depths(&chars, false));
     let mut fraction_depth = 0;
-    debug!("Projector depths = {}", projector_depths);
     debug!("Fraction depths = {}", fraction_depths);
+    let mut fraction_lengths = Projectors::new(find_fraction_lengths_stack(&chars));
+    let mut use_long_fraction_form: bool = false;
+    debug!("Fraction lengths = {}", fraction_lengths);
     while i < chars.len() {
         let ch = chars[i];
-        // debug!(" ...mode={}, l_mode={}, u_mode={}, p/n depth = {}/{}, ch/next {}/{}, result='{}'",
-        //         mode, letter_mode, unit_mode, projector_depth, nesting_depth, ch, if i+1<chars.len() {chars[i+1]} else {' '}, &result);
+        // debug!(" ...mode={}, l_mode={}, u_mode={}, p/n depth = {}/{}, long?={}, ch/next {}/{}, result='{}'",
+        //         mode, letter_mode, unit_mode, projector_depth, nesting_depth, use_long_fraction_form,ch, if i+1<chars.len() {chars[i+1]} else {' '}, &result);
         match ch {
             'l' | 'L' => {
                 if unit_mode || text_mode {
@@ -2277,8 +2295,8 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 } else {
                     let new_mode = if ch == 'l' { BrailleMode::Letter } else { BrailleMode::CapLetter };
                     if (letter_mode != new_mode || (mode == BrailleMode::Number && LETTER_NUMBERS.contains(&chars[i+1]))) ||
-                    (braille_level != BrailleLevel::Advanced && ch == 'L') ||
-                    letter_mode == BrailleMode::None {
+                       letter_mode == BrailleMode::None ||
+                       (ch == 'L' && !previous_was_cap_letter(&chars, i)) {
                         // we only output indicator if the letter is a-j
                         result.push(ch);
                     }
@@ -2310,17 +2328,20 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 mode = BrailleMode::None;
             },
             'g' | 'G' => {
-                if unit_mode || text_mode {
-                    result.push(ch);
-                    mode = BrailleMode::Greek;      // doesn't matter whether lower or cap
-                } else {
-                    let new_mode = if ch == 'g' { BrailleMode::Greek } else { BrailleMode::CapGreek };
-                    if braille_level != BrailleLevel::Advanced || mode != new_mode {
-                        result.push(ch);
-                    }
-                    mode = new_mode;
-                    letter_mode = BrailleMode::None;
-                }
+                // if unit_mode || text_mode {
+                //     result.push(ch);
+                //     mode = BrailleMode::Greek;      // doesn't matter whether lower or cap
+                // } else {
+                //     let new_mode = if ch == 'g' { BrailleMode::Greek } else { BrailleMode::CapGreek };
+                //     if braille_level != BrailleLevel::Advanced || mode != new_mode {
+                //         result.push(ch);
+                //     }
+                //     mode = new_mode;
+                //     letter_mode = BrailleMode::None;
+                // }
+                result.push(ch);
+                mode = BrailleMode::None;
+                letter_mode = BrailleMode::None;
                 result.push(chars[i+1]);
                 i += 2;
             },
@@ -2400,9 +2421,11 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                     mode = BrailleMode::None;
                 }
                 unit_mode = false;
-                debug!("ch=W, projector/frac depths={projector_depth}/{fraction_depth}, bracket_nesting_depth={bracket_nesting_depth}");
-                if fraction_depth == 1 && i+1 < chars.len() && chars[i+1] == '/' {
+                debug!("ch=W, projector/frac depths={projector_depth}/{fraction_depth}, bracket_nesting_depth={bracket_nesting_depth}, use_long={use_long_fraction_form}");
+                if !use_long_fraction_form && fraction_depth == 1 && i+1 < chars.len() && chars[i+1] == '/' {
                     // drop whitespace before '/' (nothing to do)
+                } else if i+1 < chars.len() && chars[i+1] == '>' {
+                    // drop whitespace before '>' (nothing to do)
                 } else if ch == 'W' && (projector_depth == 1 || projector_depth == 2) && bracket_nesting_depth == 0 && fraction_depth < 2 {
                     result.push('⠈');               // substitute "filler" character
                 } else {
@@ -2411,25 +2434,33 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 i += 1;
             },
             '<' => {
-                // debug!("@<: i={i}, depth={projector_depth}, {projector_depths}");
+                // debug!("@<: i={i}, depth={projector_depth}, {projector_depths}, use_long={use_long_fraction_form}");
                 projector_depth = projector_depths.push();
                 if chars[i+1] == '⠆' { // fractions aren't projectors
                     fraction_depth = fraction_depths.push();
-                    debug!("@<: i={i}, frac depth={fraction_depth}, {fraction_depths}");
+                    use_long_fraction_form = fraction_lengths.push() > SHORT_FRACTION_MAX_LENGTH;
+                    debug!("@<: i={i}, frac depth={fraction_depth}, {fraction_depths}, use_long={use_long_fraction_form}");
+                    let has_keep_fraction_start_char = chars[i+2] == '+';
                     // Look for '<⠆⠤' -- all other patterns can drop fraction start ('⠆') -- p24, rule 4b
                     // Also want to keep '⠆' when the numerator is "long" (undefined and inconsistent in spec)
-                    const LONG_NUMERATOR: usize = 13;
+                    const LONG_NUMERATOR: usize = 4;  // # of letters or digits in numerator to be considered long
                     if chars[i+2] == '-' {      // hack to signal not to use start fraction indicator (for open, always more chars)
                         i += 1;
                     } else if fraction_depth < 2 {
-                        if braille_level != BrailleLevel::Advanced ||
-                           (chars[i+2] == '⠤' ||  // always should be something after "<x"
-                            chars[i+2..].iter().position(|&ch| ch == '/').unwrap() > LONG_NUMERATOR) { // should always find "/" because of '⠆'
+                        if chars[i+2] == '⠤' || use_long_fraction_form || has_keep_fraction_start_char {
                             result.push('⠆');
+                        } else {
+                            let i_numerator_end = i+2 + chars[i+2..].iter().position(|&ch| ch == '/').unwrap_or(0);
+                            if chars[i+2..i_numerator_end].iter().filter(|&ch| matches!(ch, 'l' | 'L' | 'n' | 'N' | 'g' | 'G' )).count() >= LONG_NUMERATOR {
+                                result.push('⠆');
+                            }
                         }
                     } else {
                         result.push('<');
                         result.push('⠆');
+                    }
+                    if has_keep_fraction_start_char {
+                        i += 1;         // skip over the char
                     }
                 } else {
                     if projector_depth <= 1 { 
@@ -2452,18 +2483,19 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 if chars[i+1] == '⠰' { // fractions aren't projectors; the indicator goes away (full form doesn't use ">'")
                     if i+2 < chars.len() && chars[i+2] == '-' {
                         i += 1;     // hack to signal not to use end fraction indicator
-                    } else if fraction_depth > 1 {
+                    } else if fraction_depth > 1 || use_long_fraction_form {
                         result.push('>');
                         result.push('⠰');
                     }
                     fraction_depth = fraction_depths.pop();  // back to previous depth
+                    use_long_fraction_form= fraction_lengths.pop() > SHORT_FRACTION_MAX_LENGTH;  // back to previous depth
                 } else {
-                    if projector_depth == 1 {
-                        if i+2 < chars.len() && chars[i+2] == '!' {
+                    if projector_depth == 1 || chars[i+1] == 'W' {   // 'W' for lim, integral, ... -- forces close
+                        if i+2 < chars.len() && chars[i+2] == '+' {
                             // hack to force close terminator to avoid being deleted
                             // in this case, we don't output the ">" so the REMOVE_XXX regex patterns won't find it.
                             result.push(chars[i+1]);
-                            i += 1;     // skip '!'
+                            i += 1;     // skip '+'
                         } else {
                             result.push('>');
                             result.push(chars[i+1]);
@@ -2483,11 +2515,10 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                     mode = BrailleMode::None;       // "/" seems to reset number mode based on examples I found
                 }
 
+                debug!("/: i={i}, use_long={use_long_fraction_form}");
                 // skip whitespace around "/" -- already processed previous whitespace
-                if fraction_depth > 1 {
-                    result.push('/');
-                } else {
-                    result.push('/');
+                result.push('/');
+                if fraction_depth < 2 && !use_long_fraction_form  {
                     if chars[i+1] == 'W' {
                         i += 1;     // skip whitespace
                     }
@@ -2513,6 +2544,27 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
         if mode == BrailleMode::Number || mode == BrailleMode::None {
             unit_mode = false;
         }
+
+        // look back to see if previous non-space char was 'L' or matches the regex that allows for a script/modifier in between (chars[i]=='L')
+        fn previous_was_cap_letter(chars: &[char], i: usize) -> bool {
+            lazy_static! {
+                static ref SIMPLE_SCRIPT_MODIFIER_CAP_LETTER: Regex =Regex::new(r"L.p(⠔|⠔⠔)").unwrap();  // ′ and ″ seem most likely (see Modifiers in definitions.yaml)
+                static ref SIMPLE_SCRIPT_AFTER_CAP_LETTER: Regex =Regex::new(r"L.<.[lLnN].>.").unwrap();  // something A_1 A_2
+            }
+
+            if i >= 2 {
+                if chars[i-2] == 'L' {
+                    return true;
+                }
+                if i >= 4 && SIMPLE_SCRIPT_MODIFIER_CAP_LETTER.is_match(&chars[i-4..i].iter().collect::<String>()) {
+                    return true;
+                }
+                if i >= 8 && SIMPLE_SCRIPT_AFTER_CAP_LETTER.is_match(&chars[i-8..i].iter().collect::<String>()) {
+                    return true;
+                }
+            }
+            return false;
+        }   
     }
 
     return result;
@@ -2537,7 +2589,7 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                         return None;
                     }
                     break;
-                }
+                },
                 _ => break,
             }
             run.push(chars[i+1]);
@@ -2546,14 +2598,15 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
         return if n_letters > 1 { Some( (i, run)) } else { None };
     }
 
+
+    const MAX_CHARS_FOR_INTERMEDIATE: usize = 8;
+
     /// Return a vector whose ith entry is the nesting depth of the ith '<'
     /// If 'any_start_indicator' is false, the ith entry is a fraction start ("<⠆")
     /// This is modified by the BrailleLevel:
     ///    Beginner: forces all depths to be "detailed"/"full record" (3)
     ///    Intermediate: TBD (for now, leaves "short" sequences alone and force details/full for others)
     ///    Advanced: uses the true nesting levels
-    const MAX_CHARS_FOR_INTERMEDIATE: usize = 8;
-
     fn max_nesting_depths(chars: &[char], any_start_indicator: bool) -> Vec<usize> {
         let braille_level = BrailleLevel::from(&PreferenceManager::get().borrow().pref_to_string("Polish_BrailleLevel"));
         let mut result = Vec::new();
@@ -2645,6 +2698,34 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                         .any(|(i, &ch)| ch == 'W' && chars[i-1] != '/' && chars[i+1] != '/');
         }
     }}
+
+    /// Return a vector whose ith entry is the length of the ith fraction (not including the <⠆ and >⠰)
+    fn find_fraction_lengths_stack(chars: &[char]) -> Vec<usize> {
+        let mut stack: Vec<usize> = Vec::new();
+        let mut results: Vec<(usize, usize)> = Vec::new(); // (start_index, length)
+        let mut i = 0;
+
+        while i < chars.len() - 1 {
+            let ch = chars[i];
+            if ch == '<' && chars[i + 1] == '⠆' {
+                stack.push(i);
+                i += 2;
+            } else if ch == '>' && chars[i + 1] == '⠰' {
+                if let Some(start_index) = stack.pop() {
+                    let length = i - start_index;
+                    results.push((start_index, length));
+                }
+                i += 2;
+            } else {
+                i += 1;
+            }
+        }
+
+        // Sort results by the order of opening "<:" markers
+        results.sort_by_key(|&(start, _)| start);
+        return results.into_iter().map(|(_, len)| len).collect();
+    }
+
 
 static SWEDISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     // FIX: this needs cleaning up -- not all of these are used
