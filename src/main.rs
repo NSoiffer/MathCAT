@@ -189,7 +189,7 @@ fn main() {
   //   </math>";
 
   let expr = r#"
-   <math><msup><mi>y</mi><mo>..</mo></msup></math> 
+   <math><mmultiscripts><mi>Po</mi><mprescripts/><mn>84</mn><mn>215</mn></mmultiscripts></math> 
                       "#;
   let instant = Instant::now();
 
