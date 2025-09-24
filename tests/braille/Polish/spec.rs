@@ -382,7 +382,7 @@ fn sets_p17_3() {
 #[test]
 fn sets_p17_4() {
     let expr = r#"<math><mn>2</mn><mo>&#x2208;</mo><msup><mi>ℂ</mi><mo>+</mo></msup></math>"#;
-    test_braille("Polish", expr, "⠼⠃⠈⠑⠨⠨⠉⠖");
+    test_braille("Polish", expr, "⠼⠃⠀⠈⠑⠨⠨⠉⠖");
 }
 
 #[test]
@@ -424,37 +424,37 @@ fn sets_p18_4() {
 #[test]
 fn sets_p18_5() {
     let expr = r#"<math><mi>x</mi><mo>&#x2208;</mo><mi>A</mi><mo>&#x2216;</mo><mi>B</mi><mo>&#xA0;</mo><mtext>wtedy i tylko wtedy gdy </mtext><mo>(</mo><mi>x</mi><mo>&#x2208;</mo><mi>A</mi><mo>&#xA0;</mo><mi>i</mi><mo>&#xA0;</mo><mi>x</mi><mo>&#x2209;</mo><mi>B</mi><mo>)</mo></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠠⠭⠀⠈⠑⠨⠁⠀⠡⠄⠨⠃⠀⠺⠞⠑⠙⠽⠀⠊⠀⠞⠽⠇⠅⠕⠀⠺⠞⠑⠙⠽⠀⠛⠙⠽⠀⠣⠠⠭⠀⠈⠑⠨⠁⠀⠊⠀⠠⠭⠀⠔⠈⠑⠨⠃⠜");
+    test_braille("Polish", expr, r"⠠⠭⠀⠈⠑⠨⠁⠀⠡⠄⠨⠃⠀⠺⠞⠑⠙⠽⠀⠊⠀⠞⠽⠇⠅⠕⠀⠺⠞⠑⠙⠽⠀⠛⠙⠽⠀⠣⠠⠭⠀⠈⠑⠨⠁⠀⠊⠀⠠⠭⠀⠔⠈⠑⠨⠃⠜");
 }
 
 #[test]
 fn sets_p18_6() {
     let expr = r#"<math><mi>x</mi><mo>&#x2208;</mo><mi>A</mi><mo>&#x2216;</mo><mi>B</mi><mo>&#xA0;</mo><mo>&#x21D4;</mo><mo>(</mo><mi>x</mi><mo>&#x2208;</mo><mi>A</mi><mo>&#xA0;</mo><mo>∧</mo><mo>&#xA0;</mo><mi>x</mi><mo>&#x2209;</mo><mi>B</mi><mo>)</mo></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠠⠭⠀⠈⠑⠨⠁⠀⠡⠄⠨⠃⠀⠐⠶⠂⠣⠠⠭⠀⠈⠑⠨⠁⠀⠬⠂⠠⠭⠀⠔⠈⠑⠨⠃⠜");
+    test_braille("Polish", expr, r"⠠⠭⠀⠈⠑⠨⠁⠀⠡⠄⠨⠃⠀⠐⠶⠂⠣⠠⠭⠀⠈⠑⠨⠁⠀⠬⠂⠠⠭⠀⠔⠈⠑⠨⠃⠜");
 }
 
 #[test]
 fn sets_p18_7() {
     let expr = r#"<math><mi>A</mi><mo>=</mo><mo>{</mo><mi>x</mi><mo>:</mo><mo>&#xA0;</mo><mi>x</mi><mo>&#x2208;</mo><mi>ℂ</mi><mo>&#xA0;</mo><mi>i</mi><mo>&#xA0;</mo><mn>0</mn><mo>&lt;</mo><mi>x</mi><mo>&lt;</mo><mn>5</mn><mo>}</mo></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠨⠁⠀⠶⠪⠠⠭⠒⠀⠭⠀⠈⠑⠨⠨⠉⠀⠊⠀⠼⠚⠀⠪⠄⠭⠀⠪⠄⠼⠑⠕");
+    test_braille("Polish", expr, r"⠨⠁⠀⠶⠪⠠⠭⠒⠀⠭⠀⠈⠑⠨⠨⠉⠀⠊⠀⠼⠚⠀⠪⠄⠭⠀⠪⠄⠼⠑⠕");
 }
 
 #[test]
 fn sets_p19_1() {
     let expr = r#"<math><mo>(</mo><mi>a</mi><mo>,</mo><mo>&#xA0;</mo><mi>b</mi><mo>)</mo><mo>&#x2208;</mo><mo>&#xA0;</mo><mi>A</mi><mo>&#xD7;</mo><mi>B</mi><mo>&#xA0;</mo><mo>&#x21D4;</mo><mo>&#xA0;</mo><mo>(</mo><mi>a</mi><mo>&#x2208;</mo><mo>&#xA0;</mo><mi>A</mi><mo>&#x2227;</mo><mo>&#xA0;</mo><mi>b</mi><mo>&#x2208;</mo><mi>B</mi><mo>)</mo></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠣⠠⠁⠂⠀⠃⠜⠀⠈⠑⠨⠁⠀⠦⠨⠃⠀⠐⠶⠂⠣⠠⠁⠀⠈⠑⠨⠁⠀⠬⠂⠠⠃⠀⠈⠑⠨⠃⠜");
+    test_braille("Polish", expr, r"⠣⠠⠁⠂⠀⠃⠜⠀⠈⠑⠨⠁⠀⠦⠨⠃⠀⠐⠶⠂⠣⠠⠁⠀⠈⠑⠨⠁⠀⠬⠂⠠⠃⠀⠈⠑⠨⠃⠜");
 }
 
 #[test]
 fn sets_p19_2() {
     let expr = r#"<math><mi>A</mi><mo>&#x2282;</mo><mi>X</mi></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠨⠁⠀⠣⠄⠨⠭");
+    test_braille("Polish", expr, r"⠨⠁⠀⠣⠄⠨⠭");
 }
 
 #[test]
 fn sets_p19_3() {
     let expr = r#"<math><mi>A</mi><mo>'</mo><mo>=</mo><mi>X</mi><mo>&#x2216;</mo><mo>&#xA0;</mo><mi>A</mi></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠨⠁⠔⠀⠶⠨⠭⠀⠡⠄⠨⠁");
+    test_braille("Polish", expr, r"⠨⠁⠔⠀⠶⠨⠭⠀⠡⠄⠨⠁");
 }
 
 #[test]
@@ -502,7 +502,7 @@ fn sets_p19_10() {
 #[test]
 fn sets_p19_11() {
     let expr = r#"<math><mi>A</mi><mo>&#x2229;</mo><mi>B</mi><mo>=</mo><mo>{</mo><mn>4</mn><mo>,</mo><mn>5</mn><mo>}</mo><mo>.</mo></math>"#;
-    test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠨⠁⠀⠬⠄⠨⠃⠀⠶⠪⠼⠙⠠⠂⠀⠼⠑⠕⠄");
+    test_braille("Polish", expr, r"⠨⠁⠀⠬⠄⠨⠃⠀⠶⠪⠼⠙⠠⠂⠀⠼⠑⠕⠄");
 }
 
 // I've skipped chapter on Graphical representation of intervals, as they require multiline representation.

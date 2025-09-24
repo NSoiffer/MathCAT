@@ -2137,9 +2137,10 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
         // "!" is either punctuation or factorial -- we only use the punctuation form when it follows two letters
         static ref EXCLAMATION_MARK_IS_PUNCTUATION: Regex =Regex::new(r"(L.L.)!").unwrap();
     
-        // Need to add dot-6 between a number and punctuation (see bottom of p13 for '}' reason)
+        // Need to add dot-6 between a number and punctuation
+        // Also add dot-6 between '}' and ',' (see bottom of p13 for '}' reason (done with simple replacement below)
         // Also need to special case empty set which seems to act as a number without a number sign (⠯⠕)
-        static ref NUMBER_DOT6_PUNCTUATION: Regex =Regex::new(r"([Nn].(>[^⠰]|≫⠐.)*|⠯⠕|})(P.)").unwrap();
+        static ref NUMBER_DOT6_PUNCTUATION: Regex =Regex::new(r"([Nn].(>[^⠰]|≫⠐.)*|⠯⠕)(P.)").unwrap();
 
         static ref REPLACE_INDICATORS: Regex =Regex::new(r"([B𝔹IREDgGVHlL𝐿𝐶MnNUuwW𝐖Pp!(\[{)\]}#</>≪≫])").unwrap();
     }
@@ -2159,7 +2160,8 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     // we have to do one or the other replacement for "!" because of the white space
     let result = EXCLAMATION_MARK_IS_PUNCTUATION.replace_all(&result, "${1}P⠖W")
                                                         .replace('!', "⠫W"); // factorial
-    let result = NUMBER_DOT6_PUNCTUATION.replace_all(&result, "${1}⠠${3}");
+    let result = NUMBER_DOT6_PUNCTUATION.replace_all(&result, "${1}⠠${3}")
+                                                .replace("}P⠂", "}⠠P⠂");   // bottom of p13 -- '},'
     debug!(" After dot6 punc:    '{}'", &result);
     let result = polish_remove_unneeded_mode_changes(&result);
     debug!(" After mode changes: '{}'", &result);
