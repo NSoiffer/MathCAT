@@ -3161,7 +3161,7 @@ impl CanonicalizeContext {
 			// FIX: MathType generates the wrong version of union and intersection ops (binary instead of unary)
 		} else if !is_base && (parent_name == "msup" || parent_name == "msubsup") {
 			mo_text = match mo_text {
-				"\u{00BA}"| "\u{2092}"| "\u{20D8}"| "\u{2218}" => "\u{00B0}",		// circle-like objects -> degree
+				"\u{00BA}"| "\u{2092}"| "\u{20D8}"| "\u{2218}" | "\u{25E6}" => "\u{00B0}",		// circle-like objects -> degree
 				_ => mo_text,
 			};
 		} else {

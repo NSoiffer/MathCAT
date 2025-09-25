@@ -175,7 +175,7 @@ Using open source math books, the initial load should cover at least 99.99% of t
 
 The library is about ~3mb in size.
 
-If you are working on an in-browser solution (i.e, you are using JavaScript or some other browser-based language), MathCAT is probably not the best tool for you (although I will probably factor the [MathCATDemo](https://github.com/NSoiffer/MathCATDemo/) into a Javascript interface which the demo is built on top of). Instead, take a look at [Speech rule engine](https://github.com/zorkow/speech-rule-engine) (SRE) by Volker Sorge. It is written in TypeScript and will likely meet your needs for an in-browser solution unless UEB braille is important.
+If you are working on an in-browser solution (i.e, you are using JavaScript or some other browser-based language), MathCAT is probably not the best tool for you (although I will probably factor the [MathCATDemo](https://github.com/NSoiffer/MathCATDemo/) into a Javascript interface which the demo is built on top of). Instead, take a look at [Speech rule engine](https://github.com/zorkow/speech-rule-engine) (SRE) by Volker Sorge. It is written in TypeScript and will likely meet your needs for an in-browser solution unless braille is important; MathCAT supports multiple braille codes and at least for Nemeth Code, is higher quality.
 
 # Acknowledgements
 Several people helped out in various ways with the project. I am very grateful for all their help!

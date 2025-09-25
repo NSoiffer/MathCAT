@@ -24,8 +24,8 @@
             "type": "cargo",
             "command": "build",
             "args": [
-                "--features",
-                "include-zip" // Replace with your actual feature name
+                // "--features", "include-zip",
+                "--profile", "dev",
             ],
             "group": {
                 "kind": "build",
