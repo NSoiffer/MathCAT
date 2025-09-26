@@ -176,7 +176,7 @@
         variables: [DefaultToGiven: "count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and ../../../*[1][.='P']"] # P(A|B)
         replace:
         - test:
-            - if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')"
+            - if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
               then: [t: "vertical line"]
             - else_if: "$SpeechStyle != 'ClearSpeak'"
               then_test:
@@ -214,7 +214,7 @@
  - "´": [t: "acute"]                            # 0xb4
  - "·":                                            # 0xB7
     - test:
-        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:') or not($SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultSymbolDot = 'Auto')"
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')] or not($SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultSymbolDot = 'Auto')"
         then: [t: "dot"]
         else: [t: "times"]
  - "×":                                          # 0xd7
