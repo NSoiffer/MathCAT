@@ -511,6 +511,7 @@ pub fn get_supported_braille_codes() -> Vec<String> {
     return braille_code_paths;
  }
 
+/// Returns a Vec of all supported languages ("en", "es", ...)
 pub fn get_supported_languages() -> Vec<String> {
     enable_logs();
     let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
@@ -526,6 +527,8 @@ pub fn get_supported_languages() -> Vec<String> {
                     .filter(|string_path| !string_path.is_empty() )
                     .collect::<Vec<String>>();
 
+    // make sure the 'zz' test dir isn't included (build.rs removes it, but for debugging is there)
+    language_paths.retain(|s| !s.starts_with("zz"));
     language_paths.sort();
     return language_paths;
  }
