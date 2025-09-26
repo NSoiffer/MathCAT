@@ -463,14 +463,14 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         context.set_variable("MatchCounter", loop_count as f64);
         nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
 
-        let (intent, nav_intent) = if nav_state.mode != "Enhanced" {
+        let mut add_literal = nav_state.mode == "Character";
+        let (intent, nav_intent) = if add_literal {
             (mathml, mathml)
         } else {
             let intent = crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?;
             (intent, add_fixity_children(copy_mathml(intent)))
         };
 
-        let mut add_literal = nav_state.mode != "Enhanced";
         let mut properties = "";
         if add_literal {
             properties  = mathml.attribute_value("data-intent-property").unwrap_or_default();
@@ -486,7 +486,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             Ok(node) => node,
             Err(_) => {
                 // find the node in the other tree (probably mathml) and walk up to find a parent that has an id in both
-                let other_tree = if nav_state.mode != "Enhanced" {nav_intent} else {mathml};
+                let other_tree = if nav_state.mode == "Character" {nav_intent} else {mathml};
                 let mut found_node = get_start_node(other_tree, nav_state)?;
                 while name(found_node) != "math" {
                     found_node = get_parent(found_node);
@@ -572,7 +572,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", intent)?.0.unwrap() == "true" {
             // Speak/Overview of where we landed (if we are supposed to speak it) -- use intent, not nav_intent
             // Note: NavMode might have changed, so we need to recheck the mode to see if we use LiteralSpeak
-            let literal_speak = nav_state.mode != "Enhanced";
+            let literal_speak = nav_state.mode == "Character";
             let node_speech = match speak(mathml, intent, &nav_position.current_node, literal_speak, use_read_rules) {
                 Ok(speech) => speech,
                 Err(e) => {
@@ -1035,17 +1035,18 @@ mod tests {
     fn test_init_navigate_move_right() -> Result<()> {
         // this is how navigation typically starts up
         let mathml_str = " <math display='block' id='id-0'>
-            <mrow data-changed='added' id='id-1'>
-            <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
-            <mo id='id-3'>=</mo>
-            <mrow data-changed='added' id='id-4'>
-                <mi id='id-5'>a</mi>
-                <mo id='id-6'>-</mo>
-                <mn id='id-7'>2</mn>
-            </mrow>
+            <mrow id='id-1'>
+                <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
+                <mo id='id-3'>=</mo>
+                <mrow id='id-4'>
+                    <mi id='id-5'>a</mi>
+                    <mo id='id-6'>-</mo>
+                    <mn id='id-7'>2</mn>
+                </mrow>
             </mrow>
         </math>";
         init_default_prefs(mathml_str, "Enhanced");
+        debug!("--- Enhanced ---");
         MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -1054,6 +1055,7 @@ mod tests {
         });
 
         init_default_prefs(mathml_str, "Simple");
+        debug!("--- Simple ---");
         MATHML_INSTANCE.with(|package_instance: &RefCell<Package>| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -1062,6 +1064,7 @@ mod tests {
         });
         
         init_default_prefs(mathml_str, "Character");
+        debug!("--- Character ---");
         MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -1076,29 +1079,29 @@ mod tests {
         // (a+b)(c+d) + 1
         let mathml_str = " <math display='block' id='id-0'>
             <mrow id='id-1'>
-            <mrow id='id-2'>
-                <mrow id='id-3'>
-                <mo stretchy='false' id='id-4'>(</mo>
-                <mrow id='id-5'>
-                    <mi id='id-6'>a</mi>
-                    <mo id='id-7'>+</mo>
-                    <mi id='id-8'>b</mi>
+                <mrow id='id-2'>
+                    <mrow id='id-3'>
+                    <mo stretchy='false' id='id-4'>(</mo>
+                    <mrow id='id-5'>
+                        <mi id='id-6'>a</mi>
+                        <mo id='id-7'>+</mo>
+                        <mi id='id-8'>b</mi>
+                    </mrow>
+                    <mo stretchy='false' id='id-9'>)</mo>
+                    </mrow>
+                    <mo id='id-10'>&#x2062;</mo>
+                    <mrow id='id-11'>
+                    <mo stretchy='false' id='id-12'>(</mo>
+                    <mrow id='id-13'>
+                        <mi id='id-14'>c</mi>
+                        <mo id='id-15'>+</mo>
+                        <mi id='id-16'>d</mi>
+                    </mrow>
+                    <mo stretchy='false' id='id-17'>)</mo>
+                    </mrow>
                 </mrow>
-                <mo stretchy='false' id='id-9'>)</mo>
-                </mrow>
-                <mo id='id-10'>&#x2062;</mo>
-                <mrow id='id-11'>
-                <mo stretchy='false' id='id-12'>(</mo>
-                <mrow id='id-13'>
-                    <mi id='id-14'>c</mi>
-                    <mo id='id-15'>+</mo>
-                    <mi id='id-16'>d</mi>
-                </mrow>
-                <mo stretchy='false' id='id-17'>)</mo>
-                </mrow>
-            </mrow>
-            <mo id='id-18'>+</mo>
-            <mn id='id-19'>1</mn>
+                <mo id='id-18'>+</mo>
+                <mn id='id-19'>1</mn>
             </mrow>
         </math>";
         init_default_prefs(mathml_str, "Enhanced");
@@ -1106,15 +1109,16 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             set_preference("NavMode".to_string(), "Enhanced".to_string())?;
+            debug!("\n------EnhancedMode----------");
             test_command("ZoomIn", mathml, "id-2");
             test_command("ZoomIn", mathml, "id-5");
             test_command("ZoomIn", mathml, "id-6");
             
             // repeat, but this time with "Simple
             set_preference("NavMode".to_string(), "Simple".to_string())?;
+            debug!("\n------SimpleMode----------");
             test_command("ZoomOutAll", mathml, "id-1");
-            test_command("ZoomIn", mathml, "id-2");
-            test_command("ZoomIn", mathml, "id-3");
+            test_command("ZoomIn", mathml, "id-4");
             test_command("ZoomIn", mathml, "id-4");
             return Ok( () );
         });
@@ -1188,10 +1192,10 @@ mod tests {
     #[test]
     fn move_start_end() -> Result<()> {
         let mathml_str = " <math display='block' id='id-0'>
-        <mrow data-changed='added' id='id-1'>
+        <mrow id='id-1'>
           <mi id='id-2'>x</mi>
           <mo id='id-3'>=</mo>
-          <mrow data-changed='added' id='id-4'>
+          <mrow id='id-4'>
             <mi id='id-5'>a</mi>
             <mo id='id-6'>-</mo>
             <mn id='id-7'>2</mn>
@@ -1382,7 +1386,7 @@ mod tests {
     #[test]
     fn move_msubsup_char() -> Result<()> {
         let mathml_str = "<math display='block' id='id-0'>
-        <mrow data-changed='added' id='id-1'>
+        <mrow id='id-1'>
           <mn id='id-2'>1</mn>
           <mo id='id-3'>+</mo>
           <msubsup id='id-4'>
@@ -1417,7 +1421,7 @@ mod tests {
     fn move_mmultiscripts_char() -> Result<()> {
         let mathml_str = "<math display='block' id='id-0'>
             <mmultiscripts data-mjx-texclass='ORD' data-chem-formula='5' id='id-1'>
-                <mrow data-changed='added' data-chem-formula='3' id='id-2'>
+                <mrow data-chem-formula='3' id='id-2'>
                     <mo stretchy='false' id='id-3'>[</mo>
                     <mmultiscripts data-chem-formula='3' id='id-4'>
                         <mi data-chem-element='3' id='id-5'>Co</mi>
@@ -1502,15 +1506,15 @@ mod tests {
         let mathml_str = "<math display='block' id='id-0'>
             <mrow displaystyle='true' id='id-1'>
                 <mrow id='id-2'>
-                <mo id='id-3'>(</mo>
-                <mi id='id-4'>a</mi>
-                <mo id='id-5'>)</mo>
+                    <mo id='id-3'>(</mo>
+                    <mi id='id-4'>a</mi>
+                    <mo id='id-5'>)</mo>
                 </mrow>
                 <mo id='id-6'>&#x2062;</mo>
                 <mrow id='id-7'>
-                <mo id='id-8'>(</mo>
-                <mi id='id-9'>b</mi>
-                <mo id='id-10'>)</mo>
+                    <mo id='id-8'>(</mo>
+                    <mi id='id-9'>b</mi>
+                    <mo id='id-10'>)</mo>
                 </mrow>
             </mrow>
         </math>";
@@ -1518,11 +1522,14 @@ mod tests {
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
+            debug!("Character mode");
             do_commands(mathml)?;
             set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
-            test_command("ZoomIn", mathml, "id-2");  // zooms to the first parenthesis
+            debug!("Simple mode");
+            test_command("ZoomIn", mathml, "id-3");  // zooms to the first parenthesis
             do_commands(mathml)?;
             set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
+            debug!("Enhanced mode");
             test_command("ZoomIn", mathml, "id-4");
             test_command("MoveNext", mathml, "id-6");
             test_command("MoveNext", mathml, "id-9");
@@ -1598,7 +1605,7 @@ mod tests {
                     <mi id='id-3'>x</mi>
                     <mi id='id-4'>y</mi>
                 </mfrac>
-                <mo data-changed='added' id='id-5'>&#x2062;</mo>
+                <mo id='id-5'>&#x2062;</mo>
                 <mi id='id-6'>z</mi>
                 </mrow>
             </math>";
@@ -1619,12 +1626,12 @@ mod tests {
     #[test]
     fn move_enhanced_times() -> Result<()> {
         let mathml_str = "<math display='block' id='id-0'>
-        <mrow displaystyle='true' data-changed='added' id='id-1'>
+        <mrow displaystyle='true' id='id-1'>
           <mn id='id-2'>2</mn>
-          <mo data-changed='added' id='id-3'>&#x2062;</mo>
+          <mo id='id-3'>&#x2062;</mo>
           <mrow id='id-4'>
             <mo id='id-5'>(</mo>
-            <mrow data-changed='added' id='id-6'>
+            <mrow id='id-6'>
               <mn id='id-7'>1</mn>
               <mo id='id-8'>-</mo>
               <mi id='id-9'>x</mi>
@@ -1650,12 +1657,12 @@ mod tests {
     #[test]
     fn move_simple_no_times() -> Result<()> {
         let mathml_str = "<math display='block' id='id-0'>
-        <mrow displaystyle='true' data-changed='added' id='id-1'>
+        <mrow displaystyle='true' id='id-1'>
           <mn id='id-2'>2</mn>
-          <mo data-changed='added' id='id-3'>&#x2062;</mo>
+          <mo id='id-3'>&#x2062;</mo>
           <mrow id='id-4'>
             <mo id='id-5'>(</mo>
-            <mrow data-changed='added' id='id-6'>
+            <mrow id='id-6'>
               <mn id='id-7'>1</mn>
               <mo id='id-8'>-</mo>
               <mi id='id-9'>x</mi>
@@ -1966,8 +1973,72 @@ mod tests {
     }
 
     #[test]
+    fn zoom_root() -> Result<()> {
+        let mathml_str = r#"<math display='block' id='id-0'>
+        <mrow id='id-1'>
+            <mo id='id-9'>±</mo>
+            <msqrt id='id-10'>
+                <mrow id='id-11'>
+                    <msup id='id-12'> <mi id='id-13'>b</mi> <mn id='id-14'>2</mn> </msup>
+                    <mo id='id-15'>-</mo>
+                    <mn id='id-17'>4</mn>
+                </mrow>
+            </msqrt>
+        </mrow>
+        </math>"#;
+
+        test_mode(mathml_str, "Enhanced")?;
+        test_mode(mathml_str, "Simple")?;
+        test_mode(mathml_str, "Character")?;
+        return Ok( () );
+
+        fn test_mode(mathml_str: &str, mode: &str) -> Result<()> {
+            init_default_prefs(mathml_str, mode);
+            set_preference("AutoZoomOut".to_string(), "False".to_string())?;
+            return MATHML_INSTANCE.with(|package_instance| {
+                debug!("--- Testing mode {mode} ---");
+                let package_instance = package_instance.borrow();
+                let mathml = get_element(&*package_instance);
+                test_command("ZoomIn", mathml, "id-9");
+                debug!("\nStart zoom in");
+                match mode {
+                    "Enhanced" => {
+                        test_command("MoveNext", mathml, "id-10");
+                        let speech = test_command("ZoomIn", mathml, "id-11");
+                        assert_eq!(speech, "zoom in; in root; b squared minus 4");  // only one arg, so don't say "in root"
+                        let speech = test_command("ZoomIn", mathml, "id-12");
+                        assert_eq!(speech, "zoom in; b squared");  // only one arg, so don't say "in root"
+                        let speech = test_command("ZoomIn", mathml, "id-13");
+                        assert_eq!(speech, "zoom in; in base; b");
+                    },
+                    "Simple" => {
+                        test_command("MoveNext", mathml, "id-10");
+                        let speech = test_command("ZoomIn", mathml, "id-12");
+                        assert_eq!(speech, "zoom in; in root; b squared");
+                        let speech = test_command("ZoomIn", mathml, "id-13");
+                        assert_eq!(speech, "zoom in; in base; b");
+                    },
+                    _ => { // "Character"
+                        let speech = test_command("MoveNext", mathml, "id-13");
+                        assert_eq!(speech, "move right; in root; in base; b");
+                    }
+                }
+                let squared_speech = if mode == "Character" {"b super 2 end super"} else {"b squared"};
+                let sqrt_speech = if mode == "Character" {"root"} else {"square root"};
+                let speech = test_command("ZoomOut", mathml, "id-12");
+                assert_eq!(speech, format!("zoom out; out of base; {squared_speech}"));
+                let speech = test_command("ZoomOut", mathml, "id-11");
+                assert_eq!(speech, format!("zoom out; {squared_speech} minus 4"));
+                let speech = test_command("ZoomOut", mathml, "id-10");
+                assert_eq!(speech, format!("zoom out; out of root; the {sqrt_speech} of {squared_speech} minus 4, end root",));
+                return Ok( () );
+            });
+        }
+    }
+
+    #[test]
     fn matrix_speech() -> Result<()> {
-        let mathml_str = "<math id='math'>
+        let mathml_str = r#"<math id='math'>
             <mrow id='mrow'>
             <mo id='open'>[</mo>
             <mtable columnspacing='1em' rowspacing='4pt' id='table'>
@@ -1982,7 +2053,7 @@ mod tests {
             </mtable>
             <mo id='close'>]</mo>
             </mrow>
-        </math>";
+        </math>"#;
         init_default_prefs(mathml_str, "Enhanced");
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -2003,18 +2074,18 @@ mod tests {
     #[test]
     fn chem_speech() -> Result<()> {
         // this comes from bug 218
-        let mathml_str = "<math data-latex='H_2SO_4' display='block' id='id-0'>
-            <mrow data-changed='added' data-chem-formula='5' id='id-1'>
-                <msub data-latex='H_2' data-chem-formula='1' id='id-2'>
-                    <mi data-latex='H' data-chem-element='1' id='id-3'>H</mi>
-                    <mn data-latex='2' id='id-4'>2</mn>
+        let mathml_str = "<math display='block' id='id-0'>
+            <mrow data-chem-formula='5' id='id-1'>
+                <msub data-chem-formula='1' id='id-2'>
+                    <mi data-chem-element='1' id='id-3'>H</mi>
+                    <mn id='id-4'>2</mn>
                 </msub>
-                <mo data-changed='added' data-chem-formula-op='0' id='id-5'>&#x2063;</mo>
-                <mi data-latex='S' data-chem-element='1' id='id-6'>S</mi>
-                <mo data-changed='added' data-chem-formula-op='0' id='id-7'>&#x2063;</mo>
-                <msub data-latex='O_4' data-chem-formula='1' id='id-8'>
-                    <mi data-latex='O' data-chem-element='1' id='id-9'>O</mi>
-                    <mn data-latex='4' id='id-10'>4</mn>
+                <mo data-chem-formula-op='0' id='id-5'>&#x2063;</mo>
+                <mi data-chem-element='1' id='id-6'>S</mi>
+                <mo data-chem-formula-op='0' id='id-7'>&#x2063;</mo>
+                <msub data-chem-formula='1' id='id-8'>
+                    <mi data-chem-element='1' id='id-9'>O</mi>
+                    <mn id='id-10'>4</mn>
                 </msub>
             </mrow>
         </math>";
@@ -2171,17 +2242,13 @@ mod tests {
             set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
             debug!("Simple mode");
             let speech = test_command("ZoomIn", mathml, "id-4");
-            assert_eq!(speech, "zoom in; in numerator; n");
+            assert_eq!(speech, "zoom in; in part 1; n");
             let speech = test_command("MoveNext", mathml, "id-5");
-            assert_eq!(speech, "move right; in denominator; k");
-            let speech = test_command("MoveNext", mathml, "id-6");
-            assert_eq!(speech, "move right; out of denominator; close paren");
-            let speech = test_command("MoveNext", mathml, "id-6");
+            assert_eq!(speech, "move right; in part 2; k");
+            let speech = test_command("MoveNext", mathml, "id-5");
             assert_eq!(speech, "cannot move right, end of math");
             let speech = test_command("ZoomOut", mathml, "id-1");
-            assert_eq!(speech, "zoom out; open paren n over k, close paren");
-            let speech = test_command("ZoomOut", mathml, "id-1");
-            assert_eq!(speech, "zoomed out all the way; open paren n over k, close paren");
+            assert_eq!(speech, "zoom out; out of part 2; n choose k");
 
             set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
             debug!("Enhanced mode");
@@ -2220,7 +2287,7 @@ mod tests {
             let speech = test_command("MoveNext", mathml, "abs");
             assert_eq!(speech, "move right; the absolute value of x");
             let speech = test_command("ZoomIn", mathml, "x");
-            assert_eq!(speech, "zoom in; x");
+            assert_eq!(speech, "zoom in; in absolute value; x");
             let speech = test_command("MoveNext", mathml, "x");
             assert_eq!(speech, "cannot move right, end of math");
             set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
@@ -2337,12 +2404,11 @@ mod tests {
                 <mi id='id-12'>y</mi>
                 </mrow>
             </math>";
-        test_language("en", mathml_str);
-        test_language("es", mathml_str);
-        test_language("id", mathml_str);
-        test_language("vi", mathml_str);
-        test_language("zh-tw", mathml_str);
-        test_language("sv", mathml_str);
+        
+        set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        for lang in get_supported_languages() {
+            test_language(&lang, mathml_str);
+        }
         return Ok( () );
 
         fn test_language(lang: &str, mathml_str: &str) {
