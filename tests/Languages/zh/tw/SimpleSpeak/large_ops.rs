@@ -39,7 +39,6 @@ fn sum_both_msubsup() {
 
 #[test]
 fn sum_sub() {
-    init_logger();
     let expr = "<math>
         <msub>
             <mo>∑</mo>

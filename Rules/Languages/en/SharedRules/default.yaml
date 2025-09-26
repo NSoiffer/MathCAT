@@ -129,7 +129,7 @@
   - pause: short
   - test:
       if: "not(IsNode(*[1],'leaf')) or $Impairment = 'Blindness'"
-      then: [t: "end root"] # phrase("root of x 'end root symbol'")
+      then: [t: "end root", pause: medium] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
 - name: literal-default
