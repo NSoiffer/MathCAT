@@ -340,10 +340,31 @@
   name: default
   tag: [mtext, mi]
   match: "."
+  variables: [Abbreviations: "DefinitionValue(., 'Braille', 'Abbreviations')"]
   replace:
   - test:
-      # add unit indicator
-      if: "@class='MathML-unit' or contains(@intent, ':unit') or
+    - if: "$Abbreviations != ''"
+      then:
+      - test:
+          if: "not(.='const' or .='sgn' or .= 'lim')"
+          then: [t: 'f']    # forces function mode (lower case Roman letter)
+      - x: "$Abbreviations"
+       # text has it's own rules
+    - else_if: "IsInDefinition(., 'Braille', 'MathWords') or
+                self::m:mtext and string-length(.) > 3" 
+      then:
+      - t: "T"
+      - x: "BrailleChars(., 'Polish')"
+      - t: "t"
+      - test:
+          # Hack: there is often a space after the word, but that hard to tell
+          # we look for the space on the next child, or if it is an invisible times, on the one after that
+          if: "following-sibling::*[1][@data-previous-space-width>=0.7] or
+              (following-sibling::*[1][self::m:mo and .='\u2062'] and
+               following-sibling::*[2][@data-previous-space-width>=0.7])"
+          then: [t: "W"]
+    - else_if:  # add unit indicator
+          "@class='MathML-unit' or contains(@intent, ':unit') or
            (not(@data-chem-element) and
             (self::m:mtext or string-length(.) > 1 or @mathvariant='normal') and
             (parent::*[1][self::m:mrow and count(*)=3 and *[2][.='\u2062'] and
@@ -366,28 +387,15 @@
       - t: "U"
       - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
       - t: "u"
+    - else_if: "IsInDefinition(., 'Braille', 'Currency')" 
+      # need to add a space before and after the symbol (which is treated like text)
+      then:
+      - t: "WT"
+      - x: "BrailleChars(., 'Polish')" 
+      - t: "tW"
       else:
-      - with:
-          variables: [Abbreviations: "DefinitionValue(., 'Braille', 'Abbreviations')"]
-          replace:
-          - test:
-              if: "$Abbreviations != ''"
-              then:
-              - test:
-                  if: "not(.='const' or .='sgn' or .= 'lim')"
-                  then: [t: 'f']    # forces function mode (lower case Roman letter)
-              - x: "$Abbreviations"
-              else:
-              - test:
-                  # words have different rules from math. Guessing that strings of length 4 or more are words
-                  if: "self::m:mtext and string-length(.) > 3"
-                  then: [t: "T"] 
-              - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
-              - test:
-                  if: "self::m:mtext and string-length(.) > 3"
-                  then: [t: "t"] 
+      - x: "BrailleChars(., 'Polish')"
       
-
 
 -
   # 2.5b says that hex-like numbers don't reuse a numeric indicator after a letter -- here we try to catch that case.
@@ -627,6 +635,17 @@
       then: [t: ">W"]  # p56 and p57 say to terminate these with a space
       else: [t: ">⠱"]
 
+
+-
+  # FIX: not sure what to do -- this is based on p64 (last example) and only works for mover
+  name: oxidation-states
+  tag: mover
+  match: "BaseNode(*[1])[@data-chem-element]"
+  replace:
+  - x: "*[1]"
+  - t: "("
+  - x: "*[2]"
+  - t: ")"
 
 -
   # FIX: not sure what to do -- this is based on p64 (last example) and only works for mover
