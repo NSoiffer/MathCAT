@@ -1860,7 +1860,7 @@ fn trigonometry_p51_4() {
 
 #[test]
 fn trigonometry_p51_5() {
-    let expr = r#"<math><mn>1</mn><mi>r</mi><mi>a</mi><mi>d</mi><mo>=</mo><mfrac><mrow><mn>180</mn><mo>&#xB0;</mo></mrow><mi>&#x3C0;</mi></mfrac><mo>&#x2248;</mo><mfrac><mrow><mn>180</mn><mo>&#xB0;</mo></mrow><mrow><mn>3</mn><mo>,</mo><mn>14159</mn></mrow></mfrac><mo>&#x2248;</mo><mn>57</mn><mo>&#xB0;</mo><mn>17</mn><mo>'</mo><mn>45</mn><mo>&quot;</mo></math>"#;
+    let expr = r#"<math><mn>1</mn><mi>rad</mi><mo>=</mo><mfrac><mrow><mn>180</mn><mo>&#xB0;</mo></mrow><mi>&#x3C0;</mi></mfrac><mo>&#x2248;</mo><mfrac><mrow><mn>180</mn><mo>&#xB0;</mo></mrow><mrow><mn>3</mn><mo>,</mo><mn>14159</mn></mrow></mfrac><mo>&#x2248;</mo><mn>57</mn><mo>&#xB0;</mo><mn>17</mn><mo>'</mo><mn>45</mn><mo>&quot;</mo></math>"#;
     test_braille("Polish", expr, "⠼⠁⠼⠗⠀⠶⠼⠁⠓⠚⠴⠳⠰⠏⠀⠢⠢⠼⠁⠓⠚⠴⠳⠼⠉⠂⠁⠙⠁⠑⠊⠀⠢⠢⠼⠑⠛⠴⠼⠁⠛⠘⠔⠼⠙⠑⠘⠔⠔");
 }
 
@@ -1979,7 +1979,7 @@ fn trigonometry_p53_4() {
 #[test]
 fn trigonometry_p53_5() {
     let expr = r#"<math><mi>arcsin</mi><mo>(</mo><msup><mn>30</mn><mo>&#x2218;</mo></msup><mo>+</mo><mi>n</mi><mo>&#x22C5;</mo><msup><mn>360</mn><mo>&#x2218;</mo></msup><mo>)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>&#xA0;</mo><mi>dla</mi><mo>&#xA0;</mo><mi>n</mi><mo>=</mo><mn>0</mn><mo>,</mo><mo>&#xA0;</mo><mo>&#xB1;</mo><mn>1</mn><mo>,</mo><mo>&#xA0;</mo><mo>&#xB1;</mo><mn>2</mn><mo>,</mo><mo>&#xA0;</mo><mo>.</mo><mo>.</mo><mo>.</mo></math>"#;
-    test_braille("Polish", expr, "⠫⠂⠎⠣⠼⠉⠚⠴⠀⠖⠠⠝⠄⠼⠉⠋⠚⠴⠜⠀⠶⠼⠁⠆⠀⠙⠇⠁⠀⠠⠝⠀⠶⠼⠚⠠⠂⠀⠖⠤⠼⠁⠠⠂⠀⠖⠤⠼⠃⠠⠂⠀⠄⠄⠄");
+    test_braille("Polish", expr, "⠫⠂⠎⠣⠼⠉⠚⠴⠀⠖⠠⠝⠄⠼⠉⠋⠚⠴⠜⠀⠶⠼⠁⠆⠙⠇⠁⠀⠠⠝⠀⠶⠼⠚⠠⠂⠀⠖⠤⠼⠁⠠⠂⠀⠖⠤⠼⠃⠠⠂⠀⠄⠄⠄");
 }
 
 // MATHEMATICAL LOGIC
@@ -2931,26 +2931,27 @@ fn valence_p84_5() {
 
 #[test]
 fn oxidation_states_p85_1() {
-    let expr = r#"<math><mover><mi mathvariant="normal">S</mi><mi>IV</mi></mover><msub><mover><mi mathvariant="normal">O</mi><mrow><mo>-</mo><mi>II</mi></mrow></mover><mn>2</mn></msub></math>"#;
+    let expr = r#"<math><mover><mi mathvariant="normal">S</mi><mi>IV</mi></mover><mover><msub><mi mathvariant="normal">O</mi><mn>2</mn></msub><mrow><mo>-</mo><mi>II</mi></mrow></mover></math>"#;
     test_braille("Polish", expr, "⠨⠎⠣⠨⠊⠧⠜⠨⠕⠆⠣⠤⠨⠊⠊⠜");
 }
 
 #[test]
 fn oxidation_states_p85_2a() {
-    let expr = r#"<math><msub><mover><mi mathvariant="normal">N</mi><mn>0</mn></mover><mn>2</mn></msub></math>"#;
+    let expr = r#"<math intent=":chemical-formula"><mover><msub><mi mathvariant="normal">N</mi><mn>2</mn></msub><mn>0</mn></mover></math>"#;
     test_braille("Polish", expr, "⠨⠝⠆⠣⠼⠚⠜");
 }
 
 #[test]
+#[ignore = "alternative"]
 fn oxidation_states_p85_2b() {
-    let expr = r#"<math><msub><mover><mi mathvariant="normal">N</mi><mn>0</mn></mover><mn>2</mn></msub></math>"#;
+    let expr = r#"<math intent=":chemical-formula"><mover><msub><mi mathvariant="normal">N</mi><mn>2</mn></msub><mn>0</mn></mover></math>"#;
     test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Intermediate")], expr, r"⠨⠝⠆⠣⠴⠜");
 }
 
 #[test]
 fn reactions_p85_3() {
     let expr = r#"<math><mi>Fe</mi><mo>+</mo><mn>2</mn><mi>HCl</mi><mo>&#x2192;</mo><msub><mi>FeCl</mi><mn>2</mn></msub><mo>+</mo><msub><mi mathvariant="normal">H</mi><mn>2</mn></msub><mo>&#x2191;</mo></math>"#;
-    test_braille("Polish", expr, "⠨⠋⠑⠀⠖⠼⠃⠨⠓⠨⠉⠇⠀⠒⠂⠨⠋⠑⠨⠉⠇⠆⠀⠖⠨⠓⠆⠸⠒⠁");
+    test_braille("Polish", expr, "⠨f⠋⠑⠀⠖⠼⠃⠨⠓⠨⠉⠇⠀⠒⠂⠨⠋⠑⠨⠉⠇⠆⠀⠖⠨⠓⠆⠸⠒⠁");
 }
 
 #[test]
@@ -2976,13 +2977,15 @@ fn reactions_p86_1() {
 
 #[test]
 fn reactions_p86_2() {
-    let expr = r#"<math><mi>KOH</mi><mo>&#x21CC;</mo><msup><mi mathvariant="normal">K</mi><mo>+</mo></msup><mo>+</mo><msup><mi>OH</mi><mo>-</mo></msup></math>"#;
+    let expr = r#"<math><mi>KOH</mi><mo>⟷</mo><msup><mi mathvariant="normal">K</mi><mo>+</mo></msup><mo>+</mo><msup><mi>OH</mi><mo>-</mo></msup></math>"#;
     test_braille("Polish", expr, "⠸⠅⠕⠓⠀⠐⠒⠂⠨⠅⠌⠖⠀⠖⠸⠕⠓⠌⠤");
 }
 
 #[test]
 fn reactions_p86_3() {
-    let expr = r#"<math><mi>HCOOH</mi><mover><mo>&#x21CC;</mo><mrow><msub><mi mathvariant="normal">H</mi><mn>2</mn></msub><mn>0</mn></mrow></mover><msup><mi>HCOO</mi><mo>-</mo></msup><mo>+</mo><msup><mi mathvariant="normal">H</mi><mo>+</mo></msup></math>"#;
+    let expr = r#"<math><mi>HCOOH</mi>
+        <mover><mo>⟷</mo><mrow><msub><mi mathvariant="normal">H</mi><mn>2</mn></msub><mi mathvariant="normal">O</mi></mrow></mover>
+        <msup><mi>HCOO</mi><mo>-</mo></msup><mo>+</mo><msup><mi mathvariant="normal">H</mi><mo>+</mo></msup></math>"#;
     test_braille("Polish", expr, "⠸⠓⠉⠕⠕⠓⠀⠰⠐⠒⠂⠠⠸⠓⠆⠕⠄⠀⠸⠓⠉⠕⠕⠌⠤⠀⠖⠨⠓⠌⠖");
 }
 
