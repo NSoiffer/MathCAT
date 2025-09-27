@@ -74,7 +74,7 @@ static MERGED_TOKEN: &str = "data-merged";
 
 /// these can be in the base of an under/over script
 static CHEM_EQUATION_ARROWS: phf::Set<char> = phf_set! {
-    '→', '➔', '←', '⟶', '⟵', '⤻', '⇋', '⇌',
+    '→', '➔', '←', '⟶', '⟵', '⟷', '⤻', '⇋', '⇌',
     '↑', '↓', '↿', '↾', '⇃', '⇂', '⥮', '⥯', '⇷', '⇸', '⤉', '⤈',
     '⥂', '⥄', '⥃',
     '\u{1f8d0}', '\u{1f8d1}', '\u{1f8d2}', '\u{1f8d3}', '\u{1f8d4}', '\u{1f8d5}',         // proposed Unicode equilibrium arrows
@@ -466,7 +466,11 @@ fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
         maybe_attr.remove_from_parent();
 
         match tag_name {
-            "mi" | "mtext" => {mathml.set_attribute_value(CHEM_ELEMENT, maybe_attr.value());},
+            "mi" | "mtext" => {
+                if is_chemical_element(mathml) {
+                    mathml.set_attribute_value(CHEM_ELEMENT, maybe_attr.value());
+                }
+            },
             "mo" => {
                 if mathml.attribute(CHEM_FORMULA_OPERATOR).is_none() && mathml.attribute(CHEM_EQUATION_OPERATOR).is_none(){
                     // don't mark as both formula and equation
@@ -474,7 +478,7 @@ fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
                 }
             },
             "mn" => (),
-            "mrow" | "msub" | "msup" | "msubsup" | "mmultiscripts" => {
+            "mrow" | "msub" | "msup" | "msubsup" | "mmultiscripts" | "mover" => {
                 let mut chem_name = chem;
                 if tag_name != "mrow" && chem != CHEM_FORMULA{
                     // look at base -- if an mi/mtext then this is really a chemical formula
@@ -761,7 +765,7 @@ fn is_chemistry_sanity_check(mathml: Element) -> bool {
                 }
                 return false;
             },
-            "msub" | "msup" | "msubsup" | "mmultiscripts" => return gather_chemical_elements(get_possible_embellished_node(mathml), chem_elements),
+            "msub" | "msup" | "msubsup" | "mmultiscripts" | "mover" => return gather_chemical_elements(get_possible_embellished_node(mathml), chem_elements),
             "semantics" => {
                 return gather_chemical_elements( get_presentation_element(mathml).1, chem_elements );
             },
@@ -922,6 +926,19 @@ fn small_roman_to_number(text: &str) -> &str {
 
 }
 
+fn likely_chem_oxidation_state(over: Element) -> isize {
+    // roman numerals are "oxidation state" and range from -4 to +9 -- can also be 0 for free states
+    // I saw this notation in the Polish braille spec
+    let over_name = name(over);
+    if matches!(over_name, "mi" | "mn" |"mtext") &&
+       (as_text(over) == "0" || SMALL_UPPER_ROMAN_NUMERAL.is_match(as_text(over))) {
+        over.set_attribute_value("data-number", small_roman_to_number(as_text(over)));
+        over.set_attribute_value(MAYBE_CHEMISTRY, "2");
+        return 2;
+    }
+    return 0;
+}
+
 fn likely_chem_superscript(sup: Element) -> isize {
     // either one or more '+'s (or '-'s) or a number followed by +/-
     // also could be state (en.wikipedia.org/wiki/Nuclear_chemistry#PUREX_chemistry)
@@ -1004,7 +1021,7 @@ fn likely_chem_superscript(sup: Element) -> isize {
 /// * fences around a chemical formula
 /// * an mrow made up of only chemical formulas
 fn likely_chem_formula(mathml: Element) -> isize {
-    // debug!("start likely_chem_formula:\n{}", mml_to_string(mathml));
+    debug!("start likely_chem_formula:\n{}", mml_to_string(mathml));
     if let Some(value) = get_marked_value(mathml) {
         return value;       // already marked
     }
@@ -1016,7 +1033,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
         "mo" => likely_chem_formula_operator(mathml),
         "mtext" => 0,    // definitely need to skip empty mtext, but others are probably neutral also
         "mn" => 0,       // no info
-        "msub" | "msup" | "msubsup" | "mmultiscripts" => {
+        "msub" | "msup" | "msubsup" | "mmultiscripts" | "mover" => {
             likely_chem_formula(as_element(mathml.children()[0]));  // set MAYBE_CHEMISTRY attribute
             likely_adorned_chem_formula(mathml)
         },
@@ -1079,7 +1096,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
     if likelihood >= 0 {
         mathml.set_attribute_value(MAYBE_CHEMISTRY, &likelihood.to_string());
     }
-    // debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(mathml));
+    debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(mathml));
 
     return likelihood;
 
@@ -1303,6 +1320,9 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
         }
     }
 
+    if tag_name == "mover" {
+        likelihood += likely_chem_oxidation_state(as_element(children[1]));
+    }
     let mut empty_superscript = false;
     if tag_name == "msup" || tag_name == "msubsup" {
         // debug!("likely_adorned_chem_formula: mathml\n{}", mml_to_string(mathml));
@@ -1724,7 +1744,7 @@ fn convert_to_short_form(mathml: Element) -> Result<String> {
     return match mathml_name {
         "mi" | "mtext" | "mn" | "mo" => Ok( as_text(mathml).to_string() ),
         "none" => Ok( "".to_string() ),
-        "msub" | "msup" | "msubsup" | "mmultiscripts"=> {
+        "msub" | "msup" | "msubsup" | "mmultiscripts" | "mover" => {
             let is_mmultiscripts = mathml_name == "mmultiscripts";
             let children = mathml.children();
             let mut result = convert_to_short_form(as_element(children[0]))?;
