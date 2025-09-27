@@ -397,6 +397,18 @@
                                        not(self::m:mfrac and *[2][self::m:mn][translate(., '0123456789', '') = '']) ]"  # drop numbers
           then: [T: "W⠄"]
           else: [T: "⠄"]
+ - "⋅":                                  # 0x22C5 (Dot operator) -- treating the same as 0xb7
+    - test:
+          if: "preceding-sibling::*[1][IsNode(., '2D') and 
+                                       not(self::m:mfrac and *[2][self::m:mn][translate(., '0123456789', '') = '']) ]"  # drop numbers
+          then: [T: "W⠄"]
+          else: [T: "⠄"]
+ - "∙":                                  # 0x2219   -- similar looking to 0x22c5, treating the same as 0xb7
+    - test:
+          if: "preceding-sibling::*[1][IsNode(., '2D') and 
+                                       not(self::m:mfrac and *[2][self::m:mn][translate(., '0123456789', '') = '']) ]"  # drop numbers
+          then: [T: "W⠄"]
+          else: [T: "⠄"]
  - "°": [T: "p⠴"]                       # 0x00B0 DEGREE SIGN
  - "×": [T: "W⠦"]                       # 0x00D7 (multiplication cross)
  - "…": [T: "⠄⠄⠄"]                     # 0x2d9
@@ -940,8 +952,6 @@
  - "⊸": [t: "⠫⠒⠨⠡"]           # 0x22B8 (Multimap)
 #  - "⊾": [t: ""]                 # 0x22BE (Right angle w arc)
  - "⊿": [T: "⠻⠲⠲"]            # 0x22BF (Right triangle)
- - "⋅": [t: "W⠄"]                # 0x22C5 (Dot operator) -- treating the same as 0xb7
- - "∙": [t: "W⠄"]                # 0x2219   -- similar looking to 0x22c5, treating the same as 0xb7
  - "⋆": [t: "⠫⠎"]               # 0x22C6 (Star operator)
  - "⋍": [t: "⠠⠱⠱"]            # 0x22CD (Reversed tilde equals)
  - "⋖": [t: "⠡⠈⠐⠅⠻"]          # 0x22D6 (Less-than w dot)
@@ -990,7 +1000,7 @@
           if: "parent::m:mrow"
           then: [T: "W⠂⠒"]               
           else: [T: "⠂⠒"]       # script position
- - "⟷": [t: "⠀⠫⠪⠒⠒⠒⠕⠀"]         # 0x27F7 (Long left right arrow)
+ - "⟷": [T: "W⠐⠒⠂"]              # 0x27F7 (Long left right arrow)
  - "⟸": [t: "⠀⠫⠪⠶⠶⠶⠀"]          # 0x27F8 (Long leftwards arrow )
  - "⟹": [t: "⠀⠫⠶⠶⠶⠕⠀"]          # 0x27F9 (Long rightwards arrow)
  - "⟺": [t: "⠀⠫⠪⠶⠶⠶⠕⠀"]         # 0x27FA (Long left right arrow)
