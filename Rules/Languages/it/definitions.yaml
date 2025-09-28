@@ -82,7 +82,7 @@
     ]
 
 - NumbersOrdinalPluralHundreds: [
-       "", "centesimo", "duecentesimi", "trecentesimi", "quattrocentesimi", "cinquecentesimi",
+       "", "centesimi", "duecentesimi", "trecentesimi", "quattrocentesimi", "cinquecentesimi",
          "seicentesimi", "settecentesimi", "ottocentesimi", "novecentesimi"
     ]
       
