@@ -130,8 +130,8 @@
         if: "parent::m:modified-variable or parent::m:mover"
         then: [T: "cappellino"]                     #   (en: 'hat')
         else: [T: "accento circonflesso"]         #   (en: 'caret', MathPlayer: 'cappuccio', google: 'assegnato')
- - "_": [t: "trattino basso"]                       #  0x5f (en: 'under bar', MathPlayer: 'under bar', google: 'sotto la barra')
- - "`": [t: "accento grave"]                      #  0x60 (en: 'grave')
+ - "_": [T: "trattino basso"]                       #  0x5f (en: 'under bar', MathPlayer: 'under bar', google: 'sotto la barra')
+ - "`": [T: "accento grave"]                      #  0x60 (en: 'grave')
  - "{":                                           #  0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
@@ -275,7 +275,7 @@
  - "℃": [T: "gradi celsius"]                      #  0x2103 (en: 'degrees celsius', google translation)
  - "℉": [T: "gradi fahrenheit"]                   #  0x2109 (en: 'degrees fahrenheit', google translation)
  - "ℋℛℓ":                                         #  0x210b
-    - t: "aratteri calligrafici"                  #   (en: 'script', google translation)
+    - T: "caratteri calligrafici"                  #   (en: 'script', google translation)
     - spell: "translate('.', 'ℋℛℓ', 'HRl')"
  - "ℎ": [T: "costante di planck"]                 #  0x210e (en: 'planck constant')
  - "ℜ":                                           #  0x211c
@@ -490,10 +490,10 @@
  - "⊆":                                           #  0x2286
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "è un"]                        #   (en: 'is a', google translation)
-     - t: "sottoinsieme proprio o improprio di"   #   (en: 'subset of or equal to')
+         then: [T: "è un"]                        #   (en: 'is a')
+     - T: "sottoinsieme proprio o improprio di"   #   (en: 'subset of or equal to')
  - "⊇":                                           #  0x2287
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "è un"]                        #   (en: 'is a', google translation)
-     - t: "soprainsieme proprio p improprio di"   #   (en: 'superset of or equal to')
+         then: [T: "è un"]                        #   (en: 'is a', google translation)
+     - T: "soprainsieme proprio o improprio di"   #   (en: 'superset of or equal to')

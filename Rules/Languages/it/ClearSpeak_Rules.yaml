@@ -498,7 +498,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [t: "l'"]      # phrase('the' set of all integers)
+          then: [T: "l'"]      # phrase('the' set of all integers)
       - T: "insieme di"      # phrase(this is a 'set of' numbers)
       - test:
           if: $ClearSpeak_Sets != 'woAll'
