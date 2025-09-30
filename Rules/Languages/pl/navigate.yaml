@@ -48,7 +48,7 @@
     - if: "$MatchCounter = 0 and $SayCommand = 'true'"
       then_test:
       - if: "self::m:math and starts-with($NavCommand, 'ZoomOut')"
-        then: [t: "powiększyło się do końca", pause: "medium"]
+        then: [t: "powiększyło się maksymalnie", pause: "medium"]
       - else_if: "IsNode(., 'leaf') and starts-with($NavCommand, 'ZoomIn')"
         then: [t: "powiększone przez całą drogę", pause: "medium"]
         else:

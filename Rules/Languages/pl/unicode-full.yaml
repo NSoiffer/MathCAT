@@ -26,12 +26,12 @@
  - "·":
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
-        then: [t: "czasy"]                      	# 	(en: 'times', google translation)
+        then: [t: "razy"]                      	# 	(en: 'times', google translation)
         else: [t: "kropka"]                     	# 	(en: 'dot', google translation)
  - "×":                                         	#  0xd7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
-        then: [t: "czasy"]                      	# 	(en: 'times', google translation)
+        then: [t: "razy"]                      	# 	(en: 'times', google translation)
         else_test:
             if: $ClearSpeak_MultSymbolX = 'By'
             then: [t: "przez"]                  	# 	(en: 'by', google translation)
@@ -755,13 +755,13 @@
  - "∔": [t: "kropka plus"]                      	#  0x2214	(en: 'dot plus', google translation)
  - "∕": [t: "podzielone przez"]                 	#  0x2215	(en: 'divided by', google translation)
  - "∖": [t: "ustaw minus"]                      	#  0x2216	(en: 'set minus', google translation)
- - "∗": [t: "czasy"]                            	#  0x2217	(en: 'times', google translation)
+ - "∗": [t: "razy"]                            	#  0x2217	(en: 'times', google translation)
  - "∘": [t: "skomponowane z"]                   	#  0x2218	(en: 'composed with', google translation)
  - "∙":                                         	#  0x2219
     - test: 
         if: "@data-chem-formula-op"
         then: [t: "kropka"]                     	# 	(en: 'dot', google translation)
-        else: [t: "czasy"]                      	# 	(en: 'times', google translation)
+        else: [t: "razy"]                      	# 	(en: 'times', google translation)
 
  - "√":                                         	#  0x221a
      - test: 
@@ -1104,7 +1104,7 @@
  - "⊔": [t: "kwadratowy kubek"]                 	#  0x2294	(en: 'square cup', google translation)
  - "⊕": [t: "krewne plus"]                      	#  0x2295	(en: 'circled plus', google translation)
  - "⊖": [t: "krążył minus"]                     	#  0x2296	(en: 'circled minus', google translation)
- - "⊗": [t: "czasowe czasy"]                    	#  0x2297	(en: 'circled times', google translation)
+ - "⊗": [t: "przekreślone razy"]                    	#  0x2297	(en: 'circled times', google translation)
  - "⊘": [t: "zakończone cięcie"]                	#  0x2298	(en: 'circled slash', google translation)
  - "⊙": [t: "operator krążeniowy"]              	#  0x2299	(en: 'circled dot operator', google translation)
  - "⊚": [t: "krążelny pierścień"]               	#  0x229a	(en: 'circled ring', google translation)
@@ -1113,7 +1113,7 @@
  - "⊝": [t: "zakończony dash"]                  	#  0x229d	(en: 'circled dash', google translation)
  - "⊞": [t: "kwadratowy plus"]                  	#  0x229e	(en: 'squared plus', google translation)
  - "⊟": [t: "kwadratowy minus"]                 	#  0x229f	(en: 'squared minus', google translation)
- - "⊠": [t: "kwadratowe czasy"]                 	#  0x22a0	(en: 'squared times', google translation)
+ - "⊠": [t: "kwadratowe razy"]                 	#  0x22a0	(en: 'squared times', google translation)
  - "⊡": [t: "operator kwadratowy"]              	#  0x22a1	(en: 'squared dot operator', google translation)
  - "⊢": [t: "udowadnia"]                        	#  0x22a2	(en: 'proves', google translation)
  - "⊣": [t: "nie daje"]                         	#  0x22a3	(en: 'does not yield', google translation)
@@ -1182,10 +1182,10 @@
     - test: 
         if: "@data-chem-formula-op"
         then: [t: "kropka"]                     	# 	(en: 'dot', google translation)
-        else: [t: "czasy"]                      	# 	(en: 'times', google translation)
+        else: [t: "razy"]                      	# 	(en: 'times', google translation)
 
- - "⋆": [t: "czasy"]                            	#  0x22c6	(en: 'times', google translation)
- - "⋇": [t: "czasy podziału"]                   	#  0x22c7	(en: 'division times', google translation)
+ - "⋆": [t: "razy"]                            	#  0x22c6	(en: 'times', google translation)
+ - "⋇": [t: "podzielone przez razy"]                   	#  0x22c7	(en: 'division times', google translation)
  - "⋈": [t: "muszka"]                           	#  0x22c8	(en: 'bowtie', google translation)
  - "⋉":                                         	#  0x22c9
     - test: 
@@ -1992,8 +1992,8 @@
  - "⧑": [t: "bowtie z lewym pół czarnym"]       	#  0x29d1	(en: 'bowtie with left half black', google translation)
  - "⧒": [t: "bowtie z prawą połową czarną"]     	#  0x29d2	(en: 'bowtie with right half black', google translation)
  - "⧓": [t: "czarny bowtie"]                    	#  0x29d3	(en: 'black bowtie', google translation)
- - "⧔": [t: "czasy z lewym pół czarnym"]        	#  0x29d4	(en: 'times with left half black', google translation)
- - "⧕": [t: "czasy z prawą połową czarną"]      	#  0x29d5	(en: 'times with right half black', google translation)
+ - "⧔": [t: "razy z lewą czarną połową"]        	#  0x29d4	(en: 'times with left half black', google translation)
+ - "⧕": [t: "razy z prawą połową czarną"]      	#  0x29d5	(en: 'times with right half black', google translation)
  - "⧖": [t: "biała klepsydra"]                  	#  0x29d6	(en: 'white hourglass', google translation)
  - "⧗": [t: "czarna klepsydra"]                 	#  0x29d7	(en: 'black hourglass', google translation)
  - "⧘": [t: "lewy wiggly fence"]                	#  0x29d8	(en: 'left wiggly fence', google translation)

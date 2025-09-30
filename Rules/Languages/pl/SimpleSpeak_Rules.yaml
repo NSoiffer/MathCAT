@@ -59,7 +59,7 @@
       - if: "*[2][.='2']"
         then: [t: "pierwiastek kwadratowy"]        # phrase(the 'square root' of x)
       - else_if: "*[2][.='3']"
-        then: [t: "korzeń kostki"]        # phrase(the 'cube root' of x)
+        then: [t: "pierwiastek sześcienny"]        # phrase(the 'cube root' of x)
       - else: [x: "ToOrdinal(*[2])", t: "źródło"]      # phrase(the square 'root' of 25)
       else:
       - test:
@@ -68,7 +68,7 @@
           - x: "*[2]"
           - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: [x: "*[2]"]
-      - t: "źródło"        # phrase(the square 'root' of)
+      - t: "pierwiastek"        # phrase(the square 'root' of)
   - test:
       if: "$Verbosity!='Terse'"
       then: [t: "z"]        # phrase(the square root 'of' x)
@@ -109,7 +109,7 @@
           BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])]"
   replace:
   - x: "*[1]"
-  - t: "za"      # phrase('5 meters 'per' second)
+  - t: "na"      # phrase('5 meters 'per' second)
   - x: "*[2]"
 
 - name: simple
@@ -122,7 +122,7 @@
   - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
   replace:
   - x: "*[1]"
-  - t: "nad"      # phrase(the fraction 3 'over' 4)
+  - t: "przez"      # phrase(the fraction 3 'over' 4)
   - x: "*[2]"
   - pause: short
 
@@ -132,13 +132,13 @@
   replace:
   - test:
       if: "$Impairment = 'Blindness'"
-      then: [t: "frakcja"]      # phrase(the 'fraction' 3 over 4)
+      then: [t: "ułamek"]      # phrase(the 'fraction' 3 over 4)
   - pause: short
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1],'leaf'))"
       then: [pause: short]
-  - t: "nad"      # phrase(the fraction 3 'over' 4)
+  - t: "przez"      # phrase(the fraction 3 'over' 4)
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [pause: short]
@@ -146,7 +146,7 @@
   - pause: short
   - test:
       if: "$Impairment = 'Blindness'"
-      then: [t: "frakcja końcowa"]      # phrase(start 7 over 8 'end of fraction')
+      then: [t: "koniec ułamka"]      # phrase(start 7 over 8 'end of fraction')
   - pause: medium
 
 # rules for functions raised to a power
@@ -170,7 +170,7 @@
   - test:
       if: "*[2][.=2]"
       then: [t: "kwadrat"]      # phrase(5 'squared' equals 25)
-      else: [t: "kroje"]      # phrase(5 'cubed' equals 125)
+      else: [t: "sześcian"]      # phrase(5 'cubed' equals 125)
 - name: function-power
   tag: power
   match:
@@ -184,7 +184,7 @@
       if: "*[2][self::m:mn][not(contains(., '.'))]"
       then: [x: "ToOrdinal(*[2])"]
       else: [x: "*[2]"]
-  - t: "moc"      # phrase(the fourth 'power of' 2)
+  - t: "potęga"      # phrase(the fourth 'power of' 2)
   - pause: short
   - x: "*[1]"
 
@@ -198,7 +198,7 @@
   - test:
       if: "*[2][.=2]"
       then: [t: "kwadrat"]      # phrase(5 'squared' equals 25)
-      else: [t: "kroje"]      # phrase(5 'cubed' equals 125)
+      else: [t: "sześcian"]      # phrase(5 'cubed' equals 125)
 
 - name: simple-integer
   tag: power
@@ -226,7 +226,7 @@
   - x: "*[1]"
   - t: "do"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
-  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  - pronounce: [{text: "-tej"}, {ipa: "θ"}, {sapi5: "tej"}, {eloquence: "Tej"}]
 
 - name: simple
   tag: power
@@ -254,7 +254,7 @@
   - test:
       if: "$Impairment = 'Blindness'"
       then:
-      - t: "wykładnik końcowy"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+      - t: "koniec wykładnika"      # phrase(start 2 raised to the exponent 4 'end of exponent')
       - pause: short
       else:
       - pause: medium
@@ -266,7 +266,7 @@
   - x: "*[1]"
   - t: "podniesiony do"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
-  - t: "moc"      # phrase(15 raised to the second 'power' equals 225)
+  - t: "potęgi"      # phrase(15 raised to the second 'power' equals 225)
   - pause: short
 
 #
@@ -282,13 +282,13 @@
       - test:
           if: "$Verbosity!='Terse'"
           then: [t: ""]      # phrase('the' empty set)
-      - t: "pusty zestaw"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
+      - t: "zbiór pusty"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
           then: [t: ""]      # phrase('the' set of all integers)
-      - t: "zestaw wszystkich"      # phrase(the 'set of all' positive integers less than 10)
+      - t: "zbiór wszystkich"      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
       - t: "tak, że"      # phrase(x 'such that' x is less than y)
       - x: "*[1]/*[3]"
@@ -296,7 +296,7 @@
       - test:
           if: "$Verbosity!='Terse'"
           then: [t: ""]      # phrase('the' set of integers)
-      - t: "ustawić"      # phrase(here is a 'set' of numbers)
+      - t: "zbiór"      # phrase(here is a 'set' of numbers)
       - x: "*[1]"
 
 - name: times
@@ -325,7 +325,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - t: "czasy"      # phrase(7 'times' 5 equals 35)
+  - t: "razy"      # phrase(7 'times' 5 equals 35)
 
 - name: no-say-parens
   tag: mrow

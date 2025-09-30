@@ -289,7 +289,7 @@
   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
   replace:
   - x: "*[1]"
-  - t: "podniesiony do potęgi"      # phrase(5 'raised to the exponent' x plus 1)
+  - t: "z indeksem górnym "      # phrase(5 'raised to the exponent' x plus 1)
   - pause: short
   - x: "*[2]"
   - pause: short
@@ -462,7 +462,7 @@
   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
   replace:
   - x: "*[1]"
-  - t: "podniesiony do potęgi"      # phrase(x is 'raised to the exponent')
+  - t: "z indeksem górnym "      # phrase(x is 'raised to the exponent')
   - pause: short
   - x: "*[2]"
   - pause: short
