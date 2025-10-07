@@ -469,6 +469,8 @@ fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
             "mi" | "mtext" => {
                 if is_chemical_element(mathml) {
                     mathml.set_attribute_value(CHEM_ELEMENT, maybe_attr.value());
+                } else if mathml.attribute("data-number").is_some() {
+                    mathml.set_attribute_value("data-oxidation-number", maybe_attr.value());
                 }
             },
             "mo" => {
@@ -534,6 +536,7 @@ fn has_maybe_chemistry(mathml: Element) -> bool {
 /// Clears MAYBE_CHEMISTRY from this element and its decedents
 /// Also deletes added mrows and leaves; returns true if anything is deleted
 fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
+    // debug!("is_changed_after_unmarking_chemistry: {}", mml_to_string(mathml));
     mathml.remove_attribute(MAYBE_CHEMISTRY);
     if is_leaf(mathml) {
         // don't bother testing for the attr -- just remove and nothing bad happens if they aren't there
@@ -930,6 +933,7 @@ fn likely_chem_oxidation_state(over: Element) -> isize {
     // roman numerals are "oxidation state" and range from -4 to +9 -- can also be 0 for free states
     // I saw this notation in the Polish braille spec
     let over_name = name(over);
+    // debug!("likely_chem_oxidation_state: value={}", mml_to_string(over));
     if matches!(over_name, "mi" | "mn" |"mtext") &&
        (as_text(over) == "0" || SMALL_UPPER_ROMAN_NUMERAL.is_match(as_text(over))) {
         over.set_attribute_value("data-number", small_roman_to_number(as_text(over)));
@@ -1021,7 +1025,7 @@ fn likely_chem_superscript(sup: Element) -> isize {
 /// * fences around a chemical formula
 /// * an mrow made up of only chemical formulas
 fn likely_chem_formula(mathml: Element) -> isize {
-    debug!("start likely_chem_formula:\n{}", mml_to_string(mathml));
+    // debug!("start likely_chem_formula:\n{}", mml_to_string(mathml));
     if let Some(value) = get_marked_value(mathml) {
         return value;       // already marked
     }
@@ -1096,7 +1100,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
     if likelihood >= 0 {
         mathml.set_attribute_value(MAYBE_CHEMISTRY, &likelihood.to_string());
     }
-    debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(mathml));
+    // debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(mathml));
 
     return likelihood;
 
@@ -1413,6 +1417,18 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
 
     let base = as_element(children[0]);
     let base_name = name(base);
+    if matches!(tag_name, "mover" | "munder" | "munderover") {
+        if base_name == "mo" && is_in_set(as_text(base), &CHEM_EQUATION_ARROWS) {
+            let mut script_likelihood = likely_chem_formula(as_element(children[1]));
+            if tag_name == "munderover" {
+                script_likelihood = script_likelihood.max(likely_chem_formula(as_element(children[2])));
+            }
+            if script_likelihood > 0 {
+                likelihood += script_likelihood + 2;    // FIX: tune this
+            }
+        }
+    }
+
     if base_name == "mi" || base_name == "mtext" {
         likelihood += likely_chem_element(base);
     } else if base_name == "mrow" {
@@ -1657,7 +1673,7 @@ pub fn likely_chem_element(mathml: Element) -> isize {
     if as_text(mathml).trim().is_empty() {
         return 0;   // whitespace
     } else if is_chemical_element(mathml) {
-        // single letter = 1; single letter with mathvarinat="normal" = 2; double = 3 -- all elements are ASCII
+        // single letter = 1; single letter with mathvariant="normal" = 2; double = 3 -- all elements are ASCII
         return (if text.len() == 1 {
             if mathml.attribute_value("mathvariant").unwrap_or_default() == "normal" {2} else {1}
         } else {
