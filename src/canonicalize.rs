@@ -1205,7 +1205,7 @@ impl CanonicalizeContext {
 
 		}
 
-		/// Return true if element is not inside a sub/super over overscript in some ancestor
+		/// Return true if element is not inside a sub/superscript in a script position in some ancestor
 		fn is_in_script(mathml: Element) -> bool {
 			let mut child = mathml;
 			let mut parent = get_parent(mathml);
