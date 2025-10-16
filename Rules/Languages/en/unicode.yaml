@@ -126,7 +126,12 @@
         if: "parent::*[1][self::m:mn]"
         then: [t: "point"]
         else: [t: "dot"]
- - "/": [t: "divided by"]                          # 0x2f
+ - "/":                                           # 0x2f
+    - test:
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+        then: [t: "slash"]                        # 0x2f
+        else: [t: "divided by"]                   # 0x2f
+
  - ":": [t: "colon"]                               # 0x3a
  - ";": [t: "semicolon"]                           # 0x3b
  - "<":                                          # 0x3c

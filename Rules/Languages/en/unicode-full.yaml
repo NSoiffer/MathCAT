@@ -323,8 +323,16 @@
  - "‸": [t: "to the"]                              # 0x2038
  - "‹": [t: "single left pointing angle quote mark"] # 0x2039
  - "›": [t: "single right pointing angle quote mark"] # 0x203a
- - "‼": [t: "double factorial"]                    # 0x203c
- - "⁄": [t: "divided by"]                          # 0x2044
+ - "‼":                                            # 0x203c
+    - test:
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+        then: [t: "double exclamation point"]      # 0x203c
+        else: [t: "double factorial"]              # 0x203c
+ - "⁄":                                            # 0x2044
+    - test:
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+        then: [t: "large slash"]      # 0x203c
+        else: [t: "divided by"]              # 0x203c
  - "⁅": [t: "left square bracket with quill"]      # 0x2045
  - "⁆": [t: "right square bracket with quill"]     # 0x2046
  - "※": [t: "reference mark"]                     # 0x203b
