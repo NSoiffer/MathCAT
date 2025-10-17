@@ -627,7 +627,7 @@ impl CanonicalizeContext {
 				"mmultiscripts" => {
 					let has_prescripts = mathml.children().iter()
 							.any(|&child| name(as_element(child)) == "mprescripts");
-					if has_prescripts ^ (n_children % 2 == 0) {
+					if has_prescripts ^ (n_children.is_multiple_of(2)) {
 						bail!("{} has the wrong number of children:\n{}", element_name, mml_to_string(mathml));
 					}
 				},
@@ -1596,10 +1596,10 @@ impl CanonicalizeContext {
 			if following_siblings.len() > 1 {
 				let following_siblings = &following_siblings[1..];
 				// if there are an odd number of "|"s to the right, rule out the merge
-				if following_siblings.iter().filter(|&&child| {
+				if !(following_siblings.iter().filter(|&&child| {
 					let child = as_element(child);
 					return name(child) == "mo" && as_text(child) == "|";
-				}).count() % 2 == 1 {
+				}).count()).is_multiple_of(2) {
 					return None;
 				}
 			}
