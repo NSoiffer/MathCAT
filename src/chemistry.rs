@@ -609,12 +609,13 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
             let child = as_element(child);
             if name(child) == "mtd" {
                 assert_eq!(child.children().len(), 1);
-                // let mtd_child = as_element(child.children()[0]);
-                // if mtd_child.attribute(CHEM_FORMULA).is_none() && mtd_child.attribute(CHEM_EQUATION).is_none() {
-                // } else {
-
-                // }
-                answer = true;
+                let marked_value = get_marked_value(as_element(child.children()[0]));
+                if marked_value.is_none() || marked_value.unwrap() < CHEMISTRY_THRESHOLD {
+                    // unmark the mtd child
+                    answer |= is_changed_after_unmarking_chemistry(child);
+                } else {
+                    answer = true;
+                }
             } else {
                 answer |= is_changed_after_unmarking_chemistry(child);
             }
