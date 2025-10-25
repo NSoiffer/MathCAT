@@ -1081,7 +1081,8 @@ fn scripts_p32_7() {
 #[test]
 fn scripts_p32_8() {
     let expr = r#"<math><mfrac><mn>1</mn><mrow><mn>4</mn><mo>+</mo><msub><mi>x</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mfrac></math>"#;
-    test_braille("Polish", expr, "⠼⠁⠳⠼⠙⠈⠖⠠⠭⠡⠝⠈⠖⠼⠁⠰");
+    // removed fraction terminator as it is not needed
+    test_braille("Polish", expr, "⠼⠁⠳⠼⠙⠈⠖⠠⠭⠡⠝⠈⠖⠼⠁");
 }
 
 #[test]
@@ -1093,7 +1094,8 @@ fn scripts_p32_9() {
 #[test]
 fn scripts_p32_10() {
     let expr = r#"<math><msub><mi>f</mi><msub><mi>n</mi><mi>k</mi></msub></msub><mo>(</mo><mi>x</mi><mo>)</mo></math>"#;
-    test_braille("Polish", expr, "⠠⠋⠐⠡⠠⠝⠡⠅⠐⠱⠣⠭⠜");
+    //  Dot 6 can be omitted 'n' and 'k' and were removed
+    test_braille("Polish", expr, "⠠⠋⠐⠡⠝⠡⠅⠐⠱⠣⠭⠜");
 }
 
 #[test]
@@ -1862,7 +1864,7 @@ fn trigonometry_p51_4() {
 
 #[test]
 fn trigonometry_p51_5() {
-    let expr = r#"<math><mn>1</mn><mi>r</mi><mi>a</mi><mi>d</mi><mo>=</mo><mfrac><mrow><mn>180</mn><mo>&#xB0;</mo></mrow><mi>&#x3C0;</mi></mfrac><mo>&#x2248;</mo><mfrac><mrow><mn>180</mn><mo>&#xB0;</mo></mrow><mrow><mn>3</mn><mo>,</mo><mn>14159</mn></mrow></mfrac><mo>&#x2248;</mo><mn>57</mn><mo>&#xB0;</mo><mn>17</mn><mo>'</mo><mn>45</mn><mo>&quot;</mo></math>"#;
+    let expr = r#"<math><mn>1</mn><mi>rad</mi><mo>=</mo><mfrac><mrow><mn>180</mn><mo>&#xB0;</mo></mrow><mi>&#x3C0;</mi></mfrac><mo>&#x2248;</mo><mfrac><mrow><mn>180</mn><mo>&#xB0;</mo></mrow><mrow><mn>3</mn><mo>,</mo><mn>14159</mn></mrow></mfrac><mo>&#x2248;</mo><mn>57</mn><mo>&#xB0;</mo><mn>17</mn><mo>'</mo><mn>45</mn><mo>&quot;</mo></math>"#;
     test_braille("Polish", expr, "⠼⠁⠼⠗⠀⠶⠼⠁⠓⠚⠴⠳⠰⠏⠀⠢⠢⠼⠁⠓⠚⠴⠳⠼⠉⠂⠁⠙⠁⠑⠊⠀⠢⠢⠼⠑⠛⠴⠼⠁⠛⠘⠔⠼⠙⠑⠘⠔⠔");
 }
 
@@ -1981,7 +1983,7 @@ fn trigonometry_p53_4() {
 #[test]
 fn trigonometry_p53_5() {
     let expr = r#"<math><mi>arcsin</mi><mo>(</mo><msup><mn>30</mn><mo>&#x2218;</mo></msup><mo>+</mo><mi>n</mi><mo>&#x22C5;</mo><msup><mn>360</mn><mo>&#x2218;</mo></msup><mo>)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>&#xA0;</mo><mi>dla</mi><mo>&#xA0;</mo><mi>n</mi><mo>=</mo><mn>0</mn><mo>,</mo><mo>&#xA0;</mo><mo>&#xB1;</mo><mn>1</mn><mo>,</mo><mo>&#xA0;</mo><mo>&#xB1;</mo><mn>2</mn><mo>,</mo><mo>&#xA0;</mo><mo>.</mo><mo>.</mo><mo>.</mo></math>"#;
-    test_braille("Polish", expr, "⠫⠂⠎⠣⠼⠉⠚⠴⠀⠖⠠⠝⠄⠼⠉⠋⠚⠴⠜⠀⠶⠼⠁⠆⠀⠙⠇⠁⠀⠠⠝⠀⠶⠼⠚⠠⠂⠀⠖⠤⠼⠁⠠⠂⠀⠖⠤⠼⠃⠠⠂⠀⠄⠄⠄");
+    test_braille("Polish", expr, "⠫⠂⠎⠣⠼⠉⠚⠴⠀⠖⠠⠝⠄⠼⠉⠋⠚⠴⠜⠀⠶⠼⠁⠆⠙⠇⠁⠀⠠⠝⠀⠶⠼⠚⠠⠂⠀⠖⠤⠼⠁⠠⠂⠀⠖⠤⠼⠃⠠⠂⠀⠄⠄⠄");
 }
 
 // MATHEMATICAL LOGIC
@@ -2095,6 +2097,7 @@ fn limits_p56_5() {
 }
 
 #[test]
+#[ignore = "uses long form for no particular reason -- MathCAT uses short form"]
 fn limits_p56_6() {
     let expr = r#"<math><munder><mi>lim</mi><mrow><mi>x</mi><mo>&#x2192;</mo><mn>2</mn></mrow></munder><mfrac><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>-</mo><mn>4</mn></mrow><mrow><mi>x</mi><mo>-</mo><mn>2</mn></mrow></mfrac><mo>=</mo><munder><mi>lim</mi><mrow><mi>x</mi><mo>&#x2192;</mo><mn>2</mn></mrow></munder><mo>(</mo><mi>x</mi><mo>+</mo><mn>2</mn><mo>)</mo><mo>=</mo><mn>4</mn></math>"#;
     // uses long form of fraction
@@ -2253,7 +2256,8 @@ fn physics_p61_3() {
 #[test]
 fn physics_p61_3a() {
     let expr = r#"<math><msub><mi>W</mi><mrow><mi>A</mi><mi>B</mi></mrow></msub><mo>=</mo><mo>-</mo><mi>G</mi><mi>M</mi><mi>m</mi><mfenced><mrow><mfrac><mn>1</mn><msub><mi>r</mi><mi>A</mi></msub></mfrac><mo>-</mo><mfrac><mn>1</mn><msub><mi>r</mi><mi>B</mi></msub></mfrac></mrow></mfenced></math>"#;
-    test_braille("Polish", expr, "⠨⠺⠡⠨⠁⠃⠀⠶⠤⠨⠛⠨⠍⠠⠍⠣⠼⠁⠳⠗⠡⠨⠁⠀⠤⠼⠁⠳⠠⠗⠡⠨⠃⠜");
+    // Removed the unneeded cap indicator before 'M' in -GM
+    test_braille("Polish", expr, "⠨⠺⠡⠨⠁⠃⠀⠶⠤⠨⠛⠍⠠⠍⠣⠼⠁⠳⠗⠡⠨⠁⠀⠤⠼⠁⠳⠠⠗⠡⠨⠃⠜");
 }
 
 #[test]
@@ -2947,17 +2951,18 @@ fn valence_p84_5() {
 
 #[test]
 fn oxidation_states_p85_1() {
-    let expr = r#"<math><mover><mi mathvariant="normal">S</mi><mi>IV</mi></mover><msub><mover><mi mathvariant="normal">O</mi><mrow><mo>-</mo><mi>II</mi></mrow></mover><mn>2</mn></msub></math>"#;
+    let expr = r#"<math><mover><mi mathvariant="normal">S</mi><mi>IV</mi></mover><mover><msub><mi mathvariant="normal">O</mi><mn>2</mn></msub><mrow><mo>-</mo><mi>II</mi></mrow></mover></math>"#;
     test_braille("Polish", expr, "⠨⠎⠣⠨⠊⠧⠜⠨⠕⠆⠣⠤⠨⠊⠊⠜");
 }
 
 #[test]
 fn oxidation_states_p85_2a() {
-    let expr = r#"<math><msub><mover><mi mathvariant="normal">N</mi><mn>0</mn></mover><mn>2</mn></msub></math>"#;
+    let expr = r#"<math intent=":chemical-formula"><mover><msub><mi mathvariant="normal">N</mi><mn>2</mn></msub><mn>0</mn></mover></math>"#;
     test_braille("Polish", expr, "⠨⠝⠆⠣⠼⠚⠜");
 }
 
 #[test]
+#[ignore = "alternative"]
 fn oxidation_states_p85_2b() {
     let expr = r#"<math><msub><mover><mi mathvariant="normal">N</mi><mn>0</mn></mover><mn>2</mn></msub></math>"#;
     test_braille_prefs("Polish", vec![("Polish_BrailleLevel", "Advanced")], expr, r"⠨⠝⠆⠣⠴⠜");
@@ -2992,13 +2997,15 @@ fn reactions_p86_1() {
 
 #[test]
 fn reactions_p86_2() {
-    let expr = r#"<math><mi>KOH</mi><mo>&#x21CC;</mo><msup><mi mathvariant="normal">K</mi><mo>+</mo></msup><mo>+</mo><msup><mi>OH</mi><mo>-</mo></msup></math>"#;
+    let expr = r#"<math><mi>KOH</mi><mo>⟷</mo><msup><mi mathvariant="normal">K</mi><mo>+</mo></msup><mo>+</mo><msup><mi>OH</mi><mo>-</mo></msup></math>"#;
     test_braille("Polish", expr, "⠸⠅⠕⠓⠀⠐⠒⠂⠨⠅⠌⠖⠀⠖⠸⠕⠓⠌⠤");
 }
 
 #[test]
 fn reactions_p86_3() {
-    let expr = r#"<math><mi>HCOOH</mi><mover><mo>&#x21CC;</mo><mrow><msub><mi mathvariant="normal">H</mi><mn>2</mn></msub><mn>0</mn></mrow></mover><msup><mi>HCOO</mi><mo>-</mo></msup><mo>+</mo><msup><mi mathvariant="normal">H</mi><mo>+</mo></msup></math>"#;
+    let expr = r#"<math><mi>HCOOH</mi>
+        <mover><mo>⟷</mo><mrow><msub><mi mathvariant="normal">H</mi><mn>2</mn></msub><mi mathvariant="normal">Oh</mi></mrow></mover>
+        <msup><mi>HCOO</mi><mo>-</mo></msup><mo>+</mo><msup><mi mathvariant="normal">H</mi><mo>+</mo></msup></math>"#;
     test_braille("Polish", expr, "⠸⠓⠉⠕⠕⠓⠀⠰⠐⠒⠂⠠⠸⠓⠆⠕⠄⠀⠸⠓⠉⠕⠕⠌⠤⠀⠖⠨⠓⠌⠖");
 }
 

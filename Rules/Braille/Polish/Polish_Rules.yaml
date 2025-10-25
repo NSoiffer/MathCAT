@@ -351,6 +351,7 @@
   name: default
   tag: [mtext, mi]
   match: "."
+  variables: [Abbreviations: "DefinitionValue(., 'Braille', 'Abbreviations')"]
   replace:
   - test:
       # add unit indicator
@@ -647,6 +648,17 @@
       then: [t: ">W"]  # p56 and p57 say to terminate these with a space
       else: [t: ">⠱"]
 
+
+-
+  # FIX: not sure what to do -- this is based on p64 (last example) and only works for mover
+  name: oxidation-states
+  tag: mover
+  match: "BaseNode(*[1])[@data-chem-element]"
+  replace:
+  - x: "*[1]"
+  - t: "("
+  - x: "*[2]"
+  - t: ")"
 
 -
   # FIX: not sure what to do -- this is based on p64 (last example) and only works for mover

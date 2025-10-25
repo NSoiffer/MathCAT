@@ -1079,7 +1079,8 @@ impl CanonicalizeContext {
 								// debug!("new_child (i={})\n{}", i, mml_to_string(new_child));
 								children[i] = ChildOfElement::Element(new_child);
 								mathml.replace_children(children);
-								if new_child_name == "mi" || new_child_name == "mtext" {
+								if (new_child_name == "mi" || new_child_name == "mtext") &&
+									!is_in_script(new_child) {
 									// can't do this above in 'match' because this changes the tree and
 									// lifting single element mrows messes with structure in a conflicting way
 									// Note: if clean_chemistry_leaf() made changes, they don't need cleaning because they will be "ok" mi's
@@ -1202,6 +1203,20 @@ impl CanonicalizeContext {
 				}
 			}
 
+		}
+
+		/// Return true if element is not inside a sub/superscript in a script position in some ancestor
+		fn is_in_script(mathml: Element) -> bool {
+			let mut child = mathml;
+			let mut parent = get_parent(mathml);
+			while name(parent) != "math" {
+				if IsNode::is_modified(parent) {
+					return !child.preceding_siblings().is_empty();  // no preceding sibling => in base
+				}
+				child = parent;
+				parent = get_parent(parent);
+			}
+			return false;
 		}
 
 		/// Hack to try and guess if a colon should be a ratio -- this affects parsing because of different precedences

@@ -645,7 +645,7 @@ fn nemeth_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
         //      "-": "⠸⠤" (hyphen and dash)
         //      ",": "⠠⠀"     -- spacing already added
         // Rule II.9b (add numeric indicator after punctuation [optional minus[optional .][digit]
-        //  because this is run after the above rule, some cases are already caught, so don't
+        //  because this is run after the abovef rule, some cases are already caught, so don't
         //  match if there is already a numeric indicator
         static ref NUM_IND_9B: Regex = Regex::new(r"(?P<punct>P..?)(?P<minus>⠤?)N").unwrap();
 
@@ -2040,6 +2040,7 @@ impl BrailleLevel {
 
 static POLISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     // '+' and '-' are used in state machine -- don't use them here
+    // 'T' and 't' are used in state machine -- don't use them here
     // "S" => "XXX",    // sans-serif -- from prefs
     "B" => "⠨",     // bold
     "𝔹" => "⠨",     // blackboard -- spec only shows some upper case versions (encoded as 𝔹Lx) -- this is just a guess 
@@ -2104,7 +2105,7 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
         //    ≪ - complex and detailed open (part c)
         //    )\]} -- closing brackets (part e)
         // part f dealing with drop numbers is handled because they have an opening indicator
-        static ref REMOVE_SIMPLE_CLOSE_INDICATORS: Regex =Regex::new(r"((>[^⠰])+)((<[^⠆])|([W>≫/≪)\]}]))").unwrap();
+        static ref REMOVE_SIMPLE_CLOSE_INDICATORS: Regex =Regex::new(r"((>[^⠰])+)((<[^⠆])|([W>≫/≪)\]})]))").unwrap();
         
         // Compound (composite?, complex?) projectors: p23
         // Explanation:
@@ -2274,7 +2275,6 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
     let mut mode = BrailleMode::None;
     let mut letter_mode = BrailleMode::None; // used to determine if we need to output 'L' (etc) for letter mode
     let mut unit_mode = false;
-    let mut text_mode = false;      // in text mode, mode changes only last for the next character
     let mut bracket_nesting_depth = 0;
     let mut result = String::default();
     let chars = raw_braille.chars().collect::<Vec<char>>();
@@ -2297,7 +2297,7 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
         //         mode, letter_mode, unit_mode, projector_depth, nesting_depth, use_long_fraction_form,ch, if i+1<chars.len() {chars[i+1]} else {' '}, &result);
         match ch {
             'l' | 'L' => {
-                if unit_mode || text_mode {
+                if unit_mode {
                     if ch == 'L' || mode != BrailleMode::Letter {
                         result.push(ch);
                     }
@@ -2399,6 +2399,8 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 i += 1;
             },
             'T' | 't' => {
+                // Text has separate rules: no state, and math restarts after it.
+                // Find the end of the text run, output it and reset the state
                 // no reason to keep 'T'/'t' in the output
                 text_mode = ch == 'T';
                 if text_mode {
@@ -2407,6 +2409,17 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 }
                 unit_mode = false;
                 i += 1;
+                while i < chars.len() && chars[i] != 't' {
+                    let ch = chars[i];
+                    if ch != 'l' {  // lowercase is the default
+                        result.push(chars[i]);
+                    }
+                    i += 1;
+                }
+                i += 1;     // ignore 't'
+                mode = BrailleMode::None;
+                letter_mode = BrailleMode::None;
+                unit_mode = false;
             },
             'N' => {
                 if mode != BrailleMode::Number {
@@ -2442,7 +2455,7 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                     mode = BrailleMode::None;
                 }
                 unit_mode = false;
-                debug!("ch=W, projector/frac depths={projector_depth}/{fraction_depth}, bracket_nesting_depth={bracket_nesting_depth}, use_long={use_long_fraction_form}");
+                debug!("@{i}, ch=W, projector/frac depths={projector_depth}/{fraction_depth}, bracket_nesting_depth={bracket_nesting_depth}, use_long={use_long_fraction_form}");
                 if !use_long_fraction_form && fraction_depth == 1 && i+1 < chars.len() && chars[i+1] == '/' {
                     // drop whitespace before '/' (nothing to do)
                 } else if !use_long_fraction_form && i+1 < chars.len() && chars[i+1] == '>' {
@@ -2477,7 +2490,7 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                             result.push('⠆');
                         } else {
                             let i_numerator_end = i+2 + chars[i+2..].iter().position(|&ch| ch == '/').unwrap_or(0);
-                            if chars[i+2..i_numerator_end].iter().filter(|&ch| matches!(ch, 'l' | 'L' | 'n' | 'N' | 'g' | 'G' )).count() >= LONG_NUMERATOR {
+                            if chars[i+2..i_numerator_end].iter().filter(|&ch| matches!(ch, 'l' | 'L' | 'n' | 'N' | 'g' | 'G' | 'f' )).count() >= LONG_NUMERATOR {
                                 result.push('⠆');
                             }
                         }
@@ -2539,7 +2552,7 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                     mode = BrailleMode::None;       // "/" seems to reset number mode based on examples I found
                 }
 
-                debug!("/: i={i}, use_long={use_long_fraction_form}");
+                debug!("@{i}: /, use_long={use_long_fraction_form}");
                 // skip whitespace around "/" -- already processed previous whitespace
                 result.push('/');
                 if fraction_depth < 2 && !use_long_fraction_form  && chars[i+1] == 'W' {
