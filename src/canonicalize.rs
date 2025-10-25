@@ -750,7 +750,7 @@ impl CanonicalizeContext {
 
 			
 		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
-			"$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿" // could add more currencies...
+			"$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿", "zł", "gr" // could add more currencies...
 		};
 		
 
