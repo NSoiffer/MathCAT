@@ -738,6 +738,27 @@
       - x: "*"
 
 -
+  name: "date"
+  # match 15.03.2002, 98/08/26, 2002-03-15, or 2002 03 1, where the year can be 2 or 4 digits and at the start or end
+  tag: mrow
+  match: "count(*)=5 and
+          (*[1][self::m:mn] and *[3][self::m:mn and string-length(.)=2] and *[5][self::m:mn]) and
+          ( (*[2][self::m:mo and .='/'] and *[4][self::m:mo and .='/']) or
+            (*[2][self::m:mo and .='-'] and *[4][self::m:mo and .='-']) or
+            (*[2][self::m:mo and .='.'] and *[4][self::m:mo and .='.'])
+          ) and (
+            (string-length(*[1])=4 and string-length(*[5])=2) or
+            (string-length(*[1])=2 and string-length(*[5])=4) or
+            (string-length(*[1])=2 and string-length(*[5])=2) 
+          )"
+  replace:
+  - intent:
+      name: "date"
+      attrs: "data-intent-property=\":unit:\""
+      children:
+      - x: "*"
+
+-
   name: "piecewise"
   tag: mrow
   match: "count(*)=2 and *[1][.='{'] and

@@ -338,7 +338,7 @@
         else: [T: "W⠖"]
  - ",":                        # 0x2c (Comma)
      - test:
-        - if: "self::m:mn"
+        - if: "self::m:mn"     # 0,(3) is a notation used for repeating decimals, but hard to catch here -- done with regex in braille.rs
           then: [T: "N⠂"]
           else: [T: "P⠂W"]
  - ";": [T: "P⠆W"]              # 0x003B SEMICOLON 
@@ -369,8 +369,8 @@
  - "<": [T: "W⠪⠄"]                        # 0x003C (Less than)
  - "=":                               # 0x3d (equals)
     - test:
-        - if: "@data-chem-formula-op"
-          then: [T: "⠨⠅"]               # closing vertical bar for absolute value
+        - if: "@data-chemical-bond"
+          then: [T: "⠨⠅"]               # double bond
           else: [T: "W⠶"]               # absolute value -- opening bar of absolute value or standalone vertical bar
  - ">": [T: "W⠕⠂"]                          # 0x3e (GREATER-THAN)
  - "|":                                  # 0x007C (vertical bar)

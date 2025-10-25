@@ -55,26 +55,45 @@
   - t: ">⠱<⠩"    # '>⠱' will always get removed due to following projector, but needed for counting depth
   - x: "*[1]"
   - t: ">⠱"
-      
-# -
-#   name: repeating decimal (2.3 uses a "^" over the repeating decimals)
-#   tag: mrow
-#   match:
-#     - "count(*)=3 and *[1][self::m:mn] and *[2][self::m:mo and .='\u2062'] and"
-#     - "*[3][self::m:mover and *[1][self::m:mn] and *[2][self::m:mo and .='^']]" 
-#   replace: 
-#   - x: "*[1]"
-#   - t: "⠂"
-#   - test:
-#       if: "string-length(*[3]/*[1]) <= 2"
-#       then:             # the examples don't group the digits when there are only one or two digits
-#       - t: "𝑁"
-#       - x: "*[3]/*[1]" 
-#       else:
-#       - t: "⠢𝑁"
-#       - x: "*[3]/*[1]"
-#       - t: "⠔"
 
+-
+  name: "date"
+  # match 15.03.2002, 98/08/26, 2002-03-15, or 2002 03 1, where the year can be 2 or 4 digits and at the start or end
+  tag: mrow
+  match: "count(*)=5 and
+          (*[1][self::m:mn] and *[3][self::m:mn and string-length(.)=2] and *[5][self::m:mn]) and
+          ( (*[2][self::m:mo and .='/'] and *[4][self::m:mo and .='/']) or
+            (*[2][self::m:mo and .='-'] and *[4][self::m:mo and .='-']) or
+            (*[2][self::m:mo and .='.'] and *[4][self::m:mo and .='.'])
+          ) and (
+            (string-length(*[1])=4 and string-length(*[5])=2) or
+            (string-length(*[1])=2 and string-length(*[5])=4) or
+            (string-length(*[1])=2 and string-length(*[5])=2) 
+          )"
+  replace:
+  # want to avoid using a number sign after the first one, so we claim the separators are part of numbers
+  - x: "*[1]"
+  - t: "N"
+  - test:
+    - if: "*[2][.='.']"
+      then: [t: "⠄"]
+    - else_if: "*[2][.='-']"
+      then: [t: "⠤"]
+    - else_if: "*[2][.='/']"
+      then: [t: "⠲"]
+      else: [t: "W"]
+  - x: "*[3]"
+  - t: "N"
+  - test:
+    - if: "*[2][.='.']"
+      then: [t: "⠄"]
+    - else_if: "*[2][.='-']"
+      then: [t: "⠤"]
+    - else_if: "*[2][.='/']"
+      then: [t: "⠲"]
+      else: [t: "W"]
+  - x: "*[5]"
+      
 
 -   # p43 gives rule for binomial
   name: binomial
@@ -84,20 +103,12 @@
                (self::m:mtable and count(*)=2 and count(*[1])=1 and contains(@intent, 'binomial-coefficient('))]"
   replace: 
   - t: "("
+  - t: "<⠆-" # signal start of fraction (needed for fraction depth count -- '-' says to delete the start/end)
   - x: "*[2]/*[1]"
   - t: "⠰⠳"
   - x: "*[2]/*[2]"
+  - t: ">⠰-"
   - t: ")"
-
-# - name: binomial-table
-#   tag: mtable
-#   match: "IsBracketed(., '(', ')') and *[2][self::m:mtable][count(*)=2 and count(*[1])=1] and contains(@intent, 'binomial-coefficient(')"
-#   replace:
-#   - t: "⠨⠣"
-#   - x: "*[2]/*[1]/*[1]/*[1]"
-#   - t: "⠒"
-#   - x: "*[2]/*[2]/*[1]/*[1]"
-#   - t: "⠜"
 
 # -
 #   longer notation: use if
@@ -343,7 +354,7 @@
   replace:
   - test:
       # add unit indicator
-      if: "@class='MathML-unit' or contains(@intent, ':unit') or
+    - if: "@class='MathML-unit' or contains(@intent, ':unit') or
            (not(@data-chem-element) and
             (self::m:mtext or string-length(.) > 1 or @mathvariant='normal') and
             (parent::*[1][self::m:mrow and count(*)=3 and *[2][.='\u2062'] and
@@ -366,6 +377,11 @@
       - t: "U"
       - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
       - t: "u"
+    - else_if: "IsInDefinition(., 'Braille', 'CurrencySymbols')"
+      then:
+      - t: "WT"  
+      - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
+      - t: "tW"  
       else:
       - with:
           variables: [Abbreviations: "DefinitionValue(., 'Braille', 'Abbreviations')"]
@@ -450,6 +466,10 @@
   - test:
       if: "*[2][.='°' or .='′' or .='″' or .='\"']"
       then: [t: "p"]
+  - test:
+      # superscripts for plus that have number bases (⠖ could be confused with fraction with denom 0) [FIX: others???]
+      if: "self::m:msup and *[2][.='+'] and *[1][self::m:mn]"
+      then: [t: "⠘"]
   - x: "DefinitionValue(*[2], 'Braille', 'Scripts')"
 
 -
