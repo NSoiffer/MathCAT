@@ -1458,8 +1458,7 @@ impl PatternMatchResult {
             let mut namespaces: Namespaces = HashMap::with_capacity(evaluation.variables.capacity());
             for (key, val) in evaluation.namespaces {namespaces.insert(key.clone(), val.clone());};
             hacked_context.namespaces = namespaces;
-            let context = std::mem::transmute::<HackedContext, Context>(hacked_context);
-            context
+            return std::mem::transmute::<HackedContext, Context>(hacked_context);
         }
     }
 }

@@ -1919,12 +1919,11 @@ impl CanonicalizeContext {
 			let name_of_parent_of_mrow = name(parent_of_mrow);
 			for i in 1..n_children {
 				let child = as_element(children[i]);
-				if name(child) == "mo" && as_text(child) == "," {
-					if name_of_parent_of_mrow == "msub" ||
-					   (i+1 < n_children &&
-				   	    (name(previous_child) != "mn" || name(as_element(children[i+1])) != "mn")) {
-						return true;
-					}
+				if name(child) == "mo" && as_text(child) == "," &&
+				   (name_of_parent_of_mrow == "msub" ||
+					(i+1 < n_children &&
+				   	(name(previous_child) != "mn" || name(as_element(children[i+1])) != "mn"))) {
+					return true;
 				}
 				previous_child = child;
 			}
