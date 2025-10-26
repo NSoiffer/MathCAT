@@ -11,6 +11,7 @@
             "program": "${workspaceRoot}/target/debug/mathcat.exe",
             "args": [],
             "cwd": "${workspaceRoot}",
+            "env": {"RUST_LOG": "DEBUG"},
             "preLaunchTask": "cargo build",
         },
         {
@@ -20,7 +21,8 @@
             "program": "${workspaceRoot}/target/debug/mathcat.exe",
             "args": [],
             "cwd": "${workspaceFolder}",
+            "env": {"RUST_LOG": "DEBUG"},
             "preLaunchTask": "cargo test build",
         }
-    ]
+    ],
 }

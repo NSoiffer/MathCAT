@@ -511,6 +511,7 @@ pub fn get_supported_braille_codes() -> Vec<String> {
     return braille_code_paths;
  }
 
+/// Returns a Vec of all supported languages ("en", "es", ...)
 pub fn get_supported_languages() -> Vec<String> {
     enable_logs();
     let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
@@ -526,6 +527,8 @@ pub fn get_supported_languages() -> Vec<String> {
                     .filter(|string_path| !string_path.is_empty() )
                     .collect::<Vec<String>>();
 
+    // make sure the 'zz' test dir isn't included (build.rs removes it, but for debugging is there)
+    language_paths.retain(|s| !s.starts_with("zz"));
     language_paths.sort();
     return language_paths;
  }
@@ -539,6 +542,7 @@ pub fn get_supported_languages() -> Vec<String> {
         file_name.truncate(file_name.len() - "_Rules.yaml".len())
     }
     speech_styles.sort();
+    // remove duplicates -- shouldn't be any, but just in case
     let mut i = 1;
     while i < speech_styles.len() {
         if speech_styles[i-1] == speech_styles[i] {
@@ -606,8 +610,14 @@ fn add_ids(mathml: Element) -> Element {
             .unwrap()
             .as_millis() as usize
     };
-    let time_part = radix_fmt::radix(time, 36).to_string();
-    let random_part = radix_fmt::radix(fastrand::u32(..), 36).to_string();
+    let mut time_part = radix_fmt::radix(time, 36).to_string();
+    if time_part.len() < 3 {
+        time_part.push_str("a2c");      // needs to be at least three chars
+    }
+    let mut random_part = radix_fmt::radix(fastrand::u32(..), 36).to_string();
+    if random_part.len() < 4 {
+        random_part.push_str("a1b2");      // needs to be at least four chars
+    }
     let prefix = "M".to_string() + &time_part[time_part.len() - 3..] + &random_part[random_part.len() - 4..] + "-"; // begin with letter
     add_ids_to_all(mathml, &prefix, 0);
     return mathml;

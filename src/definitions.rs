@@ -29,8 +29,9 @@ use yaml_rust::yaml::Hash;
 use yaml_rust::Yaml;
 use crate::errors::*;
 use crate::prefs::*;
-use std::{cell::RefCell, cell::Ref, cell::RefMut, collections::HashSet,  rc::Rc};
-use std::{collections::HashMap, path::Path, path::PathBuf};
+use std::{cell::RefCell, cell::Ref, cell::RefMut, rc::Rc};
+use std::path::{Path, PathBuf};
+use std::collections::{HashMap, HashSet};
 use crate::shim_filesystem::read_to_string_shim;
 
 /// An enum to paper over the different types of data access needed.

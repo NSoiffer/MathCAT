@@ -3,9 +3,9 @@
 #
 # The general form for many rules is:
 # 1. Say the command if this is first rule to fire (MatchCounter) and depending upon "NavVerbosity"s value
+#    This will increment MatchCounter so that the command won't be spoken again
 # 2. Say info about moving into/out of 2D structures
 # 3. Set some variables and possibly recurse.
-#    If recursing, "MatchCounter" should be incremented.
 #    If stopping, "NavNode" should be set.
 #
 # The meaning of NavVerbosity:
@@ -87,7 +87,7 @@
               - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'LineEnd'"
                 then: [t: "to end of line"]                                 # phrase(move 'to end of line')
             - pause: "medium"
-  - set_variables: [MatchCounter: "1"]
+  - set_variables: [MatchCounter: "$MatchCounter + 1"]
 
 - name: into-or-out-of-silent
   tag: "*"
@@ -133,11 +133,11 @@
           - pause: "medium"
 
 # Rules for speaking what happens when moving into or out of a notation
-- name: into-or-out-of-intent
+- name: into-or-out-of-default
   tag: "*"
   # saying "out of row n" is not very useful, so skip it
-  # match: "$Move2D != '' and @data-from-mathml and @data-from-mathml != name(.) and count(./*)>1 and @data-from-mathml != 'mtable'"
-  match: "$Move2D != '' and count(./*)>1 and @data-from-mathml != 'mtable'"
+  # match: "$Move2D != '' and @data-from-mathml and @data-from-mathml != name(.) and count(*)>1 and @data-from-mathml != 'mtable'"
+  match: "$Move2D != '' and not(self::m:math or @data-from-mathml = 'mtable' or  @data-from-mathml = 'mtd') "
   replace:
   - with:
       variables:
@@ -146,8 +146,12 @@
       replace:
       - x: "$Move2D"
       - test:
-          if: "$PartName != ''"
+        - if: "$PartName != ''"
           then: [x: "$PartName"]
+        - else_if: "count(*) = 1"
+          then_test:
+            if: "$NavVerbosity = 'Verbose'"
+            then: [x: "translate(name(.), '-_', ' ')"]      # e.g., "in absolute value"
           else:
           - t: "part"         # phrase(the 'part' of the expression)
           - x: "count($Child2D/preceding-sibling::*) + 1"
@@ -290,9 +294,27 @@
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/@id"]
 
-- name: zoom-in-2D-not-enhanced
+
+- name: zoom-in-simple
   tag: "*"
-  match: "$NavCommand = 'ZoomIn' and $NavMode!='Enhanced' and (IsNode(., '2D') or not(IsNode(., 'mathml')))"
+  match: "$NavCommand = 'ZoomIn' and $NavMode='Simple'"
+  replace:
+  - with:
+      variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
+      replace: [x: "."]
+  - test:
+      if: "DEBUG($MatchCounter) > 1 and IsNode(., '2D') "
+      then: [set_variables: [NavNode: "@id"]]   # time to stop, not going "in" to next thing, so before "Move2D"
+      else:
+      - with:
+          variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator)
+          replace: [x: "."]
+      - x: "*[1]"
+
+  # At this point, we are zooming in on a non-2D element, non-leaf in Character mode
+- name: zoom-in-2D-character
+  tag: "*"
+  match: "$NavCommand = 'ZoomIn' and (IsNode(., '2D') or not(IsNode(., 'mathml')))"
   replace:
   - with:
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
@@ -300,10 +322,16 @@
   - with:
       variables: [Move2D: "'in'", Child2D: "*[1]"]          # phrase('in' the denominator)
       replace: [x: "."]
-  - with:
-      variables: [NavCommand: "'MoveNextZoom'"]
-      replace: [x: "*[1]"]
+  - test:
+      if: "$NavMode = 'Simple'"
+      then:
+      - set_variables: [NavNode: "*[1]/@id"]
+      else:
+      - with:
+          variables: [NavCommand: "'MoveNextZoom'"]
+          replace: [x: "*[1]"]
 
+  # At this point, we are zooming in on a non-2D element, non-leaf in Character mode
 - name: zoom-in-default
   tag: "*"
   match: "$NavCommand = 'ZoomIn'"
@@ -311,21 +339,8 @@
   - with:
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
-  - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator)
-      replace: [x: "."]
-  - test:
-      if: "$NavMode='Character'"
-      then: [x: "*[1]"]
-      else_test:
-        if: "self::m:mtd"
-        then: [x: "*[1]"]
-        else:
-        - test:
-            if: "$ReadZoomLevel!=-1"
-            then:
-            - set_variables: [ReadZoomLevel: "DistanceFromLeaf(*[1], true, $NavMode!='Character')"]
-        - set_variables: [NavNode: "*[1]/@id"]
+  - x: "*[1]"
+
 
 - name: zoom-in-all-default
   tag: "*"
@@ -1125,7 +1140,10 @@
       - t: "cannot move right"                              # phrase('cannot move right')
       - pause: medium
   - with:
-      variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[last()]"]
+      variables:
+      - Move2D: "'end of'"
+      - Child2D: "$EdgeNode/*[last()]"
+      - MatchCounter: $MatchCounter + 1
       replace: [x: "$EdgeNode"]
   - pause: long
   - set_variables: [SpeakExpression: "'false'"]
@@ -1259,15 +1277,13 @@
       - with:
           variables: [Move2D: "'out of'", Child2D: "."]
           replace: [x: ".."]
-      - with:
-          variables: [MatchCounter: "$MatchCounter + 1"]
-          replace: [x: "following-sibling::*[1]"]          # skip over 'none'
+      - x: "following-sibling::*[1]"
       else:
       - with:
           variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]       # phrase('in' the denominator)
           replace: [x: ".."]
       - with:
-          variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
+          variables: [NavCommand: "'MoveNextZoom'"]
           replace: [x: "following-sibling::*[1]"]
 
 - name: move-next-default
@@ -1301,13 +1317,10 @@
   - with:
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
-  - with:
-      variables: [MatchCounter: "$MatchCounter + 1"]
-      replace:
-      - test:
-          if: "preceding-sibling::*[1][.='\u2062' or .='\u2064'] and $NavMode='Enhanced'"   # invisible times and plus
-          then: [set_variables: [NavNode: "preceding-sibling::*[1]/@id"]]
-          else: [x: "preceding-sibling::*[1]"]
+  - test:
+      if: "preceding-sibling::*[1][.='\u2062' or .='\u2064'] and $NavMode='Enhanced'"   # invisible times and plus
+      then: [set_variables: [NavNode: "preceding-sibling::*[1]/@id"]]
+      else: [x: "preceding-sibling::*[1]"]
 
 # two rules for when can't move left
 - name: move-previous-no-auto-zoom-at-edge
@@ -1322,7 +1335,10 @@
       - t: "cannot move left"                                   # phrase('cannot move left' in expression)
       - pause: medium
   - with:
-      variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[1]"]
+      variables:
+      - Move2D: "'end of'"
+      - Child2D: "$EdgeNode/*[1]"
+      - MatchCounter: $MatchCounter + 1
       replace: [x: "$EdgeNode"]
   - pause: long
 

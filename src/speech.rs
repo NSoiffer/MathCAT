@@ -122,34 +122,46 @@ fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>,
 /// Speak the MathML
 /// If 'nav_node_id' is not an empty string, then the element with that id will have [[...]] around it
 fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, mathml: Element, nav_node_id: &str) -> Result<String> {
-    rules.with(|rules| {
+    return rules.with(|rules| {
         rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
         // debug!("speak_rules:\n{}", mml_to_string(mathml));
         let new_package = Package::new();
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
+        let speech_string = nestable_speak_rules(& mut rules_with_context, mathml, nav_node_id)?;
+        return Ok( rules.pref_manager.borrow().get_tts()
+            .merge_pauses(remove_optional_indicators(
+                &speech_string.replace(CONCAT_STRING, "")
+                                    .replace(CONCAT_INDICATOR, "")                            
+                            )
+            .trim_start().trim_end_matches([' ', ',', ';'])) );
+    });
+
+    fn nestable_speak_rules<'c, 's:'c, 'm:'c>(rules_with_context: &mut SpeechRulesWithContext<'c, 's, 'm>, mathml: Element<'c>, nav_node_id: &str) -> Result<String> {
         let mut speech_string = rules_with_context.match_pattern::<String>(mathml)
                     .chain_err(|| "Pattern match/replacement failure!")?;
         // debug!("speak_rules: nav_node_id={}, mathml id={}, speech_string='{}'", nav_node_id, mathml.attribute_value("id").unwrap_or_default(), &speech_string);
         // Note: [[...]] is added around a matching child, but if the "id" is on 'mathml', the whole string is used
         if !nav_node_id.is_empty() {
             // See https://github.com/NSoiffer/MathCAT/issues/174 for why we can just start the speech at the nav node
+            let intent_attr = mathml.attribute_value("data-intent-property").unwrap_or_default();
             if let Some(start) = speech_string.find("[[") {
                 match speech_string[start+2..].find("]]") {
                     None => bail!("Internal error: looking for '[[...]]' during navigation -- only found '[[' in '{}'", speech_string),
                     Some(end) => speech_string = speech_string[start+2..start+2+end].to_string(),
                 }
+            } else if !intent_attr.contains(":literal:") {
+                // try again with LiteralSpeak -- some parts might have been elided in other SpeechStyles
+                mathml.set_attribute_value("data-intent-property", (":literal:".to_string() + intent_attr).as_str());
+                let speech = nestable_speak_rules(rules_with_context, mathml, nav_node_id);
+                mathml.set_attribute_value("data-intent-property", intent_attr);
+                return speech;
             } else {
                 bail!(NAV_NODE_SPEECH_NOT_FOUND); //  NAV_NODE_SPEECH_NOT_FOUND is tested for later
             }
         }
-        return Ok( rules.pref_manager.borrow().get_tts()
-                    .merge_pauses(remove_optional_indicators(
-                        &speech_string.replace(CONCAT_STRING, "")
-                                            .replace(CONCAT_INDICATOR, "")                            
-                                    )
-                    .trim_start().trim_end_matches([' ', ',', ';'])) );
-    })
+        return Ok(speech_string);
+    }
 }
 
 /// Converts its argument to a string that can be used in a debugging message.
@@ -1757,7 +1769,7 @@ impl<'c, 'r> ContextStack<'c> {
             // set the new value
             let new_value = match def.value.evaluate(&self.base, mathml) {
                 Ok(val) => val,
-                Err(e) => bail!(format!("Can't evaluate variable def for {} with ContextStack {}\nError is '{}'", def, self, e)),
+                Err(_) => Value::Nodeset(sxd_xpath::nodeset::Nodeset::new()),
             };
             let qname = QName::new(def.name.as_str());
             self.base.set_variable(qname, new_value);

@@ -126,7 +126,12 @@
         if: "parent::*[1][self::m:mn]"
         then: [t: "point"]
         else: [t: "dot"]
- - "/": [t: "divided by"]                          # 0x2f
+ - "/":                                           # 0x2f
+    - test:
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+        then: [t: "slash"]                        # 0x2f
+        else: [t: "divided by"]                   # 0x2f
+
  - ":": [t: "colon"]                               # 0x3a
  - ";": [t: "semicolon"]                           # 0x3b
  - "<":                                          # 0x3c
@@ -176,7 +181,9 @@
         variables: [DefaultToGiven: "count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and ../../../*[1][.='P']"] # P(A|B)
         replace:
         - test:
-            - if: "$SpeechStyle != 'ClearSpeak'"
+            - if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+              then: [t: "vertical line"]
+            - else_if: "$SpeechStyle != 'ClearSpeak'"
               then_test:
                 - if: "$DefaultToGiven"
                   then: [t: "given"]
@@ -212,7 +219,7 @@
  - "´": [t: "acute"]                            # 0xb4
  - "·":                                            # 0xB7
     - test:
-        if: "$SpeechStyle = 'LiteralSpeak' or not($SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultSymbolDot = 'Auto')"
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')] or not($SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultSymbolDot = 'Auto')"
         then: [t: "dot"]
         else: [t: "times"]
  - "×":                                          # 0xd7

@@ -2,11 +2,11 @@
 - include: "../../definitions.yaml"
 
 # If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
-# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
+# If only one ":" is used, the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
 # If no ":"s are used, the same speech is used for all forms
 # If bracketing words make sense, they are separated with ";"s
 # Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
-# If there are multiple fixities (e.g., see transpose), they are separated with "||
+# If there are multiple fixities (e.g., see transpose), they are separated with "||"
 #   for readability, spaces can be used around any of the delimiter characters
 # Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
 - IntentMappings: {

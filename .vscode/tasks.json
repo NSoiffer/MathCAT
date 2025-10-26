@@ -23,10 +23,10 @@
             "label": "cargo build",
             "type": "cargo",
             "command": "build",
-            // "args": [
-            //     "--features",
-            //     "include-zip"
-            // ],
+            "args": [
+                // "--features", "include-zip",
+                "--profile", "dev",
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true

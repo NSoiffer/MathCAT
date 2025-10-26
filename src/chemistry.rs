@@ -3204,5 +3204,68 @@ mod chem_tests {
            ";
         assert!(are_strs_canonically_equal(test, target));
     }
+    
+    #[test]
+    fn mtd_assert_bug_393() {
+        let test = r#"
+        <math display="block">
+            <mtable>
+                <mtr>
+                <mtd>
+                    <mrow>
+                    <mi>A</mi>
+                    <mi>c</mi>
+                    </mrow>
+                </mtd>
+                <mtd>
+                    <mi>A</mi>
+                    <mfenced>
+                    <mtable>
+                        <mtr>
+                        <mtd>
+                            <mrow>
+                            <mi>c</mi>
+                            <mi>n</mi>
+                            </mrow>
+                        </mtd>
+                        </mtr>
+                    </mtable>
+                    </mfenced>
+                </mtd>
+                </mtr>
+            </mtable>
+        </math>"#;
+        let target = "
+        <math display='block'>
+            <mtable>
+            <mtr>
+                <mtd>
+                <mi>A</mi>
+                <mi>c</mi>
+                </mtd>
+                <mtd>
+                <mrow data-changed='added'>
+                    <mi>A</mi>
+                    <mrow>
+                    <mo data-changed='from_mfenced'>(</mo>
+                    <mtable>
+                        <mtr>
+                        <mtd>
+                            <mrow>
+                            <mi>c</mi>
+                            <mi>n</mi>
+                            </mrow>
+                        </mtd>
+                        </mtr>
+                    </mtable>
+                    <mo data-changed='from_mfenced'>)</mo>
+                    </mrow>
+                </mrow>
+                </mtd>
+            </mtr>
+            </mtable>
+        </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
 
 }

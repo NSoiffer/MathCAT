@@ -381,7 +381,7 @@ impl Function for IsNode {
 
         let nodes = args.pop_nodeset()?;
         if nodes.size() == 0 {
-            return Err(Error::Other("Missing argument for IsNode".to_string() ));
+            return Ok (Value::Boolean(false));  // like xpath, don't make this an error
         };
         return Ok(
             Value::Boolean( 
@@ -933,14 +933,18 @@ impl IsBracketed {
         }
         let right = args.pop_string()?;
         let left = args.pop_string()?;
-        let node = validate_one_node(args.pop_nodeset()?, "IsBracketed")?;
-        if let Node::Element(e) = node {
-            return Ok( Value::Boolean( IsBracketed::is_bracketed(e, &left, &right, requires_comma, requires_mrow) ) );
+        return Ok( Value::Boolean(
+            match validate_one_node(args.pop_nodeset()?, "IsBracketed") {
+                Err(_) => false,  // be fault tolerant, like xpath,
+                Ok(node) => {
+                    if let Node::Element(e) = node {
+                        IsBracketed::is_bracketed(e, &left, &right, requires_comma, requires_mrow)
+                    } else {
+                        false
+                    }
+                }
+            }) );
         }
-
-        // FIX: should having a non-element be an error instead??
-        return Ok( Value::Boolean(false) );
-    }
 }
 
 pub struct IsInDefinition;

@@ -2402,8 +2402,7 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 // Text has separate rules: no state, and math restarts after it.
                 // Find the end of the text run, output it and reset the state
                 // no reason to keep 'T'/'t' in the output
-                text_mode = ch == 'T';
-                if text_mode {
+                if ch == 'T' {
                     mode = BrailleMode::Letter;
                     letter_mode = BrailleMode::Letter;
                 }
@@ -2647,7 +2646,7 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
             if chars[i] == '<' && (any_start_indicator || chars[i+1] == '⠆') {
                 let i_start = i;
                 i += 1;
-                let depths = depth_of_indicators(chars, &mut i, any_start_indicator, braille_level);
+                let (depths,has_whitespace) = depth_of_indicators(chars, &mut i, any_start_indicator, braille_level);
                 // For non-advanced, if non fractions are long or if a fraction has whitespace (not counting space around "/"),
                 //   we use 0 which will force a longer form.
                 // Otherwise, we calculate the nesting depth which is one more than all the children
@@ -2687,16 +2686,17 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
 
         /// Recursive call that returns depths of the open and close up to the matching close.
         /// Starts at character after '<' and returns after processing '>'
-        fn depth_of_indicators(chars: &[char], i: &mut usize, any_start_indicator: bool, braille_level: BrailleLevel) -> Vec<usize> {
+        fn depth_of_indicators(chars: &[char], i: &mut usize, any_start_indicator: bool, braille_level: BrailleLevel) -> (Vec<usize>, bool) {
             // allows for ...^2 and ...^b and similar, which has coding x<.Nd>. and x<.la>. (starts first '.', ends at last '.')
             let mut result = Vec::new();
+            let mut has_whitespace = false;
             while *i < chars.len() {
                 match chars[*i] {
                     '<' => {
                         let i_start = *i;
                         *i += 1;
                         if any_start_indicator || chars[*i] == '⠆' {  // fraction start
-                            let depths = depth_of_indicators(chars, i, any_start_indicator, braille_level);
+                            let (depths,has_whitespace) = depth_of_indicators(chars, i, any_start_indicator, braille_level);
                             let mut new_depth = 0;
                             if braille_level == BrailleLevel::Advanced ||
                                !((any_start_indicator && depths.is_empty() && *i - i_start > MAX_CHARS_FOR_INTERMEDIATE) ||
@@ -2712,15 +2712,19 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                     '>' => {
                         *i += 1;
                         if any_start_indicator || chars[*i] == '⠰' {  // fraction end
-                            return result;
+                            return (result, has_whitespace);
                         }
+                    }
+                    'W' => {
+                        has_whitespace = true;
+                        *i += 1;
                     }
                     _ => {
                         *i += 1;
                     }
                 }
             }
-            return result;
+            return (result, has_whitespace);
         }
 
         /// Returns true if there are any whitespace chars in the sequence '<...>', but ignore any around "/"
