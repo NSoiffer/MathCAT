@@ -599,6 +599,34 @@ fn p22_equation_solving_notation() {
 }
 
 #[test]
+fn operate_by_on_both_sides() {
+    let expr = "<math>
+        <mo>|</mo>
+    <mo>+</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>-</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>−</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>·</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>×</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>(</mo>
+    <msup>
+    <mo>)</mo>
+    <mn>2</mn>
+    </msup>
+</math>";
+    test_braille("Finnish", expr, "⠀⠀⠸⠀⠖⠼⠑⠀⠀⠸⠀⠤⠼⠑⠀⠀⠸⠀⠄⠼⠑⠀⠀⠸⠀⠄⠼⠑⠀⠀⠸⠀⠒⠼⠑⠀⠀⠸⠦⠴⠬");
+}
+
+#[test]
 fn p24_fraction() {
     let expr = "<math>
   <mfrac>
