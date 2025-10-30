@@ -277,7 +277,7 @@ fn p16_division() {
     <mo>:</mo>
     <mn>3</mn>
 </math>";
-    test_braille("Finnish", expr, "⠦⠼⠋⠀⠭⠀⠖⠼⠉⠀⠭⠴⠀⠌⠼⠉");
+    test_braille("Finnish", expr, "⠦⠼⠋⠀⠭⠀⠖⠼⠉⠀⠭⠴⠀⠒⠼⠉");
 }
 
 #[test]
@@ -386,7 +386,7 @@ fn p17_multiple_operations() {
       <mn>2</mn>
     </msup>
 </math>";
-    test_braille("Finnish", expr, "⠼⠑⠀⠄⠼⠉⠬⠀⠖⠦⠼⠓⠁⠀⠤⠼⠋⠚⠴⠀⠌⠼⠉⠀⠤⠦⠼⠃⠀⠖⠼⠙⠴⠬");
+    test_braille("Finnish", expr, "⠼⠑⠀⠄⠼⠉⠬⠀⠖⠦⠼⠓⠁⠀⠤⠼⠋⠚⠴⠀⠒⠼⠉⠀⠤⠦⠼⠃⠀⠖⠼⠙⠴⠬");
 }
 
 #[test]
@@ -595,7 +595,7 @@ fn p22_equation_solving_notation() {
     <mo>:</mo>
     <mn>5</mn>
 </math>";
-    test_braille("Finnish", expr, "⠼⠑⠀⠭⠀⠶⠤⠼⠁⠚⠀⠀⠸⠀⠌⠼⠑");
+    test_braille("Finnish", expr, "⠼⠑⠀⠭⠀⠶⠤⠼⠁⠚⠀⠀⠸⠀⠒⠼⠑");
 }
 
 #[test]
@@ -685,7 +685,7 @@ fn p25_long_fraction() {
     </mfrac>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠦⠦⠭⠬⠀⠤⠼⠛⠀⠭⠀⠖⠼⠁⠃⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠃⠚⠴⠴⠀⠌⠦⠦⠭⠬⠀⠤⠼⠓⠀⠭⠀⠖⠼⠁⠑⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠁⠋⠴⠴");
+    test_braille("Finnish", expr, "⠦⠦⠭⠬⠀⠤⠼⠛⠀⠭⠀⠖⠼⠁⠃⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠃⠚⠴⠴⠀⠒⠦⠦⠭⠬⠀⠤⠼⠓⠀⠭⠀⠖⠼⠁⠑⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠁⠋⠴⠴");
 }
 
 #[test]
@@ -1818,7 +1818,7 @@ fn p64_chemistry_bond_1() {
 #[test]
 fn p64_chemistry_bond_1_alternative() {
     let expr = "<math intent=':chemical-formula'><mi>H</mi><mo>:</mo><mi>H</mi></math>";
-    test_braille("Finnish", expr, "⠠⠓⠀⠆⠠⠓");
+    test_braille("Finnish", expr, "⠠⠓⠀⠒⠠⠓");
 }
 
 #[test]
