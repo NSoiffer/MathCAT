@@ -50,11 +50,11 @@ fn p7_decimal_comma() {
 }
 
 
-// Now the point is transformed to comma. Maybe it should follow the text.
+// When there is a decimal point in the text then the grouping character is the number character.
 #[test]
 fn p7_decimal_point() {
     let expr = "<math><mn>5.12575</mn></math>";
-    test_braille("Finnish", expr, "⠼⠑⠂⠁⠃⠑⠄⠛⠑");
+    test_braille("Finnish", expr, "⠼⠑⠄⠁⠃⠑⠼⠛⠑");
 }
 
 #[test]
