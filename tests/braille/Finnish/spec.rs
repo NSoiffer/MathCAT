@@ -621,9 +621,12 @@ fn operate_by_on_both_sides() {
     <msup>
     <mo>)</mo>
     <mn>2</mn>
+        <mo>|</mo>
+    <mo>/</mo>
+    <mn>5</mn>
     </msup>
 </math>";
-    test_braille("Finnish", expr, "⠀⠀⠸⠀⠖⠼⠑⠀⠀⠸⠀⠤⠼⠑⠀⠀⠸⠀⠄⠼⠑⠀⠀⠸⠀⠄⠼⠑⠀⠀⠸⠀⠒⠼⠑⠀⠀⠸⠦⠴⠬");
+    test_braille("Finnish", expr, "⠀⠀⠸⠀⠖⠼⠑⠀⠀⠸⠀⠤⠼⠑⠀⠀⠸⠀⠄⠼⠑⠀⠀⠸⠀⠄⠼⠑⠀⠀⠸⠀⠒⠼⠑⠀⠀⠸⠦⠴⠬⠀⠀⠸⠀⠌⠼⠑");
 }
 
 #[test]
