@@ -27,11 +27,6 @@
  - "7": [T: "N⠛"]                # 0x0037 (digit seven)
  - "8": [T: "N⠓"]                # 0x0038 (digit eight)
  - "9": [T: "N⠊"]                # 0x0039 (digit nine)
- - "≈": [T: "W⠸⠶"]                # 0x2248 (almost equal to)
- - "⋅": [T: "W⠄"]                # 0x22C5 (dot,and times)
- - "〉": [T: "⠣"]                # 0x232A (right angle bracket ( angular parenthesis ))
- - "⟨": [T: "⠱"]                # 0x27E8 (left angle bracket ( angular parenthesis ))
-
 
  - " ":                        # 0x20 (Space)
      - test:
@@ -51,25 +46,31 @@
         then: [T: "N⠂"]
         else: [T: ",W"]
 
- - "⁡": [T: ""]                         # 0x2061⁡ (invisible function apply)
-    #- test:
-        #if:
-        #- "preceding-sibling::*[1][self::m:mi and substring(., string-length(.), 1)!=' '] and " # avoid scripted function names and one that end with spaces
-        #- "following-sibling::*[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']" # GTM 9.3.2
-        #then: [t: "W"]
-        #else: [t: ""]
+ - "⁡":                            # 0x2061⁡ (invisible function apply)
+    - test:  # add some whitespace for the function apply for  "tan x", etc
+        if:
+        - "preceding-sibling::*[1][IsInDefinition(BaseNode(.), 'Braille', 'TrigFunctionNames')] and " 
+        - "not(following-sibling::*[1][IsBracketed(., '', '')])"
+        then: [t: "W"]
+        else: [t: ""]
 
- - "⁢": [T: ""]                        # 0x2062 (invisible times)
-    #- test:
-        #if: # GTM 9.3.3 (not very clear in rule, but the function name has to start with a lower case latin char ['no indicators'])
-        #- "parent::m:mrow and "
-        #- "preceding-sibling::*[1]["
-        #- "           (self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '') or "
-        #- "           (self::m:mrow and translate(*[last()], 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '')] and"
-        #- "  following::*[1][self::m:mrow and count(*)=3 and "   # look for function apply
-        #- "     *[2][text()='⁡'] and *[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']]" 
-        #then: [t: "W"]
-        #else: [t: ""]
+ - "⁢":                        # 0x2062 (invisible times)
+     - test:
+        #  don't add whitespace when you have consecutive vars (taking into account pseudo scripts), or...
+        #  if what follows is an opening bracket (any kind) or a 2D structure
+        if: "@data-function-guess='true' or
+             (preceding-sibling::*[1][self::m:mi or
+                                     (self::m:msup and *[2][translate(., '*`ª°²³´¹º‘’“”‟′″‴‵‶‷⁗','')='']) or
+                                     (self::m:mrow and *[last()][self::m:mi])] and
+              (following-sibling::*[1][self::m:mi or
+                                      (self::m:mrow and *[1][self::m:mi])])
+             ) or
+              preceding-sibling::*[1][self::m:mn] and following-sibling::*[1][self::m:mi and .='…'] or
+              preceding-sibling::*[1][self::m:mi and (.='$' or .='£')] and following-sibling::*[1][self::m:mn]
+            "
+        then: [t: ""]
+        else: [t: "W"]
+
  - "⁣": [T: ""]                 # 0x2063⁡ (invisible separator)
  - "⁤": [T: ""]                 # 0x2064 (invisible plus)
 
@@ -328,6 +329,15 @@
         if: "@data-chem-element"
         then: [T: "𝐶L⠽"]
         else: [T: "CL⠽"]
+ - "\\":                       # 0x005C (Backslash)
+     - test:
+          # we need to recognize "set difference" -- heuristic is the operands are both capital letters
+        if: "@intent='set-difference' or
+                    parent::*[1][self::m:mrow and count(*)=3 and
+                              *[1][self::m:mi and string-length(.) = 1 and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] and
+                              *[3][self::m:mi and string-length(.) = 1 and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] ]"
+        then: [t: "W⠳⠩"]        # set difference
+        else: [t: "⠩"]
  - "Z": [T: "CL⠵"]              # 0x5a
  - "Å": [T: "CL⠡"]           # FI: Finnish alphabet
  - "Ä": [T: "CL⠜"]           # FI: Finnish alphabet
@@ -396,7 +406,7 @@
  - "!":                        # 0x0021 (exclamation point) 
     - test:
         if: "self::m:mtext"
-        then: [t: "⠲"]          # FI: regular exaclamation point in text
+        then: [t: "⠲"]          # FI: regular exclamation point in text
         else: [t: "⠠⠲"]         # FI: factorial
 
  - "$": [T: "⠮"]                # 0x0024 (dollar sign)
@@ -404,36 +414,113 @@
  - "&": [T: "⠯"]                # 0x0026 (ampersand (and, logical product))
  - "(": [T: "("]                # 0x0028 (left parenthesis -- handled later)
  - ")": [T: ")"]                # 0x0029 (right parenthesis -- handled later)
- - "+": [T: "W⠖"]                # 0x002B (regular plus)
- - "-": [T: "W⠤"]                # 0x002D (hyphen)
- - ".": [T: "⠄"]                # 0x002E # FI: used as a thousand separator
- - "/": [T: "W⠌"]                # 0x002F (diagonal fraction line)
+ - "+":                         # 0x002B (regular plus)
+     - test:               
+        if: "self::m:mo and parent::m:mrow and preceding-sibling::*"
+        then: [t: "W⠖"]         # infix plus
+        else: [t: "⠖"]          # unary plus
+ - "-":                         # 0x002D (minus)
+     - test:
+        - if: "@data-chemical-bond"
+          then: [t: "W⠒"]
+          # we need to recognize "set difference" -- heuristic is the operands are both capital letters
+        - else_if: "@intent='set-difference' or
+                    parent::*[1][self::m:mrow and count(*)=3 and
+                              *[1][self::m:mi and string-length(.) = 1 and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] and
+                              *[3][self::m:mi and string-length(.) = 1 and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] ]"
+          then: [t: "W⠳⠤"]        # set difference
+        - else_if: "self::m:mo and parent::m:mrow and preceding-sibling::*"
+          then: [t: "W⠤"]        # infix minus
+          else: [t: "⠤"]         # unary minus
+ - ".":                 # 0x002E # FI: used as a thousand separator
+    - test:
+        if: "self::m:mn"
+        then: [T: "N⠄"]
+        else: [T: "⠄"]
+
+ - "/":                         # 0x002F (diagonal fraction line)
+    - test:
+        if: "@intent='substitution' or parent::*[self::m:msubsup or self::m:munderover]"
+        then: [T: "⠸"]          # see p44 (similar to integral)
+        else: [T: "W⠌"]
+ - "⧸":                         # 0x002F (diagonal fraction line)
+    - test:
+        if: "@intent='substitution' or parent::*[self::m:msubsup or self::m:munderover]"
+        then: [T: "⠸"]          # see p44 (similar to integral)
+        else: [T: "W⠌"]
  - "÷": [T: "W⠌"]               # 0x00F7 FI: Used as division sign.
 
- - ":": [T: "W⠒"]                # 0x003A (colon)
- - "<": [T: "W⠣W"]                # 0x003C (less than sign)
- - "=": [T: "W⠶"]                # 0x003D (regular equals sign)
- - ">": [T: "W⠱W"]                # 0x003E (greater than sign ( regular ))
- - "[": [T: "⠷"]                # 0x005B (left square bracket)
- - "]": [T: "⠾"]                # 0x005D (right square bracket)
- - "{": [T: "⠫"]                # 0x007B ( left curly brace)
- - "|": [T: "⠸"]                # 0x007C (vertical bar)
+ - ":":                         # 0x003A (colon)
+   # sometimes (for division or ratio) it is dots 34 and sometimes (for function def) it is dots 25
+   # the following is a very crude test that looks for "XXX : YYY → ZZZ". Awaiting better information to improve the test.
+    - test:
+        - if: "@data-chemical-bond"
+          then: [t: "W⠆"]
+        - else_if: "preceding-sibling::*[1][name(BaseNode(.))='mi'] and 
+               following-sibling::*[1][self::m:mrow and *[2][.='→']]"
+          then: [t: "⠒W"]
+          else: [t: "W⠌"]
+
+ - ";": [t: "⠆W"]               # 0x003B (Semicolon)
+ - "<": [T: "W⠣W"]               # 0x003C (less than sign)
+ - "=":                          # 0x003D (regular equals sign)
+     - test:
+        - if: "@data-chemical-bond"
+          then: [t: "W⠒⠒"]
+          else: [t: "W⠶"]
+
+ - ">": [T: "W⠱W"]               # 0x003E (greater than sign ( regular ))
+ - "?": [t: "P⠢"]                # 0x003F (Question mark)
+ - "@": [t: "⠈"]               # 0x0040 (Commercial at sign)
+ - "[": [T: "["]                # 0x005B (left square bracket)
+ - "]": [T: "]"]                # 0x005D (right square bracket)
+ - "_": [t: "⠬"]               # 0x005F (Low line (underscore))
+ - "{": [T: "{"]                # 0x007B ( left curly brace)
+ - "|":                         # 0x007C (vertical bar)
+    - test:
+      # catch |: notation
+      # last child, inside a mrow with first child not | and the next child of the parent is ":"
+        - if: ". and .. and
+               not(following-sibling::*) and
+               parent::*[self::m:mrow and count(*)=2 and not(*[1][.='|']) and
+                         parent::*[self::m:mrow] and following-sibling::*[1][.=':']]
+               "
+          then: [t: "𝐖⠸"]
+        - else_if: "not(parent::*[self::m:mrow and count(*)=3 and *[1]='|'and *[3]='|'])"
+          then: [t: "W⠸W"]   # single vertical bar
+        - else_if: "parent::*/*[2][self::m:mtable]"
+          then: [t: "⠸"]    # these act as brackets around the rows and shouldn't have whitespace dropped
+          else: [t: "|"]     # absolute value -- need to use "|"" because whitespace needs to caught/dropped before it
+ - "\"": [t: "⠸"]
+ - "”": [t: "⠸"]
+ - "'": [t: "⠨"]
+ - "’": [t: "⠨"]
  - "∤": [T: "⠐⠸"]                # 0x2224 (does not divide)
- - "}": [T: "⠻"]                # 0x007D (right curly brace)
+ - "}": [T: "}"]                # 0x007D (right curly brace)
  - "~": [T: "⠨⠶"]                # 0x007E (simple tilde (is related to, is similar)) FI: in context of geometry. Tilde has different braille in general text.
  - "¢": [T: "⠎⠝⠞"]                # 0x00A2 (cent)
  - "£": [T: "⠇"]                # 0x00A3 (pound sterling)
  - "§": [T: "⠼"]                # 0x00A7 (single section mark)
  - "¬": [T: "W⠳⠲"]                # 0x00AC (not (negation in formal logic))
  - "°": [T: "⠴"]                # 0x00B0 (degree sign)
+ - "·": [t: "W⠄"]               # 0x00B7 (Multiplication dot (times))
  - "±": [T: "W⠖⠤"]                # 0x00B1 (plus or minus)
  - "∓": [T: "W⠤⠖"]                # 0x2213 (minus or plus)
  - "×": [T: "W⠰⠄"]                # 0x00D7 (vector or cross product)
  - "‰": [T: "⠒⠹"]                # 0x2030 (per mille sign)
- - "′": [T: "⠔"]                # 0x2032 (apostrophe)
- - "″": [T: "⠔⠔"]                # 0x2033 (double prime)
+ - "…": [t: "⠄⠄⠄"]               # 0x2026 (ellipsis)
+ - "′":                         # 0x2032 (single prime)
+    - test:
+        if: "parent::m:msup and preceding-sibling::*[1][self::m:mn]"
+        then: [t: "⠨"]         # interpret as apostrophe ("minutes")
+        else: [t: "⠔"]
+ - "″":                         # 0x2033 (double prime)
+    - test:
+        if: "parent::m:msup and preceding-sibling::*[1][self::m:mn]"
+        then: [t: "⠸"]         # interpret as double quote ("seconds")
+        else: [t: "⠔⠔"]
  - "‴": [T: "⠔⠔⠔"]                # 0x2034 (triple prime)
- - "€": [T: "⠈⠑"]                # 0x20AC (euro)
+ - "€": [T: "W⠈⠑W"]                # 0x20AC (euro)  -- seems to have spaces around it in Finnish braille
  - "←": [T: "W⠣⠤W"]                # 0x2190 (left pointing arrow)
  - "→": [T: "W⠤⠱W"]               # 0x2192 (right pointing arrow)
  - "↔": [T: "W⠣⠤⠱W"]                # 0x2194 (horizontal two-way arrow)
@@ -483,12 +570,18 @@
  - "∬": [T: "⠮⠮"]               # # 0x222C (double integral) FI: not in the specification
  - "∭": [T: "⠮⠮⠮"]              # 0x222D (triple integral) FI: not in the specification
  - "∂": [T: "⠈⠙"]                # 0x2202 (partial derivative (round d))
+ - "∷": [T: "W⠶"]                 # 0x2237 (Proportion) [only use in the spec is as a double bond with this value]
+ - "∼": [t: "W⠨⠶"]                # 0x223C (simple tilde (is related to, is similar))
  - "≁": [T: "⠐⠨⠶"]                # 0x2241 (not tilde) FI: Not in the specification, so this is a construction. Used in the context of geometry. Tilde has different braille in general text.
  - "≅": [T: "W⠰⠶"]                # 0x2245 (equals sign under tilde)
  - "≈": [T: "W⠸⠶"]                # 0x2248 (double tilde, almost equal to)
  - "≙": [T: "W⠒⠒"]                # 0x2259 (caret over equals sign)
  - "≠": [T: "W⠐⠶"]                # 0x2260 (not equal to)
- - "≡": [T: "W⠰⠶"]                # 0x2261 (identify (is congruent to, is identical with))
+ - "≡":                           # 0x2261 (identify (is congruent to, is identical with))
+     - test:
+        - if: "@data-chemical-bond"
+          then: [t: "W⠒⠒⠒"]
+          else: [t: "W⠰⠶"]
  - "≢": [T: "W⠐⠰⠶"]                # 0x2262 (is not identical to) FI: Not in the specification, but can be used.
  - "≤": [T: "W⠣⠶W"]                # 0x2264 (bar under less than sign (is less than or equal to))
  - "≥": [T: "W⠱⠶W"]                # 0x2265 (bar under greater than sign (is greater than or equal to))
@@ -503,12 +596,13 @@
  - "⊆": [T: "W⠳⠶⠪"]                # 0x2286 (bar under inclusion sign (is a subset of))
  - "⊥": [T: "W⠼⠄W"]                # 0x22A5 (is perpendicular to)
  - "⋅": [T: "W⠄"]                # 0x22C5 (dot,and times)
- - "〉": [T: "⠜"]                # 0x232A (right angle bracket ( angular parenthesis ))
+ - "〉": [T: "⠱"]                # 0x232A (right angle bracket ( angular parenthesis ))
+ - "⟨": [T: "⠣"]                # 0x27E8 (left angle bracket ( angular parenthesis ))
+
  - "□": [T: "⠫⠟"]                # 0x25A1 (square)
  - "▭": [T: "⠫⠗"]                # 0x25AD (rectangle)
  - "▱": [T: "⠫⠏"]                # 0x25B1 (parallelogram)
  - "△": [T: "⠫⠙"]                # 0x25B3 (regular triangle (equilateral)  )
  - "⌒": [T: "⠫⠁"]
- - "⟨": [T: "⠣"]                # 0x27E8 (left angle bracket ( angular parenthesis ))
  - "⪥": [T: "W⠱⠣W"]                # 0x2AA5 (greater than sign followed by less than sign)
  - "⫫": [T: "W⠼⠧W"]                # 0x2AEB (double up tack (conditionally independent))

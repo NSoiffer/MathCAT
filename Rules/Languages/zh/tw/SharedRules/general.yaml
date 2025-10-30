@@ -479,6 +479,7 @@
       else_test:
         if: "$LineCount != 1"
         then:
+        - pause: medium
         - test:
           - if: "parent::m:piecewise"
             then: [{T: "情況"}]     # phrase('case' 1 of 10 cases)

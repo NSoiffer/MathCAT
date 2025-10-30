@@ -2,6 +2,8 @@
 // The numbering refers to the Nemeth green book in most cases.
 // The newer NFB lessons include NFB (https://nfb.org/programs-services/braille-certification/mathematics-braille-transcribing)
 // These lessons are still being developed, so it is possible the numbering gets changed from that used here.
+
+// New source: https://www.brailleauthority.org/sites/default/files/2024-02/Nemeth_2022.pdf
 use crate::common::*;
 
 #[test]
@@ -1692,6 +1694,12 @@ fn in_scripts_comparison_151_17() {
 }
 
 #[test]
+fn degrees_165_1() {
+    let expr = "<math><mn>90</mn><mo>&#xB0;</mo><mo>+</mo><mn>90</mn><mo>&#xB0;</mo><mo>=</mo><mn>180</mn><mo>&#xB0;</mo></math>";
+    test_braille("Nemeth", expr, "⠼⠔⠴⠘⠨⠡⠐⠬⠔⠴⠘⠨⠡⠀⠨⠅⠀⠼⠂⠦⠴⠘⠨⠡");
+}
+
+#[test]
 fn prime_172_5() {
     let expr = "<math><msubsup><mi>x</mi><mi>i</mi><mo>'</mo></msubsup></math>";
     test_braille("Nemeth", expr, "⠭⠄⠰⠊");
@@ -1911,6 +1919,16 @@ fn tensor_from_mathml_spec() {
     // Note: the braille answer was verified to be correct (see https://github.com/NSoiffer/MathCAT/issues/55) 
     test_braille("Nemeth", expr, "⠠⠗⠰⠊⠐⠘⠚⠐⠰⠅⠐⠰⠇");
 }
+
+// The following are from the new BANA Nemeth Code (2020): https://www.brailleauthority.org/nemeth/2020-nemeth-code.html
+
+#[test]
+fn perpendicular_17_57() {
+    let expr = "<math><mi>A</mi><mi>B</mi><mo>&#x22A5;</mo><mi>C</mi><mi>D</mi></math>";
+    test_braille("Nemeth", expr, "⠠⠁⠠⠃⠀⠫⠏⠀⠠⠉⠠⠙");
+}
+
+
 
 
 // The following are chemistry tests from Braille Code of Chemical Notation 1997 (http://www.brl.org/chemistry/ which seems bug, update in late 2023?)

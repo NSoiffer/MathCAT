@@ -392,6 +392,7 @@ impl PreferenceManager {
     fn set_style_file(&mut self, language_dir: &Path, language: &str, style_file_name: &str) -> Result<()> {
         let style_file_name = style_file_name.to_string() + "_Rules.yaml";
         self.speech = PreferenceManager::find_file(language_dir, language, Some("en"), &style_file_name)?;
+      
         return Ok( () );
     }
 
@@ -545,6 +546,7 @@ impl PreferenceManager {
             if is_file_shim(&path) {
                 // we make an exception for definitions.yaml -- there a language specific checks for Hundreds, etc
                 if !(file_name == "definitions.yaml" && os_path.ends_with("Rules")) {
+                    // debug!("find_file -- found={}", path.to_string_lossy());
                     return Ok(path);
                 }
             };
@@ -581,7 +583,7 @@ impl PreferenceManager {
             // we find the first file because this is the deepest (most language specific) speech rule file
             match find_file_in_dir_that_ends_with_shim(path, "_Rules.yaml") {
                 None => bail!{"didn't find file"},
-                Some(file_name) => return Ok(path.to_path_buf().join(file_name)),
+                Some(file_name) => return Ok(path.join(file_name)),
             }
         }
     }
@@ -865,6 +867,10 @@ mod tests {
             pref_manager.set_user_prefs("DecimalSeparator", "Auto").unwrap();
             assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ".");
             assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ", \u{00A0}\u{202F}");
+
+            pref_manager.set_user_prefs("Language", "fi").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ",");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ". \u{00A0}\u{202F}");
 
             pref_manager.set_user_prefs("Language", "sv").unwrap();
             assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ",");

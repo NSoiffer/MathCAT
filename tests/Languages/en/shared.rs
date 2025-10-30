@@ -10,6 +10,7 @@ fn modified_vars() {
         <mover> <mi>c</mi> <mo>&#x0306;</mo> </mover>
         <mover> <mi>b</mi> <mo>&#x030c;</mo> </mover>
         <mover> <mi>c</mi> <mo>`</mo> </mover>  <mo>+</mo>
+        <mover> <mi>r</mi> <mo>ˇ</mo> </mover>  <mo>+</mo>
         <mover> <mi>x</mi> <mo>.</mo> </mover>
         <mover> <mi>y</mi> <mo>&#x2D9;</mo> </mover>
         <mover> <mi>z</mi> <mo>&#x00A8;</mo> </mover>
@@ -19,8 +20,8 @@ fn modified_vars() {
         <mover> <mi>t</mi> <mo>→</mo> </mover>
         </mrow> </math>";
     test("en", "SimpleSpeak", expr, 
-        "eigh grave, b tilde, c breve, b check, c grave; plus; \
-            x dot, y dot, z double dot, u triple dot, v quadruple dot; plus x hat, plus vector t");
+        "eigh grave, b tilde, c breve, b check, c grave; plus \
+            r check plus; x dot, y dot, z double dot, u triple dot, v quadruple dot; plus x hat, plus vector t");
 }
 
 #[test]
@@ -342,7 +343,6 @@ fn mn_with_block_and_decimal_separators() {
 
 #[test]
 fn divergence() {
-  init_logger();
   let expr = "<math><mo>&#x2207;</mo><mo>&#xB7;</mo><mi mathvariant='normal'>F</mi></math>";                                       // may want to change this for another language
   test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "dihv cap f");
   test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "divergence of cap f");

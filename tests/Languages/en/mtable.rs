@@ -258,10 +258,10 @@ fn matrix_2x3_labeled() {
     </math>
                                 ";
     test("en", "ClearSpeak",  expr,
-        "the 2 by 3 matrix; row 1 with label (3.1); column 2; 3, column 3; 1, column 4; 4; \
+        "the 2 by 3 matrix; row 1 with label (3.1); column 1; 3, column 2; 1, column 3; 4; \
                                    row 2; column 1; 0, column 2; 2, column 3; 6");
     test("en", "SimpleSpeak", expr,
-        "the 2 by 3 matrix; row 1 with label (3.1); column 2; 3, column 3; 1, column 4; 4; \
+        "the 2 by 3 matrix; row 1 with label (3.1); column 1; 3, column 2; 1, column 3; 4; \
                                    row 2; column 1; 0, column 2; 2, column 3; 6");
 }
 
@@ -1033,7 +1033,7 @@ fn unknown_mtable_property() {
       </mtable>
     </math>";
     test("en", "ClearSpeak",  expr,
-         "2 lines, line 1; eigh is equal to, b plus c minus d; line 2; plus e minus f");
+         "2 lines; line 1; eigh is equal to, b plus c minus d; line 2; plus e minus f");
 }
 
 
@@ -1081,4 +1081,20 @@ fn diagonal_matrix() {
       expr, "the 3 by 3 diagonal matrix; column 1; 2; column 2; 1; column 3; x squared");
   // test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")],
   //     expr, "the 3 by 3 diagonal matrix; row 1, column 1, 2; row 2, column 2, 1; row 3, column 3, x squared");
+}
+
+#[test]
+fn single_line_with_label() {
+  let expr = r#"<math>
+  <mtable class="gather" displaystyle="true" intent=":system-of-equations">
+    <mtr>
+      <mtd intent=":equation-label"> <mtext>(2)</mtext> </mtd>
+      <mtd> <mi>𝑏</mi> <mo>=</mo> <mn>2</mn> </mtd>
+    </mtr>
+  </mtable>
+  </math>"#;
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse")],
+      expr, "1 line, with label 2; b equals 2");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
+      expr, "1 equation, with label 2; b equals 2");
 }

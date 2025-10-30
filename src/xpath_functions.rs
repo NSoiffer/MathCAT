@@ -19,13 +19,13 @@
 
 use sxd_document::dom::{Element, ChildOfElement};
 use sxd_xpath::{Value, Context, context, function::*, nodeset::*};
+use sxd_xpath::function::Error as XPathError;
 use crate::definitions::{Definitions, SPEECH_DEFINITIONS, BRAILLE_DEFINITIONS};
 use regex::Regex;
 use crate::pretty_print::mml_to_string;
 use std::cell::{Ref, RefCell};
 use std::thread::LocalKey;
 use phf::phf_set;
-use sxd_xpath::function::Error as XPathError;
 use crate::canonicalize::{as_element, name, get_parent, MATHML_FROM_NAME_ATTR};
 
 // useful utility functions
@@ -1231,11 +1231,11 @@ impl Function for SpeakIntentName {
     }
 }
 
-pub struct SpeakBracketingIntentName;
-/// SpeakBracketingIntentName(name, verbosity, at_start_or_end)
+pub struct GetBracketingIntentName;
+/// GetBracketingIntentName(name, verbosity, at_start_or_end)
 ///   Returns a potentially empty string to use to bracket an intent expression (start foo... end foo)
 /// 
-impl SpeakBracketingIntentName {
+impl GetBracketingIntentName {
     fn bracketing_words(intent_name: &str, verbosity: &str, fixity: &str, at_start: bool) -> String {
         crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
@@ -1279,7 +1279,7 @@ impl SpeakBracketingIntentName {
     }
 }
 
-impl Function for SpeakBracketingIntentName {
+impl Function for GetBracketingIntentName {
     fn evaluate<'d>(&self,
                         _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
@@ -1289,12 +1289,49 @@ impl Function for SpeakBracketingIntentName {
         args.exactly(4)?;
         let start_or_end = args.pop_string()?;
         if start_or_end != "start" && start_or_end != "end" {
-            return Err( Error::Other("SpeakBracketingIntentName: first argument must be either 'start' or 'end'".to_string()) );
+            return Err( Error::Other("GetBracketingIntentName: first argument must be either 'start' or 'end'".to_string()) );
         }
         let fixity = args.pop_string()?;
         let verbosity = args.pop_string()?;
         let name = args.pop_string()?;
-        return Ok( Value::String(SpeakBracketingIntentName:: bracketing_words(&name, &verbosity, &fixity, start_or_end == "start")) );
+        return Ok( Value::String(GetBracketingIntentName:: bracketing_words(&name, &verbosity, &fixity, start_or_end == "start")) );
+    }
+}
+
+pub struct GetNavigationPartName;
+/// GetNavigationPartName(name, index)
+/// Returns the name to use to speak the part of a navigation expression (e.g., 'numerator', 'denominator', 'base', 'exponent', ...).
+/// If there is no match, an empty string is returned.
+/// 'index' is 0-based
+/// 
+impl GetNavigationPartName {
+    fn navigation_part_name(intent_name: &str, index: usize) -> String {
+        crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
+            let definitions = definitions.borrow();
+            if let Some(navigation_names) = definitions.get_hashmap("NavigationParts") {
+                if let Some(nav_part_names) = navigation_names.get(intent_name) {
+                    // Split the pattern is: part [; part]*
+                    if let Some(part_name) = nav_part_names.trim().split(";").nth(index) {
+                        return part_name.trim().to_string();
+                    }
+                }
+            }
+            return "".to_string();
+        })
+    }
+}
+
+impl Function for GetNavigationPartName {
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(2)?;
+        let index = args.pop_number()? as usize;
+        let name = args.pop_string()?;
+        return Ok( Value::String(GetNavigationPartName:: navigation_part_name(&name, index)) );
     }
 }
 
@@ -1379,6 +1416,101 @@ impl Function for ReplaceAll {
     }
 }
 
+use std::collections::HashMap;
+use sxd_xpath::{OwnedQName, function};
+/// A mapping of names to XPath functions.
+type Functions = HashMap<OwnedQName, Box<dyn function::Function + 'static>>;
+/// A mapping of names to XPath variables.
+type Variables<'d> = HashMap<OwnedQName, Value<'d>>;
+/// A mapping of namespace prefixes to namespace URIs.
+type Namespaces = HashMap<String, String>;
+
+#[allow(dead_code)]
+pub struct HackedContext<'d> {
+    pub functions: Functions,
+    pub variables: Variables<'d>,
+    pub namespaces: Namespaces,
+}
+
+#[allow(dead_code)]
+pub struct HackedEvaluation<'c, 'd: 'c> {
+    /// The context node
+    pub node: Node<'d>,
+    /// The context position
+    pub position: usize,
+    /// The context size
+    pub size: usize,
+    pub functions: &'c Functions,
+    pub variables: &'c Variables<'d>,
+    pub namespaces: &'c Namespaces,
+}
+
+pub struct PatternMatchResult;
+impl PatternMatchResult {
+    fn unsafe_temp_hack_get_context<'d>(evaluation: &context::Evaluation<'_, 'd>) -> Context<'d> {
+        unsafe {
+            let evaluation = std::mem::transmute::<&context::Evaluation, &HackedEvaluation>(evaluation);
+            let functions: Functions = HashMap::with_capacity(evaluation.functions.capacity());
+            // the following doesn't work because we can't clone the function values
+            // for (key, val) in evaluation.functions {functions.insert(key.clone(), val.clone());};
+            let mut variables: Variables = HashMap::with_capacity(evaluation.variables.capacity());
+            for (key, val) in evaluation.variables {variables.insert(key.clone(), val.clone());};
+            let mut namespaces: Namespaces = HashMap::with_capacity(evaluation.variables.capacity());
+            for (key, val) in evaluation.namespaces {namespaces.insert(key.clone(), val.clone());};
+            let hacked_context = HackedContext {
+                functions,
+                variables,
+                namespaces,
+            };
+            let mut context = std::mem::transmute::<HackedContext, Context>(hacked_context);
+            register_core_functions(&mut context);
+            add_builtin_functions(&mut context);
+            context
+        }
+    }
+}
+/// PatternMatchResult("Braille" | "Speech", xpath)
+/// Returns the result of executing the xpath (speech or braille string)
+impl Function for PatternMatchResult {
+    fn evaluate<'d>(&self,
+                        context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(2)?;
+        let braille_or_speech = args.pop_string()?.to_ascii_lowercase();
+        if braille_or_speech != "braille" && braille_or_speech != "speech" {
+            return Err(Error::Other(format!("PatternMatchResult (in rules): first arg '{}' is not 'Braille' or 'Speech'", braille_or_speech)));
+        }
+        let xpath = validate_one_node(args.pop_nodeset()?, "PatternMatchResult")?;
+        let mathml = match xpath {
+            Node::Element(e) => e,
+            _ => return Err(Error::Other(format!("PatternMatchResult (in rules): first arg '{}' is not 'Braille' or 'Speech'", braille_or_speech)))
+        };
+
+        debug!("PatternMatchRule: mathml\n{}", mml_to_string(mathml));
+        // FIX: this should be trivial, but sxd_xpath doesn't expose a xpath evaluation function on Evaluation, just on Context despite the implementation
+        //    of evaluate creating an Evaluation and then calling 'self.0.evaluate()'.
+        // Hopefully the package author fixes this (see https://github.com/shepmaster/sxd-xpath/issues/151) or I should fork the project and make
+        //    a build with the added functionality.
+        // Once a fix is made, Evaluation (not Context) should be passed around and the ContextStack modified to store an evaluation.
+        let context = PatternMatchResult::unsafe_temp_hack_get_context(context);
+        let result = if braille_or_speech == "braille" {
+            match crate::braille::braille_mathml_with_context(mathml, context) {
+                Err(e) => return Err(Error::Other(format!("PatternMatchResult: {}", e.description()))),
+                Ok(answer) => answer.0,
+            }
+        } else {
+            match crate::speech::speak_mathml(mathml, "") {
+                Err(e) => return Err(Error::Other(format!("PatternMatchResult: {}", e.description()))),
+                Ok(answer) => answer,
+            }
+        };
+        return Ok( Value::String(result) );
+    }
+}
+
 /// Add all the functions defined in this module to `context`.
 pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("NestingChars", crate::braille::NemethNestingChars);
@@ -1396,7 +1528,9 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("DistanceFromLeaf", DistanceFromLeaf);
     context.set_function("EdgeNode", EdgeNode);
     context.set_function("SpeakIntentName", SpeakIntentName);
-    context.set_function("SpeakBracketingIntentName", SpeakBracketingIntentName);
+    context.set_function("GetBracketingIntentName", GetBracketingIntentName);
+    context.set_function("GetNavigationPartName", GetNavigationPartName);
+    context.set_function("PatternMatchResult", PatternMatchResult);
     context.set_function("DEBUG", Debug);
 
     // Not used: remove??

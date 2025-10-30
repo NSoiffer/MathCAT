@@ -275,7 +275,7 @@
     - test:
         - if: "@intent='ratio' or
              ( (@intent and starts-with(@intent, '_')) and
-               ../self::m:mrow and
+               parent::m:mrow and
                not(ancestor::*[2][IsBracketed(., '[', ']')]) and
                not( preceding-sibling::*[2][.=':'] or following-sibling::*[2][.=':']) and 
                name(preceding-sibling::*[1]) = name(following-sibling::*[1]) and

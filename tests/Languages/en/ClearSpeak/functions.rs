@@ -210,14 +210,14 @@ fn times_preceding_paren() {
 }
 
 #[test]
-fn no_times_sqrt() {
+fn times_sqrt() {
     let expr = "<math><mrow>
         <msqrt> <mi>a</mi>  </msqrt>
         <msqrt> <mi>b</mi>  </msqrt>
         <mo>=</mo>
         <msqrt> <mrow>  <mi>a</mi><mi>b</mi></mrow> </msqrt>
         </mrow></math>";
-    test("en", "ClearSpeak", expr, "the square root of eigh; the square root of b; is equal to, the square root of eigh b");
+    test("en", "ClearSpeak", expr, "the square root of eigh; times the square root of b; is equal to, the square root of eigh b");
 }
 
 #[test]

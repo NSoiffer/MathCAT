@@ -415,9 +415,9 @@
       then: [T: "rad"]      # phrase(the table with 1 'row')
       else: [T: "rader"]      # phrase(the table with 3 'rows')
   - T: "och"      # phrase(the table with 3 rows 'and' 4 columns)
-  - x: "count(*[1]/*)"
+  - x: "$NumColumns"
   - test:
-      if: "count(*[1]/*)=1"
+      if: "$NumColumns"
       then: [T: "kolumn"]      # phrase(the table with 3 rows and 1 'column')
       else: [T: "kolumner"]      # phrase(the table with 3 rows and 4 'columns')
   - pause: long
@@ -429,17 +429,18 @@
   tag: [mtr, mlabeledtr]
   match: "."
   replace:
+  - pause: medium
   - T: "rad"      # phrase(the first 'row' of a matrix)
   - x: "count(preceding-sibling::*)+1"
   - test:
-      if: .[self::m:mlabeledtr]
+      if: self::m:mlabeledtr
       then:
       - T: "med etiketten"      # phrase(the line 'with label' first equation)
       - x: "*[1]/*"
       - pause: short
   - pause: medium
   - test:
-      if: .[self::m:mlabeledtr]
+      if: self::m:mlabeledtr
       then: [{x: "*[position()>1]"}]
       else: {x: "*"}
 
@@ -454,7 +455,7 @@
       if: "not($IsColumnSilent)"
       then:
       - T: "kolumn"      # phrase(the first 'column' of the matrix)
-      - x: "count(preceding-sibling::*)+1"
+      - x: "count(preceding-sibling::*)+IfThenElse(parent::m:mlabeledtr, 0, 1)"
       - pause: medium
   - x: "*"
   - test:
@@ -630,7 +631,7 @@
   - x: "*"
   - test:
       if: "not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
   - test:
       if: "IsNode(., '2D')"
       then: [pause: short]
@@ -643,7 +644,7 @@
   replace:
   - test:
       if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
   - x: "*"
   - x: "SpeakIntentName(name(.), $Verbosity, 'postfix')"
 
@@ -654,7 +655,7 @@
   replace:
   - test:
       if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
   - test:
       if: "count(*) = 1"  # in cases such as continued-row, plus/minus might have just one child
       then:
@@ -667,7 +668,7 @@
           replace: [x: "SpeakIntentName(name(.), $Verbosity, 'infix')", pause: auto]
   - test:
       if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
   - test:
       if: "IsNode(., '2D')"   # add (probably) a slightly longer pause if this came from a 2D node
       then: [pause: short]
@@ -692,7 +693,7 @@
       # SWEDISH: After correspondence with a mathematician we have decided to not have any punctuation between variables, but a short pause. Length of pause needs to be tested.
   - test:
       if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
-      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
+      then: [x: "GetBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
   - test:
       if: "IsNode(., '2D')"
       then: [pause: short]

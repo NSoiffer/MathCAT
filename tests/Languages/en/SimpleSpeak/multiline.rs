@@ -29,7 +29,7 @@ fn case_1() {
             </mtable></mrow> </mrow></mrow>
         </math>
    ";
-    test("en", "SimpleSpeak", expr, "f of x is equal to; 3 cases, \
+    test("en", "SimpleSpeak", expr, "f of x is equal to; 3 cases; \
                 case 1; negative 1 if x; is less than 0; \
                 case 2; 0 if x, is equal to 0; \
                 case 3; 1 if x, is greater than 0");
@@ -69,7 +69,7 @@ fn equation_1() {
       </mtable></mrow>
     </math>
    ";
-    test("en", "SimpleSpeak", expr, "2 equations, \
+    test("en", "SimpleSpeak", expr, "2 equations; \
                 equation 1; x plus y, is equal to 7; \
                 equation 2; 2 x plus 3 y; is equal to 17");
 }
