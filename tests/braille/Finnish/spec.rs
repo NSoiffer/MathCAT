@@ -909,6 +909,53 @@ fn p31_degrees_minutes_seconds_alternative() {
 }
 
 #[test]
+fn msub_singular() {
+    let expr = "<math>
+    <msub>
+    <mi>x</mi>
+    <mn>1</mn>
+    </msub>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠭⠡⠼⠁⠀⠖⠼⠁");
+}
+
+#[test]
+fn msub_parentheses() {
+    let expr = "<math>
+    <msub>
+    <mi>a</mi>
+    <mrow>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mn>1</mn>
+    </mrow>
+    </msub>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠁⠡⠦⠭⠀⠲⠼⠁⠴⠀⠖⠼⠁");
+}
+
+// Overline notation comes after the subscript
+#[test]
+fn msub_with_vector() {
+    let expr = "<math>
+    <msub>
+    <mover>
+    <mi>a</mi>
+    <mo>‾</mo>
+    </mover>
+    <mi>b</mi>
+    </msub>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠁⠡⠃⠱⠀⠖⠼⠁");
+}
+
+#[test]
 fn p32_expected_value() {
     let expr = "<math>
     <mi>E</mi>
