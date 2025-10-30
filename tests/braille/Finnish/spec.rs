@@ -1421,7 +1421,7 @@ fn p42_determinant() {
     <mi>a</mi>
     <mi>b</mi>
     </math>";
-    test_braille("Finnish", expr, "⠸⠁⠀⠖⠃⠀⠀⠁⠀⠤⠃⠸⠀⠐⠐⠀⠸⠁⠀⠤⠃⠀⠀⠁⠀⠖⠃⠸⠀⠶⠼⠙⠀⠁⠃");
+    test_braille("Finnish", expr, "⠸⠁⠀⠖⠃ ⠁⠀⠤⠃⠸⠀⠐⠐⠀⠸⠁⠀⠤⠃ ⠁⠀⠖⠃⠸⠀⠶⠼⠙⠀⠁⠃");
 }
 
 // Dots 156 to signify the bar over "arc"
