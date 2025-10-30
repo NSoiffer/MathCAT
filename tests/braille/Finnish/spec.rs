@@ -835,9 +835,8 @@ fn p31_trig_tan_infinity() {
     test_braille("Finnish", expr, "⠞⠁⠝⠀⠼⠊⠚⠀⠴⠀⠶⠿");
 }
 
-// This would probably need alternative markup and test case as well.
 #[test]
-fn p31_degrees_minutes_seconds() {
+fn p31_degrees_minutes_seconds_primes() {
     let expr = "<math>
   <mrow>
     <mn>30</mn>
@@ -850,6 +849,27 @@ fn p31_degrees_minutes_seconds() {
       <mn>20</mn>
       <mrow>
         <mo>′′</mo>
+      </mrow>
+    </msup>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠉⠚⠀⠴⠀⠼⠙⠑⠀⠨⠀⠼⠃⠚⠀⠸");
+}
+
+#[test]
+fn p31_degrees_minutes_seconds_alternative() {
+    let expr = "<math>
+  <mrow>
+    <mn>30</mn>
+    <mi>°</mi>
+    <msup>
+      <mn>45</mn>
+      <mo>'</mo>
+    </msup>
+    <msup>
+      <mn>20</mn>
+      <mrow>
+        <mo>''</mo>
       </mrow>
     </msup>
   </mrow>
