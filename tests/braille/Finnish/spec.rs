@@ -139,7 +139,7 @@ fn p10_currency_euro() {
 #[test]
 fn p10_currency_dollar() {
     let expr = "<math><mi>$</mi><mn>35</mn></math>";
-    test_braille("Finnish", expr, "⠠⠙⠼⠉⠑");
+    test_braille("Finnish", expr, "⠮⠼⠉⠑");
 }
 
 #[test]
