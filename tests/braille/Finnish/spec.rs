@@ -95,7 +95,7 @@ fn p7_decimal_point_endless_no_grouping_ellipses() {
 }
 
 #[test]
-fn p7_decimal_point_endless_with_grouping_space_ellpses() {
+fn p7_decimal_point_endless_with_grouping_space_ellipses() {
     let expr = "<math><mn>1,234 657 234…</mn></math>";
     test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
