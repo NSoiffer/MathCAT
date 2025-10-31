@@ -1029,7 +1029,7 @@ fn p32_expected_value() {
       <mi>i</mi>
     </msub>
 </math>";
-    test_braille("Finnish", expr, "⠠⠑⠦⠭⠴⠀⠶⠨⠍⠀⠶⠸⠎⠡⠊⠐⠏⠡⠊⠐⠭⠡⠊");
+    test_braille("Finnish", expr, "⠠⠑⠦⠭⠴⠀⠶⠨⠍⠀⠶⠸⠎⠡⠊⠐⠏⠡⠊ ⠭⠡⠊");
 }
 
 // Dots 156 to signify the bar over "AB"
