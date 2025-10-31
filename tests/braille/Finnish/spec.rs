@@ -956,6 +956,45 @@ fn msub_with_vector() {
 }
 
 #[test]
+fn msubsup_parentheses_in_sub() {
+    let expr = "<math>
+    <msubsup>
+    <mi>a</mi>
+    <mrow>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mn>1</mn>
+    </mrow>
+    <mn>10</mn>
+    </msubsup>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠁⠡⠦⠭⠀⠲⠼⠁⠴⠬⠼⠁⠚⠀⠖⠼⠁");
+}
+
+#[test]
+fn msubsup_parentheses_in_sub_and_sup() {
+    let expr = "<math>
+    <msubsup>
+    <mi>a</mi>
+    <mrow>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mn>1</mn>
+    </mrow>
+    <mrow>
+    <mi>x</mi>
+    <mo>−</mo>
+    <mn>10</mn>
+    </msubsup>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠁⠡⠦⠭⠀⠲⠼⠁⠴⠬⠦⠭⠀⠤⠼⠁⠚⠴⠀⠖⠼⠁");
+}
+
+#[test]
 fn p32_expected_value() {
     let expr = "<math>
     <mi>E</mi>
