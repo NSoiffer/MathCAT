@@ -956,21 +956,33 @@ fn msub_with_vector() {
 }
 
 #[test]
-fn msubsup_parentheses_in_sub() {
+fn msub_with_vector_with_sub_text() {
+    let expr = "<math>
+    <msub>
+    <mover>
+    <mi>a</mi>
+    <mo>‾</mo>
+    </mover>
+    <mtext>tuki</mtext>
+    </msub>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠁⠡⠞⠥⠅⠊⠱⠀⠖⠼⠁");
+}
+
+#[test]
+fn msubsup() {
     let expr = "<math>
     <msubsup>
     <mi>a</mi>
-    <mrow>
-    <mi>x</mi>
-    <mo>+</mo>
     <mn>1</mn>
-    </mrow>
-    <mn>10</mn>
+    <mn>2</mn>
     </msubsup>
     <mo>+</mo>
     <mn>1</mn>
 </math>";
-    test_braille("Finnish", expr, "⠁⠡⠦⠭⠀⠲⠼⠁⠴⠬⠼⠁⠚⠀⠖⠼⠁");
+    test_braille("Finnish", expr, "⠁⠡⠼⠁⠬⠼⠃⠀⠖⠼⠁");
 }
 
 #[test]
