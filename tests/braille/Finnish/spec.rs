@@ -1536,6 +1536,15 @@ fn p45_arcsin_with_bar_over() {
     test_braille("Finnish", expr, "⠁⠗⠉⠱⠀⠎⠊⠝⠀⠭");
 }
 
+#[test]
+fn p46_simple_derivative_fraction() {
+    let expr = "<math><mfrac>
+        <mrow><mi>d</mi><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>x</mi></mrow>
+      </mfrac></math>";
+    test_braille("Finnish", expr, "⠙⠋⠦⠭⠴⠀⠌⠙⠭");
+}
+
 // 'Change of zone' dot 5 is used after the limit subscript notation.
 #[test]
 fn p48_limit_right_hand_approaching_Finnish_notation() {
@@ -1822,14 +1831,7 @@ fn p50_conditional_probability() {
     test_braille("Finnish", expr, "⠠⠏⠦⠠⠃⠀⠸⠀⠠⠁⠴⠀⠶⠠⠏⠦⠠⠁⠠⠃⠴⠀⠌⠠⠏⠦⠠⠁⠴");
 }
 
-#[test]
-fn p46_simple_derivative_fraction() {
-    let expr = "<math><mfrac>
-        <mrow><mi>d</mi><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
-        <mrow><mi>d</mi><mi>x</mi></mrow>
-      </mfrac></math>";
-    test_braille("Finnish", expr, "⠙⠋⠦⠭⠴⠀⠌⠙⠭");
-}
+
 
 #[test]
 fn p50_alternative_derivative_1() {
