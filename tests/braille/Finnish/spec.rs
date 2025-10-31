@@ -1649,10 +1649,10 @@ fn p49_integral_with_Finnish_notation_for_substitution() {
 
 // Markup for lower and upper bounds for summation, product, intersection, union and such. "Equal to" character is replaced lower (dots 26) and upper (dots 35) bounds.
 #[test]
-fn p49_summation_with_lower_upper_limits() {
+fn p49_summation_with_lower_upper_bounds() {
   init_logger(); 
     let expr = "<math>
-<msubsup>
+<munderover>
 <mo>∑</mo>
 <mrow>
 <mi>i</mi>
@@ -1660,7 +1660,7 @@ fn p49_summation_with_lower_upper_limits() {
 <mn>0</mn>
 </mrow>
 <mi>n</mi>
-</msubsup>
+</munderover>
 <msub>
 <mi>f</mi>
 <mi>i</mi>
@@ -1671,14 +1671,14 @@ fn p49_summation_with_lower_upper_limits() {
 </msub>
 </math>";
     test_braille("Finnish", expr, "⠸⠎⠡⠊⠢⠼⠚⠔⠝⠐⠦⠋⠡⠊⠀⠭⠡⠊⠴");
-    // Parentheses are added for clarity. Dot 5 is used to end the zone of the upper limit.
+    // Parentheses are added for clarity. Dot 5 is used to end the zone of the upper bound.
 }
 
 #[test]
-fn p49_union_with_lower_upper_limits() {
+fn p49_union_with_lower_upper_bounds() {
   init_logger(); 
     let expr = "<math>
-<msubsup>
+<munderover>
 <mo>∪</mo>
 <mrow>
 <mi>i</mi>
@@ -1686,18 +1686,18 @@ fn p49_union_with_lower_upper_limits() {
 <mn>1</mn>
 </mrow>
 <mi>n</mi>
-</msubsup>
+</munderover>
 <msub>
 <mi>A</mi>
 <mi>i</mi>
 </msub>
 </math>";
     test_braille("Finnish", expr, "⠳⠖⠡⠊⠢⠼⠁⠔⠝⠐⠠⠁⠡⠊");
-    // Dot 5 is used to end the zone of the upper limit.
+    // Dot 5 is used to end the zone of the upper bound.
 }
 
 #[test]
-fn p49_sequence_with_lower_upper_limits() {
+fn p49_sequence_with_lower_upper_bounds() {
   init_logger(); 
     let expr = "<math>
 <msubsup>
@@ -1718,7 +1718,7 @@ fn p49_sequence_with_lower_upper_limits() {
 </msubsup>
 </math>";
     test_braille("Finnish", expr, "⠦⠭⠡⠝⠴⠝⠢⠼⠁⠔⠿");
-    // Dot 5 is used to end the zone of the upper limit.
+    // Dot 5 is used to end the zone of the upper bound.
 }
 
 #[test]
@@ -1867,8 +1867,6 @@ fn p50_alternative_derivative_2() {
 </math>";
     test_braille("Finnish", expr, "⠙⠀⠌⠙⠭⠀⠇⠝⠭");
 }
-
-
 
 #[test]
 fn p51_set_with_closure() {
