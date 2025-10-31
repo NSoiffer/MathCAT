@@ -1545,6 +1545,48 @@ fn p46_simple_derivative_fraction() {
     test_braille("Finnish", expr, "⠙⠋⠦⠭⠴⠀⠌⠙⠭");
 }
 
+// Line under a variable
+#[test]
+fn p46_random_variable() {
+    let expr = "<math>
+<munder>
+<mi>s</mi>
+<mo>_</mo>
+</munder>
+</math>";
+    test_braille("Finnish", expr, "⠎⠤");
+}
+
+#[test]
+fn line_under_terminated_by_space() {
+    let expr = "<math>
+<munder>
+<mi>s</mi>
+<mo>_</mo>
+</munder>
+<mo>+</mo>
+<mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠎⠤⠀⠖⠼⠁");
+}
+
+#[test]
+fn line_under_parentheses() {
+    let expr = "<math>
+<munder>
+<mrow>
+<mi>s</mi>
+<mo>/</mo>
+<mn>2</mn>
+</mrow>
+<mo>_</mo>
+</munder>
+<mo>+</mo>
+<mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠦⠎⠀⠌⠼⠃⠴⠤⠀⠖⠼⠁");
+}
+
 // 'Change of zone' dot 5 is used after the limit subscript notation.
 #[test]
 fn p48_limit_right_hand_approaching_Finnish_notation() {
