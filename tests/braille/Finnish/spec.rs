@@ -1647,6 +1647,80 @@ fn p49_integral_with_Finnish_notation_for_substitution() {
     test_braille("Finnish", expr, "⠮⠢⠼⠚⠔⠼⠙⠐⠩⠭⠀⠙⠭⠀⠶⠸⠢⠼⠚⠔⠼⠙⠐⠦⠼⠃⠒⠀⠭⠀⠩⠭⠴");
 }
 
+// Markup for lower and upper bounds for summation, product, intersection, union and such. "Equal to" character is replaced lower (dots 26) and upper (dots 35) bounds.
+#[test]
+fn p49_summation_with_lower_upper_limits() {
+  init_logger(); 
+    let expr = "<math>
+<msubsup>
+<mo>∑</mo>
+<mrow>
+<mi>i</mi>
+<mo>=</mo>
+<mn>0</mn>
+</mrow>
+<mi>n</mi>
+</msubsup>
+<msub>
+<mi>f</mi>
+<mi>i</mi>
+</msub>
+<msub>
+<mi>x</mi>
+<mi>i</mi>
+</msub>
+</math>";
+    test_braille("Finnish", expr, "⠸⠎⠡⠊⠢⠼⠚⠔⠝⠐⠦⠋⠡⠊⠀⠭⠡⠊⠴");
+    // Parentheses are added for clarity. Dot 5 is used to end the zone of the upper limit.
+}
+
+#[test]
+fn p49_union_with_lower_upper_limits() {
+  init_logger(); 
+    let expr = "<math>
+<msubsup>
+<mo>∪</mo>
+<mrow>
+<mi>i</mi>
+<mo>=</mo>
+<mn>1</mn>
+</mrow>
+<mi>n</mi>
+</msubsup>
+<msub>
+<mi>A</mi>
+<mi>i</mi>
+</msub>
+</math>";
+    test_braille("Finnish", expr, "⠳⠖⠡⠊⠢⠼⠁⠔⠝⠐⠠⠁⠡⠊");
+    // Dot 5 is used to end the zone of the upper limit.
+}
+
+#[test]
+fn p49_sequence_with_lower_upper_limits() {
+  init_logger(); 
+    let expr = "<math>
+<msubsup>
+<mrow>
+<mo>(</mo>
+<msub>
+<mi>x</mi>
+<mi>n</mi>
+</msub>
+<mo>)</mo>
+</mrow>
+<mrow>
+<mi>n</mi>
+<mo>=</mo>
+<mn>1</mn>
+</mrow>
+<mi>∞</mi>
+</msubsup>
+</math>";
+    test_braille("Finnish", expr, "⠦⠭⠡⠝⠴⠝⠢⠼⠁⠔⠿");
+    // Dot 5 is used to end the zone of the upper limit.
+}
+
 #[test]
 fn p50_such_that_y_greater_than_x() {
     let expr = "<math>
