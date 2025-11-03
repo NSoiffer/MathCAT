@@ -1,4 +1,12 @@
 ---
+# Some common German letters
+ - "ä": [t: "\\ddot𝐖a𝐖"]                 # 0xe4
+ - "ö": [t: "\\ddot𝐖o𝐖"]                 # 0xf6
+ - "ü": [t: "\\ddot𝐖u𝐖"]                 # 0xfc
+ - "Ä": [t: "\\ddot𝐖A𝐖"]                 # 0xc4
+ - "Ö": [t: "\\ddot𝐖O𝐖"]                 # 0xd6
+ - "Ü": [t: "\\ddot𝐖U𝐖"]                 # 0xdc
+# FIX: don't know what to do about ß
 
 # some alphanumeric block chars in other positions
  - "ℊ": [t: "cc𝐖c𝐖"]                      # 0x210a
