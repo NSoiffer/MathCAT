@@ -112,7 +112,7 @@
   - "BaseNode(*[2])[contains(@data-intent-property, ':unit')] "
   replace:
   - x: "*[1]"
-  - T: "5 meter"      # phrase('5 meters 'per' second)
+  - t: "pro"      # phrase('5 meters 'per' second)
   - x: "*[2]"
 
 - name: simple
