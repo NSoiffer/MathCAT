@@ -89,6 +89,21 @@ fn has_chem_intent(mathml: Element, property: &str) -> bool {
     return false;
 }
 
+fn has_inherited_property(mathml: Element, property: &str) -> bool {
+    let mut current = mathml;
+    loop {
+        if has_chem_intent(current, property) {
+            return true;
+        }
+        // chem might not be temp node without a 'math' parent
+        if name(current) == "math" || current.parent().is_none() {
+            break;
+        }
+        current = get_parent(current);
+    }
+    return false;
+}
+
 pub fn is_chemistry_off(mathml: Element) -> bool {
     if has_chem_intent(mathml, ":chemical-formula") || has_chem_intent(mathml, ":chemical-equation") {
         return false;
@@ -171,13 +186,15 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
                     // note: on the right, we haven't set chem flag for operators yet, so we skip them
                     let preceding = child.preceding_siblings();
                     let following = child.following_siblings();
-                    if !preceding.is_empty() && preceding.iter().all(|&child| {
-                        let child = as_element(child);
-                        name(child)=="mn" || child.attribute(MAYBE_CHEMISTRY).is_some()}) &&
-                        !following.is_empty() && following.iter().all(|&child| {
+                    if !preceding.is_empty() &&
+                       ( has_inherited_property(child, "chemical-formula") ||
+                         preceding.iter().all(|&child| {
                             let child = as_element(child);
-                            name(child)=="mo" || name(child)=="mn" || child.attribute(MAYBE_CHEMISTRY).is_some()
-                        }) {
+                            name(child)=="mn" || child.attribute(MAYBE_CHEMISTRY).is_some()}) &&
+                            !following.is_empty() && following.iter().all(|&child| {
+                                let child = as_element(child);
+                                name(child)=="mo" || name(child)=="mn" || child.attribute(MAYBE_CHEMISTRY).is_some()
+                            })) {
                         // "=", etc., should be treated as high priority separators
                         // debug!("clean_mrow_children_restructure: child = {}", mml_to_string(child));
                         child.set_attribute_value(CHEMICAL_BOND, "true");
@@ -424,7 +441,7 @@ pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
         assert_eq!(mathml.children().len(), 1);
         let likelihood = likely_chem_formula(child);
         if likelihood >= CHEMISTRY_THRESHOLD || has_chem_intent(mathml, ":chemical-formula") {
-            child.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
+            child.set_attribute_value(MAYBE_CHEMISTRY, std::cmp::max(CHEMISTRY_THRESHOLD, likelihood).to_string().as_str());
             set_marked_chemistry_attr(child, CHEM_FORMULA);
         }
 
@@ -432,7 +449,7 @@ pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
             // can't be both an equation and a formula...
             let likelihood = likely_chem_equation(child);
             if is_chemistry || likelihood >= CHEMISTRY_THRESHOLD || has_chem_intent(mathml, ":chemical-equation") {
-                child.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
+                child.set_attribute_value(MAYBE_CHEMISTRY, std::cmp::max(CHEMISTRY_THRESHOLD, likelihood).to_string().as_str());
                 set_marked_chemistry_attr(child, CHEM_EQUATION);
             }
         }
@@ -1462,8 +1479,10 @@ fn likely_chem_formula_operator(mathml: Element) -> isize {
     assert_eq!(name(mathml), "mo");
     let leaf_text = as_text(mathml);
     if CHEM_FORMULA_OPERATORS.contains(leaf_text) &&
-       ( !(leaf_text == "=" || leaf_text == "∷" ) || is_legal_bond(mathml, BondType::DoubleBond) )  &&
-       ( !(leaf_text == "≡" || leaf_text == ":::" ) || is_legal_bond(mathml, BondType::TripleBond) ) {
+       (has_inherited_property(mathml, "chemical-formula") ||
+        ( !(leaf_text == "=" || leaf_text == "∷" ) || is_legal_bond(mathml, BondType::DoubleBond) )  &&
+        ( !(leaf_text == "≡" || leaf_text == ":::" ) || is_legal_bond(mathml, BondType::TripleBond) )
+       )  {
         mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
         mathml.set_attribute_value(CHEM_FORMULA_OPERATOR, "1");
         return 1;
@@ -1801,12 +1820,15 @@ pub fn is_chemical_element(node: Element) -> bool {
 	}
 
 	let text = as_text(node);
-	return CHEMICAL_ELEMENT_ELECTRONEGATIVITY.contains_key(text);
+	return CHEMICAL_ELEMENT_ELECTRONEGATIVITY.contains_key(text) ||
+           has_chem_intent(node, "chemical-element") ||
+           has_inherited_property(node, "chemical-formula");
 }
 
 
 #[cfg(test)]
 mod chem_tests {
+
 
 #[allow(unused_imports)]
 	use super::super::init_logger;
@@ -1818,14 +1840,17 @@ mod chem_tests {
         use sxd_document::parser;
         use crate::interface::{get_element, trim_element};
 
+        
+        let test = if test.starts_with("<math") {test} else {&format!("<math>{}</math>", test)};
         let new_package = parser::parse(&test);
         if let Err(e) = new_package {
             panic!("Invalid MathML input:\n{}\nError is: {}", &test, &e.to_string());
         }
 
         let new_package = new_package.unwrap();
-        let mathml = get_element(&new_package);
+        let mut mathml = get_element(&new_package);
         trim_element(mathml, false);
+        mathml = as_element(mathml.children()[0]);
         return test_mathml(mathml);
     }
 
@@ -1912,14 +1937,14 @@ mod chem_tests {
              </mrow>"#;
         assert!( parse_mathml_string(test, |mathml| is_ordered_by_electronegativity( &collect_elements(mathml).unwrap() )) );
         let test = r#" 
-            <msup>
+            <mrow><msup>
                 <mo>[</mo>
                     <mi>Si</mi><mo>&#x2063;</mo> 
                     <msub><mi>As</mi><mn>4</mn></msub>
                 <mo>]</mo>
                 <mrow><mn>8</mn><mo>-</mo></mrow>
-            </msup>"#;
-        assert!( parse_mathml_string(test, |mathml| is_ordered_by_electronegativity( &collect_elements(mathml).unwrap() )) );
+            </msup></mrow>"#;
+        assert!( parse_mathml_string(test, |mathml| is_ordered_by_electronegativity( &collect_elements(as_element(mathml.children()[0])).unwrap() )) );
         let test = r#"<mrow>  
                 <mi>Si</mi><mo>&#x2063;</mo> 
                 <msub><mi>H</mi><mn>2</mn></msub>
