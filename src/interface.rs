@@ -727,11 +727,15 @@ pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
 
     fn make_leaf_element(mathml_leaf: Element) {
         // MathML leaves like <mn> really shouldn't have non-textual content, but you could have embedded HTML
-        // Here, we take convert them to leaves by grabbing up all the text and making that the content
+        // Here, we convert them to leaves by grabbing up all the text and making that the content
         // Potentially, we leave them and let (default) rules do something, but it makes other parts of the code
         //   messier because checking the text of a leaf becomes Option<&str> rather than just &str
         let children = mathml_leaf.children();
         if children.is_empty() {
+            return;
+        }
+
+        if rewrite_and_flatten_embedded_mathml(mathml_leaf) {
             return;
         }
 
@@ -777,6 +781,56 @@ pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
             // debug!("gather_text: '{}'", text);
             return text;
         }
+    }
+
+    fn rewrite_and_flatten_embedded_mathml(mathml_leaf: Element) -> bool {
+        // first see if it can or needs to be rewritten
+        // this is likely rare, so we do a check and if true, to a second pass building the result
+        let mut needs_rewrite = false;
+        for child in mathml_leaf.children() {
+            if let Some(element) = child.element() {
+                if name(element) != "math" {
+                    return false; // something other than MathML as a child -- can't rewrite
+                }
+                needs_rewrite = true;
+            }
+        };
+
+        if !needs_rewrite {
+            return false;
+        }
+
+        // now do the rewrite, flatting out the mathml and returning an mrow with the children
+        let leaf_name = name(mathml_leaf);
+        let doc = mathml_leaf.document();
+        let mut new_children = Vec::new();
+        let mut is_last_mtext = false;
+        for child in mathml_leaf.children() {
+            if let Some(element) = child.element() {
+                trim_element(element, true);
+                new_children.append(&mut element.children());   // don't want 'math' wrapper
+                is_last_mtext = false;
+            } else if let Some(text) = child.text() {
+                // combine adjacent text nodes into single nodes
+                if is_last_mtext {
+                    let last_child = new_children.last_mut().unwrap().element().unwrap();
+                    let new_text = as_text(last_child).to_string() + text.text();
+                    last_child.set_text(&new_text);
+                } else {
+                    let new_leaf_node = create_mathml_element(&doc, leaf_name);
+                    new_leaf_node.set_text(text.text());
+                    new_children.push(ChildOfElement::Element(new_leaf_node));
+                    is_last_mtext = true;
+                }
+            }
+        };
+
+        crate::canonicalize::set_mathml_name(mathml_leaf, "mrow");
+        mathml_leaf.clear_children();
+        mathml_leaf.append_children(new_children);
+
+        // debug!("rewrite_and_flatten_embedded_mathml: flattened\n'{}'", mml_to_string(mathml_leaf));
+        return true;
     }
 }
 
@@ -950,15 +1004,15 @@ mod tests {
     use super::*;
 
     fn are_parsed_strs_equal(test: &str, target: &str) -> bool {
-        let target_package = &parser::parse(target).expect("Failed to parse input");
-        let target_doc = target_package.as_document();
-        trim_doc(&target_doc);
-        debug!("target:\n{}", mml_to_string(get_element(&target_package)));
-
         let test_package = &parser::parse(test).expect("Failed to parse input");
         let test_doc = test_package.as_document();
         trim_doc(&test_doc);
         debug!("test:\n{}", mml_to_string(get_element(&test_package)));
+
+        let target_package = &parser::parse(target).expect("Failed to parse input");
+        let target_doc = target_package.as_document();
+        trim_doc(&target_doc);
+        debug!("target:\n{}", mml_to_string(get_element(&target_package)));
 
         match is_same_doc(&test_doc, &target_doc) {
             Ok(_) => return true,
@@ -1115,6 +1169,13 @@ mod tests {
     fn empty_html_in_mtext() {
         let test = "<math><mn>1</mn> <mtext>a<br/>bc</mtext> <mi>y</mi></math>";
         let target = "<math><mn>1</mn> <mtext>abc</mtext> <mi>y</mi></math>";
+        assert!(are_parsed_strs_equal(test, target));
+    }
+
+    #[test]
+    fn mathml_in_mtext() {
+        let test = "<math><mtext>if&#xa0;<math> <msup><mi>n</mi><mn>2</mn></msup></math>&#xa0;is real</mtext></math>";
+        let target = "<math><mrow><mtext>if&#xa0;</mtext><msup><mi>n</mi><mn>2</mn></msup><mtext>&#xa0;is real</mtext></mrow></math>";
         assert!(are_parsed_strs_equal(test, target));
     }
 }
