@@ -601,7 +601,7 @@ impl CanonicalizeContext {
 		}
 	}
 
-	/// Return an error is some element is not MathML (only look at first child of <semantics>) or if it has the wrong number of children
+	/// Return an error if some element is not MathML (only look at first child of <semantics>) or if it has the wrong number of children
 	fn assure_mathml(mathml: Element) -> Result<()> {
 		let n_children = mathml.children().len();
 		let element_name = name(mathml);
