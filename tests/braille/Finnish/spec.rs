@@ -50,11 +50,11 @@ fn p7_decimal_comma() {
 }
 
 
-// Now the point is transformed to comma. Maybe it should follow the text.
+// When there is a decimal point in the text then the grouping character is the number character.
 #[test]
 fn p7_decimal_point() {
     let expr = "<math><mn>5.12575</mn></math>";
-    test_braille("Finnish", expr, "⠼⠑⠂⠁⠃⠑⠄⠛⠑");
+    test_braille("Finnish", expr, "⠼⠑⠄⠁⠃⠑⠼⠛⠑");
 }
 
 #[test]
@@ -95,7 +95,7 @@ fn p7_decimal_point_endless_no_grouping_ellipses() {
 }
 
 #[test]
-fn p7_decimal_point_endless_with_grouping_space_ellpses() {
+fn p7_decimal_point_endless_with_grouping_space_ellipses() {
     let expr = "<math><mn>1,234 657 234…</mn></math>";
     test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
@@ -139,7 +139,7 @@ fn p10_currency_euro() {
 #[test]
 fn p10_currency_dollar() {
     let expr = "<math><mi>$</mi><mn>35</mn></math>";
-    test_braille("Finnish", expr, "⠠⠙⠼⠉⠑");
+    test_braille("Finnish", expr, "⠮⠼⠉⠑");
 }
 
 #[test]
@@ -277,7 +277,7 @@ fn p16_division() {
     <mo>:</mo>
     <mn>3</mn>
 </math>";
-    test_braille("Finnish", expr, "⠦⠼⠋⠀⠭⠀⠖⠼⠉⠀⠭⠴⠀⠌⠼⠉");
+    test_braille("Finnish", expr, "⠦⠼⠋⠀⠭⠀⠖⠼⠉⠀⠭⠴⠀⠒⠼⠉");
 }
 
 #[test]
@@ -386,7 +386,7 @@ fn p17_multiple_operations() {
       <mn>2</mn>
     </msup>
 </math>";
-    test_braille("Finnish", expr, "⠼⠑⠀⠄⠼⠉⠬⠀⠖⠦⠼⠓⠁⠀⠤⠼⠋⠚⠴⠀⠌⠼⠉⠀⠤⠦⠼⠃⠀⠖⠼⠙⠴⠬");
+    test_braille("Finnish", expr, "⠼⠑⠀⠄⠼⠉⠬⠀⠖⠦⠼⠓⠁⠀⠤⠼⠋⠚⠴⠀⠒⠼⠉⠀⠤⠦⠼⠃⠀⠖⠼⠙⠴⠬");
 }
 
 #[test]
@@ -595,7 +595,38 @@ fn p22_equation_solving_notation() {
     <mo>:</mo>
     <mn>5</mn>
 </math>";
-    test_braille("Finnish", expr, "⠼⠑⠀⠭⠀⠶⠤⠼⠁⠚⠀⠀⠸⠀⠌⠼⠑");
+    test_braille("Finnish", expr, "⠼⠑⠀⠭⠀⠶⠤⠼⠁⠚⠀⠀⠸⠀⠒⠼⠑");
+}
+
+#[test]
+fn operate_by_on_both_sides() {
+    let expr = "<math>
+        <mo>|</mo>
+    <mo>+</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>-</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>−</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>·</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>×</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>(</mo>
+    <msup>
+    <mo>)</mo>
+    <mn>2</mn>
+        <mo>|</mo>
+    <mo>/</mo>
+    <mn>5</mn>
+    </msup>
+</math>";
+    test_braille("Finnish", expr, "⠀⠀⠸⠀⠖⠼⠑⠀⠀⠸⠀⠤⠼⠑⠀⠀⠸⠀⠄⠼⠑⠀⠀⠸⠀⠄⠼⠑⠀⠀⠸⠀⠒⠼⠑⠀⠀⠸⠦⠴⠬⠀⠀⠸⠀⠌⠼⠑");
 }
 
 #[test]
@@ -685,7 +716,7 @@ fn p25_long_fraction() {
     </mfrac>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠦⠭⠬⠀⠤⠼⠛⠀⠭⠀⠖⠼⠁⠃⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠃⠚⠴⠀⠌⠦⠭⠬⠀⠤⠼⠓⠀⠭⠀⠖⠼⠁⠑⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠁⠋⠴");
+    test_braille("Finnish", expr, "⠦⠦⠭⠬⠀⠤⠼⠛⠀⠭⠀⠖⠼⠁⠃⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠃⠚⠴⠴⠀⠒⠦⠦⠭⠬⠀⠤⠼⠓⠀⠭⠀⠖⠼⠁⠑⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠁⠋⠴⠴");
 }
 
 #[test]
@@ -835,9 +866,8 @@ fn p31_trig_tan_infinity() {
     test_braille("Finnish", expr, "⠞⠁⠝⠀⠼⠊⠚⠀⠴⠀⠶⠿");
 }
 
-// This would probably need alternative markup and test case as well.
 #[test]
-fn p31_degrees_minutes_seconds() {
+fn p31_degrees_minutes_seconds_primes() {
     let expr = "<math>
   <mrow>
     <mn>30</mn>
@@ -855,6 +885,125 @@ fn p31_degrees_minutes_seconds() {
   </mrow>
 </math>";
     test_braille("Finnish", expr, "⠼⠉⠚⠀⠴⠀⠼⠙⠑⠀⠨⠀⠼⠃⠚⠀⠸");
+}
+
+#[test]
+fn p31_degrees_minutes_seconds_alternative() {
+    let expr = "<math>
+  <mrow>
+    <mn>30</mn>
+    <mi>°</mi>
+    <msup>
+      <mn>45</mn>
+      <mo>'</mo>
+    </msup>
+    <msup>
+      <mn>20</mn>
+      <mrow>
+        <mo>''</mo>
+      </mrow>
+    </msup>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠉⠚⠀⠴⠀⠼⠙⠑⠀⠨⠀⠼⠃⠚⠀⠸");
+}
+
+#[test]
+fn msub_singular() {
+    let expr = "<math>
+    <msub>
+    <mi>x</mi>
+    <mn>1</mn>
+    </msub>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠭⠡⠼⠁⠀⠖⠼⠁");
+}
+
+#[test]
+fn msub_parentheses() {
+    let expr = "<math>
+    <msub>
+    <mi>a</mi>
+    <mrow>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mn>1</mn>
+    </mrow>
+    </msub>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠁⠡⠦⠭⠀⠲⠼⠁⠴⠀⠖⠼⠁");
+}
+
+// Overline notation comes after the subscript
+#[test]
+fn msub_with_vector() {
+    let expr = "<math>
+    <msub>
+    <mover>
+    <mi>a</mi>
+    <mo>‾</mo>
+    </mover>
+    <mi>b</mi>
+    </msub>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠁⠡⠃⠱⠀⠖⠼⠁");
+}
+
+#[test]
+fn msub_with_vector_with_sub_text() {
+    let expr = "<math>
+    <msub>
+    <mover>
+    <mi>a</mi>
+    <mo>‾</mo>
+    </mover>
+    <mtext>tuki</mtext>
+    </msub>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠁⠡⠞⠥⠅⠊⠱⠀⠖⠼⠁");
+}
+
+#[test]
+fn msubsup() {
+    let expr = "<math>
+    <msubsup>
+    <mi>a</mi>
+    <mn>1</mn>
+    <mn>2</mn>
+    </msubsup>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠁⠡⠼⠁⠬⠼⠃⠀⠖⠼⠁");
+}
+
+#[test]
+fn msubsup_parentheses_in_sub_and_sup() {
+    let expr = "<math>
+    <msubsup>
+    <mi>a</mi>
+    <mrow>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mn>1</mn>
+    </mrow>
+    <mrow>
+    <mi>x</mi>
+    <mo>−</mo>
+    <mn>10</mn>
+    </msubsup>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠁⠡⠦⠭⠀⠲⠼⠁⠴⠬⠦⠭⠀⠤⠼⠁⠚⠴⠀⠖⠼⠁");
 }
 
 #[test]
@@ -880,7 +1029,7 @@ fn p32_expected_value() {
       <mi>i</mi>
     </msub>
 </math>";
-    test_braille("Finnish", expr, "⠠⠑⠦⠭⠴⠀⠶⠨⠍⠀⠶⠸⠎⠡⠊⠐⠏⠡⠊⠐⠭⠡⠊");
+    test_braille("Finnish", expr, "⠠⠑⠦⠭⠴⠀⠶⠨⠍⠀⠶⠸⠎⠡⠊⠐⠏⠡⠊ ⠭⠡⠊");
 }
 
 // Dots 156 to signify the bar over "AB"
@@ -1370,7 +1519,7 @@ fn p42_determinant() {
     <mi>a</mi>
     <mi>b</mi>
     </math>";
-    test_braille("Finnish", expr, "⠸⠁⠀⠖⠃⠀⠀⠁⠀⠤⠃⠸⠀⠐⠐⠀⠸⠁⠀⠤⠃⠀⠀⠁⠀⠖⠃⠸⠀⠶⠼⠙⠀⠁⠃");
+    test_braille("Finnish", expr, "⠸⠁⠀⠖⠃ ⠁⠀⠤⠃⠸⠀⠐⠐⠀⠸⠁⠀⠤⠃ ⠁⠀⠖⠃⠸⠀⠶⠼⠙⠀⠁⠃");
 }
 
 // Dots 156 to signify the bar over "arc"
@@ -1385,6 +1534,57 @@ fn p45_arcsin_with_bar_over() {
 <mi>x</mi>
 </math>";
     test_braille("Finnish", expr, "⠁⠗⠉⠱⠀⠎⠊⠝⠀⠭");
+}
+
+#[test]
+fn p46_simple_derivative_fraction() {
+    let expr = "<math><mfrac>
+        <mrow><mi>d</mi><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>x</mi></mrow>
+      </mfrac></math>";
+    test_braille("Finnish", expr, "⠙⠋⠦⠭⠴⠀⠌⠙⠭");
+}
+
+// Line under a variable
+#[test]
+fn p46_random_variable() {
+    let expr = "<math>
+<munder>
+<mi>s</mi>
+<mo>_</mo>
+</munder>
+</math>";
+    test_braille("Finnish", expr, "⠎⠤");
+}
+
+#[test]
+fn line_under_terminated_by_space() {
+    let expr = "<math>
+<munder>
+<mi>s</mi>
+<mo>_</mo>
+</munder>
+<mo>+</mo>
+<mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠎⠤⠀⠖⠼⠁");
+}
+
+#[test]
+fn line_under_parentheses() {
+    let expr = "<math>
+<munder>
+<mrow>
+<mi>s</mi>
+<mo>/</mo>
+<mn>2</mn>
+</mrow>
+<mo>_</mo>
+</munder>
+<mo>+</mo>
+<mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠦⠎⠀⠌⠼⠃⠴⠤⠀⠖⠼⠁");
 }
 
 // 'Change of zone' dot 5 is used after the limit subscript notation.
@@ -1498,6 +1698,80 @@ fn p49_integral_with_Finnish_notation_for_substitution() {
     test_braille("Finnish", expr, "⠮⠢⠼⠚⠔⠼⠙⠐⠩⠭⠀⠙⠭⠀⠶⠸⠢⠼⠚⠔⠼⠙⠐⠦⠼⠃⠒⠀⠭⠀⠩⠭⠴");
 }
 
+// Markup for lower and upper bounds for summation, product, intersection, union and such. "Equal to" character is replaced lower (dots 26) and upper (dots 35) bounds.
+#[test]
+fn p49_summation_with_lower_upper_bounds() {
+  init_logger(); 
+    let expr = "<math>
+<munderover>
+<mo>∑</mo>
+<mrow>
+<mi>i</mi>
+<mo>=</mo>
+<mn>0</mn>
+</mrow>
+<mi>n</mi>
+</munderover>
+<msub>
+<mi>f</mi>
+<mi>i</mi>
+</msub>
+<msub>
+<mi>x</mi>
+<mi>i</mi>
+</msub>
+</math>";
+    test_braille("Finnish", expr, "⠸⠎⠡⠊⠢⠼⠚⠔⠝⠐⠦⠋⠡⠊⠀⠭⠡⠊⠴");
+    // Parentheses are added for clarity. Dot 5 is used to end the zone of the upper bound.
+}
+
+#[test]
+fn p49_union_with_lower_upper_bounds() {
+  init_logger(); 
+    let expr = "<math>
+<munderover>
+<mo>∪</mo>
+<mrow>
+<mi>i</mi>
+<mo>=</mo>
+<mn>1</mn>
+</mrow>
+<mi>n</mi>
+</munderover>
+<msub>
+<mi>A</mi>
+<mi>i</mi>
+</msub>
+</math>";
+    test_braille("Finnish", expr, "⠳⠖⠡⠊⠢⠼⠁⠔⠝⠐⠠⠁⠡⠊");
+    // Dot 5 is used to end the zone of the upper bound.
+}
+
+#[test]
+fn p49_sequence_with_lower_upper_bounds() {
+  init_logger(); 
+    let expr = "<math>
+<msubsup>
+<mrow>
+<mo>(</mo>
+<msub>
+<mi>x</mi>
+<mi>n</mi>
+</msub>
+<mo>)</mo>
+</mrow>
+<mrow>
+<mi>n</mi>
+<mo>=</mo>
+<mn>1</mn>
+</mrow>
+<mi>∞</mi>
+</msubsup>
+</math>";
+    test_braille("Finnish", expr, "⠦⠭⠡⠝⠴⠝⠢⠼⠁⠔⠿");
+    // Dot 5 is used to end the zone of the upper bound.
+}
+
 #[test]
 fn p50_such_that_y_greater_than_x() {
     let expr = "<math>
@@ -1599,14 +1873,7 @@ fn p50_conditional_probability() {
     test_braille("Finnish", expr, "⠠⠏⠦⠠⠃⠀⠸⠀⠠⠁⠴⠀⠶⠠⠏⠦⠠⠁⠠⠃⠴⠀⠌⠠⠏⠦⠠⠁⠴");
 }
 
-#[test]
-fn p46_simple_derivative_fraction() {
-    let expr = "<math><mfrac>
-        <mrow><mi>d</mi><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
-        <mrow><mi>d</mi><mi>x</mi></mrow>
-      </mfrac></math>";
-    test_braille("Finnish", expr, "⠙⠋⠦⠭⠴⠀⠌⠙⠭");
-}
+
 
 #[test]
 fn p50_alternative_derivative_1() {
@@ -1645,8 +1912,6 @@ fn p50_alternative_derivative_2() {
     test_braille("Finnish", expr, "⠙⠀⠌⠙⠭⠀⠇⠝⠭");
 }
 
-
-
 #[test]
 fn p51_set_with_closure() {
     let expr = "<math>
@@ -1669,7 +1934,8 @@ fn p51_set_with_closure() {
 <mo>‾</mo>
 </mover>
 </math>";
-    test_braille("Finnish", expr, "⠈⠙⠠⠁⠀⠶⠠⠁⠱⠀⠳⠦⠦⠠⠭⠀⠳⠤⠠⠁⠴⠱");
+    test_braille("Finnish", expr, "⠈⠙⠠⠁⠀⠶⠠⠁⠱⠀⠳⠦⠦⠠⠭⠀⠤⠠⠁⠴⠱");
+    // Fixed: There was a "set minus" used here (1256 36), which can't be produced by MathML. It is now a normal minus. 
 }
 
 #[test]
@@ -1818,7 +2084,7 @@ fn p64_chemistry_bond_1() {
 #[test]
 fn p64_chemistry_bond_1_alternative() {
     let expr = "<math intent=':chemical-formula'><mi>H</mi><mo>:</mo><mi>H</mi></math>";
-    test_braille("Finnish", expr, "⠠⠓⠀⠆⠠⠓");
+    test_braille("Finnish", expr, "⠠⠓⠀⠒⠠⠓");
 }
 
 #[test]
