@@ -1,9 +1,10 @@
+#![allow(clippy::needless_return)]
 //! XPath underlies rule matching and speech generation. The version of xpath used is based on xpath 1.0
 //! and includes the ability to define functions and variables.
 //! The variables defined are all the preferences and also variables set in speech rules via the `variables` keyword.
 //! The function defined here are:
 //! * `IsNode(node, kind)`:  returns true if the node matches the "kind".
-//!    Valid values are "leaf", "2D", "simple", "common_fraction", "trig_name".
+//!   Valid values are "leaf", "2D", "simple", "common_fraction", "trig_name".
 //! * `ToOrdinal(number, fractional, plural)`: converts the number to an ordinal (e.g, third)
 //!   * `number` -- the number to translate
 //!   * `fractional` -- true if this is a fractional ordinal (e.g, "half")
@@ -11,11 +12,10 @@
 //! * `ToCommonFraction(mfrac)` -- converts the fraction to an ordinal version (e.g, 2 thirds)
 //! * `IsLargeOp(node)` -- returns true if the node is a large operator (e.g, integral or sum)
 //! * `IsBracketed(node, left, right, requires_comma)` -- returns true if the first/last element in the mrow match `left`/`right`.
-//!    If the optional `requires_comma` argument is given and is `true`, then there also must be a "," in the mrow (e.g., "f(x,y)")
+//!   If the optional `requires_comma` argument is given and is `true`, then there also must be a "," in the mrow (e.g., "f(x,y)")
 //! * `DEBUG(xpath)` -- _Very_ useful function for debugging speech rules.
-//!    This can be used to surround a whole or part of an xpath expression in a match or output.
-//!    The result will be printed to standard output and the result returned so that `DEBUG` does not affect the computation.    
-#![allow(clippy::needless_return)]
+//!   This can be used to surround a whole or part of an xpath expression in a match or output.
+//!   The result will be printed to standard output and the result returned so that `DEBUG` does not affect the computation.    
 
 use sxd_document::dom::{Element, ChildOfElement};
 use sxd_xpath::{Value, Context, context, function::*, nodeset::*};
@@ -56,7 +56,7 @@ fn get_text_from_COE(coe: &ChildOfElement) -> String {
 // Returns the node or an Error
 pub fn validate_one_node<'n>(nodes: Nodeset<'n>, func_name: &str) -> Result<Node<'n>, Error> {
     if nodes.size() == 0 {
-        return Err(Error::Other(format!("Missing argument for {}", func_name)));
+        return Err(Error::Other(format!("Missing argument for {func_name}")));
     } else if nodes.size() > 1 {
         return Err( Error::Other(format!("{} arguments for {}; expected 1 argument", nodes.size(), func_name)) );
     }
@@ -112,7 +112,7 @@ impl IsNode {
 
 
         // returns the element's text value
-        fn to_str(e: Element) -> &str {
+        fn to_str(e: Element<'_>) -> &str {
             // typically usage assumes 'e' is a leaf
             // bad MathML is the following isn't true
             if e.children().len() == 1 {
@@ -125,7 +125,7 @@ impl IsNode {
         }
 
         // same as 'to_str' but for ChildOfElement
-        fn coe_to_str(coe: ChildOfElement) -> &str {
+        fn coe_to_str(coe: ChildOfElement<'_>) -> &str {
             // typically usage assumes 'coe' is a leaf
             let element_node = coe.element();
             if let Some(e) = element_node {
@@ -381,7 +381,7 @@ impl Function for IsNode {
 
         let nodes = args.pop_nodeset()?;
         if nodes.size() == 0 {
-            return Err(Error::Other("Missing argument for IsNode".to_string() ));
+            return Ok (Value::Boolean(false));  // like xpath, don't make this an error
         };
         return Ok(
             Value::Boolean( 
@@ -641,7 +641,7 @@ impl Function for ToOrdinal {
     {
         let mut args = Args(args);
         if let Err(e) = args.exactly(1).or_else(|_| args.exactly(3)) {
-            return Err( XPathError::Other(format!("ToOrdinal requires 1 or 3 args: {}", e)));
+            return Err( XPathError::Other(format!("ToOrdinal requires 1 or 3 args: {e}")));
         };
         let mut fractional = false;
         let mut plural = false;
@@ -753,7 +753,7 @@ struct BaseNode;
     /// Recursively find the base node
     /// The base node of a non scripted element is the element itself
     fn base_node(node: Element) -> Element {
-        let name = name(node);
+        let name = node.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(node));
         if ["msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts"].contains(&name) {
             return BaseNode::base_node(as_element(node.children()[0]));
         } else {
@@ -808,8 +808,9 @@ struct IfThenElse;
 
 struct Debug;
 /**
- * Returns true if the node is a large op
- * @param(node)     -- node(s) to test -- should be an <mo>
+ * Prints it's argument along with the string that was evaluated
+ * @param(node)     -- node(s) to be evaluated/printed
+ * @param(string)   -- string showing what is being evaluated
  */
  impl Function for Debug {
 
@@ -822,7 +823,7 @@ struct Debug;
         args.exactly(2)?;
         let xpath_str = args.pop_string()?;
         let eval_result = &args[0];
-        debug!("  -- Debug: value of '{}' is ", xpath_str);
+        debug!("  -- Debug: value of '{xpath_str}' is ");
         match eval_result {
             Value::Nodeset(nodes) => {
                 if nodes.size() == 0 {
@@ -839,12 +840,12 @@ struct Debug;
                             match node {
                                 Node::Element(mathml) => debug!("#{}:\n{}",
                                         i, mml_to_string(*mathml)),
-                                _ => debug!("'{:?}'", node),
+                                _ => debug!("'{node:?}'"),
                             }   
                         })    
                 }
             },
-            _ => debug!("'{:?}'", eval_result),
+            _ => debug!("'{eval_result:?}'"),
         }
         return Ok( eval_result.clone() );
     }
@@ -932,14 +933,18 @@ impl IsBracketed {
         }
         let right = args.pop_string()?;
         let left = args.pop_string()?;
-        let node = validate_one_node(args.pop_nodeset()?, "IsBracketed")?;
-        if let Node::Element(e) = node {
-            return Ok( Value::Boolean( IsBracketed::is_bracketed(e, &left, &right, requires_comma, requires_mrow) ) );
+        return Ok( Value::Boolean(
+            match validate_one_node(args.pop_nodeset()?, "IsBracketed") {
+                Err(_) => false,  // be fault tolerant, like xpath,
+                Ok(node) => {
+                    if let Node::Element(e) = node {
+                        IsBracketed::is_bracketed(e, &left, &right, requires_comma, requires_mrow)
+                    } else {
+                        false
+                    }
+                }
+            }) );
         }
-
-        // FIX: should having a non-element be an error instead??
-        return Ok( Value::Boolean(false) );
-    }
 }
 
 pub struct IsInDefinition;
@@ -954,7 +959,7 @@ impl IsInDefinition {
             if let Some(hashmap) = definitions.borrow().get_hashmap(set_name) {
                 return Ok( hashmap.contains_key(test_str) );
             }
-            return Err( Error::Other( format!("\n  IsInDefinition: '{}' is not defined in definitions.yaml", set_name) ) );
+            return Err( Error::Other( format!("\n  IsInDefinition: '{set_name}' is not defined in definitions.yaml") ) );
         });
     }
 }
@@ -1030,7 +1035,7 @@ impl DefinitionValue {
                     Some(str) => str.clone(),
                 });
             }
-            return Err( Error::Other( format!("\n  DefinitionValue: '{}' is not defined in definitions.yaml", set_name) ) );
+            return Err( Error::Other( format!("\n  DefinitionValue: '{set_name}' is not defined in definitions.yaml") ) );
         });
     }
 }
@@ -1095,7 +1100,7 @@ impl DistanceFromLeaf {
         let mut distance = 1;
         loop {
             // debug!("distance={} -- element: {}", distance, mml_to_string(element));
-            if is_leaf(element) {
+            if MATHML_LEAF_NODES.contains(element.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(element))) {
                 return distance;
             }
             if treat_2d_elements_as_tokens && (IsNode::is_2D(element) || !IsNode::is_mathml(element)) {
@@ -1132,7 +1137,7 @@ impl Function for DistanceFromLeaf {
         }
 
         // FIX: should having a non-element be an error instead??
-        return Err(Error::Other(format!("DistanceFromLeaf: first arg '{:?}' is not a node", node)));
+        return Err(Error::Other(format!("DistanceFromLeaf: first arg '{node:?}' is not a node")));
     }
 }
 
@@ -1209,7 +1214,7 @@ impl Function for EdgeNode {
         }
 
         // FIX: should having a non-element be an error instead??
-        return Err(Error::Other(format!("EdgeNode: first arg '{:?}' is not a node", node)));
+        return Err(Error::Other(format!("EdgeNode: first arg '{node:?}' is not a node")));
     }
 }
 
@@ -1258,7 +1263,7 @@ impl GetBracketingIntentName {
                         1 => return speech[0].to_string(),
                         2 | 3 => {
                             if speech.len() == 2 {
-                                warn!("Intent '{}'  has only two ':' separated parts, but should have three", intent_name);
+                                warn!("Intent '{intent_name}'  has only two ':' separated parts, but should have three");
                                 speech.push(speech[1]);
                             }
                             let bracketing_words = match verbosity {
@@ -1362,7 +1367,7 @@ impl FontSizeGuess {
                     "ex" => 0.5,
                     "em" => 1.0,
                     "rem" => 16.0/12.0,
-                    default => {debug!("unit='{}'", default); 10.0}
+                    default => {debug!("unit='{default}'"); 10.0}
                 };
                 // debug!("FontSizeGuess: {}->{}, val={}, multiplier={}", value_with_unit, value*multiplier, value, multiplier);
                 return cap[1].parse::<f64>().unwrap_or(0.0) * multiplier;

@@ -41,10 +41,10 @@
       then: [t: "of"]   # phrase(the square root 'of' x)
       else: [pause: short]
   - x: "*[1]"
+  - pause: short
   - test:
-      if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
-      then: [pause: short]
-      else: [t: "end root", pause: short]  # phrase(start the square root of x 'end of root')
+      if: "not(IsNode(*[1], 'leaf')) and $Impairment = 'Blindness'"
+      then: [t: "end root", pause: medium]  # phrase(start the square root of x 'end of root')
 
 - name: default
   tag: root
@@ -73,10 +73,10 @@
       if: "$Verbosity!='Terse'"
       then: [t: "of"]        # phrase(the square root 'of' x)
   - x: "*[1]"
+  - pause: short
   - test:
-      if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
-      then: [pause: short]
-      else: [t: "end root", pause: short]      # phrase(start the fifth root of x 'end of root')
+      if: "not(IsNode(*[1], 'leaf')) and $Impairment = 'Blindness'"
+      then: [t: "end root", pause: medium]  # phrase(start the square root of x 'end of root')
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
@@ -102,11 +102,14 @@
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 
-# Units (e.g., meters per second)
+# Units (e.g., meters per second, m^2/s^2, (3m^2)/s)
 - name: per-fraction
   tag: fraction
-  match: "BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])] and
-          BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])]"
+  match:
+  - "BaseNode(*[1])[contains(@data-intent-property, ':unit') or"
+  - "               ( self::m:mrow and count(*)=3 and"  # maybe a bit paranoid checking the structure...
+  - "                 *[1][self::m:mn] and *[2][.='\u2062'] and BaseNode(*[3])[contains(@data-intent-property, ':unit')] ) ] and"
+  - "BaseNode(*[2])[contains(@data-intent-property, ':unit')] "
   replace:
   - x: "*[1]"
   - t: "per"      # phrase('5 meters 'per' second)

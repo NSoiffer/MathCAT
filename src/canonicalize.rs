@@ -651,7 +651,7 @@ impl CanonicalizeContext {
 				"mmultiscripts" => {
 					let has_prescripts = mathml.children().iter()
 							.any(|&child| name(as_element(child)) == "mprescripts");
-					if has_prescripts ^ (n_children % 2 == 0) {
+					if has_prescripts ^ (n_children.is_multiple_of(2)) {
 						bail!("{} has the wrong number of children:\n{}", element_name, mml_to_string(mathml));
 					}
 				},
@@ -1080,6 +1080,7 @@ impl CanonicalizeContext {
 							(children.len() > 1 && ELEMENTS_WITH_ONE_CHILD.contains(element_name)) {
 					let merged = merge_dots(mathml);	// FIX -- switch to passing in children
 					let merged = merge_primes(merged);
+					let merged = merge_degrees_C_F(merged);
 					let merged = merge_chars(merged, &IS_UNDERSCORE);
 					handle_pseudo_scripts(merged)
 				} else {
@@ -1215,7 +1216,7 @@ impl CanonicalizeContext {
 				}
 				let attr_name = match child.attribute_value("encoding") {
 					Some(encoding_name) => format!("data-{}-{}", child_name, encoding_name.replace('/', "_slash_")),
-					None => format!("data-{}", child_name),		// probably shouldn't happen
+					None => format!("data-{child_name}"),		// probably shouldn't happen
 				};
 				let attr_name = attr_name.as_str();
 				if child_name == "annotation" {
@@ -1619,10 +1620,10 @@ impl CanonicalizeContext {
 			if following_siblings.len() > 1 {
 				let following_siblings = &following_siblings[1..];
 				// if there are an odd number of "|"s to the right, rule out the merge
-				if following_siblings.iter().filter(|&&child| {
+				if !(following_siblings.iter().filter(|&&child| {
 					let child = as_element(child);
 					return name(child) == "mo" && as_text(child) == "|";
-				}).count() % 2 == 1 {
+				}).count()).is_multiple_of(2) {
 					return None;
 				}
 			}
@@ -2310,6 +2311,44 @@ impl CanonicalizeContext {
 			children.drain(start+1..end);
 		}
 
+		
+		/// merge  ° C or  ° F into a single <mi> with the text '℃' or '℉' -- prevents '°' from becoming a superscript
+		#[allow(non_snake_case)]
+		fn merge_degrees_C_F<'a>(mrow: Element<'a>) -> Element<'a> {
+			let mut degree_child = None;
+			for child in mrow.children() {
+				let child = as_element(child);
+				if is_leaf(child) {
+					match as_text(child) {
+						"°" => {
+							degree_child = Some(child);
+						},
+						"°C" => {
+							child.set_text("℃");
+							degree_child = None;
+						},
+						"°F" => {
+							child.set_text("℉");
+							degree_child = None;
+						},
+						text  => {
+							if let Some(degree_child) = degree_child {
+								if text == "C" || text == "F" {
+									// merge the degree child with the current child
+									degree_child.set_text(if text == "C" { "℃" } else { "℉" });
+									child.remove_from_parent();
+								}
+								// merge the degree child with the current child
+							}
+							degree_child = None;	
+						},
+					}
+				}
+			}
+			return mrow;
+		}
+
+
 		/// merge consecutive leaves containing any of the 'chars' into the first leaf -- probably used for omission with('_')
 		fn merge_chars<'a>(mrow: Element<'a>, pattern: &Regex) -> Element<'a> {
 			let mut first_child = None;
@@ -2470,7 +2509,7 @@ impl CanonicalizeContext {
 					'‴' => n_primes += 3,
 					'⁗' => n_primes += 4,
 					_ => {
-						eprint!("merge_prime_text: unexpected char '{}' found", ch);
+						eprint!("merge_prime_text: unexpected char '{ch}' found");
 						return text.to_string();
 					}
 				}
@@ -3148,7 +3187,7 @@ impl CanonicalizeContext {
 			// FIX: MathType generates the wrong version of union and intersection ops (binary instead of unary)
 		} else if !is_base && (parent_name == "msup" || parent_name == "msubsup") {
 			mo_text = match mo_text {
-				"\u{00BA}"| "\u{2092}"| "\u{20D8}"| "\u{2218}" | "\u{02DA}" => "\u{00B0}",		// circle-like objects -> degree
+				"\u{00BA}"| "\u{2092}"| "\u{20D8}"| "\u{2218}" | "\u{25E6}" | "\u{02DA}" => "\u{00B0}",		// circle-like objects -> degree
 				_ => mo_text,
 			};
 		} else {
@@ -3429,7 +3468,7 @@ impl CanonicalizeContext {
 		return FunctionNameCertainty::True;
 	}
 	
-	// Try to figure out whether an <mi> is a function name or note.
+	// Try to figure out whether an <mi> is a function name or not.
 	// There are two important cases depending upon whether parens/brackets are used or not.
 	// E.g, sin x and f(x)
 	// 1. If parens follow the name, then we use a more inclusive set of heuristics as it is more likely a function
@@ -3554,7 +3593,8 @@ impl CanonicalizeContext {
 			}
 
 			// debug!("      ...didn't match options to be a function");
-			return FunctionNameCertainty::Maybe;		// didn't fit one of the above categories
+			// debug!("Right siblings:\n{}  ", right_siblings.iter().map(|&child| mml_to_string(as_element(child))).collect::<Vec<String>>().join("\n  "));
+			return if is_name_inside_parens(base_name, right_siblings) {FunctionNameCertainty::False} else {FunctionNameCertainty::Maybe};
 		});
 	
 		fn is_single_arg(open: &str, following_nodes: &[ChildOfElement]) -> bool {
@@ -3617,6 +3657,58 @@ impl CanonicalizeContext {
 			let text = as_text(node);
 			// debug!("         is_matching_right_paren: open={}, close={}", open, text);
 			return (open == "(" && text == ")") || (open == "[" && text == "]");
+		}
+
+		/// Returns true if the name of the potential function is inside the parens. In that case, it is very unlikely to be a function call
+		/// For example, "n(n+1)"
+		fn is_name_inside_parens(function_name: &str, right_siblings: &[ChildOfElement]) -> bool {
+			// the first child of right_siblings is either '(' or '['
+			// right_siblings may extend well beyond the closing parens, so we first break this into finding the contents
+			// then we search the contents for the name
+			match find_contents(right_siblings) {
+				None => return false,
+				Some(contents) => return is_name_inside_contents(function_name, contents),
+			}
+			
+
+			fn find_contents<'a>(right_siblings: &'a[ChildOfElement<'a>]) -> Option<&'a[ChildOfElement<'a>]> {
+				let open_text = as_text(as_element(right_siblings[0]));
+				let close_text = if open_text == "("  { ")" } else { "]" };
+				let mut nesting_level = 1;
+				let mut i = 1;
+				while i < right_siblings.len() {
+					let child = as_element(right_siblings[i]);
+					if name(child) == "mo" {
+						let op_text = as_text(child);
+						if op_text == open_text {
+							nesting_level += 1;
+						} else if op_text == close_text {
+							if nesting_level == 1 {
+								return Some(&right_siblings[1..i]);
+							} 
+							nesting_level -= 1;
+						}
+					}
+					i += 1;
+				}
+				return None;	// didn't find matching paren
+			}
+
+			fn is_name_inside_contents(function_name: &str, contents: &[ChildOfElement]) -> bool {
+				for &child in contents {
+					let child = as_element(child);
+					// debug!("is_name_inside_contents: child={}", mml_to_string(child));
+					if is_leaf(child) {
+						let text = as_text(child);
+						if (name(child) == "mi" || name(child) == "mtext") && text == function_name {
+							return true;
+						}
+					} else if is_name_inside_contents(function_name, &child.children()) {
+						return true;
+					}
+				}
+				return false;
+			}
 		}
 	}
 	
@@ -4181,7 +4273,7 @@ pub fn add_attrs<'a>(mathml: Element<'a>, attrs: &[Attribute]) -> Element<'a> {
 }
 
 
-pub fn name(node: Element) -> &str {
+pub fn name(node: Element<'_>) -> &str {
 	return node.name().local_part();
 }
 
@@ -4198,7 +4290,7 @@ pub fn as_element(child: ChildOfElement) -> Element {
 
 /// The child of a leaf element must be text (previously trimmed)
 /// Note: trim() combines all the Text children into a single string
-pub fn as_text(leaf_child: Element) -> &str {
+pub fn as_text(leaf_child: Element<'_>) -> &str {
 	assert!(is_leaf(leaf_child));
 	let children = leaf_child.children();
 	if children.is_empty() {

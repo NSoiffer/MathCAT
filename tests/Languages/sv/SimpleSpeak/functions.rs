@@ -257,7 +257,7 @@ fn no_times_sqrt() {
             <mfrac> <mn>1</mn><mn>2</mn></mfrac>
             <mo>)</mo></mrow></mrow>
     </mrow></math>";
-    test("sv", "SimpleSpeak", expr, "2 plus en halv");
+    test("sv", "SimpleSpeak", expr, "2 plus 1 halv");
     }
 
 

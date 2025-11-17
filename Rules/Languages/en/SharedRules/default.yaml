@@ -109,7 +109,7 @@
   - pause: short
   - test:
       if: "$Impairment = 'Blindness'"
-      then: [t: "end over"]          # phrase("start of fraction x over y 'end over'")
+      then: [t: "end"]          # phrase("start of fraction x over y 'end over'")
   - pause: medium
 
 
@@ -129,7 +129,7 @@
   - pause: short
   - test:
       if: "not(IsNode(*[1],'leaf')) or $Impairment = 'Blindness'"
-      then: [t: "end root"] # phrase("root of x 'end root symbol'")
+      then: [t: "end root", pause: medium] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
 - name: literal-default
@@ -613,10 +613,10 @@
   match: .
   replace:
   - x: "*[1]"
-  - t: "applied to"      # phrase(the function sine 'applied to' x plus y)
-  - x: "*[2]"
-
-
+  - t: "of"      # phrase(the sine 'of' x )
+  - pause: auto
+  - x: "*[position() > 1]"
+ 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent
   # uncaught intent -- the args have been inserted in the order of speech 

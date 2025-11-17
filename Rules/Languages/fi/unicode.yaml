@@ -136,14 +136,25 @@
         else: [T: "vasen aaltosulku"]            	# 	(en: 'left brace', google: 'vasen ahdin')
  - "|":                                         	#  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
-     - test:
-        - if: "$SpeechStyle != 'ClearSpeak' or not(preceding-sibling::*) or not(following-sibling::*)"
-          then: [T: "pystysuora viiva"]         	# 	(en: 'vertical line', google translation)
-        - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
-          then: [T: "siten että"]                	# 	(en: 'such that', google translation)
-        - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
-          then: [T: "ehdolla"]                  	# 	(en: 'given', google translation)
-        - else: [T: "jakaa"]               	        # 	(en: 'divides', google: 'jakaa')
+     - with:
+        variables: [DefaultToGiven: "count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and ../../../*[1][.='P']"] # P(A|B)
+        replace:
+        - test:
+            - if: "$SpeechStyle != 'ClearSpeak'"
+              then_test:
+                - if: "$DefaultToGiven"
+                  then: [T: "ehdolla"]
+                - else_if: "preceding-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))] and 
+                            following-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))]"
+                  then: [T: "jakaa"]
+                  else: [T: "pystysuora viiva"]
+            - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
+              then: [T: "pystysuora viiva"]
+            - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+              then: [T: "siten että"]
+            - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
+              then: [T: "ehdolla"] 
+            - else: [T: "jakaa"]                   
 
  - "}":                                         	#  0x7d
     - test:
@@ -253,11 +264,20 @@
             then: [T: "ja niin edelleen"]       	# 	(en: 'and so on', google translation)
             else: [T: "ja niin edelleen kunnes"]      	# 	(en: 'and so on up to', google: 'ja niin edelleen'); possibly obsolete if-else
 
- - "⁡":                                         	#  0x2061, function application
+ - "⁡":                                          # 0x2061
     - test:
         # skip saying "of" when Terse and a trig function, when it is a shape (does this happen?), or we are in :literal mode
-        if: "not($Verbosity='Terse' and preceding-sibling::*[1][IsInDefinition(., 'TrigFunctionNames')]) and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
-             not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
+        # log is treated differently than trig functions
+        # Note: this differs from 'en' because the ClearSpeak and default rules are different from 'en'
+        if: "not(
+              ( $Verbosity='Terse' or ($SpeechStyle = 'ClearSpeak' and IsNode(following-sibling::*[1],'simple')) and
+                preceding-sibling::*[1][IfThenElse($SpeechStyle='ClearSpeak',
+                                                   IsInDefinition(., 'ClearSpeakTrigFunctionNames'),
+                                                   IsInDefinition(., 'TrigFunctionNames') )]
+              ) or
+              preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')] or
+              (@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])
+            )"
         then: [T: "arvolla"]                     
  - "⁢": [T: ""]                                 	#  0x2062 # invisible 'times', fi: should this have a value?
  - "⁣": [T: ""]                                 	#  0x2063 # invisible 'separator', fi: should this have a value?

@@ -183,7 +183,7 @@ pub fn add_fixity_children(intent: Element) -> Element {
         fn create_operator_element<'a>(intent_name: &str, fixity: &str, id: &str, id_inc: usize, doc: &Document<'a>) -> ChildOfElement<'a> {
             let intent_name = intent_speech_for_name(intent_name, &PreferenceManager::get().borrow().pref_to_string("NavMode"), fixity);
             let element = create_mathml_element(doc, &intent_name);
-            element.set_attribute_value("id", &format!("{}-{}",id, id_inc));
+            element.set_attribute_value("id", &format!("{id}-{id_inc}"));
             element.set_attribute_value(MATHML_FROM_NAME_ATTR, "mo");
             return ChildOfElement::Element(element);
         }
@@ -206,7 +206,7 @@ pub fn intent_speech_for_name(intent_name: &str, verbosity: &str, fixity: &str) 
                     1 => return operator_names[0].trim().to_string(),
                     2 | 3 => {
                         if operator_names.len() == 2 {
-                            warn!("Intent '{}' has only two operator names, but should have three", intent_name);
+                            warn!("Intent '{intent_name}' has only two operator names, but should have three");
                             operator_names.push(operator_names[1]);
                         }
                         let intent_word = match verbosity {
@@ -277,11 +277,11 @@ impl fmt::Display for Token<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return write!(f, "{}",
             match self {
-                Token::Terminal(str) => format!("Terminal('{}')", str),
-                Token::Property(str) => format!("Property({})", str),
-                Token::ArgRef(str) => format!("ArgRef({})", str),
-                Token::ConceptOrLiteral(str) => format!("Literal({})", str),
-                Token::Number(str) => format!("Number({})", str),
+                Token::Terminal(str) => format!("Terminal('{str}')"),
+                Token::Property(str) => format!("Property({str})"),
+                Token::ArgRef(str) => format!("ArgRef({str})"),
+                Token::ConceptOrLiteral(str) => format!("Literal({str})"),
+                Token::Number(str) => format!("Number({str})"),
                 Token::None => "None".to_string(),
             }
         );
@@ -348,7 +348,7 @@ impl<'i> LexState<'i> {
         return Ok( () );
     }
 
-    fn get_next(&mut self) -> Result<&Token> {
+    fn get_next(&mut self) -> Result<&Token<'_>> {
         if self.remaining_str.is_empty() {
             self.token = Token::None;
         } else if TERMINALS_AS_U8.contains(&self.remaining_str.as_bytes()[0]) {
@@ -612,6 +612,7 @@ mod tests {
 
     fn test_intent(mathml: &str, target: &str, intent_error_recovery: &str) -> bool {
 		use crate::interface::*;
+        use crate::pretty_print::mml_to_string;
 		// this forces initialization
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         // crate::speech::SpeechRules::initialize_all_rules().unwrap();
@@ -620,12 +621,12 @@ mod tests {
         let package1 = &parser::parse(mathml).expect("Failed to parse test input");
         let mathml = get_element(package1);
         trim_element(mathml, false);
-        debug!("test:\n{}", crate::pretty_print::mml_to_string(mathml));
+        debug!("test:\n{}", mml_to_string(mathml));
         
         let package2 = &parser::parse(target).expect("Failed to parse target input");
         let target = get_element(package2);
         trim_element(target,true);
-        debug!("target:\n{}", crate::pretty_print::mml_to_string(target));
+        debug!("target:\n{}", mml_to_string(target));
 
         let result = match crate::speech::intent_from_mathml(mathml, package2.as_document()) {
             Ok(e) => e,
@@ -634,10 +635,10 @@ mod tests {
                 return false;       // could be intentional failure
             }
         };
-        debug!("result:\n{}", crate::pretty_print::mml_to_string(result));
+        debug!("result:\n{}", mml_to_string(result));
         match is_same_element(result, target) {
 			Ok(_) => return true,
-			Err(e) => panic!("{}", e),
+			Err(e) => panic!("{}:\nresult: {}target: {}", e, mml_to_string(result), mml_to_string(target)),
 		}
     }
 

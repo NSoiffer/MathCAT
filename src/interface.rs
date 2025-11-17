@@ -13,6 +13,7 @@ use sxd_document::parser;
 use sxd_document::Package;
 
 use crate::canonicalize::{as_element, name};
+use crate::shim_filesystem::{find_all_dirs_shim, find_files_in_dir_that_ends_with_shim};
 
 use crate::navigate::*;
 use crate::pretty_print::mml_to_string;
@@ -212,7 +213,7 @@ pub fn get_preference(name: String) -> Result<String> {
 /// * TTS -- SSML, SAPI5, None
 /// * Pitch -- normalized at '1.0'
 /// * Rate -- words per minute (should match current speech rate).
-///       There is a separate "MathRate" that is user settable that causes a relative percentage change from this rate.
+///   There is a separate "MathRate" that is user settable that causes a relative percentage change from this rate.
 /// * Volume -- default 100
 /// * Voice -- set a voice to use (not implemented)
 /// * Gender -- set pick any voice of the given gender (not implemented)
@@ -494,6 +495,65 @@ pub fn get_navigation_node_from_braille_position(position: usize) -> Result<(Str
     });
 }
 
+pub fn get_supported_braille_codes() -> Vec<String> {
+    enable_logs();
+    let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
+    let braille_dir = rules_dir.join("Braille");
+    let mut braille_code_paths = Vec::new();
+
+    find_all_dirs_shim(&braille_dir, &mut braille_code_paths);
+    let mut braille_code_paths = braille_code_paths.iter()
+                    .map(|path| path.strip_prefix(&braille_dir).unwrap().to_string_lossy().to_string())
+                    .filter(|string_path| !string_path.is_empty() )
+                    .collect::<Vec<String>>();
+    braille_code_paths.sort();
+
+    return braille_code_paths;
+ }
+
+/// Returns a Vec of all supported languages ("en", "es", ...)
+pub fn get_supported_languages() -> Vec<String> {
+    enable_logs();
+    let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
+    let lang_dir = rules_dir.join("Languages");
+    let mut lang_paths = Vec::new();
+
+    find_all_dirs_shim(&lang_dir, &mut lang_paths);
+    let mut language_paths = lang_paths.iter()
+                    .map(|path| path.strip_prefix(&lang_dir).unwrap()
+                                              .to_string_lossy()
+                                              .replace(std::path::MAIN_SEPARATOR, "-")
+                                              .to_string())
+                    .filter(|string_path| !string_path.is_empty() )
+                    .collect::<Vec<String>>();
+
+    // make sure the 'zz' test dir isn't included (build.rs removes it, but for debugging is there)
+    language_paths.retain(|s| !s.starts_with("zz"));
+    language_paths.sort();
+    return language_paths;
+ }
+
+ pub fn get_supported_speech_styles(lang: String) -> Vec<String> {
+    enable_logs();
+    let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
+    let lang_dir = rules_dir.join("Languages").join(lang);
+    let mut speech_styles = find_files_in_dir_that_ends_with_shim(&lang_dir, "_Rules.yaml");
+    for file_name in &mut speech_styles {
+        file_name.truncate(file_name.len() - "_Rules.yaml".len())
+    }
+    speech_styles.sort();
+    // remove duplicates -- shouldn't be any, but just in case
+    let mut i = 1;
+    while i < speech_styles.len() {
+        if speech_styles[i-1] == speech_styles[i] {
+            speech_styles.remove(i);
+        } else {
+            i += 1;
+        }
+    }
+    return speech_styles;
+ }
+
 // utility functions
 
 /// Copy (recursively) the (MathML) element and return the new one.
@@ -531,10 +591,10 @@ pub fn errors_to_string(e: &Error) -> String {
     let mut first_time = true;
     for e in e.iter() {
         if first_time {
-            result = format!("{}\n", e);
+            result = format!("{e}\n");
             first_time = false;
         } else {
-            result += &format!("caused by: {}\n", e);
+            result += &format!("caused by: {e}\n");
         }
     }
     return result;
@@ -550,8 +610,14 @@ fn add_ids(mathml: Element) -> Element {
             .unwrap()
             .as_millis() as usize
     };
-    let time_part = radix_fmt::radix(time, 36).to_string();
-    let random_part = radix_fmt::radix(fastrand::u32(..), 36).to_string();
+    let mut time_part = radix_fmt::radix(time, 36).to_string();
+    if time_part.len() < 3 {
+        time_part.push_str("a2c");      // needs to be at least three chars
+    }
+    let mut random_part = radix_fmt::radix(fastrand::u32(..), 36).to_string();
+    if random_part.len() < 4 {
+        random_part.push_str("a1b2");      // needs to be at least four chars
+    }
     let prefix = "M".to_string() + &time_part[time_part.len() - 3..] + &random_part[random_part.len() - 4..] + "-"; // begin with letter
     add_ids_to_all(mathml, &prefix, 0);
     return mathml;
@@ -576,7 +642,7 @@ fn add_ids(mathml: Element) -> Element {
     }
 }
 
-pub fn get_element(package: &Package) -> Element {
+pub fn get_element(package: &Package) -> Element<'_> {
     enable_logs();
     let doc = package.as_document();
     let mut result = None;
@@ -649,8 +715,7 @@ pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
         if !single_text.trim_matches(WHITESPACE).is_empty() {
             error!(
-                "trim_element: both element and textual children which shouldn't happen -- ignoring text '{}'",
-                single_text
+                "trim_element: both element and textual children which shouldn't happen -- ignoring text '{single_text}'"
             );
         }
         return;
@@ -662,11 +727,15 @@ pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
 
     fn make_leaf_element(mathml_leaf: Element) {
         // MathML leaves like <mn> really shouldn't have non-textual content, but you could have embedded HTML
-        // Here, we take convert them to leaves by grabbing up all the text and making that the content
+        // Here, we convert them to leaves by grabbing up all the text and making that the content
         // Potentially, we leave them and let (default) rules do something, but it makes other parts of the code
         //   messier because checking the text of a leaf becomes Option<&str> rather than just &str
         let children = mathml_leaf.children();
         if children.is_empty() {
+            return;
+        }
+
+        if rewrite_and_flatten_embedded_mathml(mathml_leaf) {
             return;
         }
 
@@ -712,6 +781,56 @@ pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
             // debug!("gather_text: '{}'", text);
             return text;
         }
+    }
+
+    fn rewrite_and_flatten_embedded_mathml(mathml_leaf: Element) -> bool {
+        // first see if it can or needs to be rewritten
+        // this is likely rare, so we do a check and if true, to a second pass building the result
+        let mut needs_rewrite = false;
+        for child in mathml_leaf.children() {
+            if let Some(element) = child.element() {
+                if name(element) != "math" {
+                    return false; // something other than MathML as a child -- can't rewrite
+                }
+                needs_rewrite = true;
+            }
+        };
+
+        if !needs_rewrite {
+            return false;
+        }
+
+        // now do the rewrite, flatting out the mathml and returning an mrow with the children
+        let leaf_name = name(mathml_leaf);
+        let doc = mathml_leaf.document();
+        let mut new_children = Vec::new();
+        let mut is_last_mtext = false;
+        for child in mathml_leaf.children() {
+            if let Some(element) = child.element() {
+                trim_element(element, true);
+                new_children.append(&mut element.children());   // don't want 'math' wrapper
+                is_last_mtext = false;
+            } else if let Some(text) = child.text() {
+                // combine adjacent text nodes into single nodes
+                if is_last_mtext {
+                    let last_child = new_children.last_mut().unwrap().element().unwrap();
+                    let new_text = as_text(last_child).to_string() + text.text();
+                    last_child.set_text(&new_text);
+                } else {
+                    let new_leaf_node = create_mathml_element(&doc, leaf_name);
+                    new_leaf_node.set_text(text.text());
+                    new_children.push(ChildOfElement::Element(new_leaf_node));
+                    is_last_mtext = true;
+                }
+            }
+        };
+
+        crate::canonicalize::set_mathml_name(mathml_leaf, "mrow");
+        mathml_leaf.clear_children();
+        mathml_leaf.append_children(new_children);
+
+        // debug!("rewrite_and_flatten_embedded_mathml: flattened\n'{}'", mml_to_string(mathml_leaf));
+        return true;
     }
 }
 
@@ -885,15 +1004,15 @@ mod tests {
     use super::*;
 
     fn are_parsed_strs_equal(test: &str, target: &str) -> bool {
-        let target_package = &parser::parse(target).expect("Failed to parse input");
-        let target_doc = target_package.as_document();
-        trim_doc(&target_doc);
-        debug!("target:\n{}", mml_to_string(get_element(&target_package)));
-
         let test_package = &parser::parse(test).expect("Failed to parse input");
         let test_doc = test_package.as_document();
         trim_doc(&test_doc);
         debug!("test:\n{}", mml_to_string(get_element(&test_package)));
+
+        let target_package = &parser::parse(target).expect("Failed to parse input");
+        let target_doc = target_package.as_document();
+        trim_doc(&target_doc);
+        debug!("target:\n{}", mml_to_string(get_element(&target_package)));
 
         match is_same_doc(&test_doc, &target_doc) {
             Ok(_) => return true,
@@ -1050,6 +1169,13 @@ mod tests {
     fn empty_html_in_mtext() {
         let test = "<math><mn>1</mn> <mtext>a<br/>bc</mtext> <mi>y</mi></math>";
         let target = "<math><mn>1</mn> <mtext>abc</mtext> <mi>y</mi></math>";
+        assert!(are_parsed_strs_equal(test, target));
+    }
+
+    #[test]
+    fn mathml_in_mtext() {
+        let test = "<math><mtext>if&#xa0;<math> <msup><mi>n</mi><mn>2</mn></msup></math>&#xa0;is real</mtext></math>";
+        let target = "<math><mrow><mtext>if&#xa0;</mtext><msup><mi>n</mi><mn>2</mn></msup><mtext>&#xa0;is real</mtext></mrow></math>";
         assert!(are_parsed_strs_equal(test, target));
     }
 }
