@@ -707,15 +707,15 @@
           then:
           - T: "con etichetta"      # phrase(the item 'with label' complete)
           - x: "*[1]/*"
-    - test:
-        - if: "$ClearSpeak_MultiLineLabel='None'"
-          then: [pause: xlong]   # need a very long pause with no line labels
-        - else_if: "not(contains(@data-intent-property, ':continued-row:'))"
-          then: [pause: medium]
-    - test:
-        if: "self::m:mlabeledtr"
-        then: [x: "*[position()>1]"]
-        else: [x: "*"]
+  - test:
+      - if: "$ClearSpeak_MultiLineLabel='None'"
+        then: [pause: xlong]   # need a very long pause with no line labels
+      - else_if: "not(contains(@data-intent-property, ':continued-row:'))"
+        then: [pause: medium]
+  - test:
+      if: "self::m:mlabeledtr"
+      then: [x: "*[position()>1]"]
+      else: [x: "*"]
 
 - name: ClearSpeak_Functions_None
   tag: mo
