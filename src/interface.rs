@@ -681,9 +681,9 @@ pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
     // these are combined into one child as it makes code downstream simpler
 
     // space, tab, newline, carriage return all get collapsed to a single space
-    const WHITESPACE: &[char] = &[' ', '\u{0009}', '\u{000A}', '\u{000D}'];
+    const WHITESPACE: &[char] = &[' ', '\u{0009}', '\u{000A}','\u{000C}', '\u{000D}'];
     lazy_static! {
-        static ref WHITESPACE_MATCH: Regex = Regex::new(r#"[ \u{0009}\u{000A}\u{000D}]+"#).unwrap();
+        static ref WHITESPACE_MATCH: Regex = Regex::new(r#"[ \u{0009}\u{000A}\u{00C}\u{000D}]+"#).unwrap();
     }
 
     if is_leaf(e) && (!allow_structure_in_leaves || IsNode::is_mathml(e)) {
@@ -825,6 +825,17 @@ pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
             }
         };
 
+        // clean up whitespace in text nodes
+        for child in &mut new_children {    
+            if let Some(element) = child.element() {
+                if is_leaf(element) {
+                    let text = as_text(element);
+                    let cleaned_text = WHITESPACE_MATCH.replace_all(text, " ").trim_matches(WHITESPACE).to_string();
+                    element.set_text(&cleaned_text);
+                }
+            }
+        }
+        
         crate::canonicalize::set_mathml_name(mathml_leaf, "mrow");
         mathml_leaf.clear_children();
         mathml_leaf.append_children(new_children);
