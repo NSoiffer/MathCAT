@@ -300,7 +300,7 @@ fn ignore_period_and_space() {
         </mstyle>
       </mrow>
 </math>";
-    test("en", "ClearSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
+    test("en", "ClearSpeak", expr, "cap p, open paren, cap eigh divides cap b, close paren; is equal to; the fraction with numerator; cap p, open paren, cap eigh intersection cap b; close paren; and denominator cap p of cap b");
 }
 
 
