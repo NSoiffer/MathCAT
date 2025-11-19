@@ -110,7 +110,7 @@ fn prime() {
 #[test]
 fn given() {
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
-    test("zh-tw", "SimpleSpeak", expr, "大寫 p, 左小括, 大寫 a 垂線 大寫 b, 右小括");
+    test("zh-tw", "SimpleSpeak", expr, "大寫 p, 左小括, 大寫 a 給定 大寫 b, 右小括");
 }
 
 #[test]

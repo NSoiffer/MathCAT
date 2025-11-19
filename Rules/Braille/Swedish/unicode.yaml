@@ -228,7 +228,7 @@
              (following-sibling::*[1][
                   IsNode(., 'leaf') and 
                   translate(substring(., 1, 1), 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] or
-              ($NewScriptContext='' andnot(ancestor::*[self::m:mfrac]) and following-sibling::*[1][not(self::m:mfrac or IsBracketed(., '', ''))])
+              ($NewScriptContext='' and not(ancestor::*[self::m:mfrac]) and following-sibling::*[1][not(self::m:mfrac or IsBracketed(., '', ''))])
              )" 
         then: [t: "w"]      # follows a function name, so lowercase
         else: [t: ""]

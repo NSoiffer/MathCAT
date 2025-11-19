@@ -36,6 +36,7 @@ mod braille {
 
     mod French {
         mod french;
+        mod chemistry;
     }
 }
 

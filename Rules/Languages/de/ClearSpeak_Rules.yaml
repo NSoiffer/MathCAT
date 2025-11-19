@@ -1,0 +1,786 @@
+---
+- name: intent-literal-silent
+  tag: [mi, mo, mn]
+  match: "contains(@data-intent-property, ':silent:')"
+  # say nothing
+  replace: []
+
+# handling of negative numbers that come from 'intent' is hard -- we do something that is close to right here 
+- name: intent-literal-negative-number
+  tag: mn
+  match: "starts-with(text(), '-')"
+  replace:
+  - T: "minus"
+  - x: "translate(text(), '-_', '')"
+
+- name: default
+  tag: square-root
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {T: "die"}
+  - test:
+      if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+      then:
+      - bookmark: "*[1]/@id"
+      - test:
+          if: parent::*[self::m:minus and count(*)=1]
+          then: [{T: "minus"}]
+          else: [{T: "plus"}]
+  - T: "quadratwurzel"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {T: "von"}
+      else: {pause: short}
+  - x: "*[1]"
+  - test:
+    - if: "$ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
+      then:
+      - pause: short
+      - T: "ende der wurzel"
+      - pause: medium
+    - else_if: "IsNode(*[1], 'simple')"
+      then: [{pause: short}]
+      else: [{pause: long}]
+
+- name: default
+  tag: root
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {T: "die"}
+  - test:
+      if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+      then:
+      - test:
+          if: "parent::*[(self::m:minus or self::m:plus) and count(*)=1]"
+          then: [{bookmark: "parent/@id"}]
+      - test:
+          if: parent::m:minus
+          then: [{T: "negative"}]
+          else: [{T: "positive"}]
+  - test:
+      if: "*[2][self::m:mn]"
+      then_test:
+      - if: "*[2][.='2']"
+        then: {T: "quadratwurzel"}
+      - else_if: "*[2][.='3']"
+        then: {T: "kubikwurzel"}
+      - else_if: "*[2][not(contains(., '.'))]"
+        then: [{x: "ToOrdinal(*[2])"}, {T: "Wurzel"}]
+      else:
+      - test:
+          if: "*[2][self::m:mi][string-length(.)=1]"
+          then:
+          - x: "*[2]"
+          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+          else: {x: "*[2]"}
+      - T: "wurzel"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {T: "von"}
+  - x: "*[1]"
+  - test:
+      if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+      then:
+      - pause: short
+      - T: "ende der wurzel"
+      - pause: medium
+      else_test:
+        if: IsNode(*[1], 'simple')
+        then: [{pause: short}]
+        else: [{pause: long}]
+
+# The 'negative' rule interacts with the msqrt/mroot rules as those might pick off this case ("the negative square root of x")
+- name: negative_and_positive
+  tag: [plus, minus]
+  match: "count(*)=1 and contains(@data-intent-property, ':prefix:')"
+  replace:
+  - test:
+      if:
+      - "*[1][self::m:square-root or self::m:root] and"
+      - "($ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd')"
+      then: {T: ""}
+      else:
+      - bookmark: "@id"
+      - test:
+          if: "self::m:minus"
+          then: [{T: "negative"}]
+          else: [{T: "positive"}]
+  - x: "*[1]"
+
+# Fraction rules
+# Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
+
+# Units (e.g., meters per second)
+- name: per-fraction
+  tag: fraction
+  match:
+  - "$ClearSpeak_Fractions='Per' or"
+  - "(BaseNode(*[1])[contains(@data-intent-property, ':unit') or"
+  - "                ( self::m:mrow and count(*)=3 and"  # maybe a bit paranoid checking the structure...
+  - "                 *[1][self::m:mn] and *[2][.='\u2062'] and BaseNode(*[3])[contains(@data-intent-property, ':unit')] ) ] and"
+  - " BaseNode(*[2])[contains(@data-intent-property, ':unit')] )"
+  replace:
+  - x: "*[1]"
+  - t: "pro"      # phrase('5 meters 'per' second)
+  - x: "*[2]"
+
+- name: common-fraction
+  tag: fraction
+  match:
+  - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
+  - "*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
+  - "*[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
+  replace: [{x: ToCommonFraction(.)}]
+
+- name: common-fraction-mixed-number
+  tag: fraction
+  match:
+  - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
+  - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
+  - "*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
+  - "*[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
+  replace: [{x: ToCommonFraction(.)}]
+
+- name: fraction-over-simple
+  tag: fraction
+  match:
+  - "($ClearSpeak_Fractions='Over' or $ClearSpeak_Fractions='FracOver' or $ClearSpeak_Fractions='OverEndFrac') or"
+  - "( not($ClearSpeak_Fractions='General' or $ClearSpeak_Fractions='GeneralEndFrac') and"
+  - "  (IsNode(*[1],'simple') and IsNode(*[2],'simple')) )" # simple fraction in ClearSpeak spec
+  replace:
+  - test:
+      if: "$ClearSpeak_Fractions='FracOver'"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: [{OT: "der"}]
+      - T: "bruch"
+  - x: "*[1]"
+  - T: "durch"
+  - x: "*[2]"
+  - test:
+      # very ugly!!! -- replicate nested ordinal fraction as they are an exception
+      if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
+      then:
+      - pause: short
+      - T: "ende des bruchs"
+      - pause: short
+
+- # fraction with text or numbers followed by text in both numerator and denominator
+  name: fraction-over-text
+  tag: fraction
+  match:
+  - "not($ClearSpeak_Fractions='General' or $ClearSpeak_Fractions='GeneralEndFrac') and"
+  - "( "
+  - "  ((*[1][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
+  - "   (*[1][self::m:mrow][count(*)=3][ "
+  - "        *[1][self::m:mn] and "
+  - "        *[2][self::m:mo][.='⁢'] and " # invisible times
+  - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) ) and"
+  - "  ((*[2][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
+  - "   (*[2][self::m:mrow][count(*)=3][ "
+  - "        *[1][self::m:mn] and "
+  - "        *[2][self::m:mo][.='⁢'] and " # invisible times
+  - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) )"
+  - ")"
+  replace:
+  - x: "*[1]"
+  - T: "durch"
+  - x: "*[2]"
+  - test:
+      if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
+      then:
+      - pause: short
+      - T: "ende des bruchs"
+      - pause: short
+
+- name: default
+  tag: fraction
+  match: "."
+  replace:
+  - OT: "der"
+  - T: "bruch mit zähler"
+  - test:
+      if: not(IsNode(*[1], 'simple'))
+      then: {pause: medium}
+  - x: "*[1]"
+  - pause: medium
+  - T: "und nenner"
+  - x: "*[2]"
+  - pause: long
+  - test:
+      if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='GeneralEndFrac'"
+      then:
+      - pause: short
+      - T: "ende des bruchs"
+      - pause: short
+
+# rules for functions raised to a power
+# these could have been written on 'mrow' but putting them on msup seems more specific
+# to see if it is a function, we look right to see if the following sibling is apply-function
+- name: ClearSpeak-function-inverse
+  tag: inverse-function
+  match: "."
+  replace:
+  - test:
+      if: $ClearSpeak_Trig = 'TrigInverse'
+      then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, {T: "umgekehrte"}]
+      else_test:
+        if: $ClearSpeak_Trig = 'ArcTrig'
+        then: [{bookmark: "*[2]/@id"}, {T: "ark"}, {x: "*[1]"}]
+        else: [{bookmark: "*[2]/@id"}, {T: "umgekehrte"}, {x: "*[1]"}] # default/Auto
+
+- name: function-squared-or-cubed
+  tag: power
+  match:
+  - "*[2][self::m:mn][.='2' or .='3'] and"
+  - "following-sibling::*[1][self::m:mo][.='⁡']" #invisible function apply
+  replace:
+  - x: "*[1]"
+  - bookmark: "*[2]/@id"
+  - test:
+      if: "*[2][.='2']"
+      then_test: 
+        if: "$Verbosity='Verbose'"
+        then: [T: "hoch zwei"]
+        else: [T: "quadrat"]
+      else: {T: "hoch 3"}
+
+- name: function-power
+  tag: power
+  match:
+  - "following-sibling::*[1][self::m:mo][.='⁡']" #invisible function apply
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {T: ""}
+  - bookmark: "*[2]/@id"
+  - test:
+      if: "*[2][self::m:mn][not(contains(., '.'))]"
+      then: [{x: "ToOrdinal(*[2])"}]
+      else: [{x: "*[2]"}]
+  - T: "hoch"
+  - pause: short
+  - x: "*[1]"
+
+- name: AfterPower-nested
+  tag: power
+  match: # directly a superscript or an mrow that contains a superscript
+  - "$ClearSpeak_Exponents = 'AfterPower' and"
+  - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
+  replace:
+  - x: "*[1]"
+  - T: "zum exponent"
+  - pause: short
+  - x: "*[2]"
+  - pause: short
+  - T: "ende exponent"
+
+- name: AfterPower-default
+  tag: power
+  match: "$ClearSpeak_Exponents = 'AfterPower'"
+  replace:
+  - x: "*[1]"
+  - T: "zum exponent"
+  - x: "*[2]"
+  - pause: short
+
+- name: squared
+  tag: power
+  match: "*[2][self::m:mn][.='2'] and $ClearSpeak_Exponents = 'Auto'"
+  replace:
+  - x: "*[1]"
+  - bookmark: "*[2]/@id"
+  - T: "quadrat"
+
+- name: cubed
+  tag: power
+  match: "*[2][self::m:mn][.='3'] and $ClearSpeak_Exponents = 'Auto'"
+  replace:
+  - x: "*[1]"
+  - bookmark: "*[2]/@id"
+  - T: "hoch 3"
+
+- name: simple-integer
+  tag: power
+  match: "*[2][self::m:mn][not(contains(., '.'))]"
+  replace:
+  - x: "*[1]"
+  - T: "hoch"
+  - test:
+      if: "*[2][.>0]"
+      then: {x: "ToOrdinal(*[2])"}
+      else: {x: "*[2]"}
+  - test:
+      if: "$ClearSpeak_Exponents != 'Ordinal'"
+      then: [{T: "hoch"}]
+
+- name: simple-negative-integer
+  tag: power
+  match:
+  - "*[2][self::m:minus and count(*)=1 and"
+  - "     *[1][self::m:mn][not(contains(., '.'))]"
+  - "    ]"
+  replace:
+  - x: "*[1]"
+  - T: "hoch"
+  - x: "*[2]"
+  - test:
+      if: "$ClearSpeak_Exponents != 'Ordinal'"
+      then: [{T: "hoch"}]
+
+- name: simple-var
+  tag: power
+  match: "*[2][self::m:mi][string-length(.)=1]"
+  replace:
+  - x: "*[1]"
+  - T: "hoch"
+  - x: "*[2]"
+  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  - test:
+      if: "$ClearSpeak_Exponents != 'Ordinal'"
+      then: [{T: "hoch"}]
+
+# match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
+#   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
+# where xxx is a number or common fraction (or a var in the first two forms)
+# short of creating a specialized built-in function, I don't see a way to eliminate a lot of repetition in the matches
+# also really bad is that the test of a common fraction is replicated here (four times!)
+# Note: the ClearSpeak doc doesn't say these only apply when the pref is "Auto",
+#   but the test cases all fall back to "raised to the exponent" when not "Auto"
+#   If these are allowed for non-Auto values, then you end up with "...power power...".
+- # [xxx]^n
+  name: nested-squared-or-cubed
+  tag: power
+  match:
+  - "$ClearSpeak_Exponents = 'Auto' and"
+  - "*[2][self::m:power]["
+  - "     *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3
+  # base is mn, mi, common fraction ([xxx] case)
+  - "     *[1][self::m:mn or self::m:mi or "
+  - "          self::m:fraction[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
+  - "                        *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
+  - "         ]"
+  - "    ]"
+  replace:
+  - x: "*[1]"
+  - T: "zum exponent"
+  - x: "*[2]"
+
+- # - [xxx]^n
+  name: nested-negative-squared-or-cubed
+  tag: power
+  match:
+  - "$ClearSpeak_Exponents = 'Auto' and"
+  - " *[2][self::m:minus and count(*)=1 and "
+  - "      *[1]/*[1][self::m:power]["
+  - "                *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3"
+  # base is mn, mi, common fraction ([xxx] case)
+  - "                *[1][self::m:mn or self::m:mi or "
+  - "                     self::m:fraction[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
+  - "                                   *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
+  - "               ]"
+  - "          ]"
+  - "     ]"
+  replace:
+  - x: "*[1]"
+  - T: "hoch"
+  - x: "*[2]"
+
+- # [xxx] var^n
+  name: nested-var-squared-or-cubed
+  tag: power
+  match:
+  - "$ClearSpeak_Exponents = 'Auto' and"
+  - "  *[2][self::m:mrow][count(*)=3][ "
+  - "       *[3][self::m:power]["
+  - "            *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3
+  - "            *[1][self::m:mi]"
+  - "           ] and "
+  - "       *[2][self::m:mo][.='⁢'] and " # invisible times
+  # base is mn, or common fraction ([xxx] case)
+  - "       *[1][self::m:mn or "
+  - "            self::m:fraction[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
+  - "                          *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
+  - "           ]"
+  - "      ]"
+  replace:
+  - x: "*[1]"
+  - T: "hoch"
+  - x: "*[2]"
+
+- # -[xxx] var^n
+  name: nested-negative-var-squared-or-cubed
+  tag: power
+  match:
+  - "$ClearSpeak_Exponents = 'Auto' and"
+  - "  *[2][self::m:mrow][count(*)=3][ "
+  - "       *[3][self::m:power]["
+  - "            *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3
+  - "            *[1][self::m:mi]"
+  - "           ] and "
+  - "       *[2][self::m:mo][.='⁢'] and " # invisible times
+  - "       *[1][self::m:minus and count(*)=1 and "
+  # base is mn, or common fraction ([xxx] case)
+  - "            *[1][self::m:mn or "
+  - "                 self::m:fraction[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
+  - "                                  *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
+  - "                ]"
+  - "           ]"
+  - "      ]"
+  replace:
+  - x: "*[1]"
+  - T: "hoch"
+  - x: "*[2]"
+
+- name: default-exponent-power
+  tag: power
+  match: # directly a superscript or an mrow that contains a superscript
+  - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
+  replace:
+  - x: "*[1]"
+  - T: "zum Exponent"
+  - pause: short
+  - x: "*[2]"
+  - pause: short
+  - T: "Ende Exponent"
+
+- name: default
+  tag: power
+  match: "."
+  replace:
+  - x: "*[1]"
+  - T: "hoch"
+  - x: "*[2]"
+
+#
+# Some rules on mrows
+#
+- # the inference rules lump absolute value and cardinality together, so those rules are implemented here
+  name: ClearSpeak-absolute-value
+  tag: absolute-value
+  match: "."
+  variables: [{WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Kardinalität', 'Kardinalität', 'Betrag')"}]
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {T: "der"}
+  - x: "$WordToSay"
+  - T: "von"
+  - x: "*[1]"
+  - test:
+      if: "$ClearSpeak_AbsoluteValue = 'AbsEnd'"
+      then:
+      - pause: short
+      - T: "end"
+      - x: "$WordToSay"
+  - pause: short
+
+- name: set
+  tag: set
+  match: "."
+  replace:
+  - test:
+    - if: "count(*)=0"
+      then: [{T: "leere Menge"}]
+    - else_if: "count(*)=2"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {T: "die"}
+      - T: "leere Menge"
+    - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {T: "die"}
+      - T: "Menge"
+      - test:
+          if: $ClearSpeak_Sets != 'woAll'
+          then: [{T: "alle"}]
+      - x: "*[1]/*[1]"
+      - T: "so dass"
+      - x: "*[1]/*[3]"
+      else:
+      - test:
+          if: $ClearSpeak_Sets != 'SilentBracket'
+          then:
+          - test:
+              if: "$Verbosity!='Terse'"
+              then: {T: "die"}
+          - T: "Menge"
+      - x: "*[1]"
+
+- # intervals are controlled by a ClearSpeak Preference -- parens/brackets don't have to match, so we avoid IsBracketed
+  # alternatively, we could have four (or ten) rules, but there is a lot of duplication if we do that
+  # this one rule handles all ten cases listed as part $ClearSpeak_Paren = 'Interval'
+  # note that *[2] is an mrow with X, ",", Y, so getting X or Y is a double index
+  name: ClearSpeak-intervals # avoid overriding with default "intervals" name
+  variables:
+  - is_intervals_start_infinity: "*[1][self::m:minus and count(*)=1 and *[1][.='∞']]"
+  - is_intervals_end_infinity: "*[2][.='∞'or (self::m:plus and count(*)=1 and *[1][.='∞'])]"
+  tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
+  match: "."
+  replace:
+  - T: "das Intervall"
+  - x: "*[1]"
+  - T: "bis"
+  - x: "*[2]"
+  - pause: short
+  - test:
+      if: "not($is_intervals_start_infinity)"
+      then:
+      - test:
+          if: "starts-with(name(.), 'open')"
+          then: [{T: "no"}]
+      - T: "einschließlich"
+      - x: "*[1]"
+    # logic to deal with [not] arg #1
+  - test:
+      if: "not($is_intervals_start_infinity or $is_intervals_end_infinity)"
+      then_test:
+      - if: "name(.)='open-interval'"
+        then: [{T: "ohne"}]
+      - else_if: "name(.)='closed-interval'"
+        then: [{T: "mit"}]
+        else: [{T: "ohne"}]
+    # some ugly logic dealing with connectives: or, but, but, and (cleaner to be part of next clause?)
+  - test:
+      if: not($is_intervals_end_infinity)
+      then:
+      - test:
+          # there is some asymmetry to the test because of the and/or/but logic above
+          if: not( name(.)='open-interval' or name(.)='closed-interval' ) or $is_intervals_start_infinity
+          then:
+          - test:
+              if: "name(.) = 'open-interval' or name(.) = 'closed-open-interval'"
+              then: [{T: "ohne"}]
+          - T: "einschließlich"
+      - x: "*[2]"
+
+    # onto the [not] [including]... part
+- name: binomial-frac-vector
+  tag: matrix
+  match:
+  - "$ClearSpeak_Matrix = 'Combinatorics' and "
+  - "count(*[1]/*)=1 and count(*)=2"
+  replace:
+  - T: "wähle"
+  - x: "*[1]/*[1]/*" # mtable/mtr/mtd
+  - T: "aus"
+  - x: "*[2]/*[1]/*"
+
+- name: ClearSpeak-default
+  tag: [mtr, mlabeledtr]
+  match: "parent::m:matrix or parent::m:determinant"
+  replace:
+  - pause: medium
+  - T: "zeile"
+  - x: "count(preceding-sibling::*)+1"
+  - test:
+      if: .[self::m:mlabeledtr]
+      then:
+      - T: "mit bezeichnung"
+      - x: "*[1]/*"
+      - pause: short
+  - pause: medium
+  - test:
+      if: .[self::m:mlabeledtr]
+      then: [{x: "*[position()>1]"}]
+      else: {x: "*"}
+
+- name: matrix-default
+  tag: mtd
+  match: "parent::*[parent::m:matrix or parent::m:determinant]"
+  replace:
+  - test:
+      #  ClearSpeak normally speaks "column 1" even though it says the row number, which is a waste...
+      #  The following is commented out but the count(...)!=0 probably belongs in other rule sets
+      #   if: not($IsColumnSilent) and ($ClearSpeak_Matrix = 'SpeakColNum' or count(preceding-sibling::*) != 0)
+      if: "not($IsColumnSilent)"
+      then:
+      - T: "spalte"
+      - x: "count(preceding-sibling::*)+1"
+      - pause: medium
+  - x: "*"
+  - test:
+    # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
+    - if: count(following-sibling::*) > 0
+      then: {pause: short}
+    - else_if: count(../following-sibling::*) > 0
+      then: {pause: medium}
+      else: {pause: long}
+
+- # handle both log and ln
+  name: ClearSpeak-log
+  tag: mrow
+  variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
+  match:
+  - "count(*)=3 and"
+  - "*[1][self::m:mi][.='log' or .='ln'] and"
+  - "*[2][self::m:mo][.='⁡']"
+  replace:
+  - test:
+      if: "$log_is_simple"
+      then_test:
+      - if: "*[1][.='log']"
+        then: [{T: "log"}]
+      - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
+        then: [{T:  "Natürliche Logarithmus"}]
+        else: [{spell: "'ln'"}]
+      else:
+      - test:
+          if: "$Verbosity!='Terse' and not(log_is_simple)"
+          then: {T: "der"}
+      - test:
+        - if: "*[1][.='log']"
+          then: [{T: "log"}]
+        - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
+          then: [{T: "Natürliche Logarithmus"}]
+          else: [{spell: "'ln'"}]
+      - T: "von"
+      - pause: short
+  - x: "*[3]"
+
+- name: ClearSpeak-multi-line
+  tag: [piecewise, system-of-equations, lines] # these are ignored in favor of the ClearSpeak prefs
+  match: "."
+  variables:
+    # Wikipedia has some tables where all the entire first column is empty (e.g., https://en.wikipedia.org/wiki/List_of_trigonometric_identities)
+    - LineCount: "count(*[not(contains(@data-intent-property, ':continued-row:'))])"
+    - NextLineIsContinuedRow: "false()"   # default value
+    - IsColumnSilent: true()
+  replace:
+    - test:
+        - if: $ClearSpeak_MultiLineOverview = 'Auto'
+          then:
+            - x: "$LineCount"
+            - test:
+                - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
+                  then: [t: "fall"]      # phrase(this is the first 'case' of three cases)
+                - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line' or $ClearSpeak_MultiLineLabel = 'None'" # already dealt with Auto/Case
+                  then: [t: "zeile"]      # phrase(this is the first 'line' of three lines)
+                - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
+                  then: [t: "bedingung"]      # phrase(this is the first 'constraint' of three constraints)
+                - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
+                  then: [t: "gleichung"]      # phrase(this is the first 'equation' of three equations)
+                - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
+                  then: [t: "reihe"]      # phrase(this is the first 'row' of three rows)
+                - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
+                  then: [t: "stufe"]      # phrase(this is the first 'step' of three steps)
+                  # else 'None -- don't say anything'
+            - test:
+                - if: "$LineCount != 1"
+                  then: [ct: "s"] # plural      # phrase(shown by the letter 's')
+            - pause: short
+    - x: "*"
+    - pause: long
+
+- name: ClearSpeak-default-multiline
+  tag: [mtr, mlabeledtr]
+  match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
+  variables: [NextLineIsContinuedRow: "following-sibling::*[1][contains(@data-intent-property, ':continued-row:')]"]
+  replace:
+    - test:
+        if: "not($LineCount=1 or $ClearSpeak_MultiLineLabel='None' or contains(@data-intent-property, ':continued-row:'))"
+        then:
+          - pause: medium
+          - test:
+              - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
+                then: [t: "fall"]      # phrase(in this  'case' x is not equal to y)
+              - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
+                then: [t: "zeile"]      # phrase(the straight 'line' between x and y)
+              - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
+                then: [t: "bedingung"]      # phrase(there is a 'constraint' on possible values)
+              - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
+                then: [t: "gleichung"]      # phrase(the 'equation' pi r squared gives the area of a circle)
+              - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
+                then: [t: "reihe"]      # phrase(the values on the top 'row' are relevant)
+              - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
+                then: [t: "stufe"]      # phrase(this is a 'step' by step process)
+                # else 'None -- don't say anything'
+          - x: "count(preceding-sibling::*[not(contains(@data-intent-property, ':continued-row:'))]) + 1"
+    - test:
+        if: "self::m:mlabeledtr"
+        then:
+          - t: "with label"      # phrase(the diagram is complete 'with label')
+          - x: "*[1]/*"
+    - test:
+        - if: "$ClearSpeak_MultiLineLabel='None'"
+          then: [pause: xlong]   # need a very long pause with no line labels
+        - else_if: "not(contains(@data-intent-property, ':continued-row:'))"
+          then: [pause: medium]
+    - test:
+        if: "self::m:mlabeledtr"
+        then: [x: "*[position()>1]"]
+        else: [x: "*"]
+
+- name: ClearSpeak_Functions_None
+  tag: mo
+  match:
+  - ".='⁡' and $ClearSpeak_Functions = 'None' and"
+  - "not(preceding-sibling::*[1][IsInDefinition(., 'TrigFunctionNames')])" # Functions=None does not apply to "trig" functions
+  replace:
+    test:
+      if: "$ClearSpeak_ImpliedTimes = 'None'"
+      then: [{T: ""}]
+      else: [{T: "mal"}]
+
+- name: no-times
+  tag: mo
+  match:
+  # Note: this rule is also part of the paren rule so that the parens speak
+  - ".='⁢' and $ClearSpeak_ImpliedTimes = 'None'"
+  replace:
+  - T: ""
+
+- name: ClearSpeak-times
+  tag: mo
+  match:
+  # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s
+  # if we aren't sure if it is times or not, don't say anything
+  - ".='⁢' and (not(@data-function-guess) or $ClearSpeak_Functions = 'None') and ("
+  - "  $ClearSpeak_ImpliedTimes = 'MoreImpliedTimes'"
+  - " or "
+  - "  following-sibling::*[1]["
+  - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|') or "
+  - "    self::m:matrix or self::m:determinant or self::m:binomial or" # followed by parens
+  - "    ( (self::m:msup or self::m:msub or self::m:msubsup or self::m:power) and " # followed by msup, etc.
+  - "       *[1][self::m:mrow[IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')] or "
+  - "            self::m:matrix or self::m:determinant]" # base has parens
+  - "    )"
+  - "  ]"
+  # other possibility is the preceding element has parens (but not the following)
+  # this is not mentioned in the ClearSpeak rules or examples but seems like it should say "times". E.g, |x| y
+  - " or "
+  - "  preceding-sibling::*[1]["
+  - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
+  - " )"
+  replace:
+  - T: "mal"
+
+- name: no-say-parens
+  tag: mrow
+  match:
+  - "parent::*[not(self::m:msup) and not(self::m:msub) and not(self::m:msubsup) and not(self::m:power) and"
+  - "          not(self::m:math) ] and "       # rule out [x] standing alone
+  - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
+  - "not( $ClearSpeak_Functions = 'None' and "
+  - "     (preceding-sibling::*[1][.='⁡'] or following-sibling::*[1][.='⁡']) ) and "
+  - "not( $ClearSpeak_ImpliedTimes = 'None' and "
+  - "     (preceding-sibling::*[1][.='⁢'] or following-sibling::*[1][.='⁢']) ) and "
+  - "( IsNode(*[2], 'simple') )"
+  # missing clause: 'a positive fraction that is spoken as an ordinal
+  #   (either by the Ordinal preference or by the default rules)'
+  replace:
+  - x: "*[2]"
+
+- include: "SharedRules/geometry.yaml"
+- include: "SharedRules/linear-algebra.yaml"
+- include: "SharedRules/calculus.yaml"
+- include: "SharedRules/general.yaml"
+- include: "SharedRules/default.yaml"

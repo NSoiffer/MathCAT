@@ -404,39 +404,64 @@ def dict_compare(lang: str, sre: dict, mp: dict):
 # Strangely, if you copy the '.../en/definitions.yaml' and paste that into translate.google.com, it does it all.
 # Rather than waste a bunch more time on this, the code assumes you've translated the file already and stored
 #   it in 'google-defs.yaml' in the current dir
-# It then goes through the English version leaving the English and  pulling out only the translated *values*
+# It then goes through the English version leaving the English and pulling out only the translated *values*
 #   from 'google-defs.yaml' writing '[lang]-definitions.yaml'.
 def translate_definitions(path_to_mathcat: str, lang: str):
     if lang == 'nb' or lang == 'nn':
         lang = 'no'  # google doesn't know those variants
 
-    file_to_translate = "{}/Rules/Languages/en/definitions.yaml".format(path_to_mathcat)
+    file_to_translate = f'{path_to_mathcat}/Rules/Languages/en/definitions.yaml'
+    translated_file = f'{path_to_mathcat}/Rules/Languages/{lang}/definitions.yaml'
     with open("google-defs.yaml", 'r', encoding='utf8') as google_stream:
         translated_lines = google_stream.readlines()
         with open(file_to_translate, 'r', encoding='utf8') as in_stream:
-            with open(f"{lang}/definitions.yaml", 'w', encoding='utf8') as out_stream:
+            with open(translated_file, 'w', encoding='utf8') as out_stream:
                 lines = in_stream.readlines()
-                i = 0
+                i_en = 0
+                i_trans = 0
                 n_lines = len(lines)
-                while i < n_lines:
-                    if not (lines[i].startswith('#')) and lines[i].find(': [') >= 0:
+                while i_en < n_lines:
+                    if not (lines[i_en].startswith('#')) and (lines[i_en].find(': [') >= 0 or lines[i_en].find(': {') >= 0):
                         # handles 'xxx: [' inclusive of the line with the matching ']'
-                        i = translate_definition(i, lines, translated_lines, out_stream)
+                        (i_en, i_trans) = translate_definition(i_en, lines, i_trans, translated_lines, out_stream)
                     else:
-                        out_stream.write(lines[i])
-                    i += 1
+                        out_stream.write(lines[i_en])
+                    i_en += 1
+                    # i_trans += 1
 
 
-def translate_definition(start: int, lines: list[str], translated_lines: list[str], out_stream):
-    out_stream.write(lines[start])
-    i = start+1    # first line is 'name: ['
-    while i < len(lines):
-        if lines[i].find(']') >= 0:
-            out_stream.write(lines[i])
-            return i
-        out_stream.write(translated_lines[i].replace("“", "'").replace("”", "'").replace("、", ","))  # Chinese
-        i += 1
-    return i
+def translate_definition(i_en: int, lines: list[str], i_trans: int, translated_lines: list[str], out_stream) -> (int, int):
+    out_stream.write(lines[i_en])
+    i_en = i_en+1    # first line is 'name: [' or 'name: {'
+    # sync lines -- find '[' in translation
+    while not (translated_lines[i_trans].find(': [') >= 0 or translated_lines[i_trans].find(': {') >= 0):
+        i_trans += 1
+    i_trans += 1   # skip the [/{ line
+    while i_en < len(lines):
+        if (
+            translated_lines[i_en].strip().startswith('#') or
+            len(translated_lines[i_en].strip()) == 0 and len(translated_lines[i_trans].strip()) == 0
+        ):
+            out_stream.write(lines[i_en])
+        elif lines[i_en].find(']') >= 0 or lines[i_en].find('}') >= 0:
+            out_stream.write(lines[i_en])
+            return (i_en, i_trans)
+        elif len(translated_lines[i_trans].strip()) == 0:  # google sometimes adds blank lines
+            i_trans += 1
+            continue
+        else:
+            print(f'en: {lines[i_en].strip()}\ntr: {translated_lines[i_trans].strip()}')
+            # get indentation right
+            i_spaces = lines[i_en].find('"')
+            cleaned_line = (
+                translated_lines[i_trans]
+                .replace("“", '"').replace("”", '"').replace("„", '"').replace("、", ",")  # Chinese
+                .lstrip()
+            )
+            out_stream.write(f'{" ".ljust(i_spaces)}' + cleaned_line)
+        i_en += 1
+        i_trans += 1
+    return (i_en, i_trans)
 
 
 def build_euro(lang: str):
@@ -502,7 +527,7 @@ ACCESS8_Location = r"C:\dev\Access8Math\addon\globalPlugins\Access8Math\locale"
 # (sre_only, mp_only, differ, same) = dict_compare("fr", get_sre_unicode_dict(SRE_Location, "fr"), get_mathplayer_unicode_dict(MP_Location, "fr"))
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
 
-language = "ru"
+language = "pl"
 # build_new_translation("..", language, "unicode")
 # build_new_translation("..", language, "unicode-full")
 

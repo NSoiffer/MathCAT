@@ -473,9 +473,15 @@ fn si_other_numbers() {
                             <mn>1235</mn><mi intent=":unit">daN</mi><mo>,</mo>
                             <mn>2.5</mn><mi intent=":unit">&#xB5;sec</mi><mo>,</mo>
                             <mn>32.34</mn><mi intent=":unit">mol</mi></math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1.0 litre, comma; 2.0 metres, comma; x milli-seconds, comma; y micro-seconds, comma, \
-                deka-grams, comma; 1235 deka-newtons; comma; 2.5 micro-seconds; comma; 32.34 moles");
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr,
+            "1.0 l comma, 2.0 m comma; x milli-seconds, comma; y micro-seconds, comma, \
+                    deka-grams, comma; 1235 deka-newtons; comma; 2.5 micro-seconds; comma; 32.34 moles");
+    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
+            "1.0 litre, comma; 2.0 metres, comma; x milli-seconds, comma; y micro-seconds, comma, \
+                    deka-grams, comma; 1235 deka-newtons; comma; 2.5 micro-seconds; comma; 32.34 moles");
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+            "1.0 litre, comma; 2.0 metres, comma; x milli-seconds, comma; y micro-seconds, comma, \
+                    deka-grams, comma; 1235 deka-newtons; comma; 2.5 micro-seconds; comma; 32.34 moles");
 }
 
 
@@ -491,3 +497,16 @@ fn test_mtext_inference() {
         "open bracket; 1 metric ton, comma; 2 peta-amps, comma, \
                 3 pascals, comma; 4.5 milli-teslas; close bracket");
 }
+
+    #[test]
+    fn infer_unit() {
+        let expr = r#"<math>
+            <mn>3</mn><mi mathvariant="normal">m</mi><mo>,</mo>
+            <mn>1</mn><mi>km</mi><mo>,</mo>
+            <mn>3</mn><mtext>m</mtext><mo>,</mo>
+            <mfrac><mn>3</mn><mn>10</mn></mfrac><mi mathvariant="normal">F</mi><mo>,</mo>
+            <msub><mi>m</mi><mi>min</mi></msub>
+            </math>"#;
+        test("en", "SimpleSpeak", expr, 
+            "3 metres, comma; 1 kilo-metre, comma, 3 metres, comma; 3 tenths farads, comma; m sub min end sub");
+    }

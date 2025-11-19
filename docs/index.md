@@ -175,8 +175,7 @@ Using open source math books, the initial load should cover at least 99.99% of t
 
 The library is about ~3mb in size.
 
-If you are working on an in-browser solution (i.e, you are using JavaScript or some other browser-based language), MathCAT is probably not the best tool for you (although I will probably factor the [MathCATDemo](https://github.com/NSoiffer/MathCATDemo/) into a Javascript interface which the demo is built on top of). Instead, take a look at [Speech rule engine](https://github.com/zorkow/speech-rule-engine) (SRE) by Volker Sorge. It is written in TypeScript and will likely meet your needs for an in-browser solution unless UEB braille is important.
-
+If you are working on an in-browser solution (i.e, you are using JavaScript or some other browser-based language), MathCAT is probably not the best tool for you (although I will probably factor the [MathCATDemo](https://github.com/NSoiffer/MathCATDemo/) into a Javascript interface which the demo is built on top of). Instead, take a look at [Speech rule engine](https://github.com/zorkow/speech-rule-engine) (SRE) by Volker Sorge. It is written in TypeScript and will likely meet your needs for an in-browser solution unless braille is important; MathCAT supports multiple braille codes and at least for Nemeth Code, is higher quality.
 
 # Acknowledgements
 Several people helped out in various ways with the project. I am very grateful for all their help!
@@ -188,18 +187,25 @@ Several people helped out in various ways with the project. I am very grateful f
 * Sam Dooley, Murray Sargent, and Volker Sorge -- provided tables of Nemeth translations of characters and Nemeth tests
 
 Translators:
+
 * Chinese (Traditional) -- Hon-Jang Yang
+* Finnish -- Sami Määttä, Accessibility Library Celia, and Essi Viippola, freelancer
+* German --Nazli Andjic, Robert Graf and Paul Libbrecht (IU International University of Applied Sciences)
 * Indonesian -- Dr. Pinta Deniyanti Sampoerno, M.Si; Dr. Meiliasari, S.Pd., M.Sc; and Ari Hendarno, S.Pd., M.kom
+* Norwegian -- Marthe Gjelstad, National Library of Norway, Kvile
 * Spanish -- Noelia Ruiz Martínez (also help with NVDA addon development) and María Allo Roldán
+* Swedish -- Tim Arborealis Lötberg, Swedish Agency for Accessible Media (MTM) and Anders Eklund, SPSM
 * Vietnamese -- Dang Hoai Phúc and Trang Pham
 * Others??? -- please volunteer so I can list you here...
 
 The initial translation of many braille characters for braille codes developed in 2024 and beyond was greatly helped by a spreadsheet given to me by Georgious Kouroupetroglou and is the work of a larger team. For more details, see:
+
 * [MathBrailleCodes Repository](https://access.uoa.gr/mathbraille/index.php/en/), Speech and Accessibility Lab, National and Kapodistrian University of Athens, Greece: P. Riga, T. Antonakopoulou, D. Kouvaras, S. Lentas and G. Kouroupetroglou (2021) “[The BrailleMathCodes Repository](https://access.uoa.gr/mathbraille/index.php/en/)”, Proceedings of the 4th International Workshop on “[Digitization and e-Inclusion in Mathematics and Science 2021](https://workshop.sciaccess.net/deims2021/DEIMS2021_Proceedings.zip)” DEIMS2021, February 18-19, 2021, Tokyo, pp. 105-114. 
 
 Thanks to everyone who volunteered!
 
 # About me
+
 I've been working on math accessibility since 2002. At the time, I worked on Mathematica's WYSIWYG math editor and other UI features. Prof. John Gardner, who had lost his sight 15 years earlier, asked whether I could make the Mathematica frontend accessible. I maybe got 80% of the way there, but the company wasn't interested in pursuing this and ultimately I left the company and the company removed the code. That was the start of my accessibility journey: one step forward, one step back, and then forward again because allowing _everyone_ to have a chance to find the joy of math and science has given purpose to my life.
 
 I then joined Design Science, Inc (DSI) which had an interest in making math accessible. At the time, DSI had recently developed MathPlayer, a plugin for IE6 that displayed MathML. I worked on adding features to that and with the company's support, applied for and received an NSF grant to make MathPlayer accessible. That work was quite successful and in subsequent years I continued to add features to it. However, for security reasons, Internet Explorer removed the interface that MathPlayer depended upon. It's tempting to say that is what doomed IE... After that, MathPlayer became an accessibility-only NVDA add-on. Further work through an IES grant with ETS refined MathPlayer's capabilities; valuable insight was gained via user-studies funded by the grant.
