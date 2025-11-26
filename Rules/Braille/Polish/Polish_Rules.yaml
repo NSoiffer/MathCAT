@@ -1,21 +1,20 @@
-# References such as 7.2(5) refer to the fifth example in section 7.2 in guide from ONCE
-# https://www.once.es/servicios-sociales/braille/comision-braille-espanola/documentos-tecnicos/documentos-tecnicos-relacionados-con-el-braille/documentos/b5-signografia-matematica.pdf
 ---
-# -
-#   name: unit-spaces
-#   tag: "!*"
-#   match: "not(self::m:math) and not($MatchingWhitespace) and (@data-previous-space-width >= 0.25 or @data-following-space-width >= 0.25)"
-#   replace:
-#    - with:
-#       variables: [MatchingWhitespace: "true()"]
-#       replace:
-#       - test:
-#         - if: "(@class='MathML-unit' or contains(@intent, ':unit') or BaseNode(.)[@class='MathML-unit' or contains(@intent, ':unit')]) and @data-previous-space-width >= 0.25" 
-#           then: [t: "𝐖"]
-#       - x: "."
-#       - test:
-#         - if: "(@class='MathML-unit' or contains(@intent, ':unit') or BaseNode(.)[@class='MathML-unit' or contains(@intent, ':unit')]) and @data-following-space-width >= 0.25" 
-#           then: [t: "𝐖"]
+-
+  name: spaces
+  tag: "!*"
+  # 0.8 was chosen as it is larger than 0.7 which is used for a non-breaking space (works for the tests, but I'm not sure that is the best choice)
+  match: "not(self::m:math) and not($MatchingWhitespace) and (@data-previous-space-width >= 0.8 or @data-following-space-width >= 0.8)"
+  replace:
+   - with:
+      variables: [MatchingWhitespace: "true()"]
+      replace:
+      - test:
+        - if: "@data-previous-space-width >= 0.8" 
+          then: [t: "𝐖"]
+      - x: "."
+      - test:
+        - if: "@data-following-space-width >= 0.8" 
+          then: [t: "𝐖"]
 
 -
   name: omissions
@@ -95,20 +94,20 @@
   - x: "*[5]"
       
 
--   # p43 gives rule for binomial
-  name: binomial
-  tag: mrow
-  match: "IsBracketed(., '(', ')') and
-          *[2][(self::m:mfrac and @linethickness=0) or
-               (self::m:mtable and count(*)=2 and count(*[1])=1 and contains(@intent, 'binomial-coefficient('))]"
-  replace: 
-  - t: "("
-  - t: "<⠆-" # signal start of fraction (needed for fraction depth count -- '-' says to delete the start/end)
-  - x: "*[2]/*[1]"
-  - t: "⠰⠳"
-  - x: "*[2]/*[2]"
-  - t: ">⠰-"
-  - t: ")"
+# -   # p43 gives rule for binomial
+#   name: binomial
+#   tag: mrow
+#   match: "IsBracketed(., '(', ')') and
+#           *[2][(self::m:mfrac and @linethickness=0) or
+#                (self::m:mtable and count(*)=2 and count(*[1])=1 and contains(@intent, 'binomial-coefficient('))]"
+#   replace: 
+#   - t: "("
+#   - t: "<⠆-" # signal start of fraction (needed for fraction depth count -- '-' says to delete the start/end)
+#   - x: "*[2]/*[1]"
+#   - t: "⠰⠳"
+#   - x: "*[2]/*[2]"
+#   - t: ">⠰-"
+#   - t: ")"
 
 # -
 #   longer notation: use if
@@ -204,46 +203,66 @@
 # Matrix/Determinant rules
 # matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
 # we don't do spatial layout, instead the beginning/ending of each row uses the enlarged bracketing chars
--
-  name: default-matrix
-  tag: mrow
-  variables:
-    - RowStart: "*[1]"
-    - RowEnd: "*[3]"
-  match:
-    - "*[2][self::m:mtable] and"
-    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
-  replace: [x: "*[2]"]
+
 
 -
-   name: default-mtable
-   tag: mtable
-   match: "."
-   replace: [x: "*"]
+  name: determinant-replacement
+  # This replaces W = | ... | with just the determinant content
+  # “W” comes from Polish name "Wyznacznik" (determinant), and this eliminates redundancy (see p46, second form is preferred)
+  tag: mrow
+  match:
+    - "*[1][self::m:mi and .='W' or .='𝐖'] and *[2][self::m:mo and .='='] and IsBracketed(*[3], '|', '|')"
+  replace:
+  - t: "⠻⠙⠑⠞⠣"   # "det("
+  - x: "*[3]/*[2]"
+  - t: "⠜"        # ")"
+  - x: "*[position()>3]"
+
+-
+  name: determinant-determinant-replacement
+  # This replaces |W| = | | ... | | with just the determinant content
+  # “W” comes from Polish name "Wyznacznik" (determinant), and this eliminates redundancy (see p46, second form is preferred)
+  tag: mrow
+  match:
+    - "IsBracketed(*[1], '|', '|') and *[1]/*[2][self::m:mi and .='W' or .='𝐖'] and *[2][self::m:mo and .='='] and IsBracketed(*[3], '|', '|')"
+  replace:
+  - t: "⠈⠇⠻⠙⠑⠞⠣"   # "|det("
+  - x: "*[3]/*[2]/*[2]"
+  - t: "⠜⠸"        # ")"
+  - x: "*[position()>3]"
+
+
+-
+  name: default-mtable
+  tag: mtable
+  match: "."
+  replace:
+  - x: "*"
+
 
 -
   name: default
   tag: [mtr, mlabeledtr]
   match: "."
   replace:
-   - test: 
+  - test: 
       if: "count(parent::*) > 1"
       then: [t: "⠠"]
-   - t: ""
-   - x: $RowStart
-   - test:
+  - test: 
+      if: "preceding-sibling::*"
+      then: [t: "⠰⠳"]
+  - test:
       if: .[self::m:mlabeledtr]
       then:
          - t: "⠗⠕⠺W⠇⠁⠃⠑⠇⠸⠒"  # "row label:"
          - x: "*[1]/*"           # contents of row label
-   - test:
+  - test:
       if: .[self::m:mlabeledtr]
       then: [x: "*[position()>1]"]
       else: {x: "*"}
-   - test: 
+  - test: 
       if: "count(parent::*) > 1"
       then: [t: "⠠"]
-   - x: $RowEnd
 
 -
   name: default
@@ -256,7 +275,9 @@
       - test: 
          if: "preceding-sibling::*"
          then: [t: "W"]
+      - t: "<⠆-" # signal start of fraction (needed for depth count because of tables are off the baseline -- '-' says to delete the start/end)
       - x: "*"
+      - t: ">⠰-" # not sure if this should be some other indicator; for now using the fraction indicator seems to be ok
       # else nothing to braille
 
 -
@@ -270,8 +291,6 @@
   tag: math
   match: "."
   variables:
-    - RowStart: "''"           # empty string -- it needs to be set
-    - RowEnd: "''"             # empty string -- it needs to be set
     - NewScriptContext: "''"    # empty string -- it needs to be set
     - MatchingWhitespace: "false()"
   replace: [x: "*"]
@@ -354,8 +373,15 @@
   variables: [Abbreviations: "DefinitionValue(., 'Braille', 'Abbreviations')"]
   replace:
   - test:
+      # Abbreviations take precedence over units and currency symbols (see "rad" on p51), unless they are marked as units
+    - if: "$Abbreviations != '' and not(@class='MathML-unit' or contains(@intent, ':unit'))" 
+      then:
+      - test:
+          if: "not(.='const' or .='sgn' or .= 'lim')"
+          then: [t: 'f']    # forces function mode (lower case Roman letter)
+      - x: "$Abbreviations"
       # add unit indicator
-    - if: "@class='MathML-unit' or contains(@intent, ':unit') or
+    - else_if: "@class='MathML-unit' or contains(@intent, ':unit') or
            (not(@data-chem-element) and
             (self::m:mtext or string-length(.) > 1 or @mathvariant='normal') and
             (parent::*[1][self::m:mrow and count(*)=3 and *[2][.='\u2062'] and
@@ -384,25 +410,14 @@
       - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
       - t: "tW"  
       else:
-      - with:
-          variables: [Abbreviations: "DefinitionValue(., 'Braille', 'Abbreviations')"]
-          replace:
-          - test:
-              if: "$Abbreviations != ''"
-              then:
-              - test:
-                  if: "not(.='const' or .='sgn' or .= 'lim')"
-                  then: [t: 'f']    # forces function mode (lower case Roman letter)
-              - x: "$Abbreviations"
-              else:
-              - test:
-                  # words have different rules from math. Guessing that strings of length 4 or more are words
-                  if: "self::m:mtext and string-length(.) > 3"
-                  then: [t: "T"] 
-              - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
-              - test:
-                  if: "self::m:mtext and string-length(.) > 3"
-                  then: [t: "t"] 
+      - test:
+          # words have different rules from math. Guessing that strings of length 4 or more are words
+          if: "self::m:mtext and string-length(.) > 3"
+          then: [t: "T"] 
+      - x: "BrailleChars(., 'Polish')"   # also deals with "dot after 'arc'"
+      - test:
+          if: "self::m:mtext and string-length(.) > 3"
+          then: [t: "t"] 
       
 
 
@@ -472,6 +487,16 @@
       if: "self::m:msup and *[2][.='+'] and *[1][self::m:mn]"
       then: [t: "⠘"]
   - x: "DefinitionValue(*[2], 'Braille', 'Scripts')"
+  
+-
+  name: time
+  tag: msup
+  # see p92 for examples
+  match: "*[1][self::m:mn] and *[2][self::m:mn] and ancestor-or-self::*[contains(@intent, ':time')]"
+  replace:
+  - x: "*[1]"
+  - t: "N⠄"
+  - x: "*[2]"
 
 -
   name: pseudo-scripts
@@ -505,7 +530,12 @@
   - test:
       if: "$Polish_BrailleLevel = 'Advanced' and *[2][self::m:mn and not(contains(., $DecimalSeparators))]"
       then: [x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Polish')"]
-      else: [x: "*[2]"]
+      else:
+      # not part of the spec, but it is better to force a lower case indicator for the base of a log
+      - test:
+          if: "translate(*[2], 'abcdefghij', '') = ''"
+          then: [t: "𝒍"]
+      - x: "*[2]"
   - x: "*[1]"
 
 -
@@ -650,14 +680,18 @@
 
 
 -
-  # FIX: not sure what to do -- this is based on p64 (last example) and only works for mover
-  name: oxidation-states
+ 
+  name: oxidation-states   #p 85
   tag: mover
   match: "BaseNode(*[1])[@data-chem-element]"
   replace:
   - x: "*[1]"
   - t: "("
-  - x: "*[2]"
+  - test:
+      # should be 0 or a roman numeral
+      if: "*[2][self::m:mn and .='0' and $Polish_BrailleLevel != 'Beginner']"
+      then: [x: "BrailleChars('\ue000', 'Polish')"]   # drop zero
+      else: [x: "*[2]"]   # indicates unknown oxidation state
   - t: ")"
 
 -

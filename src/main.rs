@@ -192,15 +192,9 @@ fn main() {
   //   </math>";
 
   let expr = r#"
-<<<<<<< HEAD
-   <math><mmultiscripts><mi>Po</mi><mprescripts/><mn>84</mn><mn>215</mn></mmultiscripts></math> 
+<math xmlns="http://www.w3.org/1998/Math/MathML"><mo>&#x27E8;</mo><mo>&#x1D713;</mo><mo>|</mo><mo>+</mo><mn>1</mn></math>
                       "#;
-  let instant = Instant::now();
-=======
-<math xmlns="http://www.w3.org/1998/Math/MathML"><mo>(</mo><mn>1</mn><mo>)</mo></math>
-                   "#;
   // let instant = Instant::now();
->>>>>>> main
 
   // let rules_dir = "".to_string();    // Use MathCATRulesDir, potentially pointing to a zipped version
   if let Err(e) = set_rules_dir(get_rules_dir()) {

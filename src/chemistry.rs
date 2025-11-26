@@ -417,7 +417,9 @@ pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
         // need to determine if it is an equation or a formula
         latex.trim_start().starts_with(r"\ce") 
     } else {
-        has_chem_intent(mathml, ":chemical-formula") || has_chem_intent(mathml, ":chemical-equation")
+        has_chem_intent(mathml, ":chemical-formula") ||
+        has_chem_intent(mathml, ":chemical-equation") ||
+        has_chem_intent(mathml, ":chemical-element")
     };
 
     if is_chemistry || is_chemistry_sanity_check(mathml) {
@@ -536,7 +538,12 @@ fn has_maybe_chemistry(mathml: Element) -> bool {
 /// Clears MAYBE_CHEMISTRY from this element and its decedents
 /// Also deletes added mrows and leaves; returns true if anything is deleted
 fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
-    // debug!("is_changed_after_unmarking_chemistry: {}", mml_to_string(mathml));
+    // debug!("is_changed_after_unmarking_chemistry:\n{}", mml_to_string(mathml));
+    if has_chem_intent(mathml, ":chemical-formula") ||
+       has_chem_intent(mathml, ":chemical-equation") ||
+       has_chem_intent(mathml, ":chemical-element") {
+        return false;   // don't unmark if intent says it is chemistry
+    }
     mathml.remove_attribute(MAYBE_CHEMISTRY);
     if is_leaf(mathml) {
         // don't bother testing for the attr -- just remove and nothing bad happens if they aren't there
@@ -561,6 +568,10 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
             }
         }
         return false;
+    } else if IsNode::is_scripted(mathml) && has_chem_intent(as_element(mathml.children()[0]), ":chemical-element") {
+        mathml.set_attribute_value(MAYBE_CHEMISTRY, as_element(mathml.children()[0]).attribute_value(MAYBE_CHEMISTRY).unwrap());
+        set_marked_chemistry_attr(mathml, CHEM_FORMULA);
+        return false;   // if base is definitely a chem element, don't unmark as this is almost certainly chemistry
     } else if IsNode::is_scripted(mathml) &&
               name(as_element(mathml.children()[0])) == "mi" &&
               as_element(mathml.children()[0]).attribute(SPLIT_TOKEN).is_some() {
@@ -1674,6 +1685,11 @@ pub fn likely_chem_element(mathml: Element) -> isize {
     if as_text(mathml).trim().is_empty() {
         return 0;   // whitespace
     } else if is_chemical_element(mathml) {
+        if has_chem_intent(mathml, ":chemical-element") {
+            mathml.set_attribute_value(CHEM_ELEMENT, CHEMISTRY_THRESHOLD.to_string().as_str());
+            return CHEMISTRY_THRESHOLD;
+        }
+
         // single letter = 1; single letter with mathvariant="normal" = 2; double = 3 -- all elements are ASCII
         return (if text.len() == 1 {
             if mathml.attribute_value("mathvariant").unwrap_or_default() == "normal" {2} else {1}
@@ -1837,7 +1853,9 @@ static CHEMICAL_ELEMENT_ATOMIC_NUMBER: phf::Map<&str, u32> = phf_map! {
 };
 
 pub fn is_chemical_element(node: Element) -> bool {
-	// FIX: allow name to be in an mrow (e.g., <mi>N</mi><mi>a</mi>
+    if has_chem_intent(node, ":chemical-element") {
+        return true;
+    }
 	let name = name(node);
 	if name != "mi" && name != "mtext" {
 		return false;

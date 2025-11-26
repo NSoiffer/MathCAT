@@ -333,9 +333,9 @@
  - "”": [T: "⠴W"]                 # 0x201D RIGHT DOUBLE QUOTATION MARK
  - "+":                           # 0x2b (PLUS sign )
      - test:
-        if: "parent::m:msup"
-        then: [T: "⠖"]
-        else: [T: "W⠖"]
+        if: "preceding-sibling::* and parent::m:mrow"
+        then: [T: "W⠖"]
+        else: [T: "⠖"]
  - ",":                        # 0x2c (Comma)
      - test:
         - if: "self::m:mn"     # 0,(3) is a notation used for repeating decimals, but hard to catch here -- done with regex in braille.rs
@@ -352,7 +352,7 @@
           else: [T: "⠤"]
  - ".":                            # 0x2e
      - test:
-        if: "self::m:mn"
+        if: "self::m:mn or ancestor::*[contains(@intent, ':time')]"
         then: [T: "N⠄"]
         else: [T: "P⠄"]
 
@@ -552,10 +552,20 @@
  - "∳": [t: "⠮⠈⠫⠢⠔⠕⠻"]          # 0x2233
  - "∴": [t: "⠠⠡"]               # 0x2234
  - "∵": [t: "⠈⠌"]               # 0x2235
- - "∶": [T: "W⠲"]               # 0x2236
+ - "∶":                          # 0x2236
+    - test:
+        if: "ancestor::*[contains(@intent, ':time')]"
+        then: [T: "N⠒"]          # time
+        else: [T: "W⠲"]         # ratio
+
  - "∷": [t: "⠰⠆"]               # 0x2237
  - "∸": [t: "⠨⠤"]               # 0x2238
- - "∼": [T: "W⠢"]               # 0x223c (TILDE OPERATOR, not, proportional to)
+ - "∼":                         # 0x223c (TILDE OPERATOR, proportional to, prefix not)W⠒⠔
+     - test:
+          if: "preceding-sibling::* and parent::m:mrow"
+          then: [T: "W⠢"]
+          else: [T: "W⠒⠔"]
+
  - "≁": [T: "W⠔⠢"]              # 0x2241
  - "≂": [t: "⠱⠈⠱"]              # 0x2242
  - "≃": [t: "⠈⠱⠱"]              # 0x2243
@@ -725,19 +735,8 @@
  - "Û": [t: "⠠⠈⠥"]              # 0xdb
  - "Ü": [t: "⠠⠈⠥"]              # 0xdc
  - "Ý": [t: "⠠⠈⠽"]              # 0xdd
- - "↑":                          # 0x2191
-    - test:
-        if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
-        then: [T: "⠸⠒⠁"]
-        else: [t: "⠫⠣⠒⠒⠕"]
-# FIX: Polish specs use up arrow only in the context of chemical reactions; p. 79
-
- - "↓":                          # 0x2193
-    - test:
-        if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
-        then: [T: "⠸⠒⠄"]
-        else: [t: "⠫⠩⠒⠒⠕"]
-# FIX: Polish specs use down arrow only in the context of chemical reactions; p. 79
+ - "↑": [T: "⠸⠒⠁"]              # 0x2191
+ - "↓": [T: "⠸⠒⠄"]              # 0x2193
 
  - "↔": [T: "⠐⠒⠂"]              # 0x2194 (LEFT RIGHT ARROW)
  - "↕": [t: "⠫⠣⠩⠪⠒⠒⠕"]          # 0x2195
@@ -990,17 +989,21 @@
  - "⟧": [t: "⠈⠸⠾"]              # 0x27E7 (Mathematical right white square bracket)
  - "⟨": [T: "⠷⠄"]              # 0x27E8 (Mathematical left angle bracket)
  - "⟩": [T: "⠠⠾"]              # 0x27E9 (Mathematical right angle bracket)
- - "⟵":                         # 0x27F5 (Long leftwards arrow)   #FIX: currently same as short arrow -- is this ok?
+ - "⟵":                        # 0x27F5 (Long leftwards arrow)   #FIX: currently same as short arrow -- is this ok?
     - test:
           if: "parent::m:mrow"
           then: [T: "W⠒⠂"]               
           else: [T: "⠒⠂"]       # script position
- - "⟶":                          # 0x27F6 (Long rightwards arrow)  #FIX: currently same as short arrow -- is this ok?
+ - "⟶":                         # 0x27F6 (Long rightwards arrow)  #FIX: currently same as short arrow -- is this ok?
     - test:
           if: "parent::m:mrow"
           then: [T: "W⠂⠒"]               
           else: [T: "⠂⠒"]       # script position
- - "⟷": [T: "W⠐⠒⠂"]              # 0x27F7 (Long left right arrow)
+ - "⟷":                        # 0x27F7 (Long left right arrow)
+    - test:
+          if: "parent::m:mrow"
+          then: [T: "W⠐⠒⠂"]               
+          else: [T: "⠐⠒⠂"]       # script position
  - "⟸": [t: "⠀⠫⠪⠶⠶⠶⠀"]          # 0x27F8 (Long leftwards arrow )
  - "⟹": [t: "⠀⠫⠶⠶⠶⠕⠀"]          # 0x27F9 (Long rightwards arrow)
  - "⟺": [t: "⠀⠫⠪⠶⠶⠶⠕⠀"]         # 0x27FA (Long left right arrow)

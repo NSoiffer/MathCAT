@@ -24,7 +24,8 @@
     "sin": "⠫⠎", "cos": "⠫⠉", "tg": "⠫⠞", "ctg": "⠫⠳", "sec": "⠫⠤", "cosec": "⠫⠣",
     "arcsin": "⠫⠂⠎", "arccos": "⠫⠂⠉", "arctg": "⠫⠂⠞", "arcctg": "⠫⠂⠳", "arcsec": "⠫⠂⠤", "arccosec": "⠫⠂⠣",
     "const": "⠼⠅", "log": "⠫⠇", "ln": "⠫⠦⠇", "sgn": "⠼⠎", "lim": "⠼⠇",
-    "min": "⠼⠝", "max": "⠼⠭", "sup": "⠻⠎⠥⠏", "inf": "⠻⠊⠝⠋", "rad": "⠼⠗",
+    "min": "⠼⠝", "max": "⠼⠭", "sup": "⠻⠎⠥⠏", "inf": "⠻⠊⠝⠋", "rad": "⠼⠗", "radian": "⠼⠗",
+    "prosta": "⠨⠒⠒",
   }
 
 - Scripts: {

@@ -645,7 +645,7 @@ fn nemeth_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
         //      "-": "⠸⠤" (hyphen and dash)
         //      ",": "⠠⠀"     -- spacing already added
         // Rule II.9b (add numeric indicator after punctuation [optional minus[optional .][digit]
-        //  because this is run after the abovef rule, some cases are already caught, so don't
+        //  because this is run after the above rule, some cases are already caught, so don't
         //  match if there is already a numeric indicator
         static ref NUM_IND_9B: Regex = Regex::new(r"(?P<punct>P..?)(?P<minus>⠤?)N").unwrap();
 
@@ -2046,7 +2046,8 @@ static POLISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "𝔹" => "⠨",     // blackboard -- spec only shows some upper case versions (encoded as 𝔹Lx) -- this is just a guess 
     // "T" => "⠈",     // script
     "I" => "⠸",     // italic 
-    "l" => "⠠",     // Lower case Roman letter left in to assist in locating letters
+    "𝒍" => "⠠",     // Lower case Roman letter left in to assist in locating letters
+    "l" => "⠠",     // Forced output of Lower case Roman letter left in to assist in locating letters
     "L" => "⠨",     // Upper case Roman letter left in to assist in locating letters
     "𝐿" => "⠨",     // Chemical element: like cap, but if followed by a lower case letter (e.g., Na), no lower case letter indicator
     "𝐶" => "⠸",     // Chemical element: run of single letter chemical elements
@@ -2149,7 +2150,7 @@ fn polish_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
         // Also need to special case empty set which seems to act as a number without a number sign (⠯⠕)
         static ref NUMBER_DOT6_PUNCTUATION: Regex =Regex::new(r"([Nn].(>[^⠰]|≫⠐.)*|⠯⠕)(P.)").unwrap();
 
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([B𝔹IREDgGVHlL𝐿𝐶MnNUuwW𝐖Pp!(\[{)\]}#</>≪≫])").unwrap();
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([B𝔹IREDgGVH𝒍lL𝐿𝐶MnNUuwW𝐖Pp!(\[{)\]}#</>≪≫])").unwrap();
     }
 
     let braille_level = BrailleLevel::from(&PreferenceManager::get().borrow().pref_to_string("Polish_BrailleLevel"));
@@ -2316,6 +2317,13 @@ fn polish_remove_unneeded_mode_changes(raw_braille: &str) -> String {
                 }
                 result.push(chars[i+1]);
                 i += 2;
+            },
+            '𝒍' => {
+                // forced lower case letter indicator
+                result.push(ch);
+                mode = BrailleMode::Letter;
+                letter_mode = BrailleMode::Letter;
+                i += 1;
             },
             '𝐿' => {
                 // chemical element start (might have a lower case letter after it)
