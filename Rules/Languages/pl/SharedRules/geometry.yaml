@@ -7,12 +7,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "segment linii z"      # phrase('the line segment from' A to B)
+      - t: "odcinek z"      # phrase('the line segment from' A to B)
       - x: "*[1]"
       - t: "do"                         # phrase(the line segment from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "segment linii"               # phrase(the 'line segment' A  B)
+      - t: "odcinek"               # phrase(the 'line segment' A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -23,7 +23,7 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "ray z"             # phrase('the ray from' A to B)
+      - t: "promień z"             # phrase('the ray from' A to B)
       - x: "*[1]"
       - t: "do"                       # phrase(the ray from A 'to' B)
       - x: "*[2]"
@@ -68,7 +68,7 @@
   - t: "punkt"      # phrase(the 'point' at 1, 2)
   - test:
       if: "$Verbosity='Verbose'"
-      then: [t: "na"]      # phrase('the' point at 1, 2)
+      then: [t: "o współrzędnych"]      # phrase('the' point at 1, 2)
   - pause: short
   - insert:
       nodes: "*"

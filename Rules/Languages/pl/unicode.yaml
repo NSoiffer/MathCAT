@@ -31,7 +31,7 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "wielki poziom"]          	# 	(en: 'cap', google translation)
+            then: [t: "duże"]          	# 	(en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"]
     - pitch:
         value: "$CapitalLetters_Pitch"
@@ -54,7 +54,7 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "wielki poziom"]          	# 	(en: 'cap', google translation)
+            then: [t: "duże"]          	# 	(en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
@@ -74,9 +74,9 @@
             else: [t: "wykrzyknik"]             	#  0x21	(en: 'exclamation point', google translation)
         else: [t: "silnia"]                     	#  0x21	(en: 'factorial', google translation)
           
- - "\"": [t: "cytat"]                           	#  0x22	(en: 'quotation mark', google translation)
+ - "\"": [t: "cudzysłów"]                           	#  0x22	(en: 'quotation mark', google translation)
  - "#": [t: "numer"]                            	#  0x23	(en: 'number', google translation)
- - "$": [t: "dolary"]                           	#  0x24	(en: 'dollars', google translation)
+ - "$": [t: "dolar"]                           	#  0x24	(en: 'dollars', google translation)
  - "%": [t: "procent"]                          	#  0x25	(en: 'percent', google translation)
  - "&": [t: "ampersand"]                        	#  0x26	(google translation)
  - "'": [t: "apostrof"]                         	#  0x27	(en: 'apostrophe', google translation)
@@ -85,7 +85,7 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [t: "otwarte"]                	#  0x28	(en: 'open', google translation)
+            then: [t: "otwarty"]                	#  0x28	(en: 'open', google translation)
             else: [t: "otwarty nawias"]         	#  0x28	(en: 'open paren', google translation)
         else: [t: "lewy nawias"]                	#  0x28	(en: 'left paren', google translation)
  - ")":                                         	#  0x29
@@ -93,15 +93,15 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [t: "zamknąć"]                	#  0x29	(en: 'close', google translation)
-            else: [t: "bliski nawias"]          	#  0x29	(en: 'close paren', google translation)
+            then: [t: "zamknięty"]                	#  0x29	(en: 'close', google translation)
+            else: [t: "nawias zamknięty"]          	#  0x29	(en: 'close paren', google translation)
         else: [t: "prawy nawias"]               	#  0x29	(en: 'right paren', google translation)
 
  - "*":                                         	#  0x2a
     test:
         if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='skip-super']"
-        then: [t: "gwiazda"]                    	#  0x2a	(en: 'star', google translation)
-        else: [t: "czasy"]                      	#  0x2a	(en: 'times', google translation)
+        then: [t: "gwiazdka"]                    	#  0x2a	(en: 'star', google translation)
+        else: [t: "razy"]                      	#  0x2a	(en: 'times', google translation)
  - "+": [t: "plus"]                             	#  0x2b	(google translation)
  - ",":                                         	#  0x2c
     # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
@@ -115,7 +115,7 @@
                # except if expression starts with '…'
             - "../*[1][.='…'] "
         then:
-        - T: "comma"                            	#  	(en: 'comma', google translation)
+        - T: "przecinek"                            	#  	(en: 'comma', google translation)
         - test:
             if: "$Verbosity != Terse"
             then: [pause: short]
@@ -125,16 +125,16 @@
  - ".":                                         	#  0x2e
     - test:
         if: "parent::*[1][self::m:mn]"
-        then: [t: "punkt"]                      	# 	(en: 'point', google translation)
+        then: [t: "kropka"]                      	# 	(en: 'point', google translation)
         else: [t: "kropka"]                     	# 	(en: 'dot', google translation)
  - "/": [t: "podzielone przez"]                 	#  0x2f	(en: 'divided by', google translation)
- - ":": [t: "okrężnica"]                        	#  0x3a	(en: 'colon', google translation)
+ - ":": [t: "dwukropek"]                        	#  0x3a	(en: 'colon', google translation)
  - ";": [t: "średnik"]                          	#  0x3b	(en: 'semicolon', google translation)
  - "<":                                         	#  0x3c
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "jest"]                      	# 	(en: 'is', google translation)
-     - t: "mniej niż"                           	# 	(en: 'less than', google translation)
+         then: [t: "jest mniejsze niż"]                      	# 	(en: 'is', google translation)
+     - t: "mniejszy niż"                           	# 	(en: 'less than', google translation)
  - "=":                                         	#  0x3d
     - test: 
         if: "$Verbosity!='Terse'"
@@ -144,32 +144,32 @@
  - ">":                                         	#  0x3e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "jest"]                      	# 	(en: 'is', google translation)
+         then: [t: "jest większy niż"]                      	# 	(en: 'is', google translation)
      - t: "większy niż"                         	# 	(en: 'greater than', google translation)
  - "?": [t: "znak zapytania"]                   	#  0x3f	(en: 'question mark', google translation)
  - "@": [t: "na znak"]                          	#  0x40	(en: 'at sign', google translation)
  - "[":                                         	#  0x5b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "otwarty wspornik"]           	# 	(en: 'open bracket', google translation)
-        else: [t: "lewy wspornik"]              	# 	(en: 'left bracket', google translation)
+        then: [t: "otwarty nawias klamrowy"]           	# 	(en: 'open bracket', google translation)
+        else: [t: "lewy nawias klamrowy"]              	# 	(en: 'left bracket', google translation)
  - "\\": [t: "powrót do cięcia"]                	#  0x5c	(en: 'back slash', google translation)
  - "]":                                         	#  0x5d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "blisko wspornika"]           	# 	(en: 'close bracket', google translation)
-        else: [t: "prawy wspornik"]             	# 	(en: 'right bracket', google translation)
+        then: [t: "zamknięty nawias klamrowy"]           	# 	(en: 'close bracket', google translation)
+        else: [t: "prawy nawias klamrowy"]             	# 	(en: 'right bracket', google translation)
  - "^":                                         	#  0x5e
     - test:
         if: "parent::m:modified-variable or parent::m:mover"
-        then: [t: "kapelusz"]                   	# 	(en: 'hat', google translation)
-        else: [t: "wstawka korektorska"]        	# 	(en: 'caret', google translation)
- - "_": [t: "pod paskiem"]                      	#  0x5f	(en: 'under bar', google translation)
- - "`": [t: "grób"]                             	#  0x60	(en: 'grave', google translation)
+        then: [t: "daszek"]                   	# 	(en: 'hat', google translation)
+        else: [t: "daszek"]        	# 	(en: 'caret', google translation)
+ - "_": [t: "podkreślenie "]                      	#  0x5f	(en: 'under bar', google translation)
+ - "`": [t: "podkreślenie"]                             	#  0x60	(en: 'grave', google translation)
  - "{":                                         	#  0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "otwórz klamę"]               	# 	(en: 'open brace', google translation)
+        then: [t: "otwarta klamra"]               	# 	(en: 'open brace', google translation)
         else: [t: "lewa klamra"]                	# 	(en: 'left brace', google translation)
  - "|":                                         	#  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
@@ -193,8 +193,8 @@
  - "}":                                         	#  0x7d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "zamknij klamra"]             	# 	(en: 'close brace', google translation)
-        else: [t: "prawa orteza"]               	# 	(en: 'right brace', google translation)
+        then: [t: "zamknięta klamra"]             	# 	(en: 'close brace', google translation)
+        else: [t: "prawa klamra"]               	# 	(en: 'right brace', google translation)
 
  - "~": [t: "tylda"]                            	#  0x7e	(en: 'tilde', google translation)
  - " ":                                         	#  0xa0
@@ -212,24 +212,24 @@
     - test:
         if: "$SpeechStyle = 'LiteralSpeak' or not($SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultSymbolDot = 'Auto')"
         then: [t: "kropka"]                     	# 	(en: 'dot', google translation)
-        else: [t: "czasy"]                      	# 	(en: 'times', google translation)
+        else: [t: "razy"]                      	# 	(en: 'times', google translation)
  - "×":                                         	#  0xd7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
-        then: [t: "czasy"]                      	# 	(en: 'times', google translation)
+        then: [t: "razy"]                      	# 	(en: 'times', google translation)
         else_test:
             if: $ClearSpeak_MultSymbolX = 'By'
             then: [t: "przez"]                  	# 	(en: 'by', google translation)
-            else: [t: "przechodzić"]            	# 	(en: 'cross', google translation)
+            else: [t: "pomnożony przez"]           	# 	(en: 'cross', google translation)
  - "÷": [t: "podzielone przez"]                 	#  0xf7	(en: 'divided by', google translation)
- - "̀": [t: "grób zdobienia akcentu"]           	#  0x300	(en: 'grave accent embellishment', google translation)
- - "́": [t: "ostre ozdoby akcentu"]             	#  0x301	(en: 'acute accent embellishment', google translation)
- - "̂": [t: "oncrexflex accent zdobienia"]      	#  0x302	(en: 'circumflex accent embellishment', google translation)
- - "̃": [t: "ozdoba tylde"]                     	#  0x303	(en: 'tilde embellishment', google translation)
- - "̄": [t: "uzbiszenie macrona"]               	#  0x304	(en: 'macron embellishment', google translation)
- - "̅": [t: "overbar upiększenie"]              	#  0x305	(en: 'overbar embellishment', google translation)
- - "̆": [t: "breve"]                            	#  0x306	(google translation)
- - "̇": [t: "kropka powyżej ozdoby"]            	#  0x307	(en: 'dot above embellishment', google translation)
+ - "̀": [t: "dolny ozdobny akcent"]           	#  0x300	(en: 'grave accent embellishment', google translation)
+ - "́": [t: "ostry ozdobny akcent"]             	#  0x301	(en: 'acute accent embellishment', google translation)
+ - "̂": [t: "pojedynczy ozdobny akcent"]      	#  0x302	(en: 'circumflex accent embellishment', google translation)
+ - "̃": [t: "ozdobna tylda"]                     	#  0x303	(en: 'tilde embellishment', google translation)
+ - "̄": [t: "makron"]               	#  0x304	(en: 'macron embellishment', google translation)
+ - "̅": [t: "górna ozdobna kreska"]              	#  0x305	(en: 'overbar embellishment', google translation)
+ - "̆": [t: "falka"]                            	#  0x306	(google translation)
+ - "̇": [t: "górna ozdobna kropka"]            	#  0x307	(en: 'dot above embellishment', google translation)
 
    # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
  - "Α-Ω": 
@@ -245,7 +245,7 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "wielki poziom"]          	# 	(en: 'cap', google translation)
+            then: [t: "duże"]          	# 	(en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
@@ -260,32 +260,32 @@
  - "ζ": [t: "zeta"]                             	#  0x3b6	(google translation)
  - "η": [t: "eta"]                              	#  0x3b7	(google translation)
  - "θ": [t: "theta"]                            	#  0x3b8	(google translation)
- - "ι": [t: "odrobina"]                         	#  0x3b9	(en: 'iota', google translation)
+ - "ι": [t: "omikron"]                         	#  0x3b9	(en: 'iota', google translation)
  - "κ": [t: "kappa"]                            	#  0x3ba	(google translation)
  - "λ": [t: "lambda"]                           	#  0x3bb	(google translation)
  - "μ": [t: "mu"]                               	#  0x3bc	(google translation)
  - "ν": [t: "nu"]                               	#  0x3bd	(google translation)
- - "ξ": [t: "zai"]                              	#  0x3be	(google translation)
+ - "ξ": [t: "ksii"]                              	#  0x3be	(google translation)
  - "ο": [t: "omicron"]                          	#  0x3bf	(google translation)
- - "π": [t: "liczba pi"]                        	#  0x3c0	(en: 'pi', google translation)
+ - "π": [t: "pi"]                        	#  0x3c0	(en: 'pi', google translation)
  - "ρ": [t: "rho"]                              	#  0x3c1	(google translation)
- - "ς": [t: "ostateczny sigma"]                 	#  0x3c2	(en: 'final sigma', google translation)
+ - "ς": [t: "sigma"]                 	#  0x3c2	(en: 'final sigma', google translation)
  - "σ": [t: "sigma"]                            	#  0x3c3	(google translation)
  - "τ": [t: "tau"]                              	#  0x3c4	(google translation)
- - "υ": [t: "upsilon"]                          	#  0x3c5	(google translation)
- - "φ": [t: "phi"]                              	#  0x3c6	(google translation)
+ - "υ": [t: "ypsilon"]                          	#  0x3c5	(google translation)
+ - "φ": [t: "fi"]                              	#  0x3c6	(google translation)
  - "χ": [t: "chi"]                              	#  0x3c7	(google translation)
  - "ψ": [t: "psi"]                              	#  0x3c8	(google translation)
  - "ω": [t: "omega"]                            	#  0x3c9	(google translation)
- - "ϕ": [t: "phi"]                              	#  0x3d5	(google translation)
- - "ϖ": [t: "liczba pi"]                        	#  0x3d6	(en: 'pi', google translation)
+ - "ϕ": [t: "fi"]                              	#  0x3d5	(google translation)
+ - "ϖ": [t: "pi"]                        	#  0x3d6	(en: 'pi', google translation)
  - "ϵ": [t: "epsilon"]                          	#  0x3f5	(google translation)
  - "϶": [t: "odwrócony epsilon"]                	#  0x3f6	(en: 'reversed epsilon', google translation)
 
- - "–": [t: "en dash"]                          	#  0x2013	(google translation)
- - "—": [t: "em dash"]                          	#  0x2014	(google translation)
- - "―": [t: "poziom poziomy"]                   	#  0x2015	(en: 'horizontal bar', google translation)
- - "‖": [t: "podwójna linia pionowa"]           	#  0x2016	(en: 'double vertical line', google translation)
+ - "–": [t: "myślnik"]                          	#  0x2013	(google translation)
+ - "—": [t: "długi myślnik"]                          	#  0x2014	(google translation)
+ - "―": [t: "pozioma kreska"]                   	#  0x2015	(en: 'horizontal bar', google translation)
+ - "‖": [t: "norma"]           	#  0x2016	(en: 'double vertical line', google translation)
  - "…":                                         	#  0x2026
     test:
         if:
@@ -308,12 +308,12 @@
  - "⁢": [t: ""]                                 	#  0x2062
  - "⁣": [t: ""]                                 	#  0x2063
  - "⁤": [t: "i"]                                	#  0x2064	(en: 'and', google translation)
- - "′": [t: "główny"]                           	#  0x2032	(en: 'prime', google translation)
- - "″": [t: "podwójny prime"]                   	#  0x2033	(en: 'double prime', google translation)
- - "‴": [t: "triple prime"]                     	#  0x2034	(google translation)
+ - "′": [t: "liczba pierwsza"]                           	#  0x2032	(en: 'prime', google translation)
+ - "″": [t: "podwójna liczba pierwsza"]                   	#  0x2033	(en: 'double prime', google translation)
+ - "‴": [t: "potrujna liczba pierwsza"]                     	#  0x2034	(google translation)
 
  - "ℂℕℚℝℤ":                                     	#  here we rely on this running through the table again to speak "cap xxx"
-    - t: "podwójnie uderzanie"                  	# 	(en: 'double-struck', google translation)
+    - t: "podwójne c"                  	# 	(en: 'double-struck', google translation)
     - spell: "translate('.', 'ℂℕℚℝℤ', 'CNQRZ')"
 
  - "℃": [t: "stopnie celsjusza"]                	#  0x2103	(en: 'degrees celsius', google translation)
@@ -321,7 +321,7 @@
  - "ℋℛℓ":                                       	#  0x210b
     - t: "scenariusz"                           	# 	(en: 'script', google translation)
     - spell: "translate('.', 'ℋℛℓ', 'HRl')"
- - "ℎ": [t: "planck stała"]                     	#  0x210e	(en: 'planck constant', google translation)
+ - "ℎ": [t: "stała planka"]                     	#  0x210e	(en: 'planck constant', google translation)
  - "ℜ":                                         	#  0x211c
     - t: "fraktur"                              	# 	(google translation)
     - spell: "'R'"
