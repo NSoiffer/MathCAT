@@ -2603,64 +2603,6 @@ impl BrailleChars {
         }
     }
 
-    fn get_braille_finnish_chars(mathml: Element, text_range: Option<Range<usize>>) -> Result<String> {
-        // Numbers need block separators.
-        // FIX: this needs to deal with typefaces properly -- currently we fall back to UEB behavior
-        let math_variant = mathml.attribute_value("mathvariant");
-        if math_variant.is_none() && name(mathml) == "mn" {
-            let number = as_text(mathml);
-            let number =  match text_range {
-                None => number,
-                Some(range) => &number[range],
-            };
-            let number = number.replace([' ', ' '], ".");       // space and non-breaking space
-            if number.is_ascii() && number.len() > 4 {
-                // at this point, we know each digit is one char in the string
-
-                //let mut braille_chars = braille_replace_chars(&number, mathml)?;
-                let mut parts = number.split(',');      // decimal separator
-                let int_part = parts.next().unwrap();
-                let mut answer = "".to_string();
-                if int_part.len() > 4 && !int_part.contains('.') {   // if it has '.'s, then assume it is already in number blocks
-                    // go thru blocks of three, but start with the leading chars
-                    let excess = int_part.len() % 3;
-                    answer = if excess > 0 {&int_part[..excess]} else {""}.to_string();
-                    for i in 0..int_part.len()/3 {
-                        let start = excess + 3*i;
-                        answer += ".";
-                        answer += &int_part[start..start+3]
-                    }
-                } else {
-                    answer += int_part;
-                }
-                if let Some(decimal_part) = parts.next() {
-                    answer += ",";
-                    if decimal_part.len() > 3  && !decimal_part.contains('.') {   // if it has '.'s, then assume it is already in number blocks
-                        // go thru blocks of three, then add on extra chars (opposite of int loop)
-                        let excess = decimal_part.len() % 3;
-                        for i in 0..decimal_part.len()/3 {
-                            let start = 3*i;
-                            answer += &decimal_part[start..start+3];
-                            if start + 3 < decimal_part.len() {
-                                answer += ".";
-                            }
-                        }
-                        if excess > 0 {
-                            answer += &decimal_part[decimal_part.len()-excess..]
-                        }
-                    } else {
-                        answer += decimal_part;
-                    }
-                }
-                return braille_replace_chars(&answer, mathml);      // what else is possible?
-            }
-            // at this point, we know each digit is one char in the string
-            return braille_replace_chars(&number, mathml);      // what else is possible?
-        } else {
-            return BrailleChars::get_braille_ueb_chars(mathml, text_range);
-        }
-    }
-
     fn get_braille_vietnam_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {
         // this is basically the same as for ueb except:
         // 1. we deal with switching '.' and ',' if in English style for numbers
