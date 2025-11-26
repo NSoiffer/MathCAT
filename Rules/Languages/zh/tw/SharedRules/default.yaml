@@ -603,8 +603,9 @@
   match: .
   replace:
   - x: "*[1]"
-  - T: "作用到"      # phrase(the function sine 'applied to' x plus y)
-  - x: "*[2]"
+  - t: ""      # phrase(the sine 'of' x )
+  - pause: auto
+  - x: "*[position() > 1]"
 
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'

@@ -534,8 +534,9 @@
   match: .
   replace:
   - x: "*[1]"
-  - T: "aplicado a"
-  - x: "*[2]"
+  - T: "de"
+  - pause: auto
+  - x: "*[position() > 1]"
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent

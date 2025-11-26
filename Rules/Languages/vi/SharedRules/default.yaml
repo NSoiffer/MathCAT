@@ -625,8 +625,9 @@
   match: .
   replace:
   - x: "*[1]"
-  - T: "ứng với"      # phrase(the function sine 'applied to' x plus y)
-  - x: "*[2]"
+  - T: "của"
+  - pause: auto
+  - x: "*[position() > 1]"
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent

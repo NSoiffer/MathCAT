@@ -300,7 +300,7 @@ fn ignore_period_and_space() {
         </mstyle>
       </mrow>
 </math>";
-    test("en", "ClearSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
+    test("en", "ClearSpeak", expr, "cap p, open paren, cap eigh divides cap b, close paren; is equal to; the fraction with numerator; cap p, open paren, cap eigh intersection cap b; close paren; and denominator cap p of cap b");
 }
 
 
@@ -365,7 +365,7 @@ fn gradient() {
 }
 
 #[test]
-fn literal_speak() {
+fn literal_speak_perpendicular() {
   let expr = r#"<math data-latex='\vec{A} \perp \vec{B}' display='block'>
   <mrow data-changed='added'>
     <mover data-latex='\vec{A}'>
@@ -380,6 +380,24 @@ fn literal_speak() {
   </mrow>
  </math>"#; 
   test("en", "LiteralSpeak", expr, "cap eigh right arrow, perpendicular to, cap b right arrow");
+}
+
+#[test]
+fn literal_speak_chars() {
+  let expr = r#"<math>
+        <mfenced open="|" close="|">
+            <mrow>
+                <mi>x</mi><mo>&#xD7;</mo><mi>y</mi>
+                <mo>&#xB7;</mo>
+                <mi>z</mi><mo>/</mo><mn>2</mn>
+                <mo>+</mo>
+                <mi>a</mi><mo>&#x2225;</mo><mi>b</mi>
+                <mo>+</mo>
+                <mi>x</mi><mo>!</mo>
+            </mrow>
+        </mfenced>
+    </math>"#; 
+  test("en", "LiteralSpeak", expr, "vertical line; x cross, y dot z slash 2; plus eigh; double vertical line, b plus x exclamation point; vertical line");
 }
 
 #[test]

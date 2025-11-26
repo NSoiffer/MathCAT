@@ -82,7 +82,7 @@ fn deeply_nested_fraction_msqrt() {
         </mrow>
     </math>
                             ";
-    test("en", "SimpleSpeak", expr, "fraction, x plus, the square root of 1 over y, end root; over, x minus y, end fraction");
+    test("en", "SimpleSpeak", expr, "fraction, x plus, the square root of 1 over y; end root; over, x minus y, end fraction");
 }
 
 #[test]
@@ -98,7 +98,7 @@ fn deeply_nested_fraction_mrow_msqrt() {
         </mrow>
     </math>
                             ";
-    test("en", "SimpleSpeak", expr, "fraction, x plus, the square root of 2 plus 1 over y, end root; over, x minus y, end fraction");
+    test("en", "SimpleSpeak", expr, "fraction, x plus, the square root of 2 plus 1 over y; end root; over, x minus y, end fraction");
 }
 
 #[test]

@@ -405,7 +405,9 @@
 
 - name: default
   tag: mtable
-  variables: [IsColumnSilent: false()]
+  variables:
+  - IsColumnSilent: "false()"
+  - NumColumns: "count(*[1]/*) - IfThenElse(*/self::m:mlabeledtr, 1, 0)"
   match: "."
   replace:
   - T: "tabell med"      # phrase(the 'table with' 3 rows)
@@ -606,8 +608,9 @@
   match: .
   replace:
   - x: "*[1]"
-  - T: "tillämpad på"      # phrase(the function sine 'applied to' x plus y)
-  - x: "*[2]"
+  - T: "av"
+  - pause: auto
+  - x: "*[position() > 1]"
 
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'

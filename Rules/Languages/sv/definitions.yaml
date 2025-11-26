@@ -112,7 +112,7 @@
 
     # accepted (plus a few variants) that take SI prefixes
     "l": "liter", "L": "liter", "ℓ": "liter",  # Should only take negative powers; British spelling works for US also
-    "t": "ton",           # should only take positive powers
+    "t": "tonn",           # should only take positive powers
     "Da": "dalton",
     "Np": "neper",               # should only take negative powers
     "u": "atommassenhet",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
@@ -296,6 +296,26 @@
     "mile per gallon": "miles per gallon",
   }
 
+
+- NeuterUnits: {
+    #SIUnits
+     "g", "t", "a", "rpm",
+  }
+    
+- NeuterUnitsWithoutPrefixes: {
+    #UnitsWithoutPrefixes
+    "y", "yr",
+    "ltyr", "ly", "l.y.",
+    
+    #EnglishUnits
+    "bbl", "BBL", "lb",
+  }
+
+    # stop when regularity begins
+- OrdinalFractionalDenominatorsForUnits: {
+          "0": "", "1": "", "2": "halv", "3": "tredjedels", "4": "fjärdedels", "5": "femtedels",
+          "6": "sjättedels", "7": "sjundedels", "8": "åttondels", "9": "niondels", "10": "tiondels",
+  }
 
 # ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words

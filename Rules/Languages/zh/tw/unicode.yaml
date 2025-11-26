@@ -160,16 +160,27 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: "左大括"]                       	# 	(en: 'open brace', google translation)
         else: [T: "左大括"]                        	# 	(en: 'left brace')
- - "|":                                         	#  0x7c
+ - "|":                                                 #  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
-     - test:
-        - if: "$SpeechStyle != 'ClearSpeak' or not(preceding-sibling::*) or not(following-sibling::*)"
-          then: [T: "垂線"]                       	# 	(en: 'vertical line', google translation)
-        - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
-          then: [T: "滿足"]                       	# 	(en: 'such that', google translation)
-        - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
-          then: [T: "給定"]                       	# 	(en: 'given', google translation)
-        - else: [T: "整除"]                       	# 	(en: 'divides')
+     - with:
+        variables: [DefaultToGiven: "count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and ../../../*[1][.='P']"] # P(A|B)
+        replace:
+         - test:
+            - if: "$SpeechStyle != 'ClearSpeak'"
+              then_test:
+                - if: "$DefaultToGiven"
+                  then: [T: "給定"]                         #       (en: 'given', google translation)
+                - else_if: "preceding-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))] and 
+                            following-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))]"
+                  then: [T: "整除"]                         #       (en: 'divides')
+                  else: [T: "垂線"]                         #       (en: 'vertical line', google translation)
+            - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
+              then: [T: "垂線"]                             #       (en: 'vertical line', google translation
+            - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+              then: [T: "滿足"]                             #       (en: 'such that', google translation)
+            - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
+              then: [T: "給定"]                             #       (en: 'given', google translation)
+            - else: [T: "整除"]                             #       (en: 'divides')
 
  - "}":                                         	#  0x7d
     - test:
