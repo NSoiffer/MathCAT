@@ -21,10 +21,10 @@
       if: "IsNode(*[1], 'simple') and IsNode(*[2], 'simple')"
       then:
       - x: "*[1]"
-      - t: "nad"
+      - t: "przez"
       - x: "*[2]"
       else:
-      - t: "frakcja"
+      - t: "ułamek"
 
 - name: overview-default
   tag: [msqrt, "square-root"]
@@ -49,7 +49,7 @@
       - if: "*[2][.='2']"
         then: [t: "pierwiastek kwadratowy"]
       - else_if: "*[2][.='3']"
-        then: [t: "korzeń kostki"]
+        then: [t: "pierwiastek sześcienny"]
       - else_if: "*[2][not(contains(., '.'))]"
         then: [x: "ToOrdinal(*[2])", t: "źródło"]
       else:
@@ -57,9 +57,9 @@
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+          - pronounce: [{text: "-ego"}, {ipa: "θ"}, {sapi5: "ego"}, {eloquence: "T"}]
           else: {x: "*[2]"}
-      - t: "źródło"
+      - t: "pierwiastek"
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
@@ -81,7 +81,7 @@
   - test:
       if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
       then: [t: "wyznacznik"]
-      else: [t: "matryca"]
+      else: [t: "macierz"]
 
 - name: overview-default
   tag: mtable

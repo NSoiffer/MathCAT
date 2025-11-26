@@ -4,7 +4,7 @@
   tag: laplacian
   match: "count(*) <= 1"   # can be on ∇^2 or on enclosing mrow
   replace:
-  - t: "lahplahsian"      # phrase('laplacian' of x)  -- "LahPlahsian" sounds better with speech engines tested
+  - t: "laplasjan"      # phrase('laplacian' of x)  -- "LahPlahsian" sounds better with speech engines tested
   - test:
       if: "count(*) = 1"
       then:
@@ -33,7 +33,7 @@
   tag: curl
   match: "count(*) = 1"
   replace:
-  - t: "kędzior"      # phrase(the 'curl of' a field)
+  - t: "pole"      # phrase(the 'curl of' a field)
   - test:
       if: "$Verbosity!='Terse'"
       then: [t: "z"]             # phrase(function 'of' one variable) -- note OneCore voices spell out "div"
@@ -48,7 +48,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [t: "gradient"]      # phrase(the hill has a 'gradient of' five percent)
+      then: [t: "gradjent"]      # phrase(the hill has a 'gradient of' five percent)
       else: [t: "del"]      # phrase(the delete key is labeled 'del')
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
