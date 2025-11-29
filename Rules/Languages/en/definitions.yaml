@@ -88,7 +88,7 @@
 
     # I asked bard and chatgpt for formula words that are alphabetical, and they failed.
     # Here are the words I managed to find, but it almost certainly not complete. Change the list for other languages.
-    "Abel", "aery", "ails", "airy", "amps", "cents", "flux", "flow", "knot",
+    "Abel", "aery", "ails", "airy", "amps", "ceil", "cents", "chop", "flux", "flow", "knot", "most"
   }
 
 - SIPrefixes: {
