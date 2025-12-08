@@ -22,6 +22,39 @@ sys.stdout.reconfigure(encoding='utf-8')
 from googletrans import Translator
 GoogleTranslate = Translator(service_urls=["translate.google.us"])
 
+''' In some manual testing, DeepL seems to do better than Google Translate
+ deepl requires an API key.
+ There is a free tier, but it won't do a full translation in the monthly free tier (50K chars/month)
+ There are ~76k chars to translate, with ~62k of them being in unicode-full.yaml
+ The lowest paid tier gives 300k chars/month for $10.50, so four translations/month if no problems.
+ Maybe run unicode-full.yaml through Google and the rest through DeepL?
+ Below is sample DeepL code -- commented out for now.
+ '''
+# import deepl
+# import os
+
+# # 1. Set up the Translator
+# # It's best practice to use an environment variable for your API key.
+# # You can set this variable: DEEPL_AUTH_KEY="YOUR_API_KEY"
+# auth_key = os.getenv("DEEPL_AUTH_KEY", "YOUR_API_KEY") 
+# translator = deepl.Translator(auth_key)
+
+# # 2. Define the text and target language
+# text_to_translate = "Hello, world!"
+# target_language = "FR" # French
+
+# # 3. Call the translation method
+# # Omitting 'source_lang' allows DeepL to auto-detect the language.
+# result = translator.translate_text(
+#     text_to_translate,
+#     target_lang=target_language
+# )
+
+# # 4. Print the result
+# print(f"Original Text: {text_to_translate}")
+# print(f"Translated Text: {result.text}")
+# print(f"Source Language Detected: {result.detected_source_lang}")
+
 # Google allows up to 500K chars translation/month, so using a key likely would be free anyway
 
 # Got blocked trying to translated unicode-full.yaml (~8,100 text strings).
