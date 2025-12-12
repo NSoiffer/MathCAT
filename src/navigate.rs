@@ -19,6 +19,7 @@ use std::time::Instant;
 use crate::errors::*;
 use phf::phf_set;
 
+pub const ID_OFFSET: &str = "data-id-offset";
 
 const MAX_PLACE_MARKERS: usize = 10;
 
@@ -47,7 +48,7 @@ pub static NAV_COMMANDS: phf::Set<&str> = phf_set! {
 #[derive(Clone, PartialEq, Debug)]
 struct NavigationPosition {
     current_node: String,           // id of current node
-    current_node_offset: usize,     // for leaves, what char offset in leaf (default = 0)
+    current_node_offset: usize,     // for leaves, char offset in leaf (default = 0), otherwise id for artificial intent node
 }
 
 impl fmt::Display for NavigationPosition {
@@ -173,7 +174,7 @@ impl NavigationState {
             return Ok( (mathml, 0) );
         } else {
             let (position, _) = self.top().unwrap();
-            return match get_node_by_id(mathml, &position.current_node) {
+            return match get_node_by_id(mathml, position) {
                 None => bail!("internal error: id '{}' was not found in mathml:\n{}",
                                 position.current_node, mml_to_string(mathml)),
                 Some(found) => Ok( (found, position.current_node_offset) )
@@ -245,18 +246,18 @@ fn convert_last_char_to_number(str: &str) -> usize {
     return (last_char - b'0') as usize;
 }
 
-/// Get the node associated with 'id'
-/// This can be called on an intent tree -- it does not make use of is_leaf()
-fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
+/// Get the node associated with a `NavigationPosition`.
+/// This can be called on an intent tree -- it does not make use of is_leaf().
+fn get_node_by_id<'a>(mathml: Element<'a>, pos: &NavigationPosition) -> Option<Element<'a>> {
     if let Some(mathml_id) = mathml.attribute_value("id") {
-        if mathml_id == id {
+        if mathml_id == pos.current_node.as_str() {
             return Some(mathml);
         }
     }
 
     for child in mathml.children() {
         if let Some(child) = child.element() {
-            if let Some(found) = get_node_by_id(child, id) {
+            if let Some(found) = get_node_by_id(child, pos) {
                 return Some(found);
             }
         }
@@ -267,7 +268,8 @@ fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
 /// Search the mathml for the id and set the navigation node to that id
 /// Resets the navigation stack
 pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -> Result<()> {
-    let node = get_node_by_id(mathml, &id);
+    let pos = NavigationPosition { current_node: id.clone(), current_node_offset: offset };
+    let node = get_node_by_id(mathml, &pos);
     if let Some(node) = node {
         if !crate::xpath_functions::is_leaf(node) && offset != 0 {
             bail!("Id {} is not a leaf in the MathML tree but has non-zero offset={}. Referenced MathML node is {}", id, offset, mml_to_string(node));
@@ -440,12 +442,14 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
     });
 
     fn get_start_node<'m>(mathml: Element<'m>, nav_state: &RefMut<NavigationState>) -> Result<Element<'m>>  {
-        let start_node_id =  match nav_state.top() {
-            None => mathml.attribute_value("id").unwrap(),
-            Some( (position, _) ) => position.current_node.as_str(),
+        let (start_node_id, start_node_offset) = match nav_state.top() {
+            None => (mathml.attribute_value("id").unwrap(), 0usize),
+            Some( (position, _) ) => (position.current_node.as_str(), position.current_node_offset),
         };
 
-        return match get_node_by_id(mathml, start_node_id) {
+        let temp_pos = NavigationPosition { current_node: start_node_id.to_string(), current_node_offset: start_node_offset };
+
+        return match get_node_by_id(mathml, &temp_pos) {
             Some(node) => Ok(node),
             None => {
                 bail!("Internal Error: didn't find id '{}' while attempting to start navigation. MathML is\n{}",
@@ -491,7 +495,10 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                 while name(found_node) != "math" {
                     found_node = get_parent(found_node);
                     // debug!("found_node:\n{}", mml_to_string(found_node));
-                    if let Some(intent_node) = get_node_by_id(nav_intent, found_node.attribute_value("id").unwrap_or_default()) {
+                    let found_id = found_node.attribute_value("id").unwrap_or_default().to_string();
+                    let found_offset = found_node.attribute_value(ID_OFFSET).unwrap_or_default().parse::<usize>().unwrap_or(0);
+                    let temp_pos = NavigationPosition { current_node: found_id.clone(), current_node_offset: found_offset };
+                    if let Some(intent_node) = get_node_by_id(nav_intent, &temp_pos) {
                         found_node = intent_node;
                         break;
                     }
@@ -568,7 +575,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             }
         }
 
-        let nav_mathml = get_node_by_id(intent, &nav_position.current_node);
+        let nav_mathml = get_node_by_id(intent, &nav_position);
         if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", intent)?.0.unwrap() == "true" {
             // Speak/Overview of where we landed (if we are supposed to speak it) -- use intent, not nav_intent
             // Note: NavMode might have changed, so we need to recheck the mode to see if we use LiteralSpeak
@@ -648,22 +655,25 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
 /// If full_read is true, we speak the tree, otherwise we use the overview rules.
 /// If literal_speak is true, we use the literal speak rules (and use the mathml tree).
 fn speak(mathml: Element, intent: Element, nav_node_id: &str, literal_speak: bool, full_read: bool) -> Result<String> {
-    if full_read {
+        if full_read {
         // In something like x^3, we might be looking for the '3', but it will be "cubed", so we don't find it.
         // Or we might be on a "(" surrounding a matrix and that isn't part of the intent
         // We are probably safer in terms of getting the same speech if we retry intent starting at the nav node,
         //  but the node to speak is almost certainly trivial.
         // By speaking the non-intent tree, we are certain to speak on the next try
-        if !literal_speak && get_node_by_id(intent, nav_node_id).is_some() {
-            // debug!("speak: nav_node_id={}, intent=\n{}", nav_node_id, mml_to_string(intent));
-            match crate::speech::speak_mathml(intent, nav_node_id) {
-                Ok(speech) => return Ok(speech),
-                Err(e) => {
-                    if e.to_string() != crate::speech::NAV_NODE_SPEECH_NOT_FOUND {
-                        return Err(e);
-                    }
-                    // else could be something like '3' in 'x^3' ("cubed")
-                },
+        if !literal_speak {
+            let temp_pos = NavigationPosition { current_node: nav_node_id.to_string(), current_node_offset: 0 };
+            if get_node_by_id(intent, &temp_pos).is_some() {
+                // debug!("speak: nav_node_id={}, intent=\n{}", nav_node_id, mml_to_string(intent));
+                match crate::speech::speak_mathml(intent, nav_node_id) {
+                    Ok(speech) => return Ok(speech),
+                    Err(e) => {
+                        if e.to_string() != crate::speech::NAV_NODE_SPEECH_NOT_FOUND {
+                            return Err(e);
+                        }
+                        // else could be something like '3' in 'x^3' ("cubed")
+                    },
+                }
             }
         }
         // debug!("speak (literal): nav_node_id={}, mathml=\n{}", nav_node_id, mml_to_string(mathml));
