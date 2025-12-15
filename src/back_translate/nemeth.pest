@@ -1,0 +1,232 @@
+// Nemeth Braille to MathML Grammar
+// This grammar parses linear Nemeth braille expressions
+
+// Entry point
+math = { SOI ~ expression ~ EOI }
+
+// Expression is a sequence of terms with operators
+expression = { term ~ (operator ~ term)* }
+
+// A term is a single mathematical element, possibly with scripts
+term = {
+    fraction
+    | radical
+    | grouped
+    | scripted_atom
+    | atom
+}
+
+// Atoms are the basic building blocks
+atom = {
+    number
+    | greek_letter
+    | letter
+}
+
+// Scripted atoms (with superscript/subscript)
+scripted_atom = {
+    atom ~ (superscript | subscript)+
+}
+
+// Numbers (with optional numeric indicator)
+number = { numeric_indicator? ~ digit+ ~ (decimal_point ~ digit+)? }
+
+// Letters (variables)
+letter = { capital_indicator? ~ letter_indicator? ~ letter_char }
+
+// Greek letters
+greek_letter = { greek_indicator ~ capital_indicator? ~ greek_char }
+
+// Fractions
+fraction = {
+    fraction_open ~ expression ~ fraction_bar ~ expression ~ fraction_close
+}
+
+// Radicals (square root and nth root)
+radical = {
+    // nth root: index before radical
+    (radical_index ~ radical_start ~ expression ~ radical_end)
+    | (radical_start ~ expression ~ radical_end)
+}
+
+radical_index = { superscript_indicator ~ atom }
+
+// Grouping (parentheses, brackets, braces)
+grouped = {
+    open_paren ~ expression ~ close_paren
+    | open_bracket ~ expression ~ close_bracket
+    | open_brace ~ expression ~ close_brace
+}
+
+// Superscript and subscript
+superscript = { superscript_indicator ~ script_content }
+subscript = { subscript_indicator ~ script_content }
+
+// Script content (what follows the script indicator)
+script_content = {
+    grouped
+    | fraction
+    | number
+    | greek_letter
+    | letter
+}
+
+// Operators
+operator = {
+    plus | minus | times | divide | equals
+    | less_than | greater_than | less_equal | greater_equal
+    | not_equal | plus_minus
+}
+
+// === Terminal definitions (Unicode braille patterns) ===
+
+// Numeric indicator: dots 3456 (U+283C)
+numeric_indicator = { "\u{283C}" }
+
+// Decimal point: dots 46 (U+2828)
+decimal_point = { "\u{2828}" }
+
+// Digits in Nemeth (after numeric indicator or in number context)
+// These are the same patterns as letters a-j but interpreted as numbers
+digit = {
+    "\u{2802}" |  // 1 (dots 2)
+    "\u{2806}" |  // 2 (dots 23)
+    "\u{2812}" |  // 3 (dots 25)
+    "\u{2832}" |  // 4 (dots 256)
+    "\u{2822}" |  // 5 (dots 26)
+    "\u{2816}" |  // 6 (dots 235)
+    "\u{2836}" |  // 7 (dots 2356)
+    "\u{2826}" |  // 8 (dots 236)
+    "\u{2814}" |  // 9 (dots 35)
+    "\u{2834}"    // 0 (dots 356)
+}
+
+// Capital indicator: dot 6 (U+2820)
+capital_indicator = { "\u{2820}" }
+
+// Letter indicator: dots 56 (U+2830)
+letter_indicator = { "\u{2830}" }
+
+// Letter characters (a-z in braille)
+letter_char = {
+    "\u{2801}" |  // a (dot 1)
+    "\u{2803}" |  // b (dots 12)
+    "\u{2809}" |  // c (dots 14)
+    "\u{2819}" |  // d (dots 145)
+    "\u{2811}" |  // e (dots 15)
+    "\u{280B}" |  // f (dots 124)
+    "\u{281B}" |  // g (dots 1245)
+    "\u{2813}" |  // h (dots 125)
+    "\u{280A}" |  // i (dots 24)
+    "\u{281A}" |  // j (dots 245)
+    "\u{2805}" |  // k (dots 13)
+    "\u{2807}" |  // l (dots 123)
+    "\u{280D}" |  // m (dots 134)
+    "\u{281D}" |  // n (dots 1345)
+    "\u{2815}" |  // o (dots 135)
+    "\u{280F}" |  // p (dots 1234)
+    "\u{281F}" |  // q (dots 12345)
+    "\u{2817}" |  // r (dots 1235)
+    "\u{280E}" |  // s (dots 234)
+    "\u{281E}" |  // t (dots 2345)
+    "\u{2825}" |  // u (dots 136)
+    "\u{2827}" |  // v (dots 1236)
+    "\u{283A}" |  // w (dots 2456)
+    "\u{282D}" |  // x (dots 1346)
+    "\u{283D}" |  // y (dots 13456)
+    "\u{2835}"    // z (dots 1356)
+}
+
+// Greek indicator: dots 46 (U+2828)
+greek_indicator = { "\u{2828}" }
+
+// Greek characters (same as letters but with Greek indicator)
+greek_char = {
+    "\u{2801}" |  // alpha
+    "\u{2803}" |  // beta
+    "\u{281B}" |  // gamma
+    "\u{2819}" |  // delta
+    "\u{2811}" |  // epsilon
+    "\u{2835}" |  // zeta
+    "\u{2831}" |  // eta
+    "\u{2839}" |  // theta
+    "\u{280A}" |  // iota
+    "\u{2805}" |  // kappa
+    "\u{2807}" |  // lambda
+    "\u{280D}" |  // mu
+    "\u{281D}" |  // nu
+    "\u{282D}" |  // xi
+    "\u{2815}" |  // omicron
+    "\u{280F}" |  // pi
+    "\u{2817}" |  // rho
+    "\u{280E}" |  // sigma
+    "\u{281E}" |  // tau
+    "\u{2825}" |  // upsilon
+    "\u{280B}" |  // phi
+    "\u{282F}" |  // chi
+    "\u{283D}" |  // psi
+    "\u{283A}"    // omega
+}
+
+// Fraction indicators
+// Open fraction: dots 1456 (U+2839)
+fraction_open = { "\u{2839}" }
+// Fraction bar: dots 34 (U+280C)
+fraction_bar = { "\u{280C}" }
+// Close fraction: dots 3456 (U+283C)
+fraction_close = { "\u{283C}" }
+
+// Radical indicators
+// Radical start: dots 345 (U+281C)
+radical_start = { "\u{281C}" }
+// Radical end: dots 12456 (U+283B)
+radical_end = { "\u{283B}" }
+
+// Superscript indicator: dots 45 (U+2818)
+superscript_indicator = { "\u{2818}" }
+
+// Subscript indicator: dots 56 (U+2830)
+subscript_indicator = { "\u{2830}" }
+
+// Grouping symbols
+// Open parenthesis: dots 12356 (U+2837)
+open_paren = { "\u{2837}" }
+// Close parenthesis: dots 23456 (U+283E)
+close_paren = { "\u{283E}" }
+
+// Open bracket: dots 4, 12356 (U+2808 U+2837)
+open_bracket = { "\u{2808}\u{2837}" }
+// Close bracket: dots 4, 23456 (U+2808 U+283E)
+close_bracket = { "\u{2808}\u{283E}" }
+
+// Open brace: dots 46, 12356 (U+2828 U+2837)
+open_brace = { "\u{2828}\u{2837}" }
+// Close brace: dots 46, 23456 (U+2828 U+283E)
+close_brace = { "\u{2828}\u{283E}" }
+
+// Operators
+// Plus: dots 346 (U+282C)
+plus = { "\u{282C}" }
+// Minus: dots 36 (U+2824)
+minus = { "\u{2824}" }
+// Times (multiplication): dots 16 (U+2821)
+times = { "\u{2821}" }
+// Division: dots 46, 34 (U+2828 U+280C)
+divide = { "\u{2828}\u{280C}" }
+// Equals: dots 46, 13 (U+2828 U+2805)
+equals = { "\u{2828}\u{2805}" }
+// Less than: dots 5, 13 (U+2810 U+2805)
+less_than = { "\u{2810}\u{2805}" }
+// Greater than: dots 46, 2 (U+2828 U+2802)
+greater_than = { "\u{2828}\u{2802}" }
+// Less than or equal: dots 5, 13, 46 (U+2810 U+2805 U+2828)
+less_equal = { "\u{2810}\u{2805}\u{2828}" }
+// Greater than or equal: dots 46, 2, 46 (U+2828 U+2802 U+2828)
+greater_equal = { "\u{2828}\u{2802}\u{2828}" }
+// Not equal: dots 5, 46, 13 (U+2810 U+2828 U+2805)
+not_equal = { "\u{2810}\u{2828}\u{2805}" }
+// Plus-minus: dots 346, 36 (U+282C U+2824)
+plus_minus = { "\u{282C}\u{2824}" }
+
+// Whitespace (ignored)
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" | "\u{2800}" }

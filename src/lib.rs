@@ -60,9 +60,11 @@ mod xpath_functions;
 mod definitions;
 pub mod pretty_print;
 mod chemistry;
+pub mod back_translate;
 
 pub mod shim_filesystem; // really just for override_file_for_debugging_rules, but the config seems to throw it off
 pub use interface::*;
+pub use back_translate::{braille_to_mathml, braille_to_mathml_detailed, BrailleCode, get_supported_back_translation_codes};
 
 #[cfg(test)]
 pub fn init_logger() {
