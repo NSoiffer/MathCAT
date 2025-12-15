@@ -17,6 +17,7 @@ mod errors;
 mod semantic;
 mod mathml_gen;
 mod nemeth;
+mod ueb;
 
 pub use errors::{BackTranslationError, BackTranslationWarning, ParseResult};
 pub use semantic::MathNode;
@@ -94,14 +95,7 @@ pub fn braille_to_mathml(braille: &str, code: BrailleCode) -> Result<String> {
 pub fn braille_to_mathml_detailed(braille: &str, code: BrailleCode) -> ParseResult {
     match code {
         BrailleCode::Nemeth => nemeth::parse_nemeth(braille),
-        BrailleCode::UEB => {
-            // UEB parser - placeholder for Phase 3
-            ParseResult {
-                mathml: None,
-                errors: vec![BackTranslationError::UnsupportedCode { code: "UEB".to_string() }],
-                warnings: vec![],
-            }
-        }
+        BrailleCode::UEB => ueb::parse_ueb(braille),
         BrailleCode::CMU => {
             // CMU parser - placeholder for Phase 5
             ParseResult {
@@ -115,7 +109,7 @@ pub fn braille_to_mathml_detailed(braille: &str, code: BrailleCode) -> ParseResu
 
 /// Get the list of braille codes that support back-translation
 pub fn get_supported_back_translation_codes() -> Vec<String> {
-    vec!["Nemeth".to_string()]
+    vec!["Nemeth".to_string(), "UEB".to_string()]
 }
 
 #[cfg(test)]
