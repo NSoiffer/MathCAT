@@ -228,9 +228,7 @@ pub fn parse_with_code_detection(braille: &str) -> ParseResult {
         match detection.primary_code {
             BrailleCode::Nemeth => nemeth::parse_nemeth(braille),
             BrailleCode::UEB => ueb::parse_ueb(braille),
-            BrailleCode::CMU => ParseResult::failure(BackTranslationError::UnsupportedCode {
-                code: "CMU".to_string(),
-            }),
+            BrailleCode::CMU => crate::back_translate::cmu::parse_cmu(braille),
         }
     } else {
         // Complex case: multiple codes
@@ -251,9 +249,7 @@ fn parse_with_switching(detection: &CodeDetectionResult) -> ParseResult {
         let result = match segment.code {
             BrailleCode::Nemeth => nemeth::parse_nemeth(&segment.content),
             BrailleCode::UEB => ueb::parse_ueb(&segment.content),
-            BrailleCode::CMU => ParseResult::failure(BackTranslationError::UnsupportedCode {
-                code: "CMU".to_string(),
-            }),
+            BrailleCode::CMU => crate::back_translate::cmu::parse_cmu(&segment.content),
         };
 
         if !result.errors.is_empty() {
@@ -290,9 +286,13 @@ fn parse_with_switching(detection: &CodeDetectionResult) -> ParseResult {
                 .join(""));
             ueb::parse_ueb(&cleaned)
         }
-        BrailleCode::CMU => ParseResult::failure(BackTranslationError::UnsupportedCode {
-            code: "CMU".to_string(),
-        }),
+        BrailleCode::CMU => {
+            let cleaned = strip_code_switch_indicators(&detection.segments.iter()
+                .map(|s| s.content.as_str())
+                .collect::<Vec<_>>()
+                .join(""));
+            crate::back_translate::cmu::parse_cmu(&cleaned)
+        }
     };
 
     ParseResult {

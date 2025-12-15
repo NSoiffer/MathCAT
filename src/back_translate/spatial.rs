@@ -250,9 +250,7 @@ pub fn parse_with_spatial(braille: &str, code: BrailleCode) -> ParseResult {
         return match code {
             BrailleCode::Nemeth => nemeth::parse_nemeth(braille),
             BrailleCode::UEB => crate::back_translate::ueb::parse_ueb(braille),
-            BrailleCode::CMU => ParseResult::failure(BackTranslationError::UnsupportedCode {
-                code: "CMU".to_string(),
-            }),
+            BrailleCode::CMU => crate::back_translate::cmu::parse_cmu(braille),
         };
     }
 
@@ -284,7 +282,7 @@ fn parse_multiline(braille: &str, code: BrailleCode) -> ParseResult {
         let result = match code {
             BrailleCode::Nemeth => nemeth::parse_nemeth(line),
             BrailleCode::UEB => crate::back_translate::ueb::parse_ueb(line),
-            BrailleCode::CMU => continue,
+            BrailleCode::CMU => crate::back_translate::cmu::parse_cmu(line),
         };
 
         if !result.errors.is_empty() {
@@ -309,9 +307,7 @@ fn parse_multiline(braille: &str, code: BrailleCode) -> ParseResult {
     let result = match code {
         BrailleCode::Nemeth => nemeth::parse_nemeth(&combined),
         BrailleCode::UEB => crate::back_translate::ueb::parse_ueb(&combined),
-        BrailleCode::CMU => ParseResult::failure(BackTranslationError::UnsupportedCode {
-            code: "CMU".to_string(),
-        }),
+        BrailleCode::CMU => crate::back_translate::cmu::parse_cmu(&combined),
     };
 
     ParseResult {

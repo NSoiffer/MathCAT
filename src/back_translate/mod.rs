@@ -18,6 +18,7 @@ mod semantic;
 mod mathml_gen;
 mod nemeth;
 mod ueb;
+mod cmu;
 mod code_switch;
 mod spatial;
 
@@ -100,20 +101,13 @@ pub fn braille_to_mathml_detailed(braille: &str, code: BrailleCode) -> ParseResu
     match code {
         BrailleCode::Nemeth => nemeth::parse_nemeth(braille),
         BrailleCode::UEB => ueb::parse_ueb(braille),
-        BrailleCode::CMU => {
-            // CMU parser - placeholder for Phase 5
-            ParseResult {
-                mathml: None,
-                errors: vec![BackTranslationError::UnsupportedCode { code: "CMU".to_string() }],
-                warnings: vec![],
-            }
-        }
+        BrailleCode::CMU => cmu::parse_cmu(braille),
     }
 }
 
 /// Get the list of braille codes that support back-translation
 pub fn get_supported_back_translation_codes() -> Vec<String> {
-    vec!["Nemeth".to_string(), "UEB".to_string()]
+    vec!["Nemeth".to_string(), "UEB".to_string(), "CMU".to_string()]
 }
 
 /// Convert braille to MathML with automatic code detection
@@ -219,5 +213,33 @@ mod tests {
 
         let multi_line = "\u{283C}\u{2802}\n\u{283C}\u{2806}";
         assert!(has_spatial_layout(multi_line));
+    }
+
+    #[test]
+    fn test_cmu_parse_number() {
+        // CMU number 123
+        let braille = "\u{283C}\u{2801}\u{2803}\u{2809}";
+        let result = braille_to_mathml_detailed(braille, BrailleCode::CMU);
+        assert!(result.is_success(), "Parse failed: {:?}", result.errors);
+        let mathml = result.mathml.unwrap();
+        assert!(mathml.contains("<mn>123</mn>"));
+    }
+
+    #[test]
+    fn test_cmu_parse_expression() {
+        // CMU x + y
+        let braille = "\u{282D}\u{282E}\u{283D}";
+        let result = braille_to_mathml_detailed(braille, BrailleCode::CMU);
+        assert!(result.is_success(), "Parse failed: {:?}", result.errors);
+        let mathml = result.mathml.unwrap();
+        assert!(mathml.contains("<mi>x</mi>"));
+        assert!(mathml.contains("<mo>+</mo>"));
+        assert!(mathml.contains("<mi>y</mi>"));
+    }
+
+    #[test]
+    fn test_supported_codes_includes_cmu() {
+        let codes = get_supported_back_translation_codes();
+        assert!(codes.contains(&"CMU".to_string()));
     }
 }
