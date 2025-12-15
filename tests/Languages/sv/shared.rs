@@ -243,7 +243,7 @@ fn ignore_comma() {
       </mstyle>
     </mrow>
 </math>";
-    test("sv", "SimpleSpeak", expr, "fi av x lika med; c gånger, e upphöjt till minus h kvadrat, x kvadrat");
+    test("sv", "SimpleSpeak", expr, "fi av x lika med; c gånger, e upphöjt till minus h kvadrat x kvadrat");
 }
 
 #[test]

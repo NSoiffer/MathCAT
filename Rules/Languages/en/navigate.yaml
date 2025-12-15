@@ -211,11 +211,24 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
-      then: [t: "zoomed in all of the way", pause: "long"]    # phrase('zoomed in all of the way')
+      then:
+      - test:
+        - if: "string-length(.) = 1"
+          then:
+          - t: "zoomed in all of the way"
+        - else_if: "$NavNodeOffset = 0"
+          then:
+          - t: "zoomed in to first character" # phrase('zoomed in to first character')
+          else:          
+          - t: "zoomed to character"          # phrase('zoomed in to character')
+      - pause: "long"
   - test:
-      if: "$ReadZoomLevel!=-1"
+      if: "$ReadZoomLevel !=-1"
       then:
       - set_variables: [ReadZoomLevel: "0"]
+  - test:
+      if: "string-length(.) > 1 and $MatchCounter = 0 and $NavNodeOffset = 0"
+      then: [set_variables: [NavNodeOffset: "1"]]
   - set_variables: [NavNode: "@id"]
 
 # special case of zooming into a table -- move to the first row (if only one row, first column)
@@ -258,7 +271,7 @@
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
   - test:
-      if: "name(*[1]) != 'mrow'"
+      if: "not(*[1][self::m:mrow or @data-from-mathml='mrow'])"
       then:
       - with:
           variables: [Move2D: "'in'", Child2D: "IfThenElse(count(*)=0, $Move2D, $Move2D)"]   # phrase('in' the denominator)
@@ -303,7 +316,7 @@
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
   - test:
-      if: "DEBUG($MatchCounter) > 1 and IsNode(., '2D') "
+      if: "$MatchCounter > 1 and IsNode(., '2D') "
       then: [set_variables: [NavNode: "@id"]]   # time to stop, not going "in" to next thing, so before "Move2D"
       else:
       - with:
@@ -474,7 +487,11 @@
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
   - test:
-      if: "$NavMode='Enhanced' and parent::*[self::m:mrow and (IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false))]"
+    - if: "$NavNodeOffset > 0"  # Inside leaf -- just reset offset
+      then:
+      - set_variables: [NavNodeOffset: "0"]
+      # NavNode remains the same
+    - else_if: "$NavMode='Enhanced' and parent::*[self::m:mrow and (IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false))]"
       then: [x: ".."] # auto-zoom: move out a level and retry
       else:
       - with:
@@ -1066,6 +1083,28 @@
 
 # ========  Move/Read/Describe Next rules =================
 
+
+- name: move-next-character
+  tag: [mn, mi, mtext]
+  match: 
+  - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext' or $NavCommand = 'MoveNextZoom') and"
+  - "$NavNodeOffset > 0 and"
+  - "($NavNodeOffset < string-length(.) or name(EdgeNode(., 'right', 'math'))!='math')" # not at edge of math
+  replace:
+  - test:
+      if: "$NavNodeOffset < string-length(.)"
+      then:
+      - with:
+          variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
+          replace: [x: "."]
+      - set_variables: [NavNodeOffset: "$NavNodeOffset + 1"]
+      else:
+      - with:
+          variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
+          replace: [x: "."]
+      - set_variables: [NavNodeOffset: "0"]
+      - x: "."
+
 # skip 'none'
 - name: move-next-none
   tag: [none, mprescripts]
@@ -1087,28 +1126,6 @@
           - with:
               variables: [NavCommand: "'MoveNextZoom'"]
               replace: [x: "$Following"]
-
-# skip 'none'
-- name: move-previous-none
-  tag: [none, mprescripts]
-  match: 
-  - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious' or $NavCommand = 'MovePreviousZoom') and"
-  - "parent::*[1][name(.)='mmultiscripts'] and preceding-sibling::*"
-  replace:
-  - with:
-      variables: [Preceding: "preceding-sibling::*[1]"]
-      replace:
-      # two 'none's in a row -- move over and try again; one 'none', zoom in on preceding 
-      - test:
-          if: "$Preceding[name(.)='none']"
-          then: [x: "$Preceding"]
-          else:
-          - with:
-              variables: [Move2D: "'in'", Child2D: "$Preceding"]          # phrase('in' the denominator)
-              replace: [x: ".."]
-          - with:
-              variables: [NavCommand: "'MovePreviousZoom'"]
-              replace: [x: "$Preceding"]
 
 
 
@@ -1307,6 +1324,29 @@
 
 # ========  Move/Read/Describe Previous rules =================
 
+# skip 'none'
+- name: move-previous-none
+  tag: [none, mprescripts]
+  match: 
+  - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious' or $NavCommand = 'MovePreviousZoom') and"
+  - "parent::*[1][name(.)='mmultiscripts'] and preceding-sibling::*"
+  replace:
+  - with:
+      variables: [Preceding: "preceding-sibling::*[1]"]
+      replace:
+      # two 'none's in a row -- move over and try again; one 'none', zoom in on preceding 
+      - test:
+          if: "$Preceding[name(.)='none']"
+          then: [x: "$Preceding"]
+          else:
+          - with:
+              variables: [Move2D: "'in'", Child2D: "$Preceding"]          # phrase('in' the denominator)
+              replace: [x: ".."]
+          - with:
+              variables: [NavCommand: "'MovePreviousZoom'"]
+              replace: [x: "$Preceding"]
+
+
 # skip invisible chars except for Enhanced mode when "times" should be read
 - name: move-previous-invisible
   tag: "*"
@@ -1369,6 +1409,27 @@
       replace: [x: "."]
   - pause: long
   - set_variables: [SpeakExpression: "'false'"]
+
+- name: move-prev-character
+  tag: [mn, mi, mtext]
+  match: 
+  - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious' or $NavCommand = 'MovePreviousZoom') and"
+  - "$NavNodeOffset > 0 and"
+  - "($NavNodeOffset > 1 or name(EdgeNode(., 'left', 'math'))!='math')" # not at edge of math
+  replace:
+  - test:
+      if: "$NavNodeOffset > 1"
+      then:
+      - with:
+          variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
+          replace: [x: "."]
+      - set_variables: [NavNodeOffset: "$NavNodeOffset - 1"]
+      else:
+      - with:
+          variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
+          replace: [x: "."]
+      - set_variables: [NavNodeOffset: "0"]
+      - x: "."
 
 - name: move-previous-auto-zoom-up-one-level
   # Last child or in auto-zoom'd in-- move up a level and try again 

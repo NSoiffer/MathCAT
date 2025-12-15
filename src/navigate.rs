@@ -302,12 +302,12 @@ pub fn get_nav_node<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'
 }
 
 // FIX: think of a better place to put this, and maybe a better interface
+// Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate()
+/// First return tuple value is string-value (if string, bool, or single node) or None
+/// Second return tuple value is f64 if variable is a number or None
 pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<(Option<String>, Option<f64>)> {
-    // First return tuple value is string-value (if string, bool, or single node) or None
-    // Second return tuple value is f64 if variable is a number or None
     // This is slightly roundabout because Context doesn't expose a way to get the values.
     // Instead, we create an "Evaluation", which is just one level of indirection.
-    // Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate()
     use sxd_xpath::nodeset::Node;
     let evaluation = Evaluation::new(context, Node::Element(mathml));
     return match evaluation.value_of(var_name.into()) {
@@ -385,7 +385,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         return NAVIGATION_RULES.with(|rules| {
             let rules = rules.borrow();
             let new_package = Package::new();
-            let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), "");
+            let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), "", 0);
             
             nav_state.mode = rules.pref_manager.as_ref().borrow().pref_to_string("NavMode");
             nav_state.speak_overview = rules.pref_manager.as_ref().borrow().pref_to_string("Overview") == "true";
@@ -463,9 +463,11 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
     fn apply_navigation_rules<'c, 'm:'c>(mathml: Element<'m>, nav_command: &'static str,
             rules: &Ref<SpeechRules>, rules_with_context: &mut SpeechRulesWithContext<'c, '_, 'm>, nav_state: &mut RefMut<NavigationState>,
             loop_count: usize) -> Result<(String, bool)> {
-        let context = rules_with_context.get_context();
-        context.set_variable("MatchCounter", loop_count as f64);
-        nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
+        {
+            let context = rules_with_context.get_context();
+            context.set_variable("MatchCounter", loop_count as f64);
+            nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
+        }
 
         let mut add_literal = nav_state.mode == "Character";
         let (intent, nav_intent) = if add_literal {
@@ -490,6 +492,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             Ok(node) => node,
             Err(_) => {
                 // find the node in the other tree (probably mathml) and walk up to find a parent that has an id in both
+                debug!("Could not find start_node in nav_intent -- trying other_tree");
                 let other_tree = if nav_state.mode == "Character" {nav_intent} else {mathml};
                 let mut found_node = get_start_node(other_tree, nav_state)?;
                 while name(found_node) != "math" {
@@ -517,6 +520,8 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         //     }
         //     debug!("parent or grandparent of start_node:\n{}", mml_to_string(parent));
         // }
+        let offset = context_get_variable(rules_with_context.get_context(), "NavNodeOffset", intent)?.1.unwrap() as usize;
+        rules_with_context.set_nav_node_offset(offset);
 
         let raw_speech_string = rules_with_context.match_pattern::<String>(start_node)
                     .chain_err(|| "Pattern match/replacement failure during math navigation!")?;
@@ -532,6 +537,8 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         // what else needs to be done/set???
 
         // transfer some values that might have been set into the prefs
+        let offset = context_get_variable(rules_with_context.get_context(), "NavNodeOffset", intent)?.1.unwrap() as usize;
+        rules_with_context.set_nav_node_offset(offset);
         let context = rules_with_context.get_context();
         nav_state.speak_overview = context_get_variable(context, "Overview", intent)?.0.unwrap() == "true";
         nav_state.mode = context_get_variable(context, "NavMode", intent)?.0.unwrap();
@@ -556,15 +563,9 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             !nav_state.speak_overview
         };
 
-        { //if (nav_command.starts_with("Move") || nav_command.starts_with("Zoom")) && nav_command != "MoveLastLocation" {
-            // push the new location on the stack
-            if nav_position != NavigationPosition::default() {
-                // debug!("nav_state: pushing on {}", &nav_position);
-                let current_node = nav_position.current_node.as_str();
-                if current_node != nav_state.top().unwrap().0.current_node && current_node != ILLEGAL_NODE_ID {
-                    nav_state.push(nav_position.clone(), nav_command);
-                }
-            }
+        // push the new location on the stack
+        if nav_position != NavigationPosition::default() && &nav_position != nav_state.top().unwrap().0 {
+            nav_state.push(nav_position.clone(), nav_command);
         }
 
         if nav_command.starts_with("SetPlacemarker") {
@@ -580,7 +581,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             // Speak/Overview of where we landed (if we are supposed to speak it) -- use intent, not nav_intent
             // Note: NavMode might have changed, so we need to recheck the mode to see if we use LiteralSpeak
             let literal_speak = nav_state.mode == "Character";
-            let node_speech = match speak(mathml, intent, &nav_position.current_node, literal_speak, use_read_rules) {
+            let node_speech = match speak(mathml, intent, &nav_position, literal_speak, use_read_rules) {
                 Ok(speech) => speech,
                 Err(e) => {
                     remove_literal_property(mathml, add_literal, properties);
@@ -654,34 +655,31 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
 /// Speak the intent tree at the nav_node_id if that id exists in the intent tree; otherwise use the mathml tree.
 /// If full_read is true, we speak the tree, otherwise we use the overview rules.
 /// If literal_speak is true, we use the literal speak rules (and use the mathml tree).
-fn speak(mathml: Element, intent: Element, nav_node_id: &str, literal_speak: bool, full_read: bool) -> Result<String> {
-        if full_read {
+fn speak(mathml: Element, intent: Element, nav_position: &NavigationPosition, literal_speak: bool, full_read: bool) -> Result<String> {
+    if full_read {
         // In something like x^3, we might be looking for the '3', but it will be "cubed", so we don't find it.
         // Or we might be on a "(" surrounding a matrix and that isn't part of the intent
         // We are probably safer in terms of getting the same speech if we retry intent starting at the nav node,
         //  but the node to speak is almost certainly trivial.
         // By speaking the non-intent tree, we are certain to speak on the next try
-        if !literal_speak {
-            let temp_pos = NavigationPosition { current_node: nav_node_id.to_string(), current_node_offset: 0 };
-            if get_node_by_id(intent, &temp_pos).is_some() {
+        if !literal_speak && get_node_by_id(intent, nav_position).is_some() {
                 // debug!("speak: nav_node_id={}, intent=\n{}", nav_node_id, mml_to_string(intent));
-                match crate::speech::speak_mathml(intent, nav_node_id) {
-                    Ok(speech) => return Ok(speech),
-                    Err(e) => {
-                        if e.to_string() != crate::speech::NAV_NODE_SPEECH_NOT_FOUND {
-                            return Err(e);
-                        }
-                        // else could be something like '3' in 'x^3' ("cubed")
-                    },
-                }
+            match crate::speech::speak_mathml(intent, &nav_position.current_node, nav_position.current_node_offset) {
+                Ok(speech) => return Ok(speech),
+                Err(e) => {
+                    if e.to_string() != crate::speech::NAV_NODE_SPEECH_NOT_FOUND {
+                        return Err(e);
+                    }
+                    // else could be something like '3' in 'x^3' ("cubed")
+                },
             }
         }
         // debug!("speak (literal): nav_node_id={}, mathml=\n{}", nav_node_id, mml_to_string(mathml));
-        let speech = crate::speech::speak_mathml(mathml, nav_node_id);
+        let speech = crate::speech::speak_mathml(mathml, &nav_position.current_node, nav_position.current_node_offset);
         // debug!("speech from speak: {:?}", speech);
         return speech;
     } else {
-        return crate::speech::overview_mathml(mathml, nav_node_id);
+        return crate::speech::overview_mathml(mathml, &nav_position.current_node, nav_position.current_node_offset);
     }
 }
 
@@ -1578,7 +1576,7 @@ mod tests {
             </mrow>
             </mrow>
         </math>";
-        init_default_prefs(mathml_str, "Character");
+        init_default_prefs(mathml_str, "Simple");
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -1603,6 +1601,7 @@ mod tests {
             test_command("MovePrevious", mathml, "id-6");
             test_command("MovePrevious", mathml, "id-5");
             test_command("MovePrevious", mathml, "id-2");
+            test_command("ZoomOutAll", mathml, "id-1");
             return Ok( () );
         }
     }
@@ -1630,6 +1629,36 @@ mod tests {
             assert_eq!("move left; in numerator; x", test_command("MovePrevious", mathml, "id-3"));
 
             return Ok( () );
+        });
+    }
+    
+    #[test]
+    fn move_inside_leaves() -> Result<()> {
+        let mathml_str = "<math display='block' id='id-0'>
+                <mrow id='id-1'>
+                    <mfrac id='id-2'>
+                        <mi id='id-3'>top</mi>
+                        <mi id='id-4'>αβγ</mi>
+                    </mfrac>
+                </mrow>
+            </math>";
+        init_default_prefs(mathml_str, "Character");
+        return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&*package_instance);
+        test_command("ZoomInAll", mathml, "id-3");
+        assert_eq!("zoomed in to first character; t", test_command("ZoomIn", mathml, "id-3"));
+        assert_eq!("move right; o", test_command("MoveNext", mathml, "id-3"));
+        assert_eq!("move right; p", test_command("MoveNext", mathml, "id-3"));
+        assert_eq!("move right; in denominator; αβγ", test_command("MoveNext", mathml, "id-4"));
+        assert_eq!("zoomed in to first character; alpha", test_command("ZoomIn", mathml, "id-4"));
+        assert_eq!("move right; beta", test_command("MoveNext", mathml, "id-4"));
+        assert_eq!("move right; gamma", test_command("MoveNext", mathml, "id-4"));
+        assert_eq!("cannot move right, end of math", test_command("MoveNext", mathml, "id-4"));
+        assert_eq!("move left; beta", test_command("MovePrevious", mathml, "id-4"));
+        assert_eq!("zoom out; αβγ", test_command("ZoomOut", mathml, "id-4"));
+
+        return Ok( () );
         });
     }
     
