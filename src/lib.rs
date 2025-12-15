@@ -64,7 +64,13 @@ pub mod back_translate;
 
 pub mod shim_filesystem; // really just for override_file_for_debugging_rules, but the config seems to throw it off
 pub use interface::*;
-pub use back_translate::{braille_to_mathml, braille_to_mathml_detailed, BrailleCode, get_supported_back_translation_codes};
+pub use back_translate::{
+    braille_to_mathml, braille_to_mathml_detailed,
+    braille_to_mathml_auto, braille_to_mathml_auto_detailed,
+    BrailleCode, get_supported_back_translation_codes,
+    detect_code, parse_with_code_detection, CodeDetectionResult, BrailleSegment,
+    parse_with_spatial, has_spatial_layout, Matrix, MatrixType,
+};
 
 #[cfg(test)]
 pub fn init_logger() {

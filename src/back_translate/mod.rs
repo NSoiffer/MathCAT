@@ -18,9 +18,13 @@ mod semantic;
 mod mathml_gen;
 mod nemeth;
 mod ueb;
+mod code_switch;
+mod spatial;
 
 pub use errors::{BackTranslationError, BackTranslationWarning, ParseResult};
 pub use semantic::MathNode;
+pub use code_switch::{detect_code, parse_with_code_detection, CodeDetectionResult, BrailleSegment};
+pub use spatial::{parse_with_spatial, has_spatial_layout, Matrix, MatrixType};
 
 use crate::errors::Result;
 
@@ -112,6 +116,51 @@ pub fn get_supported_back_translation_codes() -> Vec<String> {
     vec!["Nemeth".to_string(), "UEB".to_string()]
 }
 
+/// Convert braille to MathML with automatic code detection
+///
+/// This function automatically detects whether the input is Nemeth or UEB
+/// and handles code switching within documents.
+///
+/// # Arguments
+/// * `braille` - Unicode braille string (U+2800-U+28FF range)
+///
+/// # Returns
+/// * `Ok(String)` - MathML string on success
+/// * `Err(Error)` - Parse error with details
+pub fn braille_to_mathml_auto(braille: &str) -> Result<String> {
+    let result = braille_to_mathml_auto_detailed(braille);
+    if let Some(mathml) = result.mathml {
+        Ok(mathml)
+    } else if !result.errors.is_empty() {
+        bail!("{}", result.errors[0])
+    } else {
+        bail!("Failed to parse braille: unknown error")
+    }
+}
+
+/// Convert braille to MathML with automatic code detection and detailed results
+///
+/// This function automatically detects the braille code and handles:
+/// - Nemeth vs UEB detection based on patterns
+/// - Code switching (e.g., Nemeth within UEB documents)
+/// - Spatial layouts (matrices, multi-line expressions)
+///
+/// # Arguments
+/// * `braille` - Unicode braille string (U+2800-U+28FF range)
+///
+/// # Returns
+/// A `ParseResult` containing the MathML and any errors/warnings
+pub fn braille_to_mathml_auto_detailed(braille: &str) -> ParseResult {
+    // First check for spatial layout
+    if spatial::has_spatial_layout(braille) {
+        let detection = code_switch::detect_code(braille);
+        return spatial::parse_with_spatial(braille, detection.primary_code);
+    }
+
+    // Use code detection and switching
+    code_switch::parse_with_code_detection(braille)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -132,5 +181,43 @@ mod tests {
         assert_eq!(format!("{}", BrailleCode::Nemeth), "Nemeth");
         assert_eq!(format!("{}", BrailleCode::UEB), "UEB");
         assert_eq!(format!("{}", BrailleCode::CMU), "CMU");
+    }
+
+    #[test]
+    fn test_auto_detect_nemeth() {
+        // Nemeth number pattern
+        let braille = "\u{283C}\u{2802}\u{2806}\u{2812}"; // 123 in Nemeth
+        let result = braille_to_mathml_auto_detailed(braille);
+        assert!(result.is_success(), "Parse failed: {:?}", result.errors);
+        let mathml = result.mathml.unwrap();
+        assert!(mathml.contains("<mn>123</mn>"));
+    }
+
+    #[test]
+    fn test_auto_detect_simple_expression() {
+        // Nemeth x + 1
+        let braille = "\u{282D}\u{282C}\u{283C}\u{2802}";
+        let result = braille_to_mathml_auto_detailed(braille);
+        assert!(result.is_success(), "Parse failed: {:?}", result.errors);
+        let mathml = result.mathml.unwrap();
+        assert!(mathml.contains("<mi>x</mi>"));
+        assert!(mathml.contains("<mo>+</mo>"));
+    }
+
+    #[test]
+    fn test_code_detection_api() {
+        let braille = "\u{283C}\u{2802}"; // Nemeth 1
+        let detection = detect_code(braille);
+        assert_eq!(detection.primary_code, BrailleCode::Nemeth);
+        assert!(!detection.has_code_switching);
+    }
+
+    #[test]
+    fn test_spatial_detection_api() {
+        let single_line = "\u{283C}\u{2802}";
+        assert!(!has_spatial_layout(single_line));
+
+        let multi_line = "\u{283C}\u{2802}\n\u{283C}\u{2806}";
+        assert!(has_spatial_layout(multi_line));
     }
 }
