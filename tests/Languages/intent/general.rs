@@ -73,3 +73,35 @@ fn nested_interval_bug_329() {
    </math>";
     test_intent(expr, target, vec![]);
 }
+
+#[test]
+fn evaluated_at() {
+    let expr = r#"<math>
+          <msubsup>
+              <mrow>
+                  <mo>[</mo>
+                  <msup><mi>x</mi><mn>2</mn></msup>
+                  <mo>+</mo>
+                  <mi>x</mi>
+                  <mo>]</mo>
+              </mrow>
+              <mn>0</mn>
+              <mn>1</mn>
+          </msubsup>
+        </math>"#;
+    let target = "<math data-from-mathml='math'>
+        <evaluate data-from-mathml='msubsup'>
+          <mrow data-from-mathml='mrow' data-changed='added'>
+            <power data-from-mathml='msup'>
+              <mi data-from-mathml='mi'>x</mi>
+              <mn data-from-mathml='mn'>2</mn>
+            </power>
+            <mo data-from-mathml='mo'>+</mo>
+            <mi data-from-mathml='mi'>x</mi>
+          </mrow>
+          <mn data-from-mathml='mn'>0</mn>
+          <mn data-from-mathml='mn'>1</mn>
+      </evaluate>
+    </math>";
+    test_intent(expr, target, vec![]);
+}
