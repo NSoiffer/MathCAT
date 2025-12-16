@@ -1,0 +1,405 @@
+// Nemeth Braille to MathML Grammar
+// This grammar parses linear Nemeth braille expressions
+// Phase 2: Extended symbols and structures
+
+// Entry point
+math = { SOI ~ expression ~ EOI }
+
+// Expression is a sequence of terms with operators
+expression = { term ~ (operator ~ term)* }
+
+// A term is a single mathematical element, possibly with scripts
+term = {
+    big_operator
+    | function_application
+    | fraction
+    | radical
+    | absolute_value
+    | grouped
+    | scripted_atom
+    | atom
+    | ellipsis
+}
+
+// Atoms are the basic building blocks
+atom = {
+    number
+    | greek_letter
+    | special_symbol
+    | letter
+}
+
+// Scripted atoms (with superscript/subscript)
+scripted_atom = {
+    atom ~ script+
+}
+
+// Scripts can be superscript, subscript, or both
+script = { superscript | subscript }
+
+// Numbers (with optional numeric indicator)
+number = { numeric_indicator? ~ digit+ ~ (decimal_point ~ digit+)? }
+
+// Letters (variables)
+letter = {
+    typeform_indicator? ~
+    capital_indicator? ~
+    letter_indicator? ~
+    letter_char
+}
+
+// Typeform indicators (bold, italic, etc.)
+typeform_indicator = {
+    bold_indicator
+    | italic_indicator
+    | script_style_indicator
+}
+
+// Greek letters
+greek_letter = { greek_indicator ~ capital_indicator? ~ greek_char }
+
+// Special symbols (infinity, empty set, etc.)
+special_symbol = {
+    infinity
+    | empty_set
+    | element_of
+    | not_element_of
+    | subset
+    | superset
+    | union
+    | intersection
+    | nabla
+    | partial_derivative
+    | degree
+    | percent
+    | therefore
+    | because
+    | factorial
+}
+
+// Fractions (with nesting support)
+fraction = {
+    (nesting_indicator* ~ fraction_open) ~
+    expression ~
+    (nesting_indicator* ~ fraction_bar) ~
+    expression ~
+    (nesting_indicator* ~ fraction_close)
+}
+
+// Radicals (square root and nth root)
+radical = {
+    // nth root: index before radical
+    (radical_index ~ nesting_indicator* ~ radical_start ~ expression ~ nesting_indicator* ~ radical_end)
+    | (nesting_indicator* ~ radical_start ~ expression ~ nesting_indicator* ~ radical_end)
+}
+
+radical_index = { superscript_indicator ~ atom }
+
+// Absolute value
+absolute_value = {
+    absolute_open ~ expression ~ absolute_close
+}
+
+// Grouping (parentheses, brackets, braces)
+grouped = {
+    open_paren ~ expression ~ close_paren
+    | open_bracket ~ expression ~ close_bracket
+    | open_brace ~ expression ~ close_brace
+    | angle_open ~ expression ~ angle_close
+}
+
+// Superscript and subscript
+superscript = { superscript_indicator ~ script_content }
+subscript = { subscript_indicator ~ script_content }
+
+// Script content (what follows the script indicator)
+script_content = {
+    grouped
+    | fraction
+    | number
+    | greek_letter
+    | letter
+}
+
+// Big operators (sum, product, integral)
+big_operator = {
+    (sum_symbol | product_symbol | integral_symbol | coproduct_symbol) ~
+    (subscript ~ superscript? | superscript ~ subscript?)?
+}
+
+// Function application (sin, cos, log, etc.)
+function_application = {
+    function_name ~ grouped?
+}
+
+function_name = {
+    sin_func | cos_func | tan_func |
+    cot_func | sec_func | csc_func |
+    arcsin_func | arccos_func | arctan_func |
+    sinh_func | cosh_func | tanh_func |
+    log_func | ln_func | exp_func |
+    lim_func | max_func | min_func |
+    det_func | mod_func | gcd_func
+}
+
+// Ellipsis (dots)
+ellipsis = {
+    horizontal_ellipsis | vertical_ellipsis | diagonal_ellipsis
+}
+
+// Operators
+operator = {
+    comparison_operator
+    | set_operator
+    | logical_operator
+    | arrow_operator
+    | arithmetic_operator
+}
+
+comparison_operator = {
+    not_equal | less_equal | greater_equal |
+    less_than | greater_than | equals |
+    approximately_equal | congruent | similar
+}
+
+set_operator = {
+    subset_equal | superset_equal |
+    subset | superset |
+    element_of | not_element_of |
+    union | intersection
+}
+
+logical_operator = {
+    logical_and | logical_or | logical_not |
+    implies | iff | forall | exists
+}
+
+arrow_operator = {
+    left_arrow | right_arrow | left_right_arrow |
+    maps_to
+}
+
+arithmetic_operator = {
+    plus_minus | minus_plus |
+    plus | minus | times | divide | dot_product | cross_product
+}
+
+// === Terminal definitions (Unicode braille patterns) ===
+
+// Nesting indicator: dot 6 repeated for level
+nesting_indicator = { "\u{2820}" }
+
+// Numeric indicator: dots 3456 (U+283C)
+numeric_indicator = { "\u{283C}" }
+
+// Decimal point: dots 46 (U+2828)
+decimal_point = { "\u{2828}" }
+
+// Digits in Nemeth (after numeric indicator or in number context)
+digit = {
+    "\u{2802}" |  // 1 (dots 2)
+    "\u{2806}" |  // 2 (dots 23)
+    "\u{2812}" |  // 3 (dots 25)
+    "\u{2832}" |  // 4 (dots 256)
+    "\u{2822}" |  // 5 (dots 26)
+    "\u{2816}" |  // 6 (dots 235)
+    "\u{2836}" |  // 7 (dots 2356)
+    "\u{2826}" |  // 8 (dots 236)
+    "\u{2814}" |  // 9 (dots 35)
+    "\u{2834}"    // 0 (dots 356)
+}
+
+// Capital indicator: dot 6 (U+2820)
+capital_indicator = { "\u{2820}" }
+
+// Letter indicator: dots 56 (U+2830)
+letter_indicator = { "\u{2830}" }
+
+// Typeform indicators
+bold_indicator = { "\u{2838}" }       // dots 456
+italic_indicator = { "\u{2828}" }      // dots 46
+script_style_indicator = { "\u{2808}" } // dots 4
+
+// Letter characters (a-z in braille)
+letter_char = {
+    "\u{2801}" |  // a (dot 1)
+    "\u{2803}" |  // b (dots 12)
+    "\u{2809}" |  // c (dots 14)
+    "\u{2819}" |  // d (dots 145)
+    "\u{2811}" |  // e (dots 15)
+    "\u{280B}" |  // f (dots 124)
+    "\u{281B}" |  // g (dots 1245)
+    "\u{2813}" |  // h (dots 125)
+    "\u{280A}" |  // i (dots 24)
+    "\u{281A}" |  // j (dots 245)
+    "\u{2805}" |  // k (dots 13)
+    "\u{2807}" |  // l (dots 123)
+    "\u{280D}" |  // m (dots 134)
+    "\u{281D}" |  // n (dots 1345)
+    "\u{2815}" |  // o (dots 135)
+    "\u{280F}" |  // p (dots 1234)
+    "\u{281F}" |  // q (dots 12345)
+    "\u{2817}" |  // r (dots 1235)
+    "\u{280E}" |  // s (dots 234)
+    "\u{281E}" |  // t (dots 2345)
+    "\u{2825}" |  // u (dots 136)
+    "\u{2827}" |  // v (dots 1236)
+    "\u{283A}" |  // w (dots 2456)
+    "\u{282D}" |  // x (dots 1346)
+    "\u{283D}" |  // y (dots 13456)
+    "\u{2835}"    // z (dots 1356)
+}
+
+// Greek indicator: dots 46 (U+2828)
+greek_indicator = { "\u{2828}" }
+
+// Greek characters (same as letters but with Greek indicator)
+greek_char = {
+    "\u{2801}" |  // alpha
+    "\u{2803}" |  // beta
+    "\u{281B}" |  // gamma
+    "\u{2819}" |  // delta
+    "\u{2811}" |  // epsilon
+    "\u{2835}" |  // zeta
+    "\u{2831}" |  // eta
+    "\u{2839}" |  // theta
+    "\u{280A}" |  // iota
+    "\u{2805}" |  // kappa
+    "\u{2807}" |  // lambda
+    "\u{280D}" |  // mu
+    "\u{281D}" |  // nu
+    "\u{282D}" |  // xi
+    "\u{2815}" |  // omicron
+    "\u{280F}" |  // pi
+    "\u{2817}" |  // rho
+    "\u{280E}" |  // sigma
+    "\u{281E}" |  // tau
+    "\u{2825}" |  // upsilon
+    "\u{280B}" |  // phi
+    "\u{282F}" |  // chi
+    "\u{283D}" |  // psi
+    "\u{283A}"    // omega
+}
+
+// Special symbols
+infinity = { "\u{2808}\u{2814}" }           // dots 4, 35
+empty_set = { "\u{2838}\u{2815}" }          // dots 456, 135
+element_of = { "\u{2808}\u{2811}" }         // dots 4, 15
+not_element_of = { "\u{2810}\u{2808}\u{2811}" } // dots 5, 4, 15
+subset = { "\u{2808}\u{2810}\u{2805}" }     // dots 4, 5, 13
+superset = { "\u{2808}\u{2828}\u{2802}" }   // dots 4, 46, 2
+union = { "\u{2808}\u{282C}" }              // dots 4, 346
+intersection = { "\u{2808}\u{2829}" }       // dots 4, 146
+nabla = { "\u{2838}\u{2813}" }              // dots 456, 125
+partial_derivative = { "\u{2838}\u{2819}" } // dots 456, 145
+degree = { "\u{2818}\u{2815}" }             // dots 45, 135
+percent = { "\u{2818}\u{2834}\u{2834}" }    // dots 45, 356, 356
+therefore = { "\u{2818}\u{2832}" }          // dots 45, 256
+because = { "\u{2838}\u{2836}" }            // dots 456, 2356
+factorial = { "\u{282E}" }                  // dots 2346
+
+// Fraction indicators
+fraction_open = { "\u{2839}" }         // dots 1456
+fraction_bar = { "\u{280C}" }          // dots 34
+fraction_close = { "\u{283C}" }        // dots 3456
+
+// Radical indicators
+radical_start = { "\u{281C}" }         // dots 345
+radical_end = { "\u{283B}" }           // dots 12456
+
+// Absolute value
+absolute_open = { "\u{2838}\u{2837}" }  // dots 456, 12356
+absolute_close = { "\u{2838}\u{283E}" } // dots 456, 23456
+
+// Superscript indicator: dots 45 (U+2818)
+superscript_indicator = { "\u{2818}" }
+
+// Subscript indicator: dots 56 (U+2830)
+subscript_indicator = { "\u{2830}" }
+
+// Grouping symbols
+open_paren = { "\u{2837}" }            // dots 12356
+close_paren = { "\u{283E}" }           // dots 23456
+open_bracket = { "\u{2808}\u{2837}" }  // dots 4, 12356
+close_bracket = { "\u{2808}\u{283E}" } // dots 4, 23456
+open_brace = { "\u{2828}\u{2837}" }    // dots 46, 12356
+close_brace = { "\u{2828}\u{283E}" }   // dots 46, 23456
+angle_open = { "\u{2810}\u{2805}" }    // dots 5, 13 (also less than)
+angle_close = { "\u{2828}\u{2802}" }   // dots 46, 2 (also greater than)
+
+// Big operators
+sum_symbol = { "\u{2838}\u{280E}" }        // dots 456, 234
+product_symbol = { "\u{2838}\u{280F}" }    // dots 456, 1234
+integral_symbol = { "\u{2808}\u{280A}" }   // dots 4, 24
+coproduct_symbol = { "\u{2838}\u{282C}" }  // dots 456, 346
+
+// Function names (multi-cell patterns)
+sin_func = { "\u{280E}\u{280A}\u{281D}" }           // s i n
+cos_func = { "\u{2809}\u{2815}\u{280E}" }           // c o s
+tan_func = { "\u{281E}\u{2801}\u{281D}" }           // t a n
+cot_func = { "\u{2809}\u{2815}\u{281E}" }           // c o t
+sec_func = { "\u{280E}\u{2811}\u{2809}" }           // s e c
+csc_func = { "\u{2809}\u{280E}\u{2809}" }           // c s c
+arcsin_func = { "\u{2801}\u{2817}\u{2809}\u{280E}\u{280A}\u{281D}" } // arcsin
+arccos_func = { "\u{2801}\u{2817}\u{2809}\u{2809}\u{2815}\u{280E}" } // arccos
+arctan_func = { "\u{2801}\u{2817}\u{2809}\u{281E}\u{2801}\u{281D}" } // arctan
+sinh_func = { "\u{280E}\u{280A}\u{281D}\u{2813}" }  // sinh
+cosh_func = { "\u{2809}\u{2815}\u{280E}\u{2813}" }  // cosh
+tanh_func = { "\u{281E}\u{2801}\u{281D}\u{2813}" }  // tanh
+log_func = { "\u{2807}\u{2815}\u{281B}" }           // log
+ln_func = { "\u{2807}\u{281D}" }                     // ln
+exp_func = { "\u{2811}\u{282D}\u{280F}" }           // exp
+lim_func = { "\u{2807}\u{280A}\u{280D}" }           // lim
+max_func = { "\u{280D}\u{2801}\u{282D}" }           // max
+min_func = { "\u{280D}\u{280A}\u{281D}" }           // min
+det_func = { "\u{2819}\u{2811}\u{281E}" }           // det
+mod_func = { "\u{280D}\u{2815}\u{2819}" }           // mod
+gcd_func = { "\u{281B}\u{2809}\u{2819}" }           // gcd
+
+// Ellipsis patterns
+horizontal_ellipsis = { "\u{2804}\u{2804}\u{2804}" }  // dots 3, 3, 3
+vertical_ellipsis = { "\u{2800}" ~ "\u{2804}" ~ "\u{2800}" ~ "\u{2804}" ~ "\u{2800}" ~ "\u{2804}" }
+diagonal_ellipsis = { "\u{2821}\u{2821}\u{2821}" }    // dots 16, 16, 16
+
+// Comparison operators
+equals = { "\u{2828}\u{2805}" }              // dots 46, 13
+not_equal = { "\u{2810}\u{2828}\u{2805}" }   // dots 5, 46, 13
+less_than = { "\u{2810}\u{2805}" }           // dots 5, 13
+greater_than = { "\u{2828}\u{2802}" }        // dots 46, 2
+less_equal = { "\u{2810}\u{2805}\u{2828}" }  // dots 5, 13, 46
+greater_equal = { "\u{2828}\u{2802}\u{2828}" } // dots 46, 2, 46
+approximately_equal = { "\u{2808}\u{2828}\u{2805}" } // dots 4, 46, 13
+congruent = { "\u{2808}\u{2808}\u{2805}" }   // dots 4, 4, 13
+similar = { "\u{2808}\u{2828}\u{2828}" }     // dots 4, 46, 46
+
+// Set operators
+subset_equal = { "\u{2808}\u{2810}\u{2805}\u{2828}" } // subset + 46
+superset_equal = { "\u{2808}\u{2828}\u{2802}\u{2828}" } // superset + 46
+
+// Logical operators
+logical_and = { "\u{2808}\u{282C}" }         // dots 4, 346
+logical_or = { "\u{2808}\u{2832}" }          // dots 4, 256
+logical_not = { "\u{2810}\u{282C}" }         // dots 5, 346
+implies = { "\u{2838}\u{282E}" }             // dots 456, 2346
+iff = { "\u{2838}\u{282E}\u{282E}" }         // dots 456, 2346, 2346
+forall = { "\u{2808}\u{2820}\u{2801}" }      // dots 4, 6, 1
+exists = { "\u{2808}\u{2820}\u{2811}" }      // dots 4, 6, 15
+
+// Arrow operators
+left_arrow = { "\u{2810}\u{282E}" }          // dots 5, 2346
+right_arrow = { "\u{282E}\u{2828}" }         // dots 2346, 46
+left_right_arrow = { "\u{2810}\u{282E}\u{2828}" } // dots 5, 2346, 46
+maps_to = { "\u{2838}\u{282E}\u{2828}" }     // dots 456, 2346, 46
+
+// Arithmetic operators
+plus = { "\u{282C}" }                // dots 346
+minus = { "\u{2824}" }               // dots 36
+times = { "\u{2821}" }               // dots 16
+divide = { "\u{2828}\u{280C}" }      // dots 46, 34
+plus_minus = { "\u{282C}\u{2824}" }  // dots 346, 36
+minus_plus = { "\u{2824}\u{282C}" }  // dots 36, 346
+dot_product = { "\u{2810}\u{2821}" } // dots 5, 16
+cross_product = { "\u{2828}\u{2821}" } // dots 46, 16
+
+// Whitespace (ignored)
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" | "\u{2800}" }

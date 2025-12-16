@@ -1,0 +1,333 @@
+// UEB (Unified English Braille) Technical Math Grammar
+// This grammar parses UEB technical/math braille expressions
+// Phase 3: UEB Technical Support
+
+// Entry point
+math = { SOI ~ expression ~ EOI }
+
+// Expression is a sequence of terms with operators
+expression = { term ~ (operator ~ term)* }
+
+// A term is a single mathematical element, possibly with scripts
+term = {
+    fraction
+    | radical
+    | grouped
+    | scripted_atom
+    | atom
+}
+
+// Atoms are the basic building blocks
+atom = {
+    number
+    | greek_letter
+    | special_symbol
+    | letter
+}
+
+// Scripted atoms (with superscript/subscript)
+scripted_atom = {
+    atom ~ script+
+}
+
+// Scripts can be superscript, subscript, or both
+script = { superscript | subscript }
+
+// Numbers (with numeric indicator)
+// UEB: numeric indicator is dots 3456 (U+283C)
+// Digits: 1=dots 1, 2=dots 12, 3=dots 14, etc. (same as letters a-j)
+number = { numeric_indicator ~ ueb_digit+ ~ (decimal_point ~ ueb_digit+)? }
+
+// Letters (variables)
+// UEB uses letter sign (dots 56) or grade 1 indicators for variables
+letter = {
+    grade1_word_indicator? ~
+    capital_indicator? ~
+    (letter_sign | grade1_symbol_indicator)? ~
+    letter_char
+}
+
+// Greek letters (Greek indicator + optional capital + letter)
+greek_letter = { greek_indicator ~ capital_indicator? ~ greek_char }
+
+// Special symbols
+special_symbol = {
+    infinity
+    | empty_set
+    | element_of
+    | not_element_of
+    | forall
+    | exists
+    | nabla
+    | partial_derivative
+    | degree
+    | percent
+    | therefore
+    | because
+    | prime
+    | double_prime
+}
+
+// Simple fraction (using general fraction indicators)
+// UEB: open fraction ⠷, close fraction ⠾, fraction line ⠌
+fraction = {
+    fraction_open ~
+    expression ~
+    fraction_line ~
+    expression ~
+    fraction_close
+}
+
+// Radicals (square root and nth root)
+// UEB: radical sign is ⠐⠩
+radical = {
+    // nth root: index before radical
+    (radical_index ~ radical_start ~ expression ~ radical_end)
+    | (radical_start ~ expression ~ radical_end)
+}
+
+radical_index = { index_indicator ~ atom }
+
+// Grouping (parentheses, brackets, braces)
+grouped = {
+    open_paren ~ expression ~ close_paren
+    | open_bracket ~ expression ~ close_bracket
+    | open_brace ~ expression ~ close_brace
+    | open_angle ~ expression ~ close_angle
+}
+
+// Superscript and subscript
+// UEB: superscript indicator ⠔, subscript indicator ⠢
+superscript = { superscript_indicator ~ script_content }
+subscript = { subscript_indicator ~ script_content }
+
+// Script content (what follows the script indicator)
+script_content = {
+    grouped
+    | fraction
+    | number
+    | greek_letter
+    | letter
+}
+
+// Operators
+operator = {
+    comparison_operator
+    | set_operator
+    | logical_operator
+    | arrow_operator
+    | arithmetic_operator
+}
+
+comparison_operator = {
+    not_equal | less_equal | greater_equal |
+    less_than | greater_than | equals |
+    approximately_equal | congruent | equivalent
+}
+
+set_operator = {
+    subset_equal | superset_equal |
+    subset | superset |
+    element_of | not_element_of |
+    union | intersection
+}
+
+logical_operator = {
+    logical_and | logical_or | logical_not |
+    implies | iff | forall | exists
+}
+
+arrow_operator = {
+    left_arrow | right_arrow | left_right_arrow |
+    double_left_arrow | double_right_arrow | double_left_right_arrow
+}
+
+arithmetic_operator = {
+    plus_minus | minus_plus |
+    plus | minus | times | divide | dot_operator
+}
+
+// === Terminal definitions (Unicode braille patterns for UEB) ===
+
+// Numeric indicator: dots 3456 (U+283C)
+numeric_indicator = { "\u{283C}" }
+
+// Decimal point: dots 256 (U+2832)
+decimal_point = { "\u{2832}" }
+
+// UEB digits (same as letters a-j after numeric indicator)
+ueb_digit = {
+    "\u{2801}" |  // 1 (dots 1, same as 'a')
+    "\u{2803}" |  // 2 (dots 12, same as 'b')
+    "\u{2809}" |  // 3 (dots 14, same as 'c')
+    "\u{2819}" |  // 4 (dots 145, same as 'd')
+    "\u{2811}" |  // 5 (dots 15, same as 'e')
+    "\u{280B}" |  // 6 (dots 124, same as 'f')
+    "\u{281B}" |  // 7 (dots 1245, same as 'g')
+    "\u{2813}" |  // 8 (dots 125, same as 'h')
+    "\u{280A}" |  // 9 (dots 24, same as 'i')
+    "\u{281A}"    // 0 (dots 245, same as 'j')
+}
+
+// Capital indicator: dot 6 (U+2820)
+capital_indicator = { "\u{2820}" }
+
+// Grade 1 indicators
+grade1_symbol_indicator = { "\u{2830}" }       // dots 56
+grade1_word_indicator = { "\u{2830}\u{2830}" } // dots 56, 56
+
+// Letter sign: dots 56 (U+2830)
+letter_sign = { "\u{2830}" }
+
+// Letter characters (a-z in UEB braille)
+letter_char = {
+    "\u{2801}" |  // a (dot 1)
+    "\u{2803}" |  // b (dots 12)
+    "\u{2809}" |  // c (dots 14)
+    "\u{2819}" |  // d (dots 145)
+    "\u{2811}" |  // e (dots 15)
+    "\u{280B}" |  // f (dots 124)
+    "\u{281B}" |  // g (dots 1245)
+    "\u{2813}" |  // h (dots 125)
+    "\u{280A}" |  // i (dots 24)
+    "\u{281A}" |  // j (dots 245)
+    "\u{2805}" |  // k (dots 13)
+    "\u{2807}" |  // l (dots 123)
+    "\u{280D}" |  // m (dots 134)
+    "\u{281D}" |  // n (dots 1345)
+    "\u{2815}" |  // o (dots 135)
+    "\u{280F}" |  // p (dots 1234)
+    "\u{281F}" |  // q (dots 12345)
+    "\u{2817}" |  // r (dots 1235)
+    "\u{280E}" |  // s (dots 234)
+    "\u{281E}" |  // t (dots 2345)
+    "\u{2825}" |  // u (dots 136)
+    "\u{2827}" |  // v (dots 1236)
+    "\u{283A}" |  // w (dots 2456)
+    "\u{282D}" |  // x (dots 1346)
+    "\u{283D}" |  // y (dots 13456)
+    "\u{2835}"    // z (dots 1356)
+}
+
+// Greek indicator: dots 46 (U+2828)
+greek_indicator = { "\u{2828}" }
+
+// Greek characters (same patterns as letters, context from Greek indicator)
+greek_char = {
+    "\u{2801}" |  // alpha (like 'a')
+    "\u{2803}" |  // beta (like 'b')
+    "\u{281B}" |  // gamma (like 'g')
+    "\u{2819}" |  // delta (like 'd')
+    "\u{2811}" |  // epsilon (like 'e')
+    "\u{2835}" |  // zeta (like 'z')
+    "\u{2831}" |  // eta (dots 156)
+    "\u{2839}" |  // theta (dots 1456)
+    "\u{280A}" |  // iota (like 'i')
+    "\u{2805}" |  // kappa (like 'k')
+    "\u{2807}" |  // lambda (like 'l')
+    "\u{280D}" |  // mu (like 'm')
+    "\u{281D}" |  // nu (like 'n')
+    "\u{282D}" |  // xi (like 'x')
+    "\u{2815}" |  // omicron (like 'o')
+    "\u{280F}" |  // pi (like 'p')
+    "\u{2817}" |  // rho (like 'r')
+    "\u{280E}" |  // sigma (like 's')
+    "\u{281E}" |  // tau (like 't')
+    "\u{2825}" |  // upsilon (like 'u')
+    "\u{280B}" |  // phi (like 'f')
+    "\u{282F}" |  // chi (dots 12346)
+    "\u{283D}" |  // psi (like 'y')
+    "\u{283A}"    // omega (like 'w')
+}
+
+// Special symbols
+infinity = { "\u{283C}\u{283F}" }              // dots 3456, 123456 (numeric + all dots)
+empty_set = { "\u{2808}\u{281A}" }             // dots 4, 245
+element_of = { "\u{2818}\u{2811}" }            // dots 45, 15
+not_element_of = { "\u{2818}\u{2811}\u{2808}\u{2831}" } // element of + negation
+forall = { "\u{2818}\u{2801}" }                // dots 45, 1
+exists = { "\u{2818}\u{2822}" }                // dots 45, 26
+nabla = { "\u{2818}\u{2819}" }                 // dots 45, 145
+partial_derivative = { "\u{2808}\u{2819}" }    // dots 4, 145
+degree = { "\u{2818}\u{281A}" }                // dots 45, 245
+percent = { "\u{2828}\u{2832}" }               // dots 46, 256
+therefore = { "\u{2820}\u{2821}" }             // dots 6, 16
+because = { "\u{2808}\u{280C}" }               // dots 4, 34
+prime = { "\u{2836}" }                         // dots 2356
+double_prime = { "\u{2836}\u{2836}" }          // dots 2356, 2356
+
+// Fraction indicators (UEB general fraction)
+fraction_open = { "\u{2837}" }                 // dots 12356
+fraction_line = { "\u{280C}" }                 // dots 34
+fraction_close = { "\u{283E}" }                // dots 23456
+
+// Radical indicators
+radical_start = { "\u{2810}\u{2829}" }         // dots 5, 146 (modified radical)
+radical_end = { "\u{283B}" }                   // dots 12456
+index_indicator = { "\u{2818}" }               // dots 45
+
+// Superscript indicator: dots 35 (U+2814)
+superscript_indicator = { "\u{2814}" }
+
+// Subscript indicator: dots 26 (U+2822)
+subscript_indicator = { "\u{2822}" }
+
+// Grouping symbols
+// UEB: parentheses are ⠐⠣ and ⠐⠜
+open_paren = { "\u{2810}\u{2823}" }            // dots 5, 126
+close_paren = { "\u{2810}\u{281C}" }           // dots 5, 345
+// UEB: brackets are ⠨⠣ and ⠨⠜
+open_bracket = { "\u{2828}\u{2823}" }          // dots 46, 126
+close_bracket = { "\u{2828}\u{281C}" }         // dots 46, 345
+// UEB: braces are ⠸⠣ and ⠸⠜
+open_brace = { "\u{2838}\u{2823}" }            // dots 456, 126
+close_brace = { "\u{2838}\u{281C}" }           // dots 456, 345
+// UEB: angle brackets are ⠈⠣ and ⠈⠜
+open_angle = { "\u{2808}\u{2823}" }            // dots 4, 126
+close_angle = { "\u{2808}\u{281C}" }           // dots 4, 345
+
+// Comparison operators
+equals = { "\u{2810}\u{2836}" }                // dots 5, 2356
+not_equal = { "\u{2810}\u{2836}\u{2808}\u{2831}" } // equals + negation
+less_than = { "\u{2808}\u{2823}" }             // dots 4, 126
+greater_than = { "\u{2808}\u{281C}" }          // dots 4, 345
+less_equal = { "\u{2838}\u{2808}\u{2823}" }    // dots 456, 4, 126
+greater_equal = { "\u{2838}\u{2808}\u{281C}" } // dots 456, 4, 345
+approximately_equal = { "\u{2818}\u{2814}" }   // dots 45, 35
+congruent = { "\u{2810}\u{2838}\u{2814}" }     // dots 5, 456, 35
+equivalent = { "\u{2838}\u{283F}" }            // dots 456, 123456
+
+// Set operators
+subset = { "\u{2818}\u{2823}" }                // dots 45, 126
+superset = { "\u{2818}\u{281C}" }              // dots 45, 345
+subset_equal = { "\u{2838}\u{2818}\u{2823}" }  // dots 456, 45, 126
+superset_equal = { "\u{2838}\u{2818}\u{281C}" } // dots 456, 45, 345
+union = { "\u{2828}\u{282C}" }                 // dots 46, 346
+intersection = { "\u{2828}\u{2829}" }          // dots 46, 146
+
+// Logical operators
+logical_and = { "\u{2808}\u{282C}" }           // dots 4, 346
+logical_or = { "\u{2808}\u{282E}" }            // dots 4, 2346
+logical_not = { "\u{2808}\u{2831}" }           // dots 4, 156
+
+// Arrows (using UEB arrow notation)
+implies = { "\u{2831}\u{2836}\u{2815}" }       // dots 156, 2356, 135
+iff = { "\u{2831}\u{283A}\u{2817}\u{2815}" }   // bidirectional implication
+left_arrow = { "\u{2831}\u{282A}" }            // dots 156, 246
+right_arrow = { "\u{2831}\u{2815}" }           // dots 156, 135
+left_right_arrow = { "\u{2831}\u{283A}\u{2817}\u{2815}" }
+double_left_arrow = { "\u{2831}\u{2836}\u{282A}" }
+double_right_arrow = { "\u{2831}\u{2836}\u{2815}" }
+double_left_right_arrow = { "\u{2831}\u{283A}\u{2836}\u{2817}\u{2815}" }
+
+// Arithmetic operators (UEB math)
+plus = { "\u{2810}\u{282E}" }                  // dots 5, 2346
+minus = { "\u{2810}\u{2824}" }                 // dots 5, 36
+times = { "\u{2810}\u{282C}" }                 // dots 5, 346
+divide = { "\u{2810}\u{280C}" }                // dots 5, 34
+plus_minus = { "\u{2838}\u{282E}" }            // dots 456, 2346
+minus_plus = { "\u{2838}\u{2824}" }            // dots 456, 36
+dot_operator = { "\u{2810}\u{2832}" }          // dots 5, 256
+
+// Whitespace (ignored)
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" | "\u{2800}" }

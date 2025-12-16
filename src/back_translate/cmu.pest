@@ -1,0 +1,323 @@
+// CMU (Spanish Mathematical Braille) Grammar
+// This grammar parses CMU technical/math braille expressions
+// Phase 5: Additional Codes - CMU Spanish Support
+
+// Entry point
+math = { SOI ~ expression ~ EOI }
+
+// Expression is a sequence of terms with operators
+expression = { term ~ (operator ~ term)* }
+
+// A term is a single mathematical element, possibly with scripts
+term = {
+    fraction
+    | radical
+    | grouped
+    | scripted_atom
+    | atom
+}
+
+// Atoms are the basic building blocks
+atom = {
+    number
+    | greek_letter
+    | special_symbol
+    | letter
+}
+
+// Scripted atoms (with superscript/subscript)
+scripted_atom = {
+    atom ~ script+
+}
+
+// Scripts can be superscript, subscript, or both
+script = { superscript | subscript }
+
+// Numbers (CMU uses same digit patterns as UEB - letters a-j)
+// No explicit numeric indicator required in many contexts
+number = { numeric_indicator? ~ cmu_digit+ ~ (decimal_separator ~ cmu_digit+)? }
+
+// Letters (variables)
+letter = {
+    capital_indicator? ~
+    letter_char
+}
+
+// Greek letters (Greek indicator + optional capital + letter)
+greek_letter = { greek_indicator ~ capital_indicator? ~ greek_char }
+
+// Special symbols
+special_symbol = {
+    infinity
+    | empty_set
+    | element_of
+    | not_element_of
+    | forall
+    | exists
+    | nabla
+    | partial_derivative
+    | degree
+    | percent
+    | ellipsis
+    | prime
+    | double_prime
+}
+
+// Simple fraction (CMU uses vertical layout or linear)
+// Linear fraction: numerator / denominator
+fraction = {
+    fraction_open ~
+    expression ~
+    fraction_bar ~
+    expression ~
+    fraction_close
+}
+
+// Radicals (square root and nth root)
+radical = {
+    (radical_index ~ radical_symbol ~ expression ~ radical_end)
+    | (radical_symbol ~ expression ~ radical_end)
+}
+
+radical_index = { superscript_indicator ~ atom }
+
+// Grouping (parentheses, brackets, braces)
+grouped = {
+    open_paren ~ expression ~ close_paren
+    | open_bracket ~ expression ~ close_bracket
+    | open_brace ~ expression ~ close_brace
+    | open_angle ~ expression ~ close_angle
+}
+
+// Superscript and subscript
+// CMU: superscript uses opening indicator ⠡
+superscript = { superscript_indicator ~ script_content ~ baseline_indicator? }
+subscript = { subscript_indicator ~ script_content ~ baseline_indicator? }
+
+// Script content (what follows the script indicator)
+script_content = {
+    grouped
+    | fraction
+    | number
+    | greek_letter
+    | letter
+}
+
+// Operators
+operator = {
+    comparison_operator
+    | set_operator
+    | logical_operator
+    | arrow_operator
+    | arithmetic_operator
+}
+
+comparison_operator = {
+    not_equal | less_equal | greater_equal |
+    much_less | much_greater |
+    less_than | greater_than | equals |
+    approximately_equal | congruent | equivalent
+}
+
+set_operator = {
+    subset_equal | superset_equal |
+    subset | superset |
+    element_of | not_element_of |
+    union | intersection | set_minus
+}
+
+logical_operator = {
+    logical_and | logical_or | logical_not |
+    implies | iff | forall | exists
+}
+
+arrow_operator = {
+    left_arrow | right_arrow | left_right_arrow |
+    double_left_arrow | double_right_arrow | double_left_right_arrow |
+    up_arrow | down_arrow
+}
+
+arithmetic_operator = {
+    plus_minus | minus_plus |
+    plus | minus | times | divide | dot_operator
+}
+
+// === Terminal definitions (Unicode braille patterns for CMU) ===
+
+// Numeric indicator (optional in CMU)
+numeric_indicator = { "\u{283C}" }
+
+// Decimal separator: dots 2 (U+2802) used as comma-like separator
+decimal_separator = { "\u{2802}" }
+
+// CMU digits (same as letters a-j)
+cmu_digit = {
+    "\u{2801}" |  // 1 (dots 1, same as 'a')
+    "\u{2803}" |  // 2 (dots 12, same as 'b')
+    "\u{2809}" |  // 3 (dots 14, same as 'c')
+    "\u{2819}" |  // 4 (dots 145, same as 'd')
+    "\u{2811}" |  // 5 (dots 15, same as 'e')
+    "\u{280B}" |  // 6 (dots 124, same as 'f')
+    "\u{281B}" |  // 7 (dots 1245, same as 'g')
+    "\u{2813}" |  // 8 (dots 125, same as 'h')
+    "\u{280A}" |  // 9 (dots 24, same as 'i')
+    "\u{281A}"    // 0 (dots 245, same as 'j')
+}
+
+// Capital indicator (implied by context in CMU)
+capital_indicator = { "\u{2820}" }
+
+// Greek indicator: dots 46 (U+2828)
+greek_indicator = { "\u{2828}" }
+
+// Letter characters (a-z in CMU braille - same as UEB)
+letter_char = {
+    "\u{2801}" |  // a (dot 1)
+    "\u{2803}" |  // b (dots 12)
+    "\u{2809}" |  // c (dots 14)
+    "\u{2819}" |  // d (dots 145)
+    "\u{2811}" |  // e (dots 15)
+    "\u{280B}" |  // f (dots 124)
+    "\u{281B}" |  // g (dots 1245)
+    "\u{2813}" |  // h (dots 125)
+    "\u{280A}" |  // i (dots 24)
+    "\u{281A}" |  // j (dots 245)
+    "\u{2805}" |  // k (dots 13)
+    "\u{2807}" |  // l (dots 123)
+    "\u{280D}" |  // m (dots 134)
+    "\u{281D}" |  // n (dots 1345)
+    "\u{2815}" |  // o (dots 135)
+    "\u{280F}" |  // p (dots 1234)
+    "\u{281F}" |  // q (dots 12345)
+    "\u{2817}" |  // r (dots 1235)
+    "\u{280E}" |  // s (dots 234)
+    "\u{281E}" |  // t (dots 2345)
+    "\u{2825}" |  // u (dots 136)
+    "\u{2827}" |  // v (dots 1236)
+    "\u{283A}" |  // w (dots 2456)
+    "\u{282D}" |  // x (dots 1346)
+    "\u{283D}" |  // y (dots 13456)
+    "\u{2835}"    // z (dots 1356)
+}
+
+// Greek characters
+greek_char = {
+    "\u{2801}" |  // alpha (like 'a')
+    "\u{2803}" |  // beta (like 'b')
+    "\u{281B}" |  // gamma (like 'g')
+    "\u{2819}" |  // delta (like 'd')
+    "\u{2811}" |  // epsilon (like 'e')
+    "\u{2835}" |  // zeta (like 'z')
+    "\u{2831}" |  // eta (dots 156)
+    "\u{2839}" |  // theta (dots 1456)
+    "\u{280A}" |  // iota (like 'i')
+    "\u{2805}" |  // kappa (like 'k')
+    "\u{2807}" |  // lambda (like 'l')
+    "\u{280D}" |  // mu (like 'm')
+    "\u{281D}" |  // nu (like 'n')
+    "\u{282D}" |  // xi (like 'x')
+    "\u{2815}" |  // omicron (like 'o')
+    "\u{280F}" |  // pi (like 'p')
+    "\u{2817}" |  // rho (like 'r')
+    "\u{280E}" |  // sigma (like 's')
+    "\u{281E}" |  // tau (like 't')
+    "\u{2825}" |  // upsilon (like 'u')
+    "\u{280B}" |  // phi (like 'f')
+    "\u{282F}" |  // chi (dots 12346)
+    "\u{283D}" |  // psi (like 'y')
+    "\u{283A}"    // omega (like 'w')
+}
+
+// Special symbols (CMU patterns)
+infinity = { "\u{283C}\u{2833}" }              // dots 3456, 1256
+empty_set = { "\u{2838}\u{281A}" }             // dots 456, 245
+element_of = { "\u{2823}\u{2802}" }            // dots 126, 2
+not_element_of = { "\u{2818}\u{2823}\u{2802}" } // prefix + element_of
+forall = { "\u{2828}\u{2804}" }                // dots 46, 3
+exists = { "\u{2828}\u{2822}" }                // dots 46, 26
+nabla = { "\u{2808}\u{283B}" }                 // dots 4, 12456
+partial_derivative = { "\u{2838}\u{2819}" }    // dots 456, 145
+degree = { "\u{2832}" }                        // dots 256
+percent = { "\u{2838}\u{2832}" }               // dots 456, 256
+ellipsis = { "\u{2804}\u{2804}\u{2804}" }      // dots 3, 3, 3
+prime = { "\u{2833}" }                         // dots 1256
+double_prime = { "\u{2833}\u{2833}" }          // dots 1256, 1256
+
+// Fraction indicators (CMU)
+fraction_open = { "\u{2837}" }                 // dots 12356 (same as paren in some contexts)
+fraction_bar = { "\u{2832}" }                  // dots 256 (division line)
+fraction_close = { "\u{283E}" }                // dots 23456
+
+// Radical indicators
+radical_symbol = { "\u{281C}" }                // dots 345
+radical_end = { "\u{283B}" }                   // dots 12456
+
+// Baseline indicator
+baseline_indicator = { "\u{2831}" }            // dots 156
+
+// Superscript indicator: dots 16 (U+2821)
+superscript_indicator = { "\u{2821}" }
+
+// Subscript indicator: dots 34 (U+280C)
+subscript_indicator = { "\u{280C}" }
+
+// Grouping symbols (CMU)
+open_paren = { "\u{2823}" }                    // dots 126
+close_paren = { "\u{281C}" }                   // dots 345
+open_bracket = { "\u{2837}" }                  // dots 12356
+close_bracket = { "\u{283E}" }                 // dots 23456
+open_brace = { "\u{2810}\u{2807}" }            // dots 5, 123
+close_brace = { "\u{2838}\u{2802}" }           // dots 456, 2
+open_angle = { "\u{2810}\u{2805}" }            // dots 5, 13
+close_angle = { "\u{2828}\u{2802}" }           // dots 46, 2
+
+// Comparison operators (CMU)
+equals = { "\u{2836}" }                        // dots 2356
+not_equal = { "\u{2818}\u{2836}" }             // dots 45, 2356
+less_than = { "\u{282A}" }                     // dots 246
+greater_than = { "\u{2815}" }                  // dots 135
+less_equal = { "\u{282A}\u{2836}" }            // less + equals
+greater_equal = { "\u{2815}\u{2836}" }         // greater + equals
+much_less = { "\u{282A}\u{282A}" }             // less less
+much_greater = { "\u{2815}\u{2815}" }          // greater greater
+approximately_equal = { "\u{2810}\u{2836}\u{2804}" } // dots 5, 2356, 3
+congruent = { "\u{2810}\u{2822}\u{2836}" }     // dots 5, 26, 2356
+equivalent = { "\u{2836}\u{2836}" }            // dots 2356, 2356
+
+// Set operators (CMU)
+subset = { "\u{2823}\u{2804}" }                // dots 126, 3
+superset = { "\u{2820}\u{281C}" }              // dots 6, 345
+subset_equal = { "\u{2823}\u{2806}" }          // dots 126, 23
+superset_equal = { "\u{2830}\u{281C}" }        // dots 56, 345
+union = { "\u{2838}\u{281C}" }                 // dots 456, 345
+intersection = { "\u{2838}\u{2831}" }          // dots 456, 156
+set_minus = { "\u{2810}\u{2804}" }             // dots 5, 3
+
+// Logical operators (CMU)
+logical_and = { "\u{2838}\u{2822}" }           // dots 456, 26
+logical_or = { "\u{2838}\u{280A}" }            // dots 456, 24
+logical_not = { "\u{2820}\u{2804}" }           // dots 6, 3
+
+// Arrows (CMU patterns)
+implies = { "\u{2812}\u{2815}" }               // dots 25, 135
+iff = { "\u{282A}\u{2812}\u{2815}" }           // bidirectional
+left_arrow = { "\u{2810}\u{2812}" }            // dots 5, 25
+right_arrow = { "\u{2812}\u{2802}" }           // dots 25, 2
+left_right_arrow = { "\u{2810}\u{2812}\u{2802}" }
+double_left_arrow = { "\u{282A}\u{2812}" }     // dots 246, 25
+double_right_arrow = { "\u{2812}\u{2815}" }    // dots 25, 135
+double_left_right_arrow = { "\u{282A}\u{2812}\u{2815}" }
+up_arrow = { "\u{2838}\u{2801}" }              // dots 456, 1
+down_arrow = { "\u{2838}\u{2804}" }            // dots 456, 3
+
+// Arithmetic operators (CMU)
+plus = { "\u{282E}" }                          // dots 2346
+minus = { "\u{2824}" }                         // dots 36
+times = { "\u{282C}" }                         // dots 346
+divide = { "\u{2832}" }                        // dots 256
+plus_minus = { "\u{282E}\u{2812}\u{2824}" }    // plus, 25, minus
+minus_plus = { "\u{2824}\u{2812}\u{282E}" }    // minus, 25, plus
+dot_operator = { "\u{2820}\u{2804}" }          // dots 6, 3
+
+// Whitespace (ignored)
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" | "\u{2800}" }
