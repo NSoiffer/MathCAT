@@ -164,8 +164,8 @@ fn is_complex(v: &Yaml) -> bool {
 
 use std::error::Error;
 use std::fmt::{self, Display};
-extern crate yaml_rust2;
-use yaml_rust2::{Yaml, yaml::Hash};
+extern crate yaml_rust;
+use yaml_rust::{Yaml, yaml::Hash};
 
 //use crate::yaml::{Hash, Yaml};
 

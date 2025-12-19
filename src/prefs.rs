@@ -19,7 +19,7 @@
 //! Note: there are a number of public 'get_xxx' functions that really are meant to be public only to the [crate::speech] module as speech needs access
 //! to the preferences to generate the speech.
 #![allow(clippy::needless_return)]
-use yaml_rust2::{Yaml, YamlLoader};
+use yaml_rust::{Yaml, YamlLoader};
 use crate::pretty_print::yaml_to_string;
 use crate::tts::TTS;
 extern crate dirs;

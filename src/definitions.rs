@@ -24,9 +24,9 @@
 //! See the struct [`Definitions`] for the variables that are read in.
 #![allow(clippy::needless_return)]
 
-extern crate yaml_rust2;
-use yaml_rust2::yaml::Hash;
-use yaml_rust2::Yaml;
+extern crate yaml_rust;
+use yaml_rust::yaml::Hash;
+use yaml_rust::Yaml;
 use crate::errors::*;
 use crate::prefs::*;
 use std::{cell::RefCell, cell::Ref, cell::RefMut, rc::Rc};

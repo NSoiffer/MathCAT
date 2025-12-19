@@ -16,7 +16,7 @@ use std::time::SystemTime;
 use crate::definitions::read_definitions_file;
 use crate::errors::*;
 use crate::prefs::*;
-use yaml_rust2::{YamlLoader, Yaml, yaml::Hash};
+use yaml_rust::{YamlLoader, Yaml, yaml::Hash};
 use crate::tts::*;
 use crate::infer_intent::*;
 use crate::pretty_print::{mml_to_string, yaml_to_string};
