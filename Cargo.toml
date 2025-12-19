@@ -23,6 +23,7 @@ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(has_error_description_depr
 sxd-document = "0.3"
 sxd-xpath = "0.4"
 yaml-rust = "0.4"
+# yaml-rust = { version = "0.11", package = "yaml-rust2" }
 lazy_static = "1.4"
 strum = "0.27.2"
 strum_macros = "0.27.2"
