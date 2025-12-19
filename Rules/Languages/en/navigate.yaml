@@ -48,9 +48,16 @@
     - if: "$MatchCounter = 0 and $SayCommand = 'true'"
       then_test:
       - if: "self::m:math and starts-with($NavCommand, 'ZoomOut')"
-        then: [t: "zoomed out all the way", pause: "medium"]
+        then: [t: "zoomed out all of the way", pause: "medium"]
       - else_if: "IsNode(., 'leaf') and starts-with($NavCommand, 'ZoomIn')"
-        then: [t: "zoomed in all the way", pause: "medium"]
+        then:
+        - test:
+          - if: "string-length(.) = 1"
+            then: [t: "zoomed in all of the way"]       # phrase('zoomed in all of the way')
+          - else_if: "$NavNodeOffset = 0"
+            then: [t: "zoomed in to first character"]   # phrase('zoomed in to first character')
+            else: [t: "zoomed to character"]          # phrase('zoomed in to character')
+        - pause: "medium"
         else:
         - test:
           - if: "starts-with($NavCommand, 'Zoom')"
@@ -70,12 +77,12 @@
                 then: [t: "in"]                                  # phrase(zoom 'in' to see more details)
               - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'InAll'"
                 # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets "ed" concatenated to "zoom"
-                then: [t: "\uF8FEed in all the way"]                     # phrase(zoom 'out all the way' to see more details)
+                then: [t: "\uF8FEed in all of the way"]                     # phrase(zoom 'out all of the way' to see more details)
               - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'Out'"
                 then: [t: "out"]                                 # phrase(zoom 'out' to see more details)
               - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'OutAll'"
                 # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets "ed" concatenated to "zoom"
-                then: [t: "\uF8FEed out all the way"]                     # phrase(zoom 'out all the way' to see more details)
+                then: [t: "\uF8FEed out all of the way"]                     # phrase(zoom 'out all of the way' to see more details)
               - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'Next'"
                 then: [t: "right"]                               # phrase(move to the 'right')
               - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'Previous'"
@@ -180,9 +187,9 @@
         - else_if: "$PreviousNavCommand = 'ZoomOut'"
           then: [t: "undo zoom out"]                      # phrase('undo zoom out')
         - else_if: "$PreviousNavCommand = 'ZoomInAll'"
-          then: [t: "undo zooming in all the way"]        # phrase('undo zooming in all the way')
+          then: [t: "undo zooming in all of the way"]        # phrase('undo zooming in all of the way')
         - else_if: "$PreviousNavCommand = 'ZoomOutAll'"
-          then: [t: "undo zooming out all the way"]       # phrase('undo zooming out all the way')
+          then: [t: "undo zooming out all of the way"]       # phrase('undo zooming out all of the way')
         - else_if: "$PreviousNavCommand = 'MovePrevious' or $PreviousNavCommand = 'MovePreviousZoom'"
           then: [t: "undo move left"]                     # phrase('undo move left')
         - else_if: "$PreviousNavCommand = 'MoveNext' or $PreviousNavCommand = 'MoveNextZoom'"
@@ -209,25 +216,15 @@
   tag: "*"
   match: "($NavCommand = 'ZoomIn' or $NavCommand = 'ZoomInAll') and IsNode(., 'leaf')"
   replace:
-  - test:
-      if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
-      then:
-      - test:
-        - if: "string-length(.) = 1"
-          then:
-          - t: "zoomed in all of the way"
-        - else_if: "$NavNodeOffset = 0"
-          then:
-          - t: "zoomed in to first character" # phrase('zoomed in to first character')
-          else:          
-          - t: "zoomed to character"          # phrase('zoomed in to character')
-      - pause: "long"
+  - with:
+      variables: [SayCommand: "string($NavVerbosity != 'Terse')"]
+      replace: [x: "."]
   - test:
       if: "$ReadZoomLevel !=-1"
       then:
       - set_variables: [ReadZoomLevel: "0"]
   - test:
-      if: "string-length(.) > 1 and $MatchCounter = 0 and $NavNodeOffset = 0"
+      if: "string-length(.) > 1 and $MatchCounter = 1 and $NavNodeOffset = 0"
       then: [set_variables: [NavNodeOffset: "1"]]
   - set_variables: [NavNode: "@id"]
 
@@ -372,7 +369,7 @@
   match: "$NavCommand = 'ZoomOut' or $NavCommand = 'ZoomOutAll'"
   replace:
   - with:
-      variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
+      variables: [SayCommand: "string($NavVerbosity != 'Terse')"]
       replace: [x: "."]
   - set_variables: [NavNode: "*[1]/@id"] # no-op for $NavCommand = 'ZoomOut'
 
@@ -389,7 +386,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'ZoomOut' or $NavCommand = 'ZoomOutAll') and"
-  - "parent::m:math "
+  - "parent::m:math"
   replace:
   - x: ".." # let math rule deal with it
 

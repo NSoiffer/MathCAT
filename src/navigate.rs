@@ -1410,7 +1410,7 @@ mod tests {
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            assert_eq!("zoomed in all the way; 1", test_command("ZoomInAll", mathml, "id-2"));
+            assert_eq!("zoomed in all of the way; 1", test_command("ZoomInAll", mathml, "id-2"));
             assert_eq!("move right; plus", test_command("MoveNext", mathml, "id-3"));
             assert_eq!("move right; in base; x", test_command("MoveNext", mathml, "id-5"));
             assert_eq!("move right; in subscript; 2", test_command("MoveNext", mathml, "id-6"));
@@ -1449,7 +1449,7 @@ mod tests {
             return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            assert_eq!("zoomed in all the way; in base; open bracket", test_command("ZoomInAll", mathml, "id-3"));
+            assert_eq!("zoomed in all of the way; in base; open bracket", test_command("ZoomInAll", mathml, "id-3"));
             assert_eq!("move right; in base; cap c o", test_command("MoveNext", mathml, "id-5"));
             assert_eq!("move right; in subscript; 6", test_command("MoveNext", mathml, "id-6"));
             assert_eq!("move right; out of subscript; close bracket", test_command("MoveNext", mathml, "id-8"));
@@ -1634,6 +1634,7 @@ mod tests {
     
     #[test]
     fn move_inside_leaves() -> Result<()> {
+        init_logger();
         let mathml_str = "<math display='block' id='id-0'>
                 <mrow id='id-1'>
                     <mfrac id='id-2'>
@@ -2174,7 +2175,7 @@ mod tests {
             let speech = test_command("MoveNext", mathml, "row2-negative");
             assert_eq!(speech, "move right; column 2, negative 6");
             let speech = test_command("ZoomOutAll", mathml, "table");
-            assert_eq!(speech, "zoomed out all the way; the 2 by 2 determinant; row 1; 9, negative 13; row 2; 5, negative 6");
+            assert_eq!(speech, "zoomed out all of the way; the 2 by 2 determinant; row 1; 9, negative 13; row 2; 5, negative 6");
             return Ok( () );
         });
     }
@@ -2386,7 +2387,7 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             let speech = test_command("ZoomOutAll", mathml, "mrow");
-            assert_eq!(speech, "zoomed out all the way; 1 plus 2 plus 3 plus 4 plus 5 plus 6 plus 7");
+            assert_eq!(speech, "zoomed out all of the way; 1 plus 2 plus 3 plus 4 plus 5 plus 6 plus 7");
             let speech = test_command("ReadCurrent", mathml, "mrow");
             assert_eq!(speech, "read current; 1 plus 2 plus 3 plus 4 plus 5 plus 6 plus 7");
             let speech = test_command("DescribeCurrent", mathml, "mrow");
