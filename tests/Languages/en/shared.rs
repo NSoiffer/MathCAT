@@ -336,6 +336,26 @@ fn mn_with_space() {
 }
 
 #[test]
+fn ignore_bold() {
+  let expr = r#"<math>
+				<mi mathvariant="bold-italic">x</mi>
+				<mo>=</mo>
+				<mn>2</mn>
+				<mrow>
+				<mi>𝒔𝒊𝒏</mi>
+				<mo>&#x2061;</mo>
+				<mrow><mi mathvariant="bold-italic">t</mi></mrow>
+				</mrow>
+				<mo>-</mo>
+				<mn>1</mn>
+			</math>"#; 
+  test_prefs("en", "SimpleSpeak", vec![("IgnoreBold", "false")],
+             expr, "bold x is equal to, 2 sine of bold t, minus 1");
+  test_prefs("en", "SimpleSpeak", vec![("IgnoreBold", "true")],
+             expr, "x is equal to, 2 sine of t, minus 1");
+}
+
+#[test]
 fn mn_with_block_and_decimal_separators() {
   let expr = "<math><mn>1,234.56</mn></math>";                                       // may want to change this for another language
   test_prefs("en", "SimpleSpeak", vec![("DecimalSeparators", "."), ("BlockSeparators", " ,")], expr, "1234.56");

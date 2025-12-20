@@ -4,6 +4,7 @@
     Language: Auto                # any known language code and sub-code -- could be en-uk, etc
     SpeechStyle: ClearSpeak     # Any known speech style (falls back to ClearSpeak)
     Verbosity: Medium           # Terse, Medium, Verbose
+    IgnoreBold: false           # Ignore bold text if true (might be used for people with low vision)
     MathRate: 100               # Change from text speech rate (%)
     PauseFactor: 100            # Change from normal pause length (%)
     SpeechSound: None           # make a sound when starting/ending math speech -- None, Beep

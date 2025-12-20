@@ -2910,8 +2910,9 @@ impl CanonicalizeContext {
 		return script;
 	}
 
+	/// Map names to start of Unicode alphanumeric blocks (Roman, digits, Greek)
+	/// Don't do this for function names -- for function names, map them back to ASCII
 	fn canonicalize_plane1<'a>(&self, mi: Element<'a>) -> Element<'a> {
-		// map names to start of Unicode alphanumeric blocks (Roman, digits, Greek)
 		// if the character shouldn't be mapped, use 0 -- don't use 'A' as ASCII and Greek aren't contiguous
 		static MATH_VARIANTS: phf::Map<&str, [u32; 3]> = phf_map! {
 			// "normal" -- nothing to do
@@ -2930,19 +2931,41 @@ impl CanonicalizeContext {
 			"monospace" => [0x1D670, 0x1D7F6, 0],
 		};
 
-		let variant = mi.attribute_value("mathvariant");
-		if variant.is_none() {
-			return mi;
-		}
+		return crate::definitions::SPEECH_DEFINITIONS.with(|defs| {
+			// names that are always function names (e.g, "sin" and "log")
+			let defs = defs.borrow();
+			let names = match defs.get_hashset("FunctionNames") {
+				Some(hs) => hs,
+				None => return mi,  // happens in some canonicalize tests but not in real use
+			};
 
-		let mi_text = as_text(mi);
-		let new_text = match MATH_VARIANTS.get(variant.unwrap()) {
-			None => mi_text.to_string(),
-			Some(start) => shift_text(mi_text, start),
-		};
-		// mi.remove_attribute("mathvariant");  // leave attr -- for Nemeth, there are italic digits etc that don't have Unicode points
-		mi.set_text(&new_text);
-		return mi;
+
+			let mi_text = as_text(mi);
+			let variant = mi.attribute_value("mathvariant");
+
+			if names.contains(mi_text) {
+				return mi;		// avoid mapping mathvariant for function names
+			}
+			// function name might be (wrongly) set to italic math alphanumeric chars, including bold italic
+			if let Some(ascii_text) = math_alphanumeric_to_ascii(mi_text) {
+				if names.contains(&ascii_text) {
+					mi.set_text(&ascii_text);
+					return mi
+				}
+			}
+
+			if variant.is_none() {
+				return mi;
+			}
+
+			let new_text = match MATH_VARIANTS.get(variant.unwrap()) {
+				None => mi_text.to_string(),
+				Some(start) => shift_text(mi_text, start),
+			};
+			// mi.remove_attribute("mathvariant");  // leave attr -- for Nemeth, there are italic digits etc that don't have Unicode points
+			mi.set_text(&new_text);
+			return mi;
+		});
 
 		fn shift_text(old_text: &str, char_mapping: &[u32; 3]) -> String {
 			// if there is no block for something, use 'a', 'A', 0 as that will be a no-op
@@ -3134,6 +3157,40 @@ impl CanonicalizeContext {
 					}
 				) }
 			}
+		}
+
+		fn math_alphanumeric_to_ascii(input: &str) -> Option<String> {
+			let mut result = String::with_capacity(input.len());
+
+			for c in input.chars() {
+				let converted = match c {
+					// Standard ASCII
+					'a'..='z' | 'A'..='Z' => c,
+					
+					// Mathematical Bold (A-Z: U+1D400, a-z: U+1D41A)
+					'\u{1D400}'..='\u{1D419}' => ((c as u32 - 0x1D400) as u8 + b'A') as char,
+					'\u{1D41A}'..='\u{1D433}' => ((c as u32 - 0x1D41A) as u8 + b'a') as char,
+					
+					// Mathematical Italic (A-Z: U+1D434, a-z: U+1D44E)
+					// Note: 'h' is missing from this range (U+210E)
+					'\u{1D434}'..='\u{1D44D}' => ((c as u32 - 0x1D434) as u8 + b'A') as char,
+					'\u{1D44E}'..='\u{1D467}' => ((c as u32 - 0x1D44E) as u8 + b'a') as char,
+					
+					// Mathematical Bold Italic (A-Z: U+1D468, a-z: U+1D482)
+					'\u{1D468}'..='\u{1D481}' => ((c as u32 - 0x1D468) as u8 + b'A') as char,
+					'\u{1D482}'..='\u{1D49B}' => ((c as u32 - 0x1D482) as u8 + b'a') as char,
+
+					// Mathematical Sans-Serif (A-Z: U+1D5A0, a-z: U+1D5BA)
+					'\u{1D5A0}'..='\u{1D5B9}' => ((c as u32 - 0x1D5A0) as u8 + b'A') as char,
+					'\u{1D5BA}'..='\u{1D5D3}' => ((c as u32 - 0x1D5BA) as u8 + b'a') as char,
+
+					// If a character isn't a letter (or supported math letter), return None
+					_ => return None,
+				};
+				result.push(converted);
+			}
+
+			Some(result)
 		}
 	}
 
@@ -3470,7 +3527,7 @@ impl CanonicalizeContext {
 		if base_name.is_empty() {
 			return FunctionNameCertainty::False;
 		}
-		// debug!("    is_function_name({}), {} following nodes", base_name, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
+		debug!("    is_function_name({}), {} following nodes", base_name, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
 		return crate::definitions::SPEECH_DEFINITIONS.with(|defs| {
 			// names that are always function names (e.g, "sin" and "log")
 			let defs = defs.borrow();
@@ -4630,7 +4687,6 @@ mod canonicalize_tests {
 		assert_eq!(first_child.children().len(), 1);
 		let mtext = as_element(first_child.children()[0]);
 		assert_eq!(name(mtext), "mtext");
-
     }
 
     #[test]
@@ -6295,5 +6351,44 @@ mod canonicalize_tests {
 		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
+
+
+	#[test]
+    fn test_nonascii_function_name() {
+        let test_str = r#"<math>
+				<mi mathvariant="bold-italic">x</mi>
+				<mo>=</mo>
+				<mn>2</mn>
+				<mrow>
+				<mi>𝒔𝒊𝒏</mi>
+				<mo>&#x2061;</mo>
+				<mrow><mi mathvariant="bold-italic">t</mi></mrow>
+				</mrow>
+				<mo>-</mo>
+				<mn>1</mn>
+			</math>"#;
+		let target_str = r#"<math>
+			<mrow data-changed='added'>
+			<mi mathvariant='bold-italic'>𝒙</mi>
+			<mo>=</mo>
+			<mrow data-changed='added'>
+				<mrow data-changed='added'>
+				<mn>2</mn>
+				<mo data-changed='added'>&#x2062;</mo>
+				<mrow>
+					<mi>sin</mi>
+					<mo>&#x2061;</mo>
+					<mi mathvariant='bold-italic'>𝒕</mi>
+				</mrow>
+				</mrow>
+				<mo>-</mo>
+				<mn>1</mn>
+			</mrow>
+			</mrow>
+		</math>"#;
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+
 }
 
