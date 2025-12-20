@@ -3527,7 +3527,7 @@ impl CanonicalizeContext {
 		if base_name.is_empty() {
 			return FunctionNameCertainty::False;
 		}
-		debug!("    is_function_name({}), {} following nodes", base_name, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
+		// debug!("    is_function_name({}), {} following nodes", base_name, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
 		return crate::definitions::SPEECH_DEFINITIONS.with(|defs| {
 			// names that are always function names (e.g, "sin" and "log")
 			let defs = defs.borrow();
