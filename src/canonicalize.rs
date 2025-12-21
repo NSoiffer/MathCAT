@@ -1992,7 +1992,8 @@ impl CanonicalizeContext {
 		/// The returned (mi) element reuses 'mi'
 		fn merge_mi_sequence(mi: Element) -> Option<Element> {
 			// The best solution would be to use a dictionary of words, or maybe restricted to words in a formula,
-			//   but that would likely miss the words used in slope=run/rise
+			//   but that would likely miss the words used in slope=run/rise.
+			// It would also be really expensive since we would need a dictionary for each language.
 			// We shouldn't need to worry about trig names like "cos", but people sometimes forget to use "\cos"
 			// Hence, we check against the "FunctionNames" that get read on startup.
 			static VOWELS: phf::Set<char> = phf_set! {
@@ -2006,7 +2007,8 @@ impl CanonicalizeContext {
 			};
 			let parent = get_parent(mi);	// not canonicalized into mrows, so parent could be "math"
 			let parent_name = name(parent);
-			if as_text(mi).len() > 1 || !(parent_name == "mrow" || parent_name == "math") {
+			// don't merge if more than one char, or if not in an mrow (or implied on since we haven't normalized yet)
+			if as_text(mi).chars().nth(1).is_some() || !(parent_name == "mrow" || parent_name == "math") {
 				return None;
 			}
 			let mut text =  as_text(mi).to_string();
@@ -2056,7 +2058,15 @@ impl CanonicalizeContext {
 			// debug!("merge_mi_sequence: text={}", &text);
 			if let Some(answer) = crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
 				let definitions = definitions.borrow();
-				if definitions.get_hashset("FunctionNames").unwrap().contains(&text) {
+				let function_names = definitions.get_hashset("FunctionNames").unwrap();
+				// UEB seems to think "Sin" (etc) is used for "sin", so we move to lower case
+				// function name might be (wrongly) set to italic math alphanumeric chars, including bold italic
+				if let Some(ascii_text) = CanonicalizeContext::math_alphanumeric_to_ascii(&text) {
+					if function_names.contains(&ascii_text.to_lowercase()) {
+						return Some(merge_from_text(mi, &ascii_text, &following_mi_siblings));
+					}
+				}
+				if function_names.contains(&text) {
 					return Some(merge_from_text(mi, &text, &following_mi_siblings));
 				}
 				// unlike "FunctionNames", "KnownWords" might not exist
@@ -2947,7 +2957,7 @@ impl CanonicalizeContext {
 				return mi;		// avoid mapping mathvariant for function names
 			}
 			// function name might be (wrongly) set to italic math alphanumeric chars, including bold italic
-			if let Some(ascii_text) = math_alphanumeric_to_ascii(mi_text) {
+			if let Some(ascii_text) = CanonicalizeContext::math_alphanumeric_to_ascii(mi_text) {
 				if names.contains(&ascii_text) {
 					mi.set_text(&ascii_text);
 					return mi
@@ -3158,40 +3168,40 @@ impl CanonicalizeContext {
 				) }
 			}
 		}
+	}
 
-		fn math_alphanumeric_to_ascii(input: &str) -> Option<String> {
-			let mut result = String::with_capacity(input.len());
+	fn math_alphanumeric_to_ascii(input: &str) -> Option<String> {
+		let mut result = String::with_capacity(input.len());
 
-			for c in input.chars() {
-				let converted = match c {
-					// Standard ASCII
-					'a'..='z' | 'A'..='Z' => c,
-					
-					// Mathematical Bold (A-Z: U+1D400, a-z: U+1D41A)
-					'\u{1D400}'..='\u{1D419}' => ((c as u32 - 0x1D400) as u8 + b'A') as char,
-					'\u{1D41A}'..='\u{1D433}' => ((c as u32 - 0x1D41A) as u8 + b'a') as char,
-					
-					// Mathematical Italic (A-Z: U+1D434, a-z: U+1D44E)
-					// Note: 'h' is missing from this range (U+210E)
-					'\u{1D434}'..='\u{1D44D}' => ((c as u32 - 0x1D434) as u8 + b'A') as char,
-					'\u{1D44E}'..='\u{1D467}' => ((c as u32 - 0x1D44E) as u8 + b'a') as char,
-					
-					// Mathematical Bold Italic (A-Z: U+1D468, a-z: U+1D482)
-					'\u{1D468}'..='\u{1D481}' => ((c as u32 - 0x1D468) as u8 + b'A') as char,
-					'\u{1D482}'..='\u{1D49B}' => ((c as u32 - 0x1D482) as u8 + b'a') as char,
+		for c in input.chars() {
+			let converted = match c {
+				// Standard ASCII
+				'a'..='z' | 'A'..='Z' => c,
+				
+				// Mathematical Bold (A-Z: U+1D400, a-z: U+1D41A)
+				'\u{1D400}'..='\u{1D419}' => ((c as u32 - 0x1D400) as u8 + b'A') as char,
+				'\u{1D41A}'..='\u{1D433}' => ((c as u32 - 0x1D41A) as u8 + b'a') as char,
+				
+				// Mathematical Italic (A-Z: U+1D434, a-z: U+1D44E)
+				// Note: 'h' is missing from this range (U+210E)
+				'\u{1D434}'..='\u{1D44D}' => ((c as u32 - 0x1D434) as u8 + b'A') as char,
+				'\u{1D44E}'..='\u{1D467}' => ((c as u32 - 0x1D44E) as u8 + b'a') as char,
+				
+				// Mathematical Bold Italic (A-Z: U+1D468, a-z: U+1D482)
+				'\u{1D468}'..='\u{1D481}' => ((c as u32 - 0x1D468) as u8 + b'A') as char,
+				'\u{1D482}'..='\u{1D49B}' => ((c as u32 - 0x1D482) as u8 + b'a') as char,
 
-					// Mathematical Sans-Serif (A-Z: U+1D5A0, a-z: U+1D5BA)
-					'\u{1D5A0}'..='\u{1D5B9}' => ((c as u32 - 0x1D5A0) as u8 + b'A') as char,
-					'\u{1D5BA}'..='\u{1D5D3}' => ((c as u32 - 0x1D5BA) as u8 + b'a') as char,
+				// Mathematical Sans-Serif (A-Z: U+1D5A0, a-z: U+1D5BA)
+				'\u{1D5A0}'..='\u{1D5B9}' => ((c as u32 - 0x1D5A0) as u8 + b'A') as char,
+				'\u{1D5BA}'..='\u{1D5D3}' => ((c as u32 - 0x1D5BA) as u8 + b'a') as char,
 
-					// If a character isn't a letter (or supported math letter), return None
-					_ => return None,
-				};
-				result.push(converted);
-			}
-
-			Some(result)
+				// If a character isn't a letter (or supported math letter), return None
+				_ => return None,
+			};
+			result.push(converted);
 		}
+
+		Some(result)
 	}
 
 	fn canonicalize_mo_text(&self, mo: Element) {
@@ -6384,6 +6394,43 @@ mod canonicalize_tests {
 				<mo>-</mo>
 				<mn>1</mn>
 			</mrow>
+			</mrow>
+		</math>"#;
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn test_nonascii_function_name_as_chars() {
+        let test_str = r#"<math display="block">
+			<mi>&#x1D499;</mi>
+			<mo>=</mo>
+			<mrow>
+				<mrow>
+					<mi>&#x1D484;</mi>
+					<mi>&#x1D490;</mi>
+					<mi>&#x1D494;</mi>
+				</mrow>
+				<mo>&#x2061;</mo>
+				<mrow>
+					<mi>&#x1D495;</mi>
+				</mrow>
+			</mrow>
+			<mo>+</mo>
+			<mn>&#x1D7D0;</mn>
+		</math>"#;
+		let target_str = r#"<math display='block'>
+			<mrow data-changed='added'>
+				<mi>𝒙</mi>
+				<mo>=</mo>
+				<mrow data-changed='added'>
+					<mrow>
+					<mi>cos</mi>
+					<mo>&#x2061;</mo>
+					<mi>𝒕</mi>
+					</mrow>
+					<mo>+</mo>
+					<mn>𝟐</mn>
+				</mrow>
 			</mrow>
 		</math>"#;
         assert!(are_strs_canonically_equal(test_str, target_str));
