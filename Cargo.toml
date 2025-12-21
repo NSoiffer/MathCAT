@@ -41,9 +41,9 @@ cfg-if = "1.0.1"
 fastrand = { version = "2.3.0" }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-zip = { version = "6.0", default-features = false, features = ["deflate"] }
+zip = { version = "7.0", default-features = false, features = ["deflate"] }
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-zip = { version = "6.0", default-features = false, features = ["bzip2"] }
+zip = { version = "7.0", default-features = false, features = ["bzip2"] }
 
 android_logger = {version = "0.15.1", optional = true}
 
@@ -53,9 +53,9 @@ android_logger = {version = "0.15.1", optional = true}
 bitflags = "2.6"
 error-chain = "0.12.4"
 [target.'cfg(target_family = "wasm")'.build-dependencies]
-zip = { version = "6.0", default-features = false, features = ["deflate"] }
+zip = { version = "7.0", default-features = false, features = ["deflate"] }
 [target.'cfg(not(target_family = "wasm"))'.build-dependencies]
-zip = { version = "6.0", default-features = false, features = ["bzip2"] }
+zip = { version = "7.0", default-features = false, features = ["bzip2"] }
 
 [lib]
 name = "libmathcat"
