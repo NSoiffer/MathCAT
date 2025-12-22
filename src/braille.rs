@@ -298,13 +298,13 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
     // save the current highlight state, set the state to be the end points so we can find the braille, then restore the state
     // FIX: this can fail if there is 8-dot braille
     use crate::interface::{get_preference, set_preference};
-    let saved_highlight_style = get_preference("BrailleNavHighlight".to_string()).unwrap();
-    set_preference("BrailleNavHighlight".to_string(), "EndPoints".to_string()).unwrap();
+    let saved_highlight_style = get_preference("BrailleNavHighlight")?;
+    set_preference("BrailleNavHighlight", "EndPoints")?;
 
     N_PROBES.with(|n| {*n.borrow_mut() = 0});
     // dive into the child of the <math> element (should only be one)
     let search_state = find_navigation_node(mathml, as_element(mathml.children()[0]), position)?;
-    set_preference("BrailleNavHighlight".to_string(), saved_highlight_style.to_string()).unwrap();
+    set_preference("BrailleNavHighlight", &saved_highlight_style)?;
 
     // we know the attr value exists because it was found internally
     // FIX: what should be done if we never did the search?
@@ -2781,7 +2781,7 @@ impl NeedsToBeGrouped {
         // if the fraction starts with a "-", it is still a numeric fraction that doesn't need parens
         let mut numerator = as_element(children[0]);
         let denominator = as_element(children[children.len()-1]);
-        let decimal_separator = crate::interface::get_preference("DecimalSeparators".to_string()).unwrap()
+        let decimal_separator = crate::interface::get_preference("DecimalSeparators").unwrap()
                                                         .chars().next().unwrap_or('.');
         if is_integer(denominator, decimal_separator) {
             // check numerator being either an integer "- integer"
@@ -3078,18 +3078,18 @@ mod tests {
                 <mi id='id-6'>c</mi>
             </mrow>
         </math>";
-        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        set_mathml(mathml_str.to_string()).unwrap();
-        set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
-        set_preference("BrailleNavHighlight".to_string(), "All".to_string()).unwrap();
-        let braille = get_braille("id-2".to_string())?;
+        set_rules_dir(&super::super::abs_rules_dir_path())?;
+        set_mathml(mathml_str)?;
+        set_preference("BrailleCode", "UEB")?;
+        set_preference("BrailleNavHighlight", "All")?;
+        let braille = get_braille("id-2")?;
         assert_eq!("⣼⣙⠰⠁⠉", braille);
-        set_navigation_node("id-2".to_string(), 0)?;
+        set_navigation_node("id-2", 0)?;
         assert_eq!( get_braille_position()?, (0,2));
 
-        let braille = get_braille("id-4".to_string())?;
+        let braille = get_braille("id-4")?;
         assert_eq!("⠼⠙⣰⣁⠉", braille);
-        set_navigation_node("id-4".to_string(), 0)?;
+        set_navigation_node("id-4", 0)?;
         assert_eq!( get_braille_position()?, (2,4));
         return Ok( () );
     }
@@ -3134,12 +3134,12 @@ mod tests {
           </mfrac>
         </mrow>
        </math>";
-        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        set_mathml(mathml_str.to_string()).unwrap();
-        set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
-        
-        set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
-        let braille = get_braille("".to_string())?;
+        set_rules_dir(&super::super::abs_rules_dir_path())?;
+        set_mathml(mathml_str)?;
+        set_preference("BrailleNavHighlight", "Off")?;
+
+        set_preference("BrailleCode", "Nemeth")?;
+        let braille = get_braille("")?;
         let answers= &[2, 3, 3, 3, 3, 4, 7, 8, 9, 9,   10, 13, 12, 14, 12, 15, 17, 19, 21, 10,   4, 23, 25, 4];
         let answers = answers.map(|num| format!("id-{}", num));
         debug!("\n*** Testing Nemeth ***");
@@ -3152,8 +3152,8 @@ mod tests {
             assert_eq!(answers[i], id, "\nNemeth test ith position={}", i);
         }
 
-        set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
-        let braille = get_braille("".to_string())?;
+        set_preference("BrailleCode", "UEB")?;
+        let braille = get_braille("")?;
         let answers= &[0, 0, 0, 2, 3, 3, 3, 3, 4, 7,   7, 8, 9, 9, 10, 13, 12, 14, 14, 15,   15, 17, 17, 19, 19, 21, 10, 4, 4, 23,   23, 25, 25, 4, 0, 0];
         let answers = answers.map(|num| format!("id-{}", num));
         debug!("\n\n*** Testing UEB ***");
@@ -3165,8 +3165,8 @@ mod tests {
             debug!("Time taken: {}ms", instant.elapsed().as_millis());
             assert_eq!(answers[i], id, "\nUEB test ith position={}", i);
         }
-        set_preference("BrailleCode".to_string(), "CMU".to_string()).unwrap();
-        let braille = get_braille("".to_string())?;
+        set_preference("BrailleCode", "CMU")?;
+        let braille = get_braille("")?;
         let answers= &[2, 3, 5, 7, 8, 9, 9, 9, 10, 10,   11, 13, 12, 14, 14, 15, 17, 17, 19, 19,   21, 11, 5, 4, 22, 23, 23, 25, 25, 22,];
         let answers = answers.map(|num| format!("id-{}", num));
         debug!("\n\n*** Testing CMU ***");
@@ -3186,14 +3186,14 @@ mod tests {
     #[allow(non_snake_case)]
     fn test_UEB_start_mode() -> Result<()> {
         let mathml_str = "<math><msup><mi>x</mi><mi>n</mi></msup></math>";
-        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        set_mathml(mathml_str.to_string()).unwrap();
-        set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
-        set_preference("UEB_START_MODE".to_string(), "Grade2".to_string()).unwrap();
-        let braille = get_braille("".to_string())?;
+        set_rules_dir(&super::super::abs_rules_dir_path())?;
+        set_mathml(mathml_str)?;
+        set_preference("BrailleCode", "UEB")?;
+        set_preference("UEB_START_MODE", "Grade2")?;
+        let braille = get_braille("")?;
         assert_eq!("⠭⠰⠔⠝", braille, "Grade2");
-        set_preference("UEB_START_MODE".to_string(), "Grade1".to_string()).unwrap();
-        let braille = get_braille("".to_string())?;
+        set_preference("UEB_START_MODE", "Grade1")?;
+        let braille = get_braille("")?;
         assert_eq!("⠭⠔⠝", braille, "Grade1");
         return Ok( () );
     }
