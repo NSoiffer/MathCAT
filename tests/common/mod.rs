@@ -42,7 +42,7 @@ fn strip_spaces(str: String) -> String {
 
 #[allow(dead_code)]     // used in testing
 fn check_answer(test: &str, target: &str, failure_message: &str) {
-    if let Err(e) = set_mathml(test.to_string()) {
+    if let Err(e) = set_mathml(test) {
         panic!("{}", errors_to_string(&e));
     };
     match get_spoken_text() {
@@ -52,7 +52,7 @@ fn check_answer(test: &str, target: &str, failure_message: &str) {
 }
 
 fn set_default_speech_prefs() {
-    set_rules_dir(abs_rules_dir_path()).unwrap();
+    set_rules_dir(&abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
@@ -69,8 +69,8 @@ fn set_default_speech_prefs() {
 #[allow(dead_code)]     // used in testing
 pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
     set_default_speech_prefs();
-    set_preference("Language".to_string(), language.to_string()).unwrap();
-    set_preference("SpeechStyle".to_string(), style.to_string()).unwrap();
+    set_preference("Language", language).unwrap();
+    set_preference("SpeechStyle", style).unwrap();
     check_answer(mathml, speech, &format!("{}/{}", language, style));
 }
 
@@ -80,10 +80,10 @@ pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
 #[allow(non_snake_case)]
 pub fn test_prefs(language: &str, speech_style: &str, test_prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
     set_default_speech_prefs();
-    set_preference("Language".to_string(), language.to_string()).unwrap();
-    set_preference("SpeechStyle".to_string(), speech_style.to_string()).unwrap();
+    set_preference("Language", language).unwrap();
+    set_preference("SpeechStyle", speech_style).unwrap();
     for (pref_name, pref_value) in test_prefs.clone() {
-        set_preference(pref_name.to_string(), pref_value.to_string()).unwrap();
+        set_preference(pref_name, pref_value).unwrap();
     };
     check_answer(mathml, speech, &format!("{}/{} with prefs {:#?}", language, speech_style, test_prefs));
 }
@@ -109,23 +109,23 @@ pub fn test_ClearSpeak_prefs(language: &str, prefs: Vec<(&str, &str)>, mathml: &
 #[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
 pub fn test_braille(code: &str, mathml: &str, braille: &str) {
-    set_rules_dir(abs_rules_dir_path()).unwrap();
-    set_preference("DecimalSeparator".to_string(), "Auto".to_string()).unwrap();
-    set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
-    set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
-    set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
-    set_preference("LaTeX_UseShortName".to_string(), "false".to_string()).unwrap();
+    set_rules_dir(&abs_rules_dir_path()).unwrap();
+    set_preference("DecimalSeparator", "Auto").unwrap();
+    set_preference("BrailleNavHighlight", "Off").unwrap();
+    set_preference("BrailleNavHighlight", "Off").unwrap();
+    set_preference("BrailleCode", code).unwrap();
+    set_preference("LaTeX_UseShortName", "false").unwrap();
     // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
     // log::debug!("\nsetting Language");
     match code {
-        "Vietnam" => set_preference("Language".to_string(), "vi".to_string()).unwrap(),
-        "CMU" => set_preference("Language".to_string(), "es".to_string()).unwrap(),
-        "UEB" | "Nemeth" | _ => set_preference("Language".to_string(), "en".to_string()).unwrap(),
+        "Vietnam" => set_preference("Language", "vi").unwrap(),
+        "CMU" => set_preference("Language", "es").unwrap(),
+        "UEB" | "Nemeth" | _ => set_preference("Language", "en").unwrap(),
     }
-    if let Err(e) = set_mathml(mathml.to_string()) {
+    if let Err(e) = set_mathml(mathml) {
         panic!("{}", errors_to_string(&e));
     };
-    match get_braille("".to_string()) {
+    match get_braille("") {
         Ok(result) => assert_eq!(braille, &result),
         Err(e) => panic!("{}", errors_to_string(&e)),
     };
@@ -133,27 +133,27 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
 
 #[allow(dead_code)]     // used in testing
 pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &str, braille: &str) {
-    set_rules_dir(abs_rules_dir_path()).unwrap();
-    set_preference("DecimalSeparator".to_string(), "Auto".to_string()).unwrap();
-    set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
+    set_rules_dir(&abs_rules_dir_path()).unwrap();
+    set_preference("DecimalSeparator", "Auto").unwrap();
+    set_preference("BrailleCode", code).unwrap();
 
     // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
     // log::debug!("\nsetting Language");
     match code {
-        "Vietnam" => set_preference("Language".to_string(), "vi".to_string()).unwrap(),
-        "CMU" => set_preference("Language".to_string(), "es".to_string()).unwrap(),
-        "UEB" | "Nemeth" | _ => set_preference("Language".to_string(), "en".to_string()).unwrap(),
+        "Vietnam" => set_preference("Language", "vi").unwrap(),
+        "CMU" => set_preference("Language", "es").unwrap(),
+        "UEB" | "Nemeth" | _ => set_preference("Language", "en").unwrap(),
     }
 
-    set_preference("UseSpacesAroundAllOperators".to_string(), "false".to_string()).unwrap();         // makes testing simpler
+    set_preference("UseSpacesAroundAllOperators", "false").unwrap();         // makes testing simpler
     for (pref_name, pref_value) in test_prefs.clone() {
-        set_preference(pref_name.to_string(), pref_value.to_string()).unwrap();
+        set_preference(pref_name, pref_value).unwrap();
     };
 
-    if let Err(e) = set_mathml(mathml.to_string()) {
+    if let Err(e) = set_mathml(mathml) {
         panic!("{}", errors_to_string(&e));
     };
-    match get_braille("".to_string()) {
+    match get_braille("") {
         Ok(result) => assert_eq!(braille, &result),
         Err(e) => panic!("{}", errors_to_string(&e)),
     };
@@ -162,7 +162,7 @@ pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &st
 #[allow(dead_code)]
 pub fn test_intent(mathml: &str, target: &str, test_prefs: Vec<(&str, &str)>) {
     use sxd_document::{parser, dom::Element};
-    set_rules_dir(abs_rules_dir_path()).unwrap();
+    set_rules_dir(&abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
@@ -171,10 +171,10 @@ pub fn test_intent(mathml: &str, target: &str, test_prefs: Vec<(&str, &str)>) {
     });
 
     // crate::speech::SpeechRules::initialize_all_rules().unwrap();
-    set_preference("IntentErrorRecovery".to_string(), "Error".to_string()).unwrap();
-    set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();      // avoids possibility of "LiteralSpeak"
+    set_preference("IntentErrorRecovery", "Error").unwrap();
+    set_preference("SpeechStyle", "SimpleSpeak").unwrap();      // avoids possibility of "LiteralSpeak"
     for (pref_name, pref_value) in test_prefs.clone() {
-        set_preference(pref_name.to_string(), pref_value.to_string()).unwrap();
+        set_preference(pref_name, pref_value).unwrap();
     };
 
     let package = &parser::parse(target).expect("Failed to parse target input");
