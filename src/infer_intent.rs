@@ -614,10 +614,10 @@ mod tests {
 		use crate::interface::*;
         use crate::pretty_print::mml_to_string;
 		// this forces initialization
-        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_rules_dir(&super::super::abs_rules_dir_path()).unwrap();
         // crate::speech::SpeechRules::initialize_all_rules().unwrap();
-        set_preference("IntentErrorRecovery".to_string(), intent_error_recovery.to_string()).unwrap();
-        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();      // avoids possibility of "LiteralSpeak"
+        set_preference("IntentErrorRecovery", intent_error_recovery).unwrap();
+        set_preference("SpeechStyle", "SimpleSpeak").unwrap();      // avoids possibility of "LiteralSpeak"
         let package1 = &parser::parse(mathml).expect("Failed to parse test input");
         let mathml = get_element(package1);
         trim_element(mathml, false);
