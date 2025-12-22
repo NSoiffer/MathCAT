@@ -216,6 +216,52 @@ class UI:
 
         print(f"{c.CYAN}{s.BOX_BL}{s.BOX_H * (width - 2)}{s.BOX_BR}{c.RESET}")
 
+    def print_warnings(result: ComparisonResult, file_name: str) -> int:
+        """Print warnings to console. Returns count of issues found."""
+    c = UI.Colors
+    s = UI.Symbols
+    issues = 0
+
+    has_issues = result.missing_rules or result.untranslated_text or result.extra_rules
+
+    if has_issues:
+        UI.print_file_header(file_name, result.english_rule_count, result.translated_rule_count)
+
+    if result.missing_rules:
+        UI.print_issue_category(
+            s.CROSS, c.RED,
+            "Missing Rules",
+            len(result.missing_rules),
+            "in English but not in translation"
+        )
+        for rule in result.missing_rules:
+            UI.print_rule_item(rule, context=" in English")
+            issues += 1
+
+    if result.untranslated_text:
+        UI.print_issue_category(
+            s.WARNING, c.YELLOW,
+            "Untranslated Text",
+            len(result.untranslated_text),
+            "lowercase t/ot/ct keys"
+        )
+        for rule, texts in result.untranslated_text:
+            UI.print_rule_item(rule)
+            UI.print_text_samples(texts)
+            issues += 1
+
+    if result.extra_rules:
+        UI.print_issue_category(
+            s.INFO, c.BLUE,
+            "Extra Rules",
+            len(result.extra_rules),
+            "may be intentional"
+        )
+        for rule in result.extra_rules:
+            UI.print_rule_item(rule)
+
+    return issues
+
 
 if sys.platform == 'win32': # Ensure UTF-8 output on Windows
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
@@ -480,57 +526,6 @@ def compare_files(english_path: str, translated_path: str) -> ComparisonResult:
         english_rule_count=len(english_rules),
         translated_rule_count=len(translated_rules)
     )
-
-
-# =============================================================================
-# Output Functions
-# =============================================================================
-
-def print_warnings(result: ComparisonResult, file_name: str) -> int:
-    """Print warnings to console. Returns count of issues found."""
-    c = UI.Colors
-    s = UI.Symbols
-    issues = 0
-
-    has_issues = result.missing_rules or result.untranslated_text or result.extra_rules
-
-    if has_issues:
-        UI.print_file_header(file_name, result.english_rule_count, result.translated_rule_count)
-
-    if result.missing_rules:
-        UI.print_issue_category(
-            s.CROSS, c.RED,
-            "Missing Rules",
-            len(result.missing_rules),
-            "in English but not in translation"
-        )
-        for rule in result.missing_rules:
-            UI.print_rule_item(rule, context=" in English")
-            issues += 1
-
-    if result.untranslated_text:
-        UI.print_issue_category(
-            s.WARNING, c.YELLOW,
-            "Untranslated Text",
-            len(result.untranslated_text),
-            "lowercase t/ot/ct keys"
-        )
-        for rule, texts in result.untranslated_text:
-            UI.print_rule_item(rule)
-            UI.print_text_samples(texts)
-            issues += 1
-
-    if result.extra_rules:
-        UI.print_issue_category(
-            s.INFO, c.BLUE,
-            "Extra Rules",
-            len(result.extra_rules),
-            "may be intentional"
-        )
-        for rule in result.extra_rules:
-            UI.print_rule_item(rule)
-
-    return issues
 
 
 def get_yaml_files(lang_dir: Path) -> List[str]:
