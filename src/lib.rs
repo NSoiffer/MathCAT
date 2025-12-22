@@ -95,11 +95,11 @@ pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, block_se
     use sxd_document::parser;
     use crate::canonicalize::canonicalize;
     // this forces initialization
-    crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
-    crate::speech::SPEECH_RULES.with(|rules|  rules.borrow_mut().read_files().unwrap());
-    set_preference("Language".to_string(), "en".to_string()).unwrap();
-    set_preference("BlockSeparators".to_string(), block_separators.to_string()).unwrap();
-    set_preference("DecimalSeparators".to_string(), decimal_separators.to_string()).unwrap();
+    set_rules_dir(&abs_rules_dir_path()).unwrap();
+    speech::SPEECH_RULES.with(|rules|  rules.borrow_mut().read_files().unwrap());
+    set_preference("Language", "en").unwrap();
+    set_preference("BlockSeparators", block_separators).unwrap();
+    set_preference("DecimalSeparators", decimal_separators).unwrap();
     
     let package1 = &parser::parse(test).expect("Failed to parse test input");
     let mathml = get_element(package1);
