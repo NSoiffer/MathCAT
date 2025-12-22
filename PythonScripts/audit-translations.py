@@ -68,11 +68,193 @@ from pathlib import Path
 from typing import List, Tuple, Optional
 from dataclasses import dataclass
 
-# Ensure UTF-8 output on Windows
-if sys.platform == 'win32':
+
+class UI:
+    """Master class for all Terminal UI logic, for example colors"""
+
+    class Colors:
+        """ANSI color codes for terminal output"""
+        # Check if colors are supported
+        _enabled = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
+
+        # Basic colors
+        RED = '\033[91m' if _enabled else ''
+        GREEN = '\033[92m' if _enabled else ''
+        YELLOW = '\033[93m' if _enabled else ''
+        BLUE = '\033[94m' if _enabled else ''
+        MAGENTA = '\033[95m' if _enabled else ''
+        CYAN = '\033[96m' if _enabled else ''
+        WHITE = '\033[97m' if _enabled else ''
+        GRAY = '\033[90m' if _enabled else ''
+
+        # Styles
+        BOLD = '\033[1m' if _enabled else ''
+        DIM = '\033[2m' if _enabled else ''
+        UNDERLINE = '\033[4m' if _enabled else ''
+
+        # Reset
+        RESET = '\033[0m' if _enabled else ''
+
+        @classmethod
+        def disable(cls):
+            """Disable all colors"""
+            cls.RED = cls.GREEN = cls.YELLOW = cls.BLUE = ''
+            cls.MAGENTA = cls.CYAN = cls.WHITE = cls.GRAY = ''
+            cls.BOLD = cls.DIM = cls.UNDERLINE = cls.RESET = ''
+
+
+    # Symbols for visual clarity
+    class Symbols:
+        """Unicode symbols for better visual output"""
+        CHECK = '✓'
+        CROSS = '✗'
+        WARNING = '⚠'
+        INFO = 'ℹ'
+        ARROW = '→'
+        BULLET = '•'
+        BOX_H = '─'
+        BOX_V = '│'
+        BOX_TL = '┌'
+        BOX_TR = '┐'
+        BOX_BL = '└'
+        BOX_BR = '┘'
+        BOX_T = '┬'
+        BOX_B = '┴'
+        BOX_L = '├'
+        BOX_R = '┤'
+        BOX_X = '┼'
+
+
+    def print_header(text: str, width: int = 70):
+        """Print a styled header box"""
+        c = UI.Colors
+        s = UI.Symbols
+        padding = (width - len(text) - 2) // 2
+
+        print(f"\n{c.CYAN}{s.BOX_TL}{s.BOX_H * (width - 2)}{s.BOX_TR}{c.RESET}")
+        print(f"{c.CYAN}{s.BOX_V}{c.RESET}{c.BOLD}{text.center(width - 2)}{c.RESET}{c.CYAN}{s.BOX_V}{c.RESET}")
+        print(f"{c.CYAN}{s.BOX_BL}{s.BOX_H * (width - 2)}{s.BOX_BR}{c.RESET}")
+
+
+    def print_subheader(text: str, width: int = 70):
+        """Print a styled subheader"""
+        c = Colors
+        s = Symbols
+        print(f"\n{c.BLUE}{s.BOX_L}{s.BOX_H * 2}{c.RESET} {c.BOLD}{text}{c.RESET} {c.BLUE}{s.BOX_H * (width - len(text) - 6)}{s.BOX_R}{c.RESET}")
+
+
+    def print_file_header(file_name: str, english_count: int, translated_count: int, width: int = 70):
+        """Print a file section header"""
+        c = UI.Colors
+        s = UI.Symbols
+
+        # Determine status color based on counts
+        if translated_count == english_count:
+            status_color = c.GREEN
+            status_icon = s.CHECK
+        elif translated_count == 0:
+            status_color = c.RED
+            status_icon = s.CROSS
+        else:
+            status_color = c.YELLOW
+            status_icon = s.WARNING
+
+        print(f"\n{c.CYAN}{s.BOX_H * width}{c.RESET}")
+        print(f"{status_color}{status_icon}{c.RESET} {c.BOLD}{file_name}{c.RESET}")
+        print(f"  {c.DIM}English: {english_count} rules  {s.ARROW}  Translated: {translated_count} rules{c.RESET}")
+        print(f"{c.CYAN}{s.BOX_H * width}{c.RESET}")
+
+
+    def print_issue_category(icon: str, color: str, title: str, count: int, description: str = ""):
+        """Print an issue category header"""
+        c = UI.Colors
+        desc = f" {c.DIM}({description}){c.RESET}" if description else ""
+        print(f"\n  {color}{icon}{c.RESET} {c.BOLD}{title}{c.RESET} [{color}{count}{c.RESET}]{desc}")
+
+
+    def print_rule_item(rule, is_unicode: bool = False, context: str = ""):
+        """Print a single rule item"""
+        c = UI.Colors
+        s = UI.Symbols
+
+        if is_unicode or rule.name is None:
+            key_display = f'"{rule.key}"'
+            print(f"      {c.GRAY}{s.BULLET}{c.RESET} {c.YELLOW}{key_display}{c.RESET} {c.DIM}(line {rule.line_number}{context}){c.RESET}")
+        else:
+            print(f"      {c.GRAY}{s.BULLET}{c.RESET} {c.CYAN}{rule.name}{c.RESET} {c.DIM}[{rule.tag}]{c.RESET} {c.DIM}(line {rule.line_number}{context}){c.RESET}")
+
+
+    def print_text_samples(texts: List[str], max_show: int = 3):
+        """Print sample untranslated text strings"""
+        c = UI.Colors
+        s = UI.Symbols
+
+        for text in texts[:max_show]:
+            # Truncate long text
+            display_text = text if len(text) <= 40 else text[:37] + "..."
+            print(f"          {c.GRAY}{s.ARROW}{c.RESET} {c.YELLOW}\"{display_text}\"{c.RESET}")
+
+        if len(texts) > max_show:
+            remaining = len(texts) - max_show
+            print(f"          {c.DIM}... and {remaining} more{c.RESET}")
+
+
+    def print_summary_box(stats: dict, width: int = 70):
+        """Print a formatted summary box"""
+        c = UI.Colors
+        s = UI.Symbols
+
+        print(f"\n{c.CYAN}{s.BOX_TL}{s.BOX_H * (width - 2)}{s.BOX_TR}{c.RESET}")
+        print(f"{c.CYAN}{s.BOX_V}{c.RESET}{c.BOLD}{'SUMMARY'.center(width - 2)}{c.RESET}{c.CYAN}{s.BOX_V}{c.RESET}")
+        print(f"{c.CYAN}{s.BOX_L}{s.BOX_H * (width - 2)}{s.BOX_R}{c.RESET}")
+
+        # Calculate column widths
+        label_width = 30
+        value_width = width - label_width - 6
+
+        for label, value, color in stats:
+            value_str = str(value)
+            colored_value = f"{color}{value_str}{c.RESET}" if color else value_str
+            padding = value_width - len(value_str)
+            print(f"{c.CYAN}{s.BOX_V}{c.RESET}  {label:<{label_width}}{colored_value}{' ' * padding}  {c.CYAN}{s.BOX_V}{c.RESET}")
+
+        print(f"{c.CYAN}{s.BOX_BL}{s.BOX_H * (width - 2)}{s.BOX_BR}{c.RESET}")
+
+
+    def print_progress(current: int, total: int, file_name: str, width: int = 50):
+        """Print a progress indicator"""
+        c = UI.Colors
+        s = UI.Symbols
+
+        percentage = (current / total) * 100 if total > 0 else 0
+        filled = int((current / total) * width) if total > 0 else 0
+        bar = f"{c.GREEN}{'█' * filled}{c.GRAY}{'░' * (width - filled)}{c.RESET}"
+
+        # Use \r to overwrite the line
+        status = f"  {bar} {percentage:5.1f}% {c.DIM}({current}/{total}){c.RESET} {file_name}"
+        print(f"\r{status}", end='', flush=True)
+
+
+    def clear_progress():
+        """Clear the progress line"""
+        print("\r" + " " * 100 + "\r", end='', flush=True)
+
+
+if sys.platform == 'win32': # Ensure UTF-8 output on Windows
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    # Enable ANSI escape sequences on Windows 10+
+    try:
+        import ctypes
+        kernel32 = ctypes.windll.kernel32
+        kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
+    except:
+        pass
 
+
+# =============================================================================
+# Data Classes
+# =============================================================================
 
 @dataclass
 class RuleInfo:
@@ -100,6 +282,10 @@ class ComparisonResult:
     english_rule_count: int
     translated_rule_count: int
 
+
+# =============================================================================
+# File Parsing Functions
+# =============================================================================
 
 def get_rules_dir() -> Path:
     """Get the Rules/Languages directory path"""
@@ -280,6 +466,10 @@ def find_untranslated_text_keys(content: str) -> List[str]:
     return untranslated
 
 
+# =============================================================================
+# Comparison Functions
+# =============================================================================
+
 def compare_files(english_path: str, translated_path: str) -> ComparisonResult:
     """Compare English and translated YAML files"""
 
@@ -322,46 +512,53 @@ def compare_files(english_path: str, translated_path: str) -> ComparisonResult:
     )
 
 
+# =============================================================================
+# Output Functions
+# =============================================================================
+
 def print_warnings(result: ComparisonResult, file_name: str) -> int:
     """Print warnings to console. Returns count of issues found."""
+    c = UI.Colors
+    s = UI.Symbols
     issues = 0
 
-    if result.missing_rules or result.untranslated_text or result.extra_rules:
-        print(f"\n{'='*60}")
-        print(f"File: {file_name}")
-        print(f"English rules: {result.english_rule_count}, Translated rules: {result.translated_rule_count}")
-        print(f"{'='*60}")
+    has_issues = result.missing_rules or result.untranslated_text or result.extra_rules
+
+    if has_issues:
+        UI.print_file_header(file_name, result.english_rule_count, result.translated_rule_count)
 
     if result.missing_rules:
-        print(f"\n  MISSING RULES ({len(result.missing_rules)} rules in English but not in translation):")
+        UI.print_issue_category(
+            s.CROSS, c.RED,
+            "Missing Rules",
+            len(result.missing_rules),
+            "in English but not in translation"
+        )
         for rule in result.missing_rules:
-            if rule.name:
-                print(f"    - name: {rule.name}, tag: {rule.tag} (line {rule.line_number} in English)")
-            else:
-                print(f"    - key: \"{rule.key}\" (line {rule.line_number} in English)")
+            UI.print_rule_item(rule, context=" in English")
             issues += 1
 
     if result.untranslated_text:
-        print(f"\n  UNTRANSLATED TEXT ({len(result.untranslated_text)} rules with lowercase t/ot/ct):")
+        UI.print_issue_category(
+            s.WARNING, c.YELLOW,
+            "Untranslated Text",
+            len(result.untranslated_text),
+            "lowercase t/ot/ct keys"
+        )
         for rule, texts in result.untranslated_text:
-            if rule.name:
-                print(f"    - name: {rule.name}, tag: {rule.tag} (line {rule.line_number}):")
-            else:
-                print(f"    - key: \"{rule.key}\" (line {rule.line_number}):")
-            for text in texts[:3]:  # Show first 3 examples
-                print(f"        \"{text}\"")
-            if len(texts) > 3:
-                print(f"        ... and {len(texts) - 3} more")
+            UI.print_rule_item(rule)
+            UI.print_text_samples(texts)
             issues += 1
 
     if result.extra_rules:
-        print(f"\n  EXTRA RULES ({len(result.extra_rules)} rules in translation but not in English):")
-        print(f"  (These may be intentional language-specific rules)")
+        UI.print_issue_category(
+            s.INFO, c.BLUE,
+            "Extra Rules",
+            len(result.extra_rules),
+            "may be intentional"
+        )
         for rule in result.extra_rules:
-            if rule.name:
-                print(f"    - name: {rule.name}, tag: {rule.tag} (line {rule.line_number})")
-            else:
-                print(f"    - key: \"{rule.key}\" (line {rule.line_number})")
+            UI.print_rule_item(rule)
 
     return issues
 
@@ -386,16 +583,19 @@ def get_yaml_files(lang_dir: Path) -> List[str]:
 
 def audit_language(language: str, specific_file: Optional[str] = None):
     """Audit translations for a specific language"""
+    c = UI.Colors
+    s = UI.Symbols
+
     rules_dir = get_rules_dir()
     english_dir = rules_dir / "en"
     translated_dir = rules_dir / language
 
     if not english_dir.exists():
-        print(f"Error: English rules directory not found: {english_dir}")
+        print(f"\n{c.RED}{s.CROSS} Error:{c.RESET} English rules directory not found: {english_dir}")
         sys.exit(1)
 
     if not translated_dir.exists():
-        print(f"Error: Translation directory not found: {translated_dir}")
+        print(f"\n{c.RED}{s.CROSS} Error:{c.RESET} Translation directory not found: {translated_dir}")
         sys.exit(1)
 
     # Get list of files to audit
@@ -404,55 +604,109 @@ def audit_language(language: str, specific_file: Optional[str] = None):
     else:
         files = get_yaml_files(english_dir)
 
+    # Print header
+    UI.print_header(f"MathCAT Translation Audit: {language.upper()}")
+    print(f"\n  {c.DIM}Comparing against English (en) reference files{c.RESET}")
+    print(f"  {c.DIM}Files to check: {len(files)}{c.RESET}")
+
     total_issues = 0
     total_missing = 0
     total_untranslated = 0
     total_extra = 0
     files_with_issues = 0
+    files_ok = 0
 
-    print(f"\nAuditing {language} translations against English")
-    print(f"Files to check: {len(files)}")
-
-    for file_name in files:
+    for i, file_name in enumerate(files):
         english_path = english_dir / file_name
         translated_path = translated_dir / file_name
 
+        # Show progress for multiple files
+        if len(files) > 1:
+            UI.print_progress(i + 1, len(files), file_name)
+
         if not english_path.exists():
-            print(f"Warning: English file not found: {english_path}")
+            UI.clear_progress()
+            print(f"\n{c.YELLOW}{s.WARNING} Warning:{c.RESET} English file not found: {english_path}")
             continue
 
         result = compare_files(str(english_path), str(translated_path))
 
-        issues = print_warnings(result, file_name)
-        if issues > 0:
-            files_with_issues += 1
-        total_issues += issues
+        has_issues = result.missing_rules or result.untranslated_text or result.extra_rules
+
+        if has_issues:
+            if len(files) > 1:
+                UI.clear_progress()
+            issues = print_warnings(result, file_name)
+            if issues > 0:
+                files_with_issues += 1
+            total_issues += issues
+        else:
+            files_ok += 1
+
         total_missing += len(result.missing_rules)
         total_untranslated += len(result.untranslated_text)
         total_extra += len(result.extra_rules)
 
-    # Print summary
-    print(f"\n{'='*60}")
-    print("SUMMARY")
-    print(f"{'='*60}")
-    print(f"Files checked: {len(files)}")
-    print(f"Files with issues: {files_with_issues}")
-    print(f"Missing rules: {total_missing}")
-    print(f"Rules with untranslated text: {total_untranslated}")
-    print(f"Extra rules (translation only): {total_extra}")
+    # Clear progress bar
+    if len(files) > 1:
+        UI.clear_progress()
+
+    # Determine overall status
+    if total_missing == 0 and total_untranslated == 0:
+        overall_status = (c.GREEN, s.CHECK, "All translations complete!")
+    elif total_missing > 0 or total_untranslated > 0:
+        overall_status = (c.YELLOW, s.WARNING, "Translation issues found")
+    else:
+        overall_status = (c.BLUE, s.INFO, "Review recommended")
+
+    # Build summary stats
+    stats = [
+        ("Files checked", len(files), None),
+        ("Files with issues", files_with_issues, c.YELLOW if files_with_issues > 0 else c.GREEN),
+        ("Files OK", files_ok, c.GREEN if files_ok > 0 else None),
+        ("", "", None),  # Spacer
+        ("Missing rules", total_missing, c.RED if total_missing > 0 else c.GREEN),
+        ("Untranslated text", total_untranslated, c.YELLOW if total_untranslated > 0 else c.GREEN),
+        ("Extra rules", total_extra, c.BLUE if total_extra > 0 else None),
+    ]
+
+    UI.print_summary_box(stats)
+
+    # Overall status
+    status_color, status_icon, status_text = overall_status
+    print(f"\n  {status_color}{status_icon} {status_text}{c.RESET}\n")
 
     return total_issues
 
 
 def list_languages():
     """List available languages for auditing"""
+    c = UI.Colors
+    s = UI.Symbols
+
     rules_dir = get_rules_dir()
 
-    print("\nAvailable languages:")
+    UI.print_header("Available Languages")
+
+    print(f"\n  {c.DIM}Language code │ YAML files{c.RESET}")
+    print(f"  {c.DIM}{'─' * 14}┼{'─' * 15}{c.RESET}")
+
     for lang_dir in sorted(rules_dir.iterdir()):
         if lang_dir.is_dir() and lang_dir.name != "en":
             yaml_files = list(lang_dir.glob("*.yaml"))
-            print(f"  {lang_dir.name}: {len(yaml_files)} YAML files")
+            count = len(yaml_files)
+
+            # Color based on file count
+            if count >= 7:
+                color = c.GREEN
+            elif count >= 4:
+                color = c.YELLOW
+            else:
+                color = c.RED
+
+            print(f"  {c.CYAN}{lang_dir.name:^14}{c.RESET}│ {color}{count:>3}{c.RESET} files")
+
+    print(f"\n  {c.DIM}Reference: en (English) - base translation{c.RESET}\n")
 
 
 def main():
@@ -464,7 +718,7 @@ Examples:
     python audit-translations.py es
     python audit-translations.py de --file SharedRules/default.yaml
     python audit-translations.py --list
-        """ # text to display after the argument help (https://docs.python.org/3/library/argparse.html#epilog)
+        """
     )
 
     parser.add_argument(
@@ -485,7 +739,16 @@ Examples:
         help="List available languages"
     )
 
+    parser.add_argument(
+        "--no-color",
+        action="store_true",
+        help="Disable colored output"
+    )
+
     args = parser.parse_args()
+
+    if args.no_color:
+        UI.Colors.disable()
 
     if args.list:
         list_languages()
@@ -493,7 +756,8 @@ Examples:
 
     if not args.language:
         parser.print_help()
-        print("\nError: Please specify a language code or use --list to see available languages")
+        c = UI.Colors
+        print(f"\n{c.RED}Error:{c.RESET} Please specify a language code or use --list to see available languages")
         sys.exit(1)
 
     audit_language(args.language, args.specific_file)
