@@ -84,8 +84,8 @@ fn frac_2a() {
 #[test]
 fn drop_frac_2a() {
     let expr = "<math><mrow> <mfrac><mn>1</mn><mn>2</mn> </mfrac> <mo>+</mo><mfrac><mn>3</mn><mn>4</mn> </mfrac> <mo>&#x2212;</mo><mfrac><mn>3</mn><mn>7</mn> </mfrac> </mrow></math>";
-    libmathcat::set_rules_dir(abs_rules_dir_path()).unwrap();
-    libmathcat::set_preference("Vietnam_UseDropNumbers".to_string(), "true".to_string()).unwrap();
+    libmathcat::set_rules_dir(&abs_rules_dir_path()).unwrap();
+    libmathcat::set_preference("Vietnam_UseDropNumbers", "true").unwrap();
     test_braille("Vietnam", expr, "⠼⠁⠆⠐⠖⠼⠉⠲⠐⠤⠼⠉⠶");
 }
 
