@@ -2,67 +2,58 @@
 """
 MathCAT Translation Audit Tool
 
-Compares English YAML rule files with translated versions to:
-1. Identify missing rules in translations
-2. Flag rules present in translations but absent from English
-3. Detect text keys that need translation (t/ot/ct -> T/OT/CT)
-4. Find structural differences between files
+Compares English YAML rule files with translated versions to identify translation
+gaps and issues. This tool helps translators ensure their translations are complete
+and properly formatted.
 
-Modes:
-- warnings: Display differences as console output without modifying files
-- new-version: Generate updated translation files with comments marking sections needing translation
+Detection Capabilities:
+    1. Missing rules - Rules present in English but not in the translation
+    2. Extra rules - Rules in translation but absent from English (flagged as
+       potentially intentional language-specific additions)
+    3. Untranslated text - Detects text keys that still use lowercase formatting,
+       indicating they haven't been reviewed/translated yet
+
+Text Key Abbreviations (t/ot/ct):
+    In MathCAT YAML rule files, text output is marked with special keys:
+    - t:  "text" - Simple text output spoken as-is
+    - ot: "open text" - Text spoken at the start of a construct (e.g., "start fraction")
+    - ct: "close text" - Text spoken at the end of a construct (e.g., "end fraction")
+
+    The translation convention is:
+    - Lowercase (t, ot, ct): Untranslated or unverified text (needs review)
+    - Uppercase (T, OT, CT): Translated and verified text
+
+    Example:
+        English:  - t: "square root"      # lowercase = original English
+        Spanish:  - T: "raíz cuadrada"    # uppercase = verified translation
+
+File Type Handling:
+    - Standard rule files: Uses name/tag identifiers to match rules
+      (e.g., ClearSpeak_Rules.yaml, SimpleSpeak_Rules.yaml, SharedRules/*.yaml)
+    - Unicode files: Uses character/range keys like "a-z", "!", "0-9"
+      (unicode.yaml, unicode-full.yaml)
+
+Convenience Features:
+    - --list flag to show available languages
+    - --file option to audit a specific file only
+    - Summary statistics after each run
 
 Usage:
-    python audit-translations.py <language> [--mode warnings|new-version] [--file <specific_file>]
+    python audit-translations.py <language> [--file <specific_file>]
+    python audit-translations.py --list
 
 Examples:
-    python audit-translations.py es --mode warnings
-    python audit-translations.py de --mode new-version
-    python audit-translations.py es --mode warnings --file SharedRules/default.yaml
-"""
+    # List available languages
+    python audit-translations.py --list
 
+    # Audit all Spanish translation files
+    python audit-translations.py es
 
+    # Audit only a specific file
+    python audit-translations.py es --file SharedRules/default.yaml
 
-
-"""
-A Python tool that compares English YAML rule files with translated versions.
-
-  Features
-
-  1. Two operational modes:
-    - --mode warnings - Display differences as console output without modifying files
-    - --mode new-version - Generate updated translation files with comments marking sections needing translation
-  2. Detection capabilities:
-    - Missing rules - Rules in English but not in translation
-    - Extra rules - Rules in translation but not in English (flagged as potentially intentional)
-    - Untranslated text - Detects lowercase t:, ot:, ct: keys that should be uppercase (T:, OT:, CT:) in translations
-  3. File type handling:
-    - Standard rule files (using name/tag identifiers)
-    - Unicode files (using character/range keys like "a-z", "!", etc.)
-  4. Convenience features:
-    - --list flag to show available languages
-    - --file option to audit a specific file
-    - Summary statistics after each run
-    - UTF-8 output support on Windows
-
-  Usage Examples
-
-  # List available languages
-  python audit-translations.py --list
-
-  # Audit all Spanish translations (warnings mode)
-  python audit-translations.py es --mode warnings
-
-  # Generate updated German translation files
-  python audit-translations.py de --mode new-version
-
-  # Audit a specific file
-  python audit-translations.py es --mode warnings --file SharedRules/default.yaml
-
-  Output Markers (new-version mode)
-
-  - # NEEDS TRANSLATION - Rules containing untranslated text (lowercase t/ot/ct)
-  - # NEW RULE THAT NEEDS TRANSLATION - Rules missing from translation that need to be added
+    # Audit German translations
+    python audit-translations.py de
 """
 
 
@@ -74,19 +65,13 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple, Any, Optional
+from typing import List, Tuple, Optional
 from dataclasses import dataclass
-from enum import Enum
 
 # Ensure UTF-8 output on Windows
 if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
-
-
-class Mode(Enum):
-    WARNINGS = "warnings"
-    NEW_VERSION = "new-version"
 
 
 @dataclass
@@ -381,102 +366,6 @@ def print_warnings(result: ComparisonResult, file_name: str) -> int:
     return issues
 
 
-def generate_new_version(result: ComparisonResult, english_path: str, translated_path: str, output_path: str):
-    """
-    Generate an updated translation file with comments marking sections needing translation.
-    """
-    with open(english_path, 'r', encoding='utf-8') as f:
-        english_content = f.read()
-
-    if os.path.exists(translated_path):
-        with open(translated_path, 'r', encoding='utf-8') as f:
-            translated_content = f.read()
-    else:
-        translated_content = "---\n"
-
-    # Parse both files to get rules
-    english_rules, _ = parse_yaml_file(english_path)
-    translated_rules, _ = parse_yaml_file(translated_path) if os.path.exists(translated_path) else ([], "")
-
-    translated_by_key = {r.key: r for r in translated_rules}
-
-    output_lines = []
-    lines = translated_content.split('\n')
-    processed_keys = set()
-
-    i = 0
-    while i < len(lines):
-        line = lines[i]
-
-        # Check if this line starts a rule or unicode entry
-        rule_match = re.match(r'^- name:\s*(.+)$', line)
-        unicode_match = re.match(r'^[\s]*-\s*"([^"]+)":', line)
-
-        if rule_match:
-            rule_name = rule_match.group(1).strip().strip('"\'')
-            # Find the tag
-            tag = None
-            j = i + 1
-            while j < len(lines) and not lines[j].startswith('- name:'):
-                tag_match = re.match(r'^\s+tag:\s*(.+)$', lines[j])
-                if tag_match:
-                    tag_value = tag_match.group(1).strip()
-                    if tag_value.startswith('['):
-                        tag = tag_value
-                    else:
-                        tag = tag_value.strip('"\'')
-                    break
-                j += 1
-
-            key = f"{rule_name}|{tag or 'unknown'}"
-            processed_keys.add(key)
-
-            # Check if this rule has untranslated text
-            if key in translated_by_key:
-                rule = translated_by_key[key]
-                if rule.has_untranslated_text:
-                    output_lines.append("# NEEDS TRANSLATION - contains untranslated text (lowercase t/ot/ct)")
-
-            # Add the original line
-            output_lines.append(line)
-
-        elif unicode_match:
-            char_key = unicode_match.group(1)
-            processed_keys.add(char_key)
-
-            # Check if this entry has untranslated text
-            if char_key in translated_by_key:
-                rule = translated_by_key[char_key]
-                if rule.has_untranslated_text:
-                    output_lines.append("# NEEDS TRANSLATION - contains untranslated text (lowercase t/ot/ct)")
-
-            output_lines.append(line)
-        else:
-            output_lines.append(line)
-
-        i += 1
-
-    # Add missing rules from English at the end
-    missing_rules = [r for r in english_rules if r.key not in processed_keys]
-    if missing_rules:
-        output_lines.append("\n# ============================================")
-        output_lines.append("# NEW RULES THAT NEED TRANSLATION")
-        output_lines.append("# ============================================")
-        for rule in missing_rules:
-            output_lines.append("")
-            output_lines.append("# NEW RULE THAT NEEDS TRANSLATION")
-            # Add the rule content from English
-            for content_line in rule.raw_content.split('\n'):
-                output_lines.append(content_line)
-
-    # Write the output file
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(output_lines))
-
-    return len(missing_rules)
-
-
 def get_yaml_files(lang_dir: Path) -> List[str]:
     """Get all YAML files to audit for a language"""
     files = []
@@ -495,7 +384,7 @@ def get_yaml_files(lang_dir: Path) -> List[str]:
     return sorted(files)
 
 
-def audit_language(language: str, mode: Mode, specific_file: Optional[str] = None):
+def audit_language(language: str, specific_file: Optional[str] = None):
     """Audit translations for a specific language"""
     rules_dir = get_rules_dir()
     english_dir = rules_dir / "en"
@@ -522,7 +411,6 @@ def audit_language(language: str, mode: Mode, specific_file: Optional[str] = Non
     files_with_issues = 0
 
     print(f"\nAuditing {language} translations against English")
-    print(f"Mode: {mode.value}")
     print(f"Files to check: {len(files)}")
 
     for file_name in files:
@@ -535,39 +423,13 @@ def audit_language(language: str, mode: Mode, specific_file: Optional[str] = Non
 
         result = compare_files(str(english_path), str(translated_path))
 
-        if mode == Mode.WARNINGS:
-            issues = print_warnings(result, file_name)
-            if issues > 0:
-                files_with_issues += 1
-            total_issues += issues
-            total_missing += len(result.missing_rules)
-            total_untranslated += len(result.untranslated_text)
-            total_extra += len(result.extra_rules)
-
-        elif mode == Mode.NEW_VERSION:
-            # Create output in a new directory
-            output_dir = rules_dir / f"{language}_updated"
-            output_path = output_dir / file_name
-
-            if not translated_path.exists():
-                print(f"  Creating new translation file: {file_name}")
-            elif result.missing_rules or result.untranslated_text:
-                print(f"  Updating: {file_name}")
-            else:
-                print(f"  No changes needed: {file_name}")
-                continue
-
-            missing_count = generate_new_version(
-                result,
-                str(english_path),
-                str(translated_path),
-                str(output_path)
-            )
-
-            total_missing += missing_count
-            total_untranslated += len(result.untranslated_text)
-            if missing_count > 0 or result.untranslated_text:
-                files_with_issues += 1
+        issues = print_warnings(result, file_name)
+        if issues > 0:
+            files_with_issues += 1
+        total_issues += issues
+        total_missing += len(result.missing_rules)
+        total_untranslated += len(result.untranslated_text)
+        total_extra += len(result.extra_rules)
 
     # Print summary
     print(f"\n{'='*60}")
@@ -577,12 +439,7 @@ def audit_language(language: str, mode: Mode, specific_file: Optional[str] = Non
     print(f"Files with issues: {files_with_issues}")
     print(f"Missing rules: {total_missing}")
     print(f"Rules with untranslated text: {total_untranslated}")
-
-    if mode == Mode.WARNINGS:
-        print(f"Extra rules (translation only): {total_extra}")
-    elif mode == Mode.NEW_VERSION:
-        output_dir = rules_dir / f"{language}_updated"
-        print(f"\nUpdated files written to: {output_dir}")
+    print(f"Extra rules (translation only): {total_extra}")
 
     return total_issues
 
@@ -604,24 +461,16 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    python audit-translations.py es --mode warnings
-    python audit-translations.py de --mode new-version
-    python audit-translations.py es --mode warnings --file SharedRules/default.yaml
+    python audit-translations.py es
+    python audit-translations.py de --file SharedRules/default.yaml
     python audit-translations.py --list
-        """
+        """ # text to display after the argument help (https://docs.python.org/3/library/argparse.html#epilog)
     )
 
     parser.add_argument(
         "language",
         nargs="?",
         help="Language code to audit (e.g., 'es', 'de', 'fi')"
-    )
-
-    parser.add_argument(
-        "--mode",
-        choices=["warnings", "new-version"],
-        default="warnings",
-        help="Output mode: 'warnings' for console output only, 'new-version' to generate updated files"
     )
 
     parser.add_argument(
@@ -647,8 +496,7 @@ Examples:
         print("\nError: Please specify a language code or use --list to see available languages")
         sys.exit(1)
 
-    mode = Mode(args.mode)
-    audit_language(args.language, mode, args.specific_file)
+    audit_language(args.language, args.specific_file)
 
 
 if __name__ == "__main__":
