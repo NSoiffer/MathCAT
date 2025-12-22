@@ -124,25 +124,18 @@ class UI:
         BOX_R = '┤'
         BOX_X = '┼'
 
-
+    @staticmethod
     def print_header(text: str, width: int = 70):
         """Print a styled header box"""
         c = UI.Colors
         s = UI.Symbols
-        padding = (width - len(text) - 2) // 2
 
         print(f"\n{c.CYAN}{s.BOX_TL}{s.BOX_H * (width - 2)}{s.BOX_TR}{c.RESET}")
         print(f"{c.CYAN}{s.BOX_V}{c.RESET}{c.BOLD}{text.center(width - 2)}{c.RESET}{c.CYAN}{s.BOX_V}{c.RESET}")
         print(f"{c.CYAN}{s.BOX_BL}{s.BOX_H * (width - 2)}{s.BOX_BR}{c.RESET}")
 
 
-    def print_subheader(text: str, width: int = 70):
-        """Print a styled subheader"""
-        c = Colors
-        s = Symbols
-        print(f"\n{c.BLUE}{s.BOX_L}{s.BOX_H * 2}{c.RESET} {c.BOLD}{text}{c.RESET} {c.BLUE}{s.BOX_H * (width - len(text) - 6)}{s.BOX_R}{c.RESET}")
-
-
+    @staticmethod
     def print_file_header(file_name: str, english_count: int, translated_count: int, width: int = 70):
         """Print a file section header"""
         c = UI.Colors
@@ -164,7 +157,7 @@ class UI:
         print(f"  {c.DIM}English: {english_count} rules  {s.ARROW}  Translated: {translated_count} rules{c.RESET}")
         print(f"{c.CYAN}{s.BOX_H * width}{c.RESET}")
 
-
+    @staticmethod
     def print_issue_category(icon: str, color: str, title: str, count: int, description: str = ""):
         """Print an issue category header"""
         c = UI.Colors
@@ -172,6 +165,7 @@ class UI:
         print(f"\n  {color}{icon}{c.RESET} {c.BOLD}{title}{c.RESET} [{color}{count}{c.RESET}]{desc}")
 
 
+    @staticmethod
     def print_rule_item(rule, is_unicode: bool = False, context: str = ""):
         """Print a single rule item"""
         c = UI.Colors
@@ -184,6 +178,7 @@ class UI:
             print(f"      {c.GRAY}{s.BULLET}{c.RESET} {c.CYAN}{rule.name}{c.RESET} {c.DIM}[{rule.tag}]{c.RESET} {c.DIM}(line {rule.line_number}{context}){c.RESET}")
 
 
+    @staticmethod
     def print_text_samples(texts: List[str], max_show: int = 3):
         """Print sample untranslated text strings"""
         c = UI.Colors
@@ -199,7 +194,8 @@ class UI:
             print(f"          {c.DIM}... and {remaining} more{c.RESET}")
 
 
-    def print_summary_box(stats: dict, width: int = 70):
+    @staticmethod
+    def print_summary_box(stats, width = 70):
         """Print a formatted summary box"""
         c = UI.Colors
         s = UI.Symbols
@@ -221,10 +217,10 @@ class UI:
         print(f"{c.CYAN}{s.BOX_BL}{s.BOX_H * (width - 2)}{s.BOX_BR}{c.RESET}")
 
 
+    @staticmethod
     def print_progress(current: int, total: int, file_name: str, width: int = 50):
         """Print a progress indicator"""
         c = UI.Colors
-        s = UI.Symbols
 
         percentage = (current / total) * 100 if total > 0 else 0
         filled = int((current / total) * width) if total > 0 else 0
@@ -235,6 +231,7 @@ class UI:
         print(f"\r{status}", end='', flush=True)
 
 
+    @staticmethod
     def clear_progress():
         """Clear the progress line"""
         print("\r" + " " * 100 + "\r", end='', flush=True)
@@ -243,13 +240,6 @@ class UI:
 if sys.platform == 'win32': # Ensure UTF-8 output on Windows
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
-    # Enable ANSI escape sequences on Windows 10+
-    try:
-        import ctypes
-        kernel32 = ctypes.windll.kernel32
-        kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
-    except:
-        pass
 
 
 # =============================================================================
