@@ -330,7 +330,7 @@ static ALL_MATHML_ELEMENTS: phf::Set<&str> = phf_set!{
     "mstack", "mlongdiv", "msgroup", "msrow", "mscarries", "mscarry", "msline",
     "none", "mprescripts", "malignmark", "maligngroup",
     "math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd", "mstyle",
-    "mrow", "mfenced", "mtable", "mtr", "mlabeledtr",
+    "mrow", "a", "mfenced", "mtable", "mtr", "mlabeledtr",
 };
 
 static MATHML_LEAF_NODES: phf::Set<&str> = phf_set! {

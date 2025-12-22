@@ -727,7 +727,7 @@ impl CanonicalizeContext {
 	/// This function does some cleanup of MathML (mostly fixing bad MathML)
 	/// Unlike the main canonicalization routine, significant tree changes happen here
 	/// Changes to "good" MathML:
-	/// 1. mfenced -> mrow
+	/// 1. mfenced -> mrow, a => mrow
 	/// 2. mspace and mtext with only whitespace are canonicalized to a non-breaking space and merged in with 
 	///    an adjacent non-mo element unless in a required element position (need to keep for braille)
 	/// 
@@ -963,6 +963,11 @@ impl CanonicalizeContext {
 				// note: chemistry test is done later as part of another phase of chemistry cleanup
 			},
 			"mfenced" => {return self.clean_mathml( convert_mfenced_to_mrow(mathml) )},
+			"a" => {
+				// convert 'a' into 'mrow'
+				set_mathml_name(mathml, "mrow");
+				return self.clean_mathml(mathml);
+			}
 			"mstyle" | "mpadded" => {
 				// Throw out mstyle and mpadded -- to do this, we need to avoid mstyle being the arg of clean_mathml
 				// FIX: should probably push the attrs down to the children (set in 'self')
@@ -4559,6 +4564,34 @@ mod canonicalize_tests {
 		assert!(canonicalize(mathml).is_err());
     }
 
+
+    #[test]
+    fn a_to_mrow() {
+        let test_str = "<math>
+			<a href='https://www.example.com'>
+				<mo>(</mo>
+				<a href='#its_relative'>
+					<mi>x</mi>
+					<mo>,</mo>
+					<mi>y</mi>
+				</a>
+				<mo>)</mo>
+			</a>
+			</math>
+";
+        let target_str = " <math>
+			<mrow href='https://www.example.com'>
+				<mo>(</mo>
+				<mrow href='#its_relative'>
+				<mi>x</mi>
+				<mo>,</mo>
+				<mi>y</mi>
+				</mrow>
+				<mo>)</mo>
+			</mrow>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
 
     #[test]
     fn mfenced_no_children() {
