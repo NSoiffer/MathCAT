@@ -4658,7 +4658,7 @@ mod canonicalize_tests {
 		use sxd_document::parser;
 		use crate::canonicalize::canonicalize;
 		// this forces initialization
-		crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
+		set_rules_dir(&abs_rules_dir_path()).unwrap();
 		crate::speech::SPEECH_RULES.with(|_| true);
 
 		// we don't want to remove the mrow because the intent on the mi would reference itself
@@ -4682,7 +4682,7 @@ mod canonicalize_tests {
 		use sxd_document::parser;
 		use crate::canonicalize::canonicalize;
 		// this forces initialization
-		crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
+		set_rules_dir(&abs_rules_dir_path()).unwrap();
 		crate::speech::SPEECH_RULES.with(|_| true);
 
 		// we don't want to remove the mrow because the intent needs to stick around
