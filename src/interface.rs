@@ -66,7 +66,7 @@ fn init_mathml_instance() -> RefCell<Package> {
 
 /// Set the Rules directory
 /// IMPORTANT: this should be the very first call to MathCAT. If 'dir' is an empty string, the environment var 'MathCATRulesDir' is tried.
-pub fn set_rules_dir(dir: String) -> Result<()> {
+pub fn set_rules_dir(dir: &str) -> Result<()> {
     enable_logs();
     use std::path::PathBuf;
     let dir = if dir.is_empty() {
@@ -76,7 +76,7 @@ pub fn set_rules_dir(dir: String) -> Result<()> {
             .unwrap()
             .to_string()
     } else {
-        dir
+        dir.to_string()
     };
     let pref_manager = crate::prefs::PreferenceManager::get();
     return pref_manager.borrow_mut().initialize(PathBuf::from(dir));
@@ -92,7 +92,7 @@ pub fn get_version() -> String {
 /// This will override any previous MathML that was set.
 /// This returns canonical MathML with 'id's set on any node that doesn't have an id.
 /// The ids can be used for sync highlighting if the `Bookmark` API preference is true.
-pub fn set_mathml(mathml_str: String) -> Result<String> {
+pub fn set_mathml(mathml_str: &str) -> Result<String> {
     enable_logs();
     lazy_static! {
         // if these are present when resent to MathJaX, MathJaX crashes (https://github.com/mathjax/MathJax/issues/2822)
@@ -188,18 +188,18 @@ pub fn get_overview_text() -> Result<String> {
 
 /// Get the value of the named preference.
 /// None is returned if `name` is not a known preference.
-pub fn get_preference(name: String) -> Result<String> {
+pub fn get_preference(name: &str) -> Result<String> {
     enable_logs();
     use crate::prefs::NO_PREFERENCE;
     return crate::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow();
         let pref_manager = rules.pref_manager.borrow();
-        let mut value = pref_manager.pref_to_string(&name);
+        let mut value = pref_manager.pref_to_string(name);
         if value == NO_PREFERENCE {
-            value = pref_manager.pref_to_string(&name);
+            value = pref_manager.pref_to_string(name);
         }
         if value == NO_PREFERENCE {
-            bail!("No preference named '{}'", &name);
+            bail!("No preference named '{}'", name);
         } else {
             return Ok(value);
         }
@@ -226,10 +226,10 @@ pub fn get_preference(name: String) -> Result<String> {
 /// A value can be overwritten by calling this function again with a different value.
 ///
 /// Be careful setting preferences -- these potentially override user settings, so only preferences that really need setting should be set.
-pub fn set_preference(name: String, value: String) -> Result<()> {
+pub fn set_preference(name: &str, value: &str) -> Result<()> {
     enable_logs();
     // "LanguageAuto" allows setting the language dir without actually changing the value of "Language" from Auto
-    let mut value = value;
+    let mut value = value.to_string();
     if name == "Language" || name == "LanguageAuto" {
         // check the format
         if value != "Auto" {
@@ -274,14 +274,14 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
         }
         let lower_case_value = value.to_lowercase();
         if lower_case_value == "true" || lower_case_value == "false" {
-            pref_manager.set_api_boolean_pref(&name, value.to_lowercase() == "true");
+            pref_manager.set_api_boolean_pref(name, value.to_lowercase() == "true");
         } else {
-            match name.as_str() {
+            match name {
                 "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch" | "MathRate" | "PauseFactor" => {
-                    pref_manager.set_api_float_pref(&name, to_float(&name, &value)?)
+                    pref_manager.set_api_float_pref(name, to_float(name, &value)?)
                 }
                 _ => {
-                    pref_manager.set_string_pref(&name, &value)?;
+                    pref_manager.set_string_pref(name, &value)?;
                 }
             }
         };
@@ -301,14 +301,14 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
 /// Get the braille associated with the MathML that was set by [`set_mathml`].
 /// The braille returned depends upon the preference for the `code` preference (default `Nemeth`).
 /// If 'nav_node_id' is given, it is highlighted based on the value of `BrailleNavHighlight` (default: `EndPoints`)
-pub fn get_braille(nav_node_id: String) -> Result<String> {
+pub fn get_braille(nav_node_id: &str) -> Result<String> {
     enable_logs();
     // use std::time::{Instant};
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
-        let braille = crate::braille::braille_mathml(mathml, &nav_node_id)?.0;
+        let braille = crate::braille::braille_mathml(mathml, nav_node_id)?.0;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok(braille);
     });
@@ -418,9 +418,9 @@ pub fn do_navigate_keypress(
 ///   `MoveTo0`, `MoveTo1`, `MoveTo2`, `MoveTo3`, `MoveTo4`, `MoveTo5`, `MoveTo6`, `MoveTo7`, `MoveTo8`, `MoveTo9`
 ///
 /// When done with Navigation, call with `Exit`
-pub fn do_navigate_command(command: String) -> Result<String> {
+pub fn do_navigate_command(command: &str) -> Result<String> {
     enable_logs();
-    let command = NAV_COMMANDS.get_key(&command); // gets a &'static version of the command
+    let command = NAV_COMMANDS.get_key(command); // gets a &'static version of the command
     if command.is_none() {
         bail!("Unknown command in call to DoNavigateCommand()");
     };
@@ -434,12 +434,12 @@ pub fn do_navigate_command(command: String) -> Result<String> {
 
 /// Given an 'id' and an offset (for tokens), set the navigation node to that id.
 /// An error is returned if the 'id' doesn't exist
-pub fn set_navigation_node(id: String, offset: usize) -> Result<()> {
+pub fn set_navigation_node(id: &str, offset: usize) -> Result<()> {
     enable_logs();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
-        return set_navigation_node_from_id(mathml, id, offset);
+        return set_navigation_node_from_id(mathml, id.to_string(), offset);
     });
 }
 
@@ -533,7 +533,7 @@ pub fn get_supported_languages() -> Vec<String> {
     return language_paths;
  }
 
- pub fn get_supported_speech_styles(lang: String) -> Vec<String> {
+ pub fn get_supported_speech_styles(lang: &str) -> Vec<String> {
     enable_logs();
     let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
     let lang_dir = rules_dir.join("Languages").join(lang);
@@ -542,15 +542,7 @@ pub fn get_supported_languages() -> Vec<String> {
         file_name.truncate(file_name.len() - "_Rules.yaml".len())
     }
     speech_styles.sort();
-    // remove duplicates -- shouldn't be any, but just in case
-    let mut i = 1;
-    while i < speech_styles.len() {
-        if speech_styles[i-1] == speech_styles[i] {
-            speech_styles.remove(i);
-        } else {
-            i += 1;
-        }
-    }
+    speech_styles.dedup(); // remove duplicates -- shouldn't be any, but just in case
     return speech_styles;
  }
 
@@ -1107,11 +1099,11 @@ mod tests {
     #[test]
     fn test_entities() {
         // this forces initialization
-        set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_rules_dir(&super::super::abs_rules_dir_path()).unwrap();
 
-        let entity_str = set_mathml("<math><mrow><mo>&minus;</mo><mi>&mopf;</mi></mrow></math>".to_string()).unwrap();
+        let entity_str = set_mathml("<math><mrow><mo>&minus;</mo><mi>&mopf;</mi></mrow></math>").unwrap();
         let converted_str =
-            set_mathml("<math><mrow><mo>&#x02212;</mo><mi>&#x1D55E;</mi></mrow></math>".to_string()).unwrap();
+            set_mathml("<math><mrow><mo>&#x02212;</mo><mi>&#x1D55E;</mi></mrow></math>").unwrap();
 
         // need to remove unique ids
         lazy_static! {
@@ -1122,19 +1114,19 @@ mod tests {
         assert_eq!(entity_str, converted_str, "normal entity test failed");
 
         let entity_str = set_mathml(
-            "<math data-quot=\"&quot;value&quot;\" data-apos='&apos;value&apos;'><mi>XXX</mi></math>".to_string(),
+            "<math data-quot=\"&quot;value&quot;\" data-apos='&apos;value&apos;'><mi>XXX</mi></math>",
         )
         .unwrap();
         let converted_str =
-            set_mathml("<math data-quot='\"value\"' data-apos=\"'value'\"><mi>XXX</mi></math>".to_string()).unwrap();
+            set_mathml("<math data-quot='\"value\"' data-apos=\"'value'\"><mi>XXX</mi></math>").unwrap();
         let entity_str = ID_MATCH.replace_all(&entity_str, "");
         let converted_str = ID_MATCH.replace_all(&converted_str, "");
         assert_eq!(entity_str, converted_str, "special entities quote test failed");
 
         let entity_str =
-            set_mathml("<math><mo>&lt;</mo><mo>&gt;</mo><mtext>&amp;lt;</mtext></math>".to_string()).unwrap();
+            set_mathml("<math><mo>&lt;</mo><mo>&gt;</mo><mtext>&amp;lt;</mtext></math>").unwrap();
         let converted_str =
-            set_mathml("<math><mo>&#x003C;</mo><mo>&#x003E;</mo><mtext>&#x0026;lt;</mtext></math>".to_string())
+            set_mathml("<math><mo>&#x003C;</mo><mo>&#x003E;</mo><mtext>&#x0026;lt;</mtext></math>")
                 .unwrap();
         let entity_str = ID_MATCH.replace_all(&entity_str, "");
         let converted_str = ID_MATCH.replace_all(&converted_str, "");
@@ -1146,13 +1138,13 @@ mod tests {
         use std::env;
         // MathCAT will check the env var "MathCATRulesDir" as an override, so the following test might succeed if we don't override the env var
         env::set_var("MathCATRulesDir", "MathCATRulesDir");
-        assert!(set_rules_dir("someInvalidRulesDir".to_string()).is_err());
+        assert!(set_rules_dir("someInvalidRulesDir").is_err());
         assert!(
-            set_rules_dir(super::super::abs_rules_dir_path()).is_ok(),
+            set_rules_dir(&super::super::abs_rules_dir_path()).is_ok(),
             "\nset_rules_dir to '{}' failed",
             super::super::abs_rules_dir_path()
         );
-        assert!(set_mathml("<math><mn>1</mn></math>".to_string()).is_ok());
+        assert!(set_mathml("<math><mn>1</mn></math>").is_ok());
     }
 
     #[test]
