@@ -217,26 +217,6 @@ class UI:
         print(f"{c.CYAN}{s.BOX_BL}{s.BOX_H * (width - 2)}{s.BOX_BR}{c.RESET}")
 
 
-    @staticmethod
-    def print_progress(current: int, total: int, file_name: str, width: int = 50):
-        """Print a progress indicator"""
-        c = UI.Colors
-
-        percentage = (current / total) * 100 if total > 0 else 0
-        filled = int((current / total) * width) if total > 0 else 0
-        bar = f"{c.GREEN}{'█' * filled}{c.GRAY}{'░' * (width - filled)}{c.RESET}"
-
-        # Use \r to overwrite the line
-        status = f"  {bar} {percentage:5.1f}% {c.DIM}({current}/{total}){c.RESET} {file_name}"
-        print(f"\r{status}", end='', flush=True)
-
-
-    @staticmethod
-    def clear_progress():
-        """Clear the progress line"""
-        print("\r" + " " * 100 + "\r", end='', flush=True)
-
-
 if sys.platform == 'win32': # Ensure UTF-8 output on Windows
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
@@ -610,12 +590,7 @@ def audit_language(language: str, specific_file: Optional[str] = None):
         english_path = english_dir / file_name
         translated_path = translated_dir / file_name
 
-        # Show progress for multiple files
-        if len(files) > 1:
-            UI.print_progress(i + 1, len(files), file_name)
-
         if not english_path.exists():
-            UI.clear_progress()
             print(f"\n{c.YELLOW}{s.WARNING} Warning:{c.RESET} English file not found: {english_path}")
             continue
 
@@ -624,8 +599,6 @@ def audit_language(language: str, specific_file: Optional[str] = None):
         has_issues = result.missing_rules or result.untranslated_text or result.extra_rules
 
         if has_issues:
-            if len(files) > 1:
-                UI.clear_progress()
             issues = print_warnings(result, file_name)
             if issues > 0:
                 files_with_issues += 1
@@ -636,10 +609,6 @@ def audit_language(language: str, specific_file: Optional[str] = None):
         total_missing += len(result.missing_rules)
         total_untranslated += len(result.untranslated_text)
         total_extra += len(result.extra_rules)
-
-    # Clear progress bar
-    if len(files) > 1:
-        UI.clear_progress()
 
     # Determine overall status
     if total_missing == 0 and total_untranslated == 0:
