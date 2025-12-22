@@ -790,23 +790,23 @@ impl SetVariables {
 /// Allow speech of an expression in the middle of a rule (used by "WhereAmI" for navigation)
 #[derive(Debug, Clone)]
 struct TranslateExpression {
-    id: MyXPath,     // variables and values
+    xpath: MyXPath,     // variables and values
 }
 
 impl fmt::Display for TranslateExpression {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "speak: {}", &self.id);
+        return write!(f, "speak: {}", &self.xpath);
     }
 }
 impl TranslateExpression {
     fn build(vars: &Yaml) -> Result<TranslateExpression> {
         // 'translate:' -- xpath (should evaluate to an id)
-        return Ok( TranslateExpression { id: MyXPath::build(vars).chain_err(|| "'translate'")? } );
+        return Ok( TranslateExpression { xpath: MyXPath::build(vars).chain_err(|| "'translate'")? } );
     }
         
     fn replace<'c, 's:'c, 'm:'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
-        if self.id.rc.string.contains('@') {
-            let xpath_value = self.id.evaluate(rules_with_context.get_context(), mathml)?;
+        if self.xpath.rc.string.starts_with('@') {
+            let xpath_value = self.xpath.evaluate(rules_with_context.get_context(), mathml)?;
             let id = match xpath_value {
                 Value::String(s) => Some(s),
                 Value::Nodeset(nodes) => {
@@ -819,7 +819,7 @@ impl TranslateExpression {
                 _ => None,
             };
             match id {
-                None => bail!("'translate' value '{}' is not a string or an attribute value (correct by using '@id'??):\n", self.id),
+                None => bail!("'translate' value '{}' is not a string or an attribute value (correct by using '@id'??):\n", self.xpath),
                 Some(id) => {
                     let speech = speak_mathml(mathml, &id, 0)?;
                     return T::from_string(speech, rules_with_context.doc);
@@ -827,7 +827,7 @@ impl TranslateExpression {
             }
         } else {
             return T::from_string(
-                self.id.replace(rules_with_context, mathml).chain_err(||"'translate'")?,
+                self.xpath.replace(rules_with_context, mathml).chain_err(||"'translate'")?,
                 rules_with_context.doc
             );
         }  
