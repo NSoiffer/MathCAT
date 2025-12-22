@@ -69,6 +69,12 @@ from typing import List, Tuple, Optional
 from dataclasses import dataclass
 
 
+
+if sys.platform == 'win32': # Ensure UTF-8 output on Windows
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
+
 class UI:
     """Master class for all Terminal UI logic, for example colors"""
 
@@ -262,10 +268,6 @@ class UI:
 
     return issues
 
-
-if sys.platform == 'win32': # Ensure UTF-8 output on Windows
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 
 # =============================================================================
