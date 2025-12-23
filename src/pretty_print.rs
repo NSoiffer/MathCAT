@@ -66,20 +66,23 @@ pub fn format_attrs(attrs: &[Attribute]) -> String {
 }
 
 fn handle_special_chars(text: &str) -> String {
-    return text.chars().map(|ch|
+    // Pre-allocate a buffer. We guess the size is roughly the same as input, maybe slightly larger.
+    let mut s = String::with_capacity(text.len());
+    for ch in text.chars() {
         match ch {
-            '"' => "&quot;".to_string(),
-            '&' => "&amp;".to_string(),
-            '\'' => "&apos;".to_string(),
-            '<' => "&lt;".to_string(),
-            '>' => "&gt;".to_string(),
-            '\u{2061}' => "&#x2061;".to_string(),
-            '\u{2062}' => "&#x2062;".to_string(),
-            '\u{2063}' => "&#x2063;".to_string(),
-            '\u{2064}' => "&#x2064;".to_string(),
-            _ => ch.to_string(),
+            '"' => s.push_str("&quot;"),
+            '&' => s.push_str("&amp;"),
+            '\'' => s.push_str("&apos;"),
+            '<' => s.push_str("&lt;"),
+            '>' => s.push_str("&gt;"),
+            '\u{2061}' => s.push_str("&#x2061;"),
+            '\u{2062}' => s.push_str("&#x2062;"),
+            '\u{2063}' => s.push_str("&#x2063;"),
+            '\u{2064}' => s.push_str("&#x2064;"),
+            _ => s.push(ch),
         }
-    ).collect::<Vec<String>>().join("");
+    }
+    s
 }
 
 
