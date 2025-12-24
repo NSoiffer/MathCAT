@@ -147,10 +147,7 @@ def audit_language(language: str, specific_file: Optional[str] = None) -> int:
         sys.exit(1)
 
     # Get list of files to audit
-    if specific_file:
-        files = [specific_file]
-    else:
-        files = get_yaml_files(english_dir)
+    files = [specific_file] if specific_file else get_yaml_files(english_dir)
 
     # Print header
     ui.print_header(f"MathCAT Translation Audit: {language.upper()}")
@@ -188,16 +185,7 @@ def audit_language(language: str, specific_file: Optional[str] = None) -> int:
         total_untranslated += len(result.untranslated_text)
         total_extra += len(result.extra_rules)
 
-    # Determine overall status
-    if total_missing == 0 and total_untranslated == 0:
-        overall_status = (c.GREEN, s.CHECK, "All translations complete!")
-    elif total_missing > 0 or total_untranslated > 0:
-        overall_status = (c.YELLOW, s.WARNING, "Translation issues found")
-    else:
-        overall_status = (c.BLUE, s.INFO, "Review recommended")
-
-    # Build summary stats
-    stats = [
+    ui.print_summary_box([
         ("Files checked", len(files), None),
         ("Files with issues", files_with_issues, c.YELLOW if files_with_issues > 0 else c.GREEN),
         ("Files OK", files_ok, c.GREEN if files_ok > 0 else None),
@@ -205,35 +193,23 @@ def audit_language(language: str, specific_file: Optional[str] = None) -> int:
         ("Missing rules", total_missing, c.RED if total_missing > 0 else c.GREEN),
         ("Untranslated text", total_untranslated, c.YELLOW if total_untranslated > 0 else c.GREEN),
         ("Extra rules", total_extra, c.BLUE if total_extra > 0 else None),
-    ]
-
-    ui.print_summary_box(stats)
-
-    # Overall status
-    status_color, status_icon, status_text = overall_status
-    print(f"\n  {status_color}{status_icon} {status_text}{c.RESET}\n")
-
+    ])
     return total_issues
 
 
 def list_languages():
     """List available languages for auditing"""
     c = ui.Colors
-    s = ui.Symbols
-
-    rules_dir = get_rules_dir()
 
     ui.print_header("Available Languages")
 
     print(f"\n  {c.DIM}Language code │ YAML files{c.RESET}")
     print(f"  {c.DIM}{'─' * 14}┼{'─' * 15}{c.RESET}")
 
-    for lang_dir in sorted(rules_dir.iterdir()):
+    for lang_dir in sorted(get_rules_dir().iterdir()):
         if lang_dir.is_dir() and lang_dir.name != "en":
-            yaml_files = list(lang_dir.glob("*.yaml"))
-            count = len(yaml_files)
+            count = len(list(lang_dir.glob("*.yaml")))
 
-            # Color based on file count
             if count >= 7:
                 color = c.GREEN
             elif count >= 4:
