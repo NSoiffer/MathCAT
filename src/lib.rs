@@ -14,7 +14,6 @@
 //! 
 //! To get the MathML associated with the current navigation node, call [`get_navigation_mathml`].
 //! To just get the `id` and offset from the id of the current navigation node, call [`get_navigation_mathml_id`].
-/// Error handling module using anyhow for ergonomic error handling.
 ///
 /// This module re-exports anyhow types. Use `bail!` for early returns and
 /// `context()`/`with_context()` on Result to add context (replacing old `chain_err()`).
