@@ -580,7 +580,7 @@ pub fn copy_mathml(mathml: Element) -> Element {
 pub fn errors_to_string(e: &Error) -> String {
     enable_logs();
     let mut result = format!("{e}\n");
-    for cause in e.chain().skip(1) {
+    for cause in e.chain().skip(1) { // skips original error
         result += &format!("caused by: {cause}\n");
     }
     result
