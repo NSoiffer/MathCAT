@@ -570,12 +570,12 @@ impl CanonicalizeContext {
 		self.assure_nary_tag_has_one_child(mathml);
 		// debug!("Not chemistry -- retry:\n{}", mml_to_string(mathml));
 		let mut converted_mathml = self.canonicalize_mrows(mathml)
-				.chain_err(|| format!("while processing\n{}", mml_to_string(mathml)))?;
+				.with_context(|| format!("while processing\n{}", mml_to_string(mathml)))?;
 		if !crate::chemistry::scan_and_mark_chemistry(converted_mathml) {
 			// debug!("canonicalize before canonicalize_mrows:\n{}", mml_to_string(converted_mathml));
 			self.assure_nary_tag_has_one_child(converted_mathml);
 			converted_mathml = self.canonicalize_mrows(mathml)
-				.chain_err(|| format!("while processing\n{}", mml_to_string(mathml)))?;
+				.with_context(|| format!("while processing\n{}", mml_to_string(mathml)))?;
 		}
 		debug!("\nMathML after canonicalize:\n{}", mml_to_string(converted_mathml));
 		return Ok(converted_mathml);

@@ -4,7 +4,7 @@
 
 use std::cell::{Ref, RefCell, RefMut};
 use sxd_xpath::context::Evaluation;
-use sxd_xpath::{Context, Value};
+use sxd_xpath::{Context as XPathContext, Value};
 use sxd_document::dom::Element;
 use sxd_document::Package;
 
@@ -191,7 +191,7 @@ impl NavigationState {
         }
     }
 
-    fn init_navigation_context(&self, context: &mut Context, command: &'static str,
+    fn init_navigation_context(&self, context: &mut XPathContext, command: &'static str,
                                nav_state_top: Option<(&NavigationPosition, &'static str)>) {
         context.set_variable("NavCommand", command);
 
@@ -290,13 +290,13 @@ pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -
 }
 
 /// Get's the Nav Node from the context, with some exceptions such as Toggle commands where it isn't set.
-pub fn get_nav_node<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>, start_node: Element<'c>, command: &str, nav_mode: &str) -> Result<(Option<String>, Option<f64>)> {
+pub fn get_nav_node<'c>(context: &XPathContext<'c>, var_name: &str, mathml: Element<'c>, start_node: Element<'c>, command: &str, nav_mode: &str) -> Result<(Option<String>, Option<f64>)> {
     let start_id = start_node.attribute_value("id").unwrap_or_default();
     if command.starts_with("Toggle") {
         return Ok( (Some(start_id.to_string()), None) );
     } else {
         return context_get_variable(context, var_name, mathml)
-                .chain_err(|| format!("When trying to {} starting at id={} in {} mode",
+                .with_context(|| format!("When trying to {} starting at id={} in {} mode",
                                                 command, start_node.attribute_value("id").unwrap_or_default(), nav_mode));
     }
 }
@@ -305,7 +305,7 @@ pub fn get_nav_node<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'
 // Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate()
 /// First return tuple value is string-value (if string, bool, or single node) or None
 /// Second return tuple value is f64 if variable is a number or None
-pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<(Option<String>, Option<f64>)> {
+pub fn context_get_variable<'c>(context: &XPathContext<'c>, var_name: &str, mathml: Element<'c>) -> Result<(Option<String>, Option<f64>)> {
     // This is slightly roundabout because Context doesn't expose a way to get the values.
     // Instead, we create an "Evaluation", which is just one level of indirection.
     use sxd_xpath::nodeset::Node;
@@ -524,7 +524,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         rules_with_context.set_nav_node_offset(offset);
 
         let raw_speech_string = rules_with_context.match_pattern::<String>(start_node)
-                    .chain_err(|| "Pattern match/replacement failure during math navigation!")?;
+                    .context("Pattern match/replacement failure during math navigation!")?;
         let speech = rules.pref_manager.borrow().get_tts()
                     .merge_pauses(crate::speech::remove_optional_indicators(
                         &raw_speech_string.replace(CONCAT_STRING, "")

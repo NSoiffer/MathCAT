@@ -163,8 +163,8 @@ impl Preferences{
             for (yaml_name, yaml_value) in new_prefs {
                 let name = as_str_checked(yaml_name);
                 if let Err(e) = name {
-                    error!("{}", (&e.chain_err(||
-                        format!("name '{}' is not a string in file {}", yaml_to_string(yaml_name, 0), file_name))));
+                    error!("{}", e.context(
+                        format!("name '{}' is not a string in file {}", yaml_to_string(yaml_name, 0), file_name)));
                 } else {
                     match yaml_value {
                         Yaml::Hash(_) => add_prefs(map, yaml_value, &(name.unwrap().to_string() + "_"), file_name),
@@ -476,7 +476,7 @@ impl PreferenceManager {
                     let language = lang.split_once('-').unwrap_or((lang, "")).0; // get the parent language
                     // debug!("unzip_files: trying again in parent language: {}", language);
                     PreferenceManager::unzip_files(path, language, default_lang)
-                                                .chain_err(|| format!("Couldn't open zip file {zip_file_string} in parent {language}: {e}."))?
+                                                .with_context(|| format!("Couldn't open zip file {zip_file_string} in parent {language}: {e}."))?
                 } else {
                     // maybe just regional dialects
                     let mut regional_dirs = Vec::new();

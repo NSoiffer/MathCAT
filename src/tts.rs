@@ -153,10 +153,10 @@ impl Pronounce {
         let mut eloquence = "";
         // values should be an array with potential values for Pronounce
         let values = values.as_vec().ok_or_else(||
-                                        format!("'pronounce' value '{}' is not an array", yaml_to_type(values)))?;
+                                        anyhow!("'pronounce' value '{}' is not an array", yaml_to_type(values)))?;
         for key_value in values {
-            let key_value_hash = key_value.as_hash().ok_or_else(|| 
-                                        format!("pronounce value '{}' is not key/value pair", yaml_to_string(key_value, 0)))?;
+            let key_value_hash = key_value.as_hash().ok_or_else(||
+                                        anyhow!("pronounce value '{}' is not key/value pair", yaml_to_string(key_value, 0)))?;
             if key_value_hash.len() != 1 {
                 bail!("pronounce value {:?} is not a single key/value pair", key_value_hash);
             }
@@ -311,14 +311,14 @@ impl TTS {
                     Err(_) => {
                         // let's try as an xpath (e.g., could be '$CapitalLetters_Pitch')
                         TTSCommandValue::XPath(
-                            MyXPath::build(tts_value).chain_err(|| format!("while trying to evaluate value of '{tts_enum}:'"))?
+                            MyXPath::build(tts_value).with_context(|| format!("while trying to evaluate value of '{tts_enum}:'"))?
                         )
                     }
                 }
             },
             TTSCommand::Bookmark | TTSCommand::Spell => {
                 TTSCommandValue::XPath(
-                    MyXPath::build(values).chain_err(|| format!("while trying to evaluate value of '{tts_enum}:'"))?
+                    MyXPath::build(values).with_context(|| format!("while trying to evaluate value of '{tts_enum}:'"))?
                 )
             },
             TTSCommand::Pronounce => {
@@ -366,7 +366,7 @@ impl TTS {
             match command.value {
                 TTSCommandValue::XPath(xpath) => {
                     let value = xpath.evaluate(rules_with_context.get_context(), mathml)
-                        .chain_err(|| format!("in 'spell': can't evaluate xpath \"{}\"", &xpath.to_string()) )?;
+                        .with_context(|| format!("in 'spell': can't evaluate xpath \"{}\"", &xpath.to_string()) )?;
                     let value_string = match value {
                         Value::String(s) => s,
                         Value::Nodeset(nodes) if nodes.size() == 1 => {
