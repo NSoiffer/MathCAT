@@ -10,9 +10,13 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+
 from .dataclasses import RuleInfo, ComparisonResult
 from .parsers import parse_yaml_file
-from . import ui
+console = Console()
 
 
 def get_rules_dir() -> Path:
@@ -82,77 +86,75 @@ def compare_files(english_path: str, translated_path: str) -> ComparisonResult:
     )
 
 
+def print_rule_item(rule: RuleInfo, context: str = ""):
+    if rule.name is None:
+        console.print(f"      [dim]•[/] [yellow]\"{rule.key}\"[/] [dim](line {rule.line_number}{context})[/]")
+    else:
+        console.print(f"      [dim]•[/] [cyan]{rule.name}[/] [dim][{rule.tag}][/] [dim](line {rule.line_number}{context})[/]")
+
+
 def print_warnings(result: ComparisonResult, file_name: str) -> int:
     """Print warnings to console. Returns count of issues found."""
-    c = ui.Colors
-    s = ui.Symbols
     issues = 0
 
     has_issues = result.missing_rules or result.untranslated_text or result.extra_rules
 
     if has_issues:
-        ui.print_file_header(file_name, result.english_rule_count, result.translated_rule_count)
+        # File header
+        style, icon = ("green", "✓") if result.translated_rule_count == result.english_rule_count else \
+                      ("red", "✗") if result.translated_rule_count == 0 else ("yellow", "⚠")
+        console.print()
+        console.rule(style="cyan")
+        console.print(f"[{style}]{icon}[/] [bold]{file_name}[/]")
+        console.print(f"  [dim]English: {result.english_rule_count} rules  →  Translated: {result.translated_rule_count} rules[/]")
+        console.rule(style="cyan")
 
     if result.missing_rules:
-        ui.print_issue_category(
-            s.CROSS, c.RED,
-            "Missing Rules",
-            len(result.missing_rules),
-            "in English but not in translation"
-        )
+        console.print(f"\n  [red]✗[/] [bold]Missing Rules[/] [[red]{len(result.missing_rules)}[/]] [dim](in English but not in translation)[/]")
         for rule in result.missing_rules:
-            ui.print_rule_item(rule, context=" in English")
+            print_rule_item(rule, context=" in English")
             issues += 1
 
     if result.untranslated_text:
-        ui.print_issue_category(
-            s.WARNING, c.YELLOW,
-            "Untranslated Text",
-            len(result.untranslated_text),
-            "lowercase t/ot/ct keys"
-        )
+        console.print(f"\n  [yellow]⚠[/] [bold]Untranslated Text[/] [[yellow]{len(result.untranslated_text)}[/]] [dim](lowercase t/ot/ct keys)[/]")
         for rule, texts in result.untranslated_text:
-            ui.print_rule_item(rule)
-            ui.print_text_samples(texts)
+            print_rule_item(rule)
+            for text in texts[:3]:
+                display = text if len(text) <= 40 else text[:37] + "..."
+                console.print(f"          [dim]→[/] [yellow]\"{display}\"[/]")
+            if len(texts) > 3:
+                console.print(f"          [dim]... and {len(texts) - 3} more[/]")
             issues += 1
 
     if result.extra_rules:
-        ui.print_issue_category(
-            s.INFO, c.BLUE,
-            "Extra Rules",
-            len(result.extra_rules),
-            "may be intentional"
-        )
+        console.print(f"\n  [blue]ℹ[/] [bold]Extra Rules[/] [[blue]{len(result.extra_rules)}[/]] [dim](may be intentional)[/]")
         for rule in result.extra_rules:
-            ui.print_rule_item(rule)
+            print_rule_item(rule)
 
     return issues
 
 
 def audit_language(language: str, specific_file: Optional[str] = None) -> int:
     """Audit translations for a specific language. Returns total issue count."""
-    c = ui.Colors
-    s = ui.Symbols
-
     rules_dir = get_rules_dir()
     english_dir = rules_dir / "en"
     translated_dir = rules_dir / language
 
     if not english_dir.exists():
-        print(f"\n{c.RED}{s.CROSS} Error:{c.RESET} English rules directory not found: {english_dir}")
+        console.print(f"\n[red]✗ Error:[/] English rules directory not found: {english_dir}")
         sys.exit(1)
 
     if not translated_dir.exists():
-        print(f"\n{c.RED}{s.CROSS} Error:{c.RESET} Translation directory not found: {translated_dir}")
+        console.print(f"\n[red]✗ Error:[/] Translation directory not found: {translated_dir}")
         sys.exit(1)
 
     # Get list of files to audit
     files = [specific_file] if specific_file else get_yaml_files(english_dir)
 
     # Print header
-    ui.print_header(f"MathCAT Translation Audit: {language.upper()}")
-    print(f"\n  {c.DIM}Comparing against English (en) reference files{c.RESET}")
-    print(f"  {c.DIM}Files to check: {len(files)}{c.RESET}")
+    console.print(Panel(f"MathCAT Translation Audit: {language.upper()}", style="bold cyan"))
+    console.print(f"\n  [dim]Comparing against English (en) reference files[/]")
+    console.print(f"  [dim]Files to check: {len(files)}[/]")
 
     total_issues = 0
     total_missing = 0
@@ -166,7 +168,7 @@ def audit_language(language: str, specific_file: Optional[str] = None) -> int:
         translated_path = translated_dir / file_name
 
         if not english_path.exists():
-            print(f"\n{c.YELLOW}{s.WARNING} Warning:{c.RESET} English file not found: {english_path}")
+            console.print(f"\n[yellow]⚠ Warning:[/] English file not found: {english_path}")
             continue
 
         result = compare_files(str(english_path), str(translated_path))
@@ -185,38 +187,36 @@ def audit_language(language: str, specific_file: Optional[str] = None) -> int:
         total_untranslated += len(result.untranslated_text)
         total_extra += len(result.extra_rules)
 
-    ui.print_summary_box([
+    # Summary
+    table = Table(title="SUMMARY", title_style="bold", box=None, show_header=False, padding=(0, 2))
+    table.add_column(width=30)
+    table.add_column()
+    for label, value, color in [
         ("Files checked", len(files), None),
-        ("Files with issues", files_with_issues, c.YELLOW if files_with_issues > 0 else c.GREEN),
-        ("Files OK", files_ok, c.GREEN if files_ok > 0 else None),
-        ("", "", None),  # Spacer
-        ("Missing rules", total_missing, c.RED if total_missing > 0 else c.GREEN),
-        ("Untranslated text", total_untranslated, c.YELLOW if total_untranslated > 0 else c.GREEN),
-        ("Extra rules", total_extra, c.BLUE if total_extra > 0 else None),
-    ])
+        ("Files with issues", files_with_issues, "yellow" if files_with_issues else "green"),
+        ("Files OK", files_ok, "green" if files_ok else None),
+        ("Missing rules", total_missing, "red" if total_missing else "green"),
+        ("Untranslated text", total_untranslated, "yellow" if total_untranslated else "green"),
+        ("Extra rules", total_extra, "blue" if total_extra else None),
+    ]:
+        table.add_row(label, f"[{color}]{value}[/]" if color else str(value))
+    console.print(Panel(table, style="cyan"))
     return total_issues
 
 
 def list_languages():
     """List available languages for auditing"""
-    c = ui.Colors
+    console.print(Panel("Available Languages", style="bold cyan"))
 
-    ui.print_header("Available Languages")
-
-    print(f"\n  {c.DIM}Language code │ YAML files{c.RESET}")
-    print(f"  {c.DIM}{'─' * 14}┼{'─' * 15}{c.RESET}")
+    table = Table(show_header=True, header_style="dim")
+    table.add_column("Language", justify="center", style="cyan")
+    table.add_column("YAML files", justify="right")
 
     for lang_dir in sorted(get_rules_dir().iterdir()):
         if lang_dir.is_dir() and lang_dir.name != "en":
             count = len(list(lang_dir.glob("*.yaml")))
+            color = "green" if count >= 7 else "yellow" if count >= 4 else "red"
+            table.add_row(lang_dir.name, f"[{color}]{count}[/] files")
 
-            if count >= 7:
-                color = c.GREEN
-            elif count >= 4:
-                color = c.YELLOW
-            else:
-                color = c.RED
-
-            print(f"  {c.CYAN}{lang_dir.name:^14}{c.RESET}│ {color}{count:>3}{c.RESET} files")
-
-    print(f"\n  {c.DIM}Reference: en (English) - base translation{c.RESET}\n")
+    console.print(table)
+    console.print("\n  [dim]Reference: en (English) - base translation[/]\n")

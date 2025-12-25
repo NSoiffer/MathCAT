@@ -8,8 +8,7 @@ import argparse
 import io
 import sys
 
-from . import ui
-from .auditor import audit_language, list_languages
+from .auditor import audit_language, list_languages, console
 
 
 def setup_encoding():
@@ -28,52 +27,26 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    python audit-translations.py es
-    python audit-translations.py de --file SharedRules/default.yaml
-    python audit-translations.py --list
+    python -m audit_translations es
+    python -m audit_translations de --file SharedRules/default.yaml
+    python -m audit_translations --list
         """
     )
 
-    parser.add_argument(
-        "language",
-        nargs="?",
-        help="Language code to audit (e.g., 'es', 'de', 'fi')"
-    )
-
-    parser.add_argument(
-        "--file",
-        dest="specific_file",
-        help="Audit only a specific file (e.g., 'SharedRules/default.yaml')"
-    )
-
-    parser.add_argument(
-        "--list",
-        action="store_true",
-        help="List available languages"
-    )
-
-    parser.add_argument(
-        "--no-color",
-        action="store_true",
-        help="Disable colored output"
-    )
+    parser.add_argument("language", nargs="?", help="Language code to audit (e.g., 'es', 'de', 'fi')")
+    parser.add_argument("--file", dest="specific_file", help="Audit only a specific file (e.g., 'SharedRules/default.yaml')")
+    parser.add_argument("--list", action="store_true", help="List available languages")
 
     args = parser.parse_args()
 
-    if args.no_color:
-        ui.Colors.disable()
-
     if args.list:
         list_languages()
-        return
-
-    if not args.language:
+    elif not args.language:
         parser.print_help()
-        c = ui.Colors
-        print(f"\n{c.RED}Error:{c.RESET} Please specify a language code or use --list to see available languages")
+        console.print("\n[red]Error:[/] Please specify a language code or use --list to see available languages")
         sys.exit(1)
-
-    audit_language(args.language, args.specific_file)
+    else:
+        audit_language(args.language, args.specific_file)
 
 
 if __name__ == "__main__":
