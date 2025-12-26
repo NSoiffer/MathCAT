@@ -302,7 +302,8 @@
       - with:
           variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator)
           replace: [x: "."]
-      - set_variables: [NavNode: "*[1]/@id"]
+      # "(...)" to get around some weird parse bug"
+      - set_variables: [NavNode: "*[1]/@id", NavNodeOffset: "IfThenElse(*[1]/@data-id-offset, (*[1]/@data-id-offset), '0')"]
 
 
 - name: zoom-in-simple

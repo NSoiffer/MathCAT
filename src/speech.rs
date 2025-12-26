@@ -140,7 +140,7 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
     fn nestable_speak_rules<'c, 's:'c, 'm:'c>(rules_with_context: &mut SpeechRulesWithContext<'c, 's, 'm>, mathml: Element<'c>) -> Result<String> {
         let mut speech_string = rules_with_context.match_pattern::<String>(mathml)
                     .chain_err(|| "Pattern match/replacement failure!")?;
-        // debug!("speak_rules: nav_node_id={}, mathml id={}, speech_string='{}'", rules_with_context.nav_node_id, mathml.attribute_value("id").unwrap_or_default(), &speech_string);
+        debug!("speak_rules: nav_node_id={}, mathml id={}, speech_string='{}'", rules_with_context.nav_node_id, mathml.attribute_value("id").unwrap_or_default(), &speech_string);
         // Note: [[...]] is added around a matching child, but if the "id" is on 'mathml', the whole string is used
         if !rules_with_context.nav_node_id.is_empty() {
             // See https://github.com/NSoiffer/MathCAT/issues/174 for why we can just start the speech at the nav node
@@ -2452,7 +2452,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                         if self.nav_node_id.is_empty() {
                             Ok( Some(s) )
                         } else {
-                            // if self.nav_node_id == mathml.attribute_value("id").unwrap_or_default() {debug!("Matched pattern name/tag: {}/{}", pattern.pattern_name, pattern.tag_name)};
+                            if self.nav_node_id == mathml.attribute_value("id").unwrap_or_default() {debug!("Matched pattern name/tag: {}/{}", pattern.pattern_name, pattern.tag_name)};
                             Ok ( Some(self.nav_node_adjust(s, mathml)) )
                         }
                     },
@@ -2571,7 +2571,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
     fn mark_nav_speech(speech: String) -> String {
         // add unique markers (since speech is mostly ascii letters and digits, most any symbol will do)
         // it's a bug (but happened during intent generation), we might have identical id's, choose innermost one
-        // debug!("mark_nav_speech: adding [[ {} ]] ", &speech);
+        debug!("mark_nav_speech: adding [[ {} ]] ", &speech);
         if !speech.contains("[[") {
             return "[[".to_string() + &speech + "]]";
         } else {

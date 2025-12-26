@@ -250,7 +250,8 @@ fn convert_last_char_to_number(str: &str) -> usize {
 /// This can be called on an intent tree -- it does not make use of is_leaf().
 fn get_node_by_id<'a>(mathml: Element<'a>, pos: &NavigationPosition) -> Option<Element<'a>> {
     if let Some(mathml_id) = mathml.attribute_value("id") {
-        if mathml_id == pos.current_node.as_str() {
+        if mathml_id == pos.current_node.as_str() &&
+           mathml.attribute_value(ID_OFFSET).unwrap_or("0") == pos.current_node_offset.to_string() {
             return Some(mathml);
         }
     }
@@ -270,10 +271,7 @@ fn get_node_by_id<'a>(mathml: Element<'a>, pos: &NavigationPosition) -> Option<E
 pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -> Result<()> {
     let pos = NavigationPosition { current_node: id.clone(), current_node_offset: offset };
     let node = get_node_by_id(mathml, &pos);
-    if let Some(node) = node {
-        if !crate::xpath_functions::is_leaf(node) && offset != 0 {
-            bail!("Id {} is not a leaf in the MathML tree but has non-zero offset={}. Referenced MathML node is {}", id, offset, mml_to_string(node));
-        }
+    if node.is_some() {
         return NAVIGATION_STATE.with(|nav_state| {
             let mut nav_state = nav_state.borrow_mut();
             nav_state.reset();
@@ -286,10 +284,10 @@ pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -
     } else {
         bail!("Id {} not found in MathML {}", id, mml_to_string(mathml));
     }
-
 }
 
 /// Get's the Nav Node from the context, with some exceptions such as Toggle commands where it isn't set.
+/// Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate().
 pub fn get_nav_node<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>, start_node: Element<'c>, command: &str, nav_mode: &str) -> Result<(Option<String>, Option<f64>)> {
     let start_id = start_node.attribute_value("id").unwrap_or_default();
     if command.starts_with("Toggle") {
@@ -302,7 +300,7 @@ pub fn get_nav_node<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'
 }
 
 // FIX: think of a better place to put this, and maybe a better interface
-// Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate()
+/// Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate().
 /// First return tuple value is string-value (if string, bool, or single node) or None
 /// Second return tuple value is f64 if variable is a number or None
 pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<(Option<String>, Option<f64>)> {
@@ -520,8 +518,9 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         //     }
         //     debug!("parent or grandparent of start_node:\n{}", mml_to_string(parent));
         // }
-        let offset = context_get_variable(rules_with_context.get_context(), "NavNodeOffset", intent)?.1.unwrap() as usize;
+        let offset = context_get_variable(rules_with_context.get_context(), "NavNodeOffset", intent)?.1.unwrap_or(0.) as usize;
         rules_with_context.set_nav_node_offset(offset);
+        debug!("starting nav_position: {}, start node ={}", nav_state.top().unwrap().0, name(start_node));
 
         let raw_speech_string = rules_with_context.match_pattern::<String>(start_node)
                     .chain_err(|| "Pattern match/replacement failure during math navigation!")?;
@@ -537,19 +536,22 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         // what else needs to be done/set???
 
         // transfer some values that might have been set into the prefs
-        let offset = context_get_variable(rules_with_context.get_context(), "NavNodeOffset", intent)?.1.unwrap() as usize;
+        let offset = context_get_variable(rules_with_context.get_context(), "NavNodeOffset", intent)?.0
+                                                    .unwrap_or("0".to_string()).parse::<usize>().unwrap_or(0);
         rules_with_context.set_nav_node_offset(offset);
         let context = rules_with_context.get_context();
         nav_state.speak_overview = context_get_variable(context, "Overview", intent)?.0.unwrap() == "true";
         nav_state.mode = context_get_variable(context, "NavMode", intent)?.0.unwrap();
         rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode)?;
 
+        debug!("context value of NavNodeOffset: {:?}", context_get_variable(context, "NavNodeOffset", intent)?);
         let nav_position = match get_nav_node(
                         context, "NavNode", intent, start_node, nav_command, &nav_state.mode)?.0 {
             None => NavigationPosition::default(),
             Some(node) => NavigationPosition {
                 current_node: node,
-                current_node_offset: context_get_variable(context, "NavNodeOffset", intent)?.1.unwrap() as usize
+                current_node_offset: context_get_variable(context, "NavNodeOffset", intent)?.0.
+                                                          unwrap_or("0".to_string()).parse::<usize>().unwrap_or(0)
             }
         };
 
@@ -563,6 +565,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             !nav_state.speak_overview
         };
 
+        debug!("after match nav_position: {}", nav_position);
         // push the new location on the stack
         if nav_position != NavigationPosition::default() && &nav_position != nav_state.top().unwrap().0 {
             nav_state.push(nav_position.clone(), nav_command);
@@ -571,7 +574,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         if nav_command.starts_with("SetPlacemarker") {
             if let Some(new_node_id) = get_nav_node(
                             context, "NavNode", intent, start_node, nav_command, &nav_state.mode)?.0 {
-                let offset = context_get_variable(context, "NavNodeOffset", intent)?.1.unwrap() as usize;
+                let offset = context_get_variable(context, "NavNodeOffset", intent)?.0.unwrap_or("0".to_string()).parse::<usize>().unwrap_or(0);
                 nav_state.place_markers[convert_last_char_to_number(nav_command)] = NavigationPosition{ current_node: new_node_id, current_node_offset: offset};
             }
         }
