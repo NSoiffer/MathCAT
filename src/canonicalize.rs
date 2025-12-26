@@ -2500,7 +2500,7 @@ impl CanonicalizeContext {
 					'‴' => n_primes += 3,
 					'⁗' => n_primes += 4,
 					_ => {
-						eprint!("merge_prime_text: unexpected char '{ch}' found");
+						eprint!("merge_prime_text: unexpected char '{ch}' found\n");
 						return text.to_string();
 					}
 				}
