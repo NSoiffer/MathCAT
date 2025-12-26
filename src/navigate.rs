@@ -247,11 +247,12 @@ fn convert_last_char_to_number(str: &str) -> usize {
 }
 
 /// Get the node associated with a `NavigationPosition`.
-/// This can be called on an intent tree -- it does not make use of is_leaf().
+/// This can be called on an intent tree 
 fn get_node_by_id<'a>(mathml: Element<'a>, pos: &NavigationPosition) -> Option<Element<'a>> {
     if let Some(mathml_id) = mathml.attribute_value("id") {
         if mathml_id == pos.current_node.as_str() &&
-           mathml.attribute_value(ID_OFFSET).unwrap_or("0") == pos.current_node_offset.to_string() {
+           (crate::xpath_functions::is_leaf(mathml) ||
+            mathml.attribute_value(ID_OFFSET).unwrap_or("0") == pos.current_node_offset.to_string()) {
             return Some(mathml);
         }
     }
@@ -450,8 +451,8 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         return match get_node_by_id(mathml, &temp_pos) {
             Some(node) => Ok(node),
             None => {
-                bail!("Internal Error: didn't find id '{}' while attempting to start navigation. MathML is\n{}",
-                      &start_node_id, mml_to_string(mathml));
+                bail!("Internal Error: didn't find id/offset '{}' while attempting to start navigation. MathML is\n{}",
+                      &temp_pos, mml_to_string(mathml));
             }
         };
     }
@@ -536,8 +537,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         // what else needs to be done/set???
 
         // transfer some values that might have been set into the prefs
-        let offset = context_get_variable(rules_with_context.get_context(), "NavNodeOffset", intent)?.0
-                                                    .unwrap_or("0".to_string()).parse::<usize>().unwrap_or(0);
+        let offset = context_get_variable(rules_with_context.get_context(), "NavNodeOffset", intent)?.1.unwrap_or(0.) as usize;
         rules_with_context.set_nav_node_offset(offset);
         let context = rules_with_context.get_context();
         nav_state.speak_overview = context_get_variable(context, "Overview", intent)?.0.unwrap() == "true";
@@ -550,8 +550,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             None => NavigationPosition::default(),
             Some(node) => NavigationPosition {
                 current_node: node,
-                current_node_offset: context_get_variable(context, "NavNodeOffset", intent)?.0.
-                                                          unwrap_or("0".to_string()).parse::<usize>().unwrap_or(0)
+                current_node_offset: context_get_variable(context, "NavNodeOffset", intent)?.1.unwrap_or(0.) as usize,
             }
         };
 
@@ -574,7 +573,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         if nav_command.starts_with("SetPlacemarker") {
             if let Some(new_node_id) = get_nav_node(
                             context, "NavNode", intent, start_node, nav_command, &nav_state.mode)?.0 {
-                let offset = context_get_variable(context, "NavNodeOffset", intent)?.0.unwrap_or("0".to_string()).parse::<usize>().unwrap_or(0);
+                let offset = context_get_variable(context, "NavNodeOffset", intent)?.1.unwrap_or(0.) as usize;
                 nav_state.place_markers[convert_last_char_to_number(nav_command)] = NavigationPosition{ current_node: new_node_id, current_node_offset: offset};
             }
         }
