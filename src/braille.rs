@@ -35,7 +35,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
         let new_package = Package::new();
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id, 0);
         let braille_string = rules_with_context.match_pattern::<String>(mathml)
-                        .chain_err(|| "Pattern match/replacement failure!")?;
+                        .context("Pattern match/replacement failure!")?;
         // debug!("braille_mathml: braille string: {}", &braille_string);
         let braille_string = braille_string.replace(' ', "");
         let pref_manager = rules_with_context.get_rules().pref_manager.borrow();

@@ -30,7 +30,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
                 mathml.remove_attribute(INTENT_ATTR);
                 // can't call intent_from_mathml() because we have already borrowed_mut -- we call a more internal version
                 let intent_tree =  match rules_with_context.match_pattern::<Element<'m>>(mathml)
-                                            .chain_err(|| "Pattern match/replacement failure!") {
+                                            .context("Pattern match/replacement failure!") {
                     Err(e) => Err(e),
                     Ok(intent) => {
                         intent.set_attribute_value(INTENT_ATTR, saved_intent_attr); //  so attr can be potentially be viewed later
@@ -48,7 +48,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
             // debug!("Before intent: {}", crate::pretty_print::mml_to_string(mathml));
             let mut lex_state = LexState::init(intent_str.trim())?;
             let result = build_intent(rules_with_context, &mut lex_state, mathml)
-                        .chain_err(|| format!("occurs before '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str))?;
+                        .with_context(|| format!("occurs before '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str))?;
             if lex_state.token != Token::None {
                 bail!("Error in intent value: extra unparsed intent '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str);
             }
@@ -398,7 +398,7 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
                 intent.set_attribute_value(INTENT_PROPERTY, &properties);
                 intent.set_attribute_value(MATHML_FROM_NAME_ATTR, name(mathml));
                 intent.set_attribute_value("id", mathml.attribute_value("id")
-                      .ok_or("no id on intent function name")?);
+                      .ok_or_else(|| anyhow!("no id on intent function name"))?);
             } else {
                 let saved_intent = mathml.attribute_value(INTENT_ATTR).unwrap();
                 mathml.remove_attribute(INTENT_ATTR);

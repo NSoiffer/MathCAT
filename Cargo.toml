@@ -15,10 +15,6 @@ exclude = ["src/main.rs", "docs", "PythonScripts"]    # should have "Rules/", bu
 "include-zip" = []
 "enable-logs" = ["android_logger"]
 
-# FIX: temporary -- need to replace error-chain package which has been deprecated
-[lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(has_error_description_deprecated)'] }
-
 [dependencies]
 sxd-document = "0.3"
 sxd-xpath = "0.4"
@@ -27,7 +23,7 @@ yaml-rust = "0.4"
 lazy_static = "1.4"
 strum = "0.27.2"
 strum_macros = "0.27.2"
-error-chain = "0.12.4"
+anyhow = "1.0"
 regex = "1.10"
 dirs = "6.0"
 bitflags = "2.10"
@@ -51,7 +47,6 @@ android_logger = {version = "0.15.1", optional = true}
 
 [build-dependencies]
 bitflags = "2.6"
-error-chain = "0.12.4"
 [target.'cfg(target_family = "wasm")'.build-dependencies]
 zip = { version = "7.0", default-features = false, features = ["deflate"] }
 [target.'cfg(not(target_family = "wasm"))'.build-dependencies]
