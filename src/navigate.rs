@@ -943,7 +943,7 @@ fn navigation_command_string(command: NavigationCommand, param: NavigationParam)
             }
         },
         NavigationCommand::ReadTo => {
-            unimplemented!("ReadTo navigation command")
+            todo!("ReadTo navigation command")
         },
         NavigationCommand::Locate => {
             if param ==NavigationParam::Previous {
