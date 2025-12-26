@@ -579,17 +579,11 @@ pub fn copy_mathml(mathml: Element) -> Element {
 
 pub fn errors_to_string(e: &Error) -> String {
     enable_logs();
-    let mut result = String::default();
-    let mut first_time = true;
-    for e in e.iter() {
-        if first_time {
-            result = format!("{e}\n");
-            first_time = false;
-        } else {
-            result += &format!("caused by: {e}\n");
-        }
+    let mut result = format!("{e}\n");
+    for cause in e.chain().skip(1) { // skips original error
+        result += &format!("caused by: {cause}\n");
     }
-    return result;
+    result
 }
 
 fn add_ids(mathml: Element) -> Element {
