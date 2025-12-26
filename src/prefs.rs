@@ -262,7 +262,7 @@ impl PreferenceManager {
     pub fn initialize(&mut self, rules_dir: PathBuf) -> Result<()> {
         #[cfg(not(feature = "include-zip"))]
         let rules_dir = match rules_dir.canonicalize() {
-            Err(e) => bail!("set_rules_dir: could not canonicalize path {}: {}", rules_dir.display(), e.to_string()),
+            Err(e) => bail!("set_rules_dir: could not canonicalize path {}: {}", rules_dir.display(), e),
             Ok(rules_dir) =>  rules_dir,
         };
 

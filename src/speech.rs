@@ -228,7 +228,7 @@ pub fn as_vec_checked(value: &Yaml) -> Result<&Vec<Yaml>> {
 
 /// Returns the Yaml as a `&str` or an error if it isn't.
 pub fn as_str_checked(yaml: &Yaml) -> Result<&str> {
-    return Ok( yaml.as_str().ok_or_else(|| yaml_type_err(yaml, "string"))? );
+    return yaml.as_str().ok_or_else(|| yaml_type_err(yaml, "string"));
 }
 
 
@@ -276,7 +276,7 @@ pub fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new
     }
     let mut new_file = match canonicalize_shim(parent_path.unwrap()) {
         Ok(path) => path,
-        Err(e) => bail!("process_include: canonicalize failed for {} with message {}", parent_path.unwrap().display(), e.to_string()),
+        Err(e) => bail!("process_include: canonicalize failed for {} with message {}", parent_path.unwrap().display(), e),
     };
 
     // the referenced file might be in a directory that hasn't been zipped up -- find the dir and call the unzip function
