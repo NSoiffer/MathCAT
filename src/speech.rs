@@ -1160,7 +1160,7 @@ impl MyXPath {
                 match ch {
                     '\\' => {
                         if i+1 == chars.len() {
-                            bail!("Syntax error in DEBUG: last char is escape char\n{}");
+                            bail!("Syntax error in DEBUG: last char is escape char\nDebug string: '{}'", chars.iter().collect::<String>());
                         }
                         i += 1;
                     },
