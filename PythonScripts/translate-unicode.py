@@ -463,7 +463,7 @@ def translate_definitions(path_to_mathcat: str, lang: str):
                     # i_trans += 1
 
 
-def translate_definition(i_en: int, lines: list[str], i_trans: int, translated_lines: list[str], out_stream) -> (int, int):
+def translate_definition(i_en: int, lines: list[str], i_trans: int, translated_lines: list[str], out_stream) -> tuple[int, int]:
     out_stream.write(lines[i_en])
     i_en = i_en+1    # first line is 'name: [' or 'name: {'
     # sync lines -- find '[' in translation
