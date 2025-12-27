@@ -289,10 +289,10 @@ pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -
 
 /// Get's the Nav Node from the context, with some exceptions such as Toggle commands where it isn't set.
 /// Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate().
-pub fn get_nav_node<'c>(context: &sxd_xpath::Context<'c>, var_name: &str, mathml: Element<'c>, start_node: Element<'c>, command: &str, nav_mode: &str) -> Result<(Option<String>, Option<f64>)> {
+pub fn get_nav_node<'c>(context: &sxd_xpath::Context<'c>, var_name: &str, mathml: Element<'c>, start_node: Element<'c>, command: &str, nav_mode: &str) -> Result<String> {
     let start_id = start_node.attribute_value("id").unwrap_or_default();
     if command.starts_with("Toggle") {
-        return Ok( (Some(start_id.to_string()), None) );
+        return Ok( start_id.to_string() );
     } else {
         return context_get_variable(context, var_name, mathml)
                 .with_context(|| format!("When trying to {} starting at id={} in {} mode",
@@ -302,22 +302,21 @@ pub fn get_nav_node<'c>(context: &sxd_xpath::Context<'c>, var_name: &str, mathml
 
 // FIX: think of a better place to put this, and maybe a better interface
 /// Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate().
-/// First return tuple value is string-value (if string, bool, or single node) or None
-/// Second return tuple value is f64 if variable is a number or None
-pub fn context_get_variable<'c>(context: &sxd_xpath::Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<(Option<String>, Option<f64>)> {
+/// If the context variable has String, Number, or Boolean xpath value, return it as a string. Otherwise it is an error
+pub fn context_get_variable<'c>(context: &sxd_xpath::Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<String> {
     // This is slightly roundabout because Context doesn't expose a way to get the values.
     // Instead, we create an "Evaluation", which is just one level of indirection.
     use sxd_xpath::nodeset::Node;
     let evaluation = Evaluation::new(context, Node::Element(mathml));
     return match evaluation.value_of(var_name.into()) {
         Some(value) => match value {
-            Value::String(s) => Ok((Some(s.clone()), None)),
-            Value::Number(f) => Ok((None, Some(*f))),
-            Value::Boolean(b) => Ok((Some(format!("{b}")), None)),
+            Value::String(s) => Ok(s.clone()),
+            Value::Number(f) => Ok(f.to_string()),
+            Value::Boolean(b) => Ok(format!("{b}")),    // "true" or "false"
             Value::Nodeset(nodes) => {
                 if nodes.size() == 1 {
                     if let Some(attr) = nodes.document_order_first().unwrap().attribute() {
-                        return Ok( (Some(attr.value().to_string()), None) );
+                        return Ok(attr.value().to_string());
                     }
                 };
                 let mut error_message = format!("Variable '{var_name}' set somewhere in navigate.yaml is nodeset and not an attribute: ");
@@ -345,6 +344,15 @@ pub fn context_get_variable<'c>(context: &sxd_xpath::Context<'c>, var_name: &str
             },
         },
         None => bail!("Could not find value for navigation variable '{}'", var_name),
+    }
+}
+
+/// Wrapper around context_get_variable to get an integer variable
+fn context_get_int_variable<'c>(context: &sxd_xpath::Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<usize> {
+    let value = context_get_variable(context, var_name, mathml)?;
+    return match value.parse::<usize>() {
+        Ok(i) => Ok(i),
+        Err(e) => bail!("Could not parse navigation variable '{}' with value '{}' as integer: {}", var_name, value, e),
     }
 }
 
@@ -465,7 +473,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         {
             let context = rules_with_context.get_context();
             context.set_variable("MatchCounter", loop_count as f64);
-            nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
+            nav_state.mode = context_get_variable(context, "NavMode", mathml)?;
         }
 
         let mut add_literal = nav_state.mode == "Character";
@@ -498,7 +506,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                     found_node = get_parent(found_node);
                     // debug!("found_node:\n{}", mml_to_string(found_node));
                     let found_id = found_node.attribute_value("id").unwrap_or_default().to_string();
-                    let found_offset = found_node.attribute_value(ID_OFFSET).unwrap_or_default().parse::<usize>().unwrap_or(0);
+                    let found_offset = found_node.attribute_value(ID_OFFSET).unwrap_or_default().parse::<usize>().unwrap_or_default();
                     let temp_pos = NavigationPosition { current_node: found_id.clone(), current_node_offset: found_offset };
                     if let Some(intent_node) = get_node_by_id(nav_intent, &temp_pos) {
                         found_node = intent_node;
@@ -519,7 +527,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         //     }
         //     debug!("parent or grandparent of start_node:\n{}", mml_to_string(parent));
         // }
-        let offset = context_get_variable(rules_with_context.get_context(), "NavNodeOffset", intent)?.1.unwrap_or(0.) as usize;
+        let offset = context_get_int_variable(rules_with_context.get_context(), "NavNodeOffset", intent)?;
         rules_with_context.set_nav_node_offset(offset);
         debug!("starting nav_position: {}, start node ={}", nav_state.top().unwrap().0, name(start_node));
 
@@ -537,22 +545,18 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         // what else needs to be done/set???
 
         // transfer some values that might have been set into the prefs
-        let offset = context_get_variable(rules_with_context.get_context(), "NavNodeOffset", intent)?.1.unwrap_or(0.) as usize;
+        let offset = context_get_int_variable(rules_with_context.get_context(), "NavNodeOffset", intent)?;
         rules_with_context.set_nav_node_offset(offset);
         let context = rules_with_context.get_context();
-        nav_state.speak_overview = context_get_variable(context, "Overview", intent)?.0.unwrap() == "true";
-        nav_state.mode = context_get_variable(context, "NavMode", intent)?.0.unwrap();
+        nav_state.speak_overview = context_get_variable(context, "Overview", intent)? == "true";
+        nav_state.mode = context_get_variable(context, "NavMode", intent)?;
         rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode)?;
 
         debug!("context value of NavNodeOffset: {:?}", context_get_variable(context, "NavNodeOffset", intent)?);
-        let nav_position = match get_nav_node(
-                        context, "NavNode", intent, start_node, nav_command, &nav_state.mode)?.0 {
-            None => NavigationPosition::default(),
-            Some(node) => NavigationPosition {
-                current_node: node,
-                current_node_offset: context_get_variable(context, "NavNodeOffset", intent)?.1.unwrap_or(0.) as usize,
-            }
-        };
+        let nav_position = NavigationPosition {
+                current_node: get_nav_node(context, "NavNode", intent, start_node, nav_command, &nav_state.mode)?,
+                current_node_offset: context_get_int_variable(context, "NavNodeOffset", intent)?,
+            };
 
         // after a command, we either read or describe the new location (part of state)
         // also some commands are DescribeXXX/ReadXXX, so we need to look at the commands also
@@ -571,15 +575,13 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         }
 
         if nav_command.starts_with("SetPlacemarker") {
-            if let Some(new_node_id) = get_nav_node(
-                            context, "NavNode", intent, start_node, nav_command, &nav_state.mode)?.0 {
-                let offset = context_get_variable(context, "NavNodeOffset", intent)?.1.unwrap_or(0.) as usize;
-                nav_state.place_markers[convert_last_char_to_number(nav_command)] = NavigationPosition{ current_node: new_node_id, current_node_offset: offset};
-            }
+            let new_node_id = get_nav_node(context, "NavNode", intent, start_node, nav_command, &nav_state.mode)?;
+            let offset = context_get_int_variable(context, "NavNodeOffset", intent)?;
+            nav_state.place_markers[convert_last_char_to_number(nav_command)] = NavigationPosition{ current_node: new_node_id, current_node_offset: offset};
         }
 
         let nav_mathml = get_node_by_id(intent, &nav_position);
-        if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", intent)?.0.unwrap() == "true" {
+        if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", intent)? == "true" {
             // Speak/Overview of where we landed (if we are supposed to speak it) -- use intent, not nav_intent
             // Note: NavMode might have changed, so we need to recheck the mode to see if we use LiteralSpeak
             let literal_speak = nav_state.mode == "Character";

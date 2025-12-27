@@ -420,9 +420,8 @@ impl TTS {
             if let TTSCommandValue::Number(number_value) = command.value {
                 if number_value == RATE_FROM_CONTEXT {
                     // handle hack for $Rate -- need to look up in context
-                    let rate_from_context = crate::navigate::context_get_variable(rules_with_context.get_context(), "MathRate", mathml)?.1;
-                    assert!(rate_from_context.is_some());
-                    command.value = TTSCommandValue::Number(rate_from_context.unwrap());
+                    let rate_from_context = crate::navigate::context_get_variable(rules_with_context.get_context(), "MathRate", mathml)?.parse::<usize>().unwrap_or(100);
+                    command.value = TTSCommandValue::Number(rate_from_context as f64);
                 }
             }
         }
