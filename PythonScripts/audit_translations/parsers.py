@@ -237,20 +237,6 @@ def extract_structure_elements(content: str) -> List[str]:
     return elements
 
 
-def normalize_for_comparison(content: str) -> str:
-    """
-    Normalize rule content for structural comparison.
-    Removes text values but keeps structure and conditions.
-    """
-    # Remove text values (T/t: "...", OT/ot: "...", CT/ct: "...")
-    normalized = re.sub(r'[TtOoCc]t?:\s*["\'][^"\']*["\']', 'TEXT', content)
-    # Remove comments
-    normalized = re.sub(r'#.*$', '', normalized, flags=re.MULTILINE)
-    # Normalize whitespace
-    normalized = re.sub(r'\s+', ' ', normalized).strip()
-    return normalized
-
-
 def diff_rules(english_rule: RuleInfo, translated_rule: RuleInfo) -> List[RuleDifference]:
     """
     Compare two rules and return fine-grained differences.
@@ -279,9 +265,7 @@ def diff_rules(english_rule: RuleInfo, translated_rule: RuleInfo) -> List[RuleDi
     if en_conditions != tr_conditions:
         # Find specific differences
         en_set, tr_set = set(en_conditions), set(tr_conditions)
-        missing_in_tr = en_set - tr_set
-        extra_in_tr = tr_set - en_set
-        if missing_in_tr or extra_in_tr:
+        if en_set != tr_set:
             differences.append(RuleDifference(
                 english_rule=english_rule,
                 translated_rule=translated_rule,
