@@ -10,7 +10,10 @@ from ..parsers import (
     extract_conditions,
     extract_variables,
     extract_structure_elements,
+    is_unicode_file,
+    diff_rules,
 )
+from ..dataclasses import RuleInfo
 
 
 class TestHasAuditIgnore:
@@ -205,3 +208,87 @@ class TestExtractStructureElements:
         assert "if:" in elements
         assert "then:" in elements
         assert "else:" in elements
+
+
+def make_rule(name: str, tag: str, content: str) -> RuleInfo:
+    """Helper to create RuleInfo for testing"""
+    return RuleInfo(
+        name=name,
+        tag=tag,
+        key=f"{name}|{tag}",
+        line_number=1,
+        raw_content=content,
+    )
+
+
+class TestDiffRules:
+    def test_identical_rules_no_diff(self):
+        content = '''- name: test
+  tag: mo
+  match: "self::m:mo"
+  replace:
+    - T: "text"
+'''
+        en = make_rule("test", "mo", content)
+        tr = make_rule("test", "mo", content)
+        assert diff_rules(en, tr) == []
+
+    def test_detects_match_pattern_difference(self):
+        en = make_rule("test", "mo", 'match: "self::m:mo"')
+        tr = make_rule("test", "mo", 'match: "self::m:mi"')
+        diffs = diff_rules(en, tr)
+        assert len(diffs) == 1
+        assert diffs[0].diff_type == "match"
+        assert "self::m:mo" in diffs[0].english_snippet
+        assert "self::m:mi" in diffs[0].translated_snippet
+
+    def test_detects_condition_difference(self):
+        en = make_rule("test", "mo", 'if: "condition1"')
+        tr = make_rule("test", "mo", 'if: "condition2"')
+        diffs = diff_rules(en, tr)
+        assert any(d.diff_type == "condition" for d in diffs)
+
+    def test_detects_missing_condition(self):
+        en = make_rule("test", "mo", 'if: "condition1"')
+        tr = make_rule("test", "mo", 'replace:\n  - T: "text"')
+        diffs = diff_rules(en, tr)
+        assert any(d.diff_type == "condition" for d in diffs)
+
+    def test_detects_variable_difference(self):
+        en = make_rule("test", "mo", 'variables: [foo: "bar"]')
+        tr = make_rule("test", "mo", 'variables: [baz: "qux"]')
+        diffs = diff_rules(en, tr)
+        assert any(d.diff_type == "variables" for d in diffs)
+
+    def test_detects_structure_difference(self):
+        en_content = '''- test:
+    if: "cond"
+    then:
+      - T: "yes"
+    else:
+      - T: "no"
+'''
+        tr_content = '''- test:
+    if: "cond"
+    then:
+      - T: "ja"
+'''
+        en = make_rule("test", "mo", en_content)
+        tr = make_rule("test", "mo", tr_content)
+        diffs = diff_rules(en, tr)
+        assert any(d.diff_type == "structure" for d in diffs)
+
+    def test_multiple_differences(self):
+        en = make_rule("test", "mo", 'match: "self::m:mo"\nif: "cond1"')
+        tr = make_rule("test", "mo", 'match: "self::m:mi"\nif: "cond2"')
+        diffs = diff_rules(en, tr)
+        assert len(diffs) == 2
+        types = {d.diff_type for d in diffs}
+        assert "match" in types
+        assert "condition" in types
+
+    def test_ignores_text_content_differences(self):
+        en = make_rule("test", "mo", 'replace:\n  - T: "hello"')
+        tr = make_rule("test", "mo", 'replace:\n  - T: "hallo"')
+        diffs = diff_rules(en, tr)
+        assert diffs == []  # text differences are intentional translations
