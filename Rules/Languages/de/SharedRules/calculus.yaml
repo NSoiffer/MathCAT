@@ -16,9 +16,12 @@
 
 - name: curl
   tag: curl
-  match: "."
+  match: "count(*) = 1"
   replace:
-  - t: "rotation von"      # phrase(the 'curl of' a field)
+  - T: "Rotation"      # phrase(die 'Rotation' eines Feldes)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [T: "von"]
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]
