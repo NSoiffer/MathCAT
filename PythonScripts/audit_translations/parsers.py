@@ -8,7 +8,7 @@ import os
 import re
 from typing import List, Tuple
 
-from .dataclasses import RuleInfo
+from .dataclasses import RuleInfo, RuleDifference
 
 
 def is_unicode_file(file_path: str) -> bool:
@@ -179,3 +179,145 @@ def find_untranslated_text_keys(content: str) -> List[str]:
                     untranslated.append(text)
 
     return untranslated
+
+
+def extract_match_pattern(content: str) -> str:
+    """Extract the match pattern from a rule, handling multi-line YAML arrays"""
+    lines = content.split('\n')
+    match_lines = []
+    in_match = False
+
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith('match:'):
+            in_match = True
+            # Check if it's a single-line match: "pattern"
+            inline = re.search(r'match:\s*["\']([^"\']+)["\']', line)
+            if inline:
+                return inline.group(1)
+            continue
+        if in_match:
+            # Stop at next top-level key (replace:, variables:, tag:, etc.)
+            if re.match(r'^[a-z_]+:', stripped) and not stripped.startswith('- '):
+                break
+            # Collect match array items
+            if stripped.startswith('- '):
+                # Extract quoted content from array item
+                quoted = re.search(r'-\s*["\']([^"\']+)["\']', stripped)
+                if quoted:
+                    match_lines.append(quoted.group(1))
+
+    return ' '.join(match_lines)
+
+
+def extract_conditions(content: str) -> List[str]:
+    """Extract all if/else conditions from a rule"""
+    conditions = []
+    for match in re.finditer(r'if:\s*["\']([^"\']+)["\']', content):
+        conditions.append(match.group(1))
+    return conditions
+
+
+def extract_variables(content: str) -> List[Tuple[str, str]]:
+    """Extract variable definitions from a rule"""
+    variables = []
+    for match in re.finditer(r'variables:\s*\[([^\]]+)\]', content, re.DOTALL):
+        var_block = match.group(1)
+        for var_match in re.finditer(r'(\w+):\s*["\']([^"\']+)["\']', var_block):
+            variables.append((var_match.group(1), var_match.group(2)))
+    return variables
+
+
+def extract_structure_elements(content: str) -> List[str]:
+    """Extract structural elements (test, with, replace blocks) ignoring text content"""
+    elements = []
+    # Extract test/if/then/else structure
+    for match in re.finditer(r'(- test:|if:|then:|else:|then_test:|else_test:|with:|replace:|intent:)', content):
+        elements.append(match.group(1))
+    return elements
+
+
+def normalize_for_comparison(content: str) -> str:
+    """
+    Normalize rule content for structural comparison.
+    Removes text values but keeps structure and conditions.
+    """
+    # Remove text values (T/t: "...", OT/ot: "...", CT/ct: "...")
+    normalized = re.sub(r'[TtOoCc]t?:\s*["\'][^"\']*["\']', 'TEXT', content)
+    # Remove comments
+    normalized = re.sub(r'#.*$', '', normalized, flags=re.MULTILINE)
+    # Normalize whitespace
+    normalized = re.sub(r'\s+', ' ', normalized).strip()
+    return normalized
+
+
+def diff_rules(english_rule: RuleInfo, translated_rule: RuleInfo) -> List[RuleDifference]:
+    """
+    Compare two rules and return fine-grained differences.
+    Ignores text content differences (T/t values) but catches structural changes.
+    """
+    differences = []
+    en_content = english_rule.raw_content
+    translated_content = translated_rule.raw_content
+
+    # Check match pattern differences
+    en_match = extract_match_pattern(en_content)
+    translated_match = extract_match_pattern(translated_content)
+    if en_match != translated_match and en_match and translated_match:
+        differences.append(RuleDifference(
+            english_rule=english_rule,
+            translated_rule=translated_rule,
+            diff_type='match',
+            description='Match pattern differs',
+            english_snippet=en_match,
+            translated_snippet=translated_match
+        ))
+
+    # Check condition differences
+    en_conditions = extract_conditions(en_content)
+    tr_conditions = extract_conditions(translated_content)
+    if en_conditions != tr_conditions:
+        # Find specific differences
+        en_set, tr_set = set(en_conditions), set(tr_conditions)
+        missing_in_tr = en_set - tr_set
+        extra_in_tr = tr_set - en_set
+        if missing_in_tr or extra_in_tr:
+            differences.append(RuleDifference(
+                english_rule=english_rule,
+                translated_rule=translated_rule,
+                diff_type='condition',
+                description='Conditions differ',
+                english_snippet=', '.join(sorted(en_set)) or '(none)',
+                translated_snippet=', '.join(sorted(tr_set)) or '(none)'
+            ))
+
+    # Check variable differences
+    en_vars = extract_variables(en_content)
+    tr_vars = extract_variables(translated_content)
+    if en_vars != tr_vars:
+        en_var_names = {v[0] for v in en_vars}
+        tr_var_names = {v[0] for v in tr_vars}
+        if en_var_names != tr_var_names:
+            differences.append(RuleDifference(
+                english_rule=english_rule,
+                translated_rule=translated_rule,
+                diff_type='variables',
+                description='Variable definitions differ',
+                english_snippet=', '.join(sorted(en_var_names)) or '(none)',
+                translated_snippet=', '.join(sorted(tr_var_names)) or '(none)'
+            ))
+
+    # Check structural differences (test/if/then/else blocks)
+    en_structure = extract_structure_elements(en_content)
+    tr_structure = extract_structure_elements(translated_content)
+    if en_structure != tr_structure:
+        differences.append(RuleDifference(
+            english_rule=english_rule,
+            translated_rule=translated_rule,
+            diff_type='structure',
+            description='Rule structure differs (test/if/then/else blocks)',
+            english_snippet=' '.join(en_structure),
+            translated_snippet=' '.join(tr_structure)
+        ))
+
+    return differences
