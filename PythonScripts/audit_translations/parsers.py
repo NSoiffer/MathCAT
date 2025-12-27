@@ -89,7 +89,8 @@ def parse_rules_file(content: str) -> List[RuleInfo]:
                 line_number=rule_start + 1,  # 1-indexed
                 raw_content=raw_content,
                 has_untranslated_text=len(untranslated) > 0,
-                untranslated_keys=untranslated
+                untranslated_keys=untranslated,
+                audit_ignore=has_audit_ignore(raw_content)
             ))
 
             i = j
@@ -140,7 +141,8 @@ def parse_unicode_file(content: str) -> List[RuleInfo]:
                 line_number=entry_start + 1,
                 raw_content=raw_content,
                 has_untranslated_text=len(untranslated) > 0,
-                untranslated_keys=untranslated
+                untranslated_keys=untranslated,
+                audit_ignore=has_audit_ignore(raw_content)
             ))
 
             i = j
@@ -148,6 +150,11 @@ def parse_unicode_file(content: str) -> List[RuleInfo]:
             i += 1
 
     return rules
+
+
+def has_audit_ignore(content: str) -> bool:
+    """Check if the rule content contains an audit-ignore comment"""
+    return '# audit-ignore' in content
 
 
 def find_untranslated_text_keys(content: str) -> List[str]:

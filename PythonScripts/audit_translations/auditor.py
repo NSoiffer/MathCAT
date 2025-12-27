@@ -70,18 +70,20 @@ def compare_files(english_path: str, translated_path: str) -> ComparisonResult:
         if key not in english_by_key:
             extra_rules.append(rule)
 
-    # Find untranslated text in translated file
+    # Find untranslated text in translated file (skip if audit-ignore)
     untranslated_text = []
     for rule in translated_rules:
-        if rule.has_untranslated_text:
+        if rule.has_untranslated_text and not rule.audit_ignore:
             untranslated_text.append((rule, rule.untranslated_keys))
 
-    # Find fine-grained differences in rules that exist in both files
+    # Find fine-grained differences in rules that exist in both files (skip if audit-ignore)
     rule_differences = []
     for key, en_rule in english_by_key.items():
         if key in translated_by_key:
-            diffs = diff_rules(en_rule, translated_by_key[key])
-            rule_differences.extend(diffs)
+            tr_rule = translated_by_key[key]
+            if not tr_rule.audit_ignore:
+                diffs = diff_rules(en_rule, tr_rule)
+                rule_differences.extend(diffs)
 
     return ComparisonResult(
         missing_rules=missing_rules,

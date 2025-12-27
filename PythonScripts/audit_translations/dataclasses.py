@@ -18,6 +18,7 @@ class RuleInfo:
     raw_content: str
     has_untranslated_text: bool = False
     untranslated_keys: List[str] = field(default_factory=list)
+    audit_ignore: bool = False
 
 
 @dataclass
