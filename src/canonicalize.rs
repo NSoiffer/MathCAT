@@ -7,6 +7,7 @@
 //! * mrows are added based on operator priorities from the MathML Operator Dictionary
 #![allow(clippy::needless_return)]
 use crate::errors::*;
+use crate::prefs::PreferenceManager;
 use std::rc::Rc;
 use std::cell::RefCell;
 use sxd_document::dom::*;
@@ -452,6 +453,19 @@ lazy_static! {
 	static ref LOWER_ROMAN_NUMERAL: Regex = Regex::new(r"^\s*^m{0,3}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})\s*$").unwrap();
 }
 
+#[derive(PartialEq)]
+struct CanonicalizeContextPatternsOptions {
+	decimal_separator: String,
+	block_separator: String,
+}
+impl CanonicalizeContextPatternsOptions {
+	fn from_prefs(pref_manager: &PreferenceManager) -> CanonicalizeContextPatternsOptions {
+		return CanonicalizeContextPatternsOptions {
+			decimal_separator: pref_manager.pref_to_string("BlockSeparators"),
+			block_separator: pref_manager.pref_to_string("DecimalSeparators"),
+		}
+	}
+}
 
 struct CanonicalizeContextPatterns {
 	decimal_separator: Regex,
@@ -464,13 +478,13 @@ struct CanonicalizeContextPatterns {
 }
 
 impl CanonicalizeContextPatterns {
-	fn new(block_separator_pref: &str, decimal_separator_pref: &str) -> CanonicalizeContextPatterns {
-		let block_separator = Regex::new(&format!("[{}]", regex::escape(block_separator_pref))).unwrap();
-		let decimal_separator = Regex::new(&format!("[{}]", regex::escape(decimal_separator_pref))).unwrap();
+	fn new(options: &CanonicalizeContextPatternsOptions) -> CanonicalizeContextPatterns {
+		let block_separator = Regex::new(&format!("[{}]", regex::escape(&options.block_separator))).unwrap();
+		let decimal_separator = Regex::new(&format!("[{}]", regex::escape(&options.decimal_separator))).unwrap();
 		// allows just "." and also matches an empty string, but those are ruled out elsewhere
-		let digit_only_decimal_number = Regex::new(&format!(r"^\d*{}?\d*$", regex::escape(decimal_separator_pref))).unwrap();
-		let block_3digit_pattern = get_number_pattern_regex(block_separator_pref, decimal_separator_pref, 3, 3);
-		let block_3_5digit_pattern = get_number_pattern_regex(block_separator_pref, decimal_separator_pref, 3, 5);
+		let digit_only_decimal_number = Regex::new(&format!(r"^\d*{}?\d*$", regex::escape(&options.decimal_separator))).unwrap();
+		let block_3digit_pattern = get_number_pattern_regex(&options.block_separator, &options.decimal_separator, 3, 3);
+		let block_3_5digit_pattern = get_number_pattern_regex(&options.block_separator, &options.decimal_separator, 3, 5);
 		// Note: on en.wikipedia.org/wiki/Decimal_separator, show '3.14159 26535 89793 23846'
 		let block_4digit_hex_pattern =  Regex::new(r"^[0-9a-fA-F]{4}([ \u00A0\u202F][0-9a-fA-F]{4})*$").unwrap();
 		let block_1digit_pattern =  Regex::new(r"^((\d(\uFFFF\d)?)(\d([, \u00A0\u202F]\d){2})*)?([\.](\d(\uFFFF\d)*)?)?$").unwrap();
@@ -499,9 +513,10 @@ impl CanonicalizeContextPatterns {
 /// Profiling showed that creating new contexts was very time consuming because creating the RegExs is very expensive
 /// Profiling set_mathml (which does the canonicalization) spends 65% of the time in Regex::new, of which half of it is spent in this initialization.
 struct CanonicalizeContextPatternsCache {
-	block_separator_pref: String,
-	decimal_separator_pref: String,
 	patterns: Rc<CanonicalizeContextPatterns>,
+
+	// options act as the cache key
+	options: CanonicalizeContextPatternsOptions,
 }
 
 thread_local!{
@@ -512,12 +527,10 @@ impl CanonicalizeContextPatternsCache {
 	fn new() -> CanonicalizeContextPatternsCache {
 		let pref_manager = crate::prefs::PreferenceManager::get();
 		let pref_manager = pref_manager.borrow();
-		let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
-		let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
+		let options = CanonicalizeContextPatternsOptions::from_prefs(&pref_manager);
 		return CanonicalizeContextPatternsCache {
-			patterns: Rc::new( CanonicalizeContextPatterns::new(&block_separator_pref, &decimal_separator_pref) ),
-			block_separator_pref,
-			decimal_separator_pref
+			patterns: Rc::new( CanonicalizeContextPatterns::new(&options) ),
+			options: options,
 		}
 	}
 
@@ -525,15 +538,13 @@ impl CanonicalizeContextPatternsCache {
 		return PATTERN_CACHE.with( |cache| {
 			let pref_manager_rc = crate::prefs::PreferenceManager::get();
 			let pref_manager = pref_manager_rc.borrow();
-			let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
-			let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
+			let new_options = CanonicalizeContextPatternsOptions::from_prefs(&pref_manager);
 
 			let mut cache = cache.borrow_mut();
-			if block_separator_pref != cache.block_separator_pref || decimal_separator_pref != cache.decimal_separator_pref {
+			if new_options != cache.options {
 				// update the cache
-				cache.patterns = Rc::new( CanonicalizeContextPatterns::new(&block_separator_pref, &decimal_separator_pref) );
-				cache.block_separator_pref = block_separator_pref;
-				cache.decimal_separator_pref = decimal_separator_pref;
+				cache.patterns = Rc::new( CanonicalizeContextPatterns::new(&new_options) );
+				cache.options = new_options;
 			}
 			return cache.patterns.clone();
 		})
