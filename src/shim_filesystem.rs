@@ -83,10 +83,10 @@ cfg_if! {
         /// Get the bytes for a file in the zip archive (intended for embedded zip files)
         fn get_bytes_from_index<'a>(archive: &mut ZipArchive<Cursor<&[u8]>>, index: usize) -> Result<Vec<u8>> {
             let mut file = archive.by_index(index)
-                .map_err(|e| format!("Error getting index={} from zip archive: {}", index, e) )?;
+                .map_err(|e| anyhow!(format!("Error getting index={} from zip archive: {}", index, e)) )?;
             let mut contents = Vec::new();
             file.read_to_end(&mut contents)
-                .map_err(|e| format!("Error reading index={} from zip archive: {}", index, e) )?;
+                .map_err(|e| anyhow!(format!("Error reading index={} from zip archive: {}", index, e)) )?;
             return Ok(contents);
         }
         /// Unzip the zip file (given by zip_archive) and record the file and dir names
