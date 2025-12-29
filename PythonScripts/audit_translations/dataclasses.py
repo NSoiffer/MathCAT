@@ -18,6 +18,18 @@ class RuleInfo:
     raw_content: str
     has_untranslated_text: bool = False
     untranslated_keys: List[str] = field(default_factory=list)
+    audit_ignore: bool = False
+
+
+@dataclass
+class RuleDifference:
+    """Fine-grained difference between English and translated rule"""
+    english_rule: RuleInfo
+    translated_rule: RuleInfo
+    diff_type: str  # 'match', 'condition', 'structure', 'variables'
+    description: str
+    english_snippet: str
+    translated_snippet: str
 
 
 @dataclass
@@ -29,3 +41,4 @@ class ComparisonResult:
     file_path: str
     english_rule_count: int
     translated_rule_count: int
+    rule_differences: List[RuleDifference] = field(default_factory=list)  # Fine-grained diffs
