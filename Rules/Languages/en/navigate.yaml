@@ -712,7 +712,7 @@
           - test:
               if: "$NavVerbosity = 'Verbose'"
               then:
-              - t: "move down"                          # phrase('move down to the next row in the table)
+              - t: "move down"                          # phrase('move down' to the next row in the table)
               - pause: short
           - test:
               if: "$NavVerbosity != 'Terse'"
@@ -742,7 +742,7 @@
   - test:
       if: "$NavVerbosity = 'Verbose'"
       then:
-      - t: "move to previous row"                              # phrase('move to previous row' to the previous row in the table)
+      - t: "move to previous row"                              # phrase('move to previous row' in the table)
       - pause: medium
   - test:
       if: "preceding-sibling::*"
@@ -766,7 +766,7 @@
   - test:
       if: "$NavVerbosity = 'Verbose'"
       then:
-      - t: "move to next row"                          # phrase('move to next row' to the next row in the table)
+      - t: "move to next row"                          # phrase('move to next row' in the table)
       - pause: medium
   - test:
       if: "following-sibling::*"
@@ -791,7 +791,7 @@
   - test:
       if: "$NavVerbosity = 'Verbose'"
       then:
-      - t: "move to previous column"                              # phrase('move to previous column' to the previous row in the table)
+      - t: "move to previous column"                              # phrase('move to previous column' in the table)
       - pause: medium
   - t: "no previous column"                          # phrase('no previous column' in the table)
   - set_variables: [SpeakExpression: "'false'"]
@@ -804,7 +804,7 @@
   - test:
       if: "$NavVerbosity = 'Verbose'"
       then:
-      - t: "move to next column"                              # phrase('move up' to the previous row in the table)
+      - t: "move to next column"                              # phrase('move to next column' in the table)
       - pause: medium
   - t: "no next column"                          # phrase('no next row' in the table)
   - set_variables: [SpeakExpression: "'false'"]
@@ -1607,7 +1607,7 @@
   - test:
     - if: "$NavMode = 'Enhanced'"
       then:
-      - t: "simple"                                                 # phrase(an 'simple' way to do something)
+      - t: "simple"                                                 # phrase(a 'simple' way to do something)
       - set_variables: [NavMode: "'Simple'", ReadZoomLevel: "1"]
     - else_if: "$NavMode = 'Character'"
       then:
