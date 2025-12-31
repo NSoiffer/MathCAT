@@ -24,19 +24,17 @@ GoogleTranslate = Translator(service_urls=["translate.google.us"])
 
 ''' In some manual testing, DeepL seems to do better than Google Translate
  deepl requires an API key.
- There is a free tier, but it won't do a full translation in the monthly free tier (50K chars/month)
- There are ~76k chars to translate, with ~62k of them being in unicode-full.yaml
- The lowest paid tier gives 300k chars/month for $10.50, so four translations/month if no problems.
- Maybe run unicode-full.yaml through Google and the rest through DeepL?
+ There is a free tier: it is limited to 500K chars/month)
+ There are ~76k chars to translate (ignoring phrases with context), with ~62k of them being in unicode-full.yaml.
+ So the free tier might be enough for a few languages every month.
+ The lowest paid tier is $5.49/month + $25 per 1m chars. It provides access to better models.
  Below is sample DeepL code -- commented out for now.
  '''
 # import deepl
 # import os
 
 # # 1. Set up the Translator
-# # It's best practice to use an environment variable for your API key.
-# # You can set this variable: DEEPL_AUTH_KEY="YOUR_API_KEY"
-# auth_key = os.getenv("DEEPL_AUTH_KEY", "YOUR_API_KEY") 
+# auth_key = os.getenv("DEEPL_KEY") 
 # translator = deepl.Translator(auth_key)
 
 # # 2. Define the text and target language
@@ -54,6 +52,7 @@ GoogleTranslate = Translator(service_urls=["translate.google.us"])
 # print(f"Original Text: {text_to_translate}")
 # print(f"Translated Text: {result.text}")
 # print(f"Source Language Detected: {result.detected_source_lang}")
+# print(f"Billed chars: {result.billed_characters}")
 
 # Google allows up to 500K chars translation/month, so using a key likely would be free anyway
 
