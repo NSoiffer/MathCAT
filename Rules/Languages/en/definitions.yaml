@@ -27,7 +27,7 @@
     "lim-sup": "prefix=lim sup as: the limit superior as: the limit superior as",
     "lim-inf": "prefix=lim inf as: the limit inferior as : the limit inferior as",
     "logarithm-with-base": "prefix=log base: the log base: the log base",
-    "natural-logarithm": "function=ln: natural log: natural log",
+    "natural-logarithm": "function=l n: natural log: natural log",
     "minus": "infix=minus || prefix=negative",
     "plus": "infix=plus || prefix=positive",
     # "pochhammer": "infix=permutations of",  # arguments are in reverse order, so can't work here
