@@ -2054,7 +2054,7 @@ mod chem_tests {
                 <mi mathvariant='normal' data-split='true' data-chem-element='1'>F</mi>
             </mrow>
        </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2063,7 +2063,7 @@ mod chem_tests {
         let target = "<math>
              <mi>HC</mi>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2076,7 +2076,7 @@ mod chem_tests {
             <mi data-merged='true' data-chem-element='3'>Cl</mi>
             </mrow>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2089,7 +2089,7 @@ mod chem_tests {
                 <mi>l</mi>
             </mrow>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2106,7 +2106,7 @@ mod chem_tests {
                 </mmultiscripts>
             </mrow>
        </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2129,7 +2129,7 @@ mod chem_tests {
                 </msubsup>
             </mrow>
             </math>"#;
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2142,7 +2142,7 @@ mod chem_tests {
                 <mi data-chem-element='3'>Cl</mi>
             </mrow>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2158,7 +2158,7 @@ mod chem_tests {
                 <mi mathvariant='normal' data-chem-element='2'>O</mi>
             </mrow>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2202,7 +2202,7 @@ mod chem_tests {
                 <mi mathvariant='normal' data-chem-element='2'>O</mi>
             </mrow>
        </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2211,7 +2211,7 @@ mod chem_tests {
         let target = " <math>
             <mi>C</mi>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2240,7 +2240,7 @@ mod chem_tests {
           </mrow>
         </msup>
        </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2271,7 +2271,7 @@ mod chem_tests {
                     </msub>
                 </mrow>
             </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2309,7 +2309,7 @@ mod chem_tests {
           <mi data-chem-element='1'>H</mi>
         </mrow>
        </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2360,7 +2360,7 @@ mod chem_tests {
                 </msup>
             </mrow>
        </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2387,7 +2387,7 @@ mod chem_tests {
                 </msub>
             </mrow>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2413,7 +2413,7 @@ mod chem_tests {
                 </mrow>
             </mrow>
        </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2439,7 +2439,7 @@ mod chem_tests {
                 </mrow>
             </mrow>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2455,7 +2455,7 @@ mod chem_tests {
             </msub>
             </mrow>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2486,7 +2486,7 @@ mod chem_tests {
                 </mmultiscripts>
             </mrow>
             </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2533,7 +2533,7 @@ mod chem_tests {
                 </mmultiscripts>
             </mrow>
        </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2567,7 +2567,7 @@ mod chem_tests {
                 </mmultiscripts>
             </mrow>
        </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2648,7 +2648,7 @@ mod chem_tests {
                 </mrow>
             </mrow>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2675,7 +2675,7 @@ mod chem_tests {
                 </msub>
             </mrow>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2768,7 +2768,7 @@ mod chem_tests {
             <mn>238</mn>
             </mmultiscripts>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2807,7 +2807,7 @@ mod chem_tests {
                 </mrow>
             </mrow>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2877,7 +2877,7 @@ mod chem_tests {
             <none></none>
         </mmultiscripts>
     </math>";
-    assert!(are_strs_canonically_equal(test, target));
+    assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     #[test]
@@ -2997,7 +2997,7 @@ mod chem_tests {
             </mmultiscripts>
         </mrow>
     </math>";
-    assert!(are_strs_canonically_equal(test, target));
+    assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
     
@@ -3142,7 +3142,7 @@ mod chem_tests {
             </mtable>
             </math>
         ";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
     
     #[test]
@@ -3184,7 +3184,7 @@ mod chem_tests {
                 </mrow>
             </math>
            ";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
     
     #[test]
@@ -3247,7 +3247,7 @@ mod chem_tests {
             </mtr>
             </mtable>
         </math>";
-        assert!(are_strs_canonically_equal(test, target));
+        assert!(are_strs_canonically_equal(test, target, &[]));
     }
 
 }
