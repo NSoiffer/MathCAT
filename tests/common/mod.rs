@@ -246,6 +246,6 @@ pub fn test_from_braille(code: &str, mathml: &str, braille: &str) {
 
     // FIX: call from_braille
     // let braille = from_braille(....);
-    assert!(libmathcat::are_strs_canonically_equal(mathml, braille, &["data-changed"]));
+    assert!(libmathcat::are_strs_canonically_equal(mathml, braille, &["data-changed", "data-id-added"]));
 
 }
