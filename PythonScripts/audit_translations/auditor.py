@@ -76,7 +76,6 @@ def get_yaml_files(lang_dir: Path) -> List[str]:
 def compare_files(
     english_path: str,
     translated_path: str,
-    fast: bool = False,
     issue_filter: Optional[set[str]] = None,
 ) -> ComparisonResult:
     """Compare English and translated YAML files"""
@@ -107,7 +106,7 @@ def compare_files(
 
     # Find extra rules (in translation but not in English)
     extra_rules = []
-    if include_extra and not fast:
+    if include_extra:
         for key, rule in translated_by_key.items():
             if key not in english_by_key:
                 extra_rules.append(rule)
@@ -121,7 +120,7 @@ def compare_files(
 
     # Find fine-grained differences in rules that exist in both files (skip if audit-ignore)
     rule_differences = []
-    if include_diffs and not fast:
+    if include_diffs:
         for key, en_rule in english_by_key.items():
             if key in translated_by_key:
                 tr_rule = translated_by_key[key]
@@ -340,10 +339,8 @@ def audit_language(
     specific_file: Optional[str] = None,
     output_format: str = "rich",
     output_path: Optional[str] = None,
-    fast: bool = False,
     rules_dir: Optional[str] = None,
     issue_filter: Optional[set[str]] = None,
-    summary_only: bool = False,
     severity_filter: Optional[set[str]] = None,
 ) -> int:
     """Audit translations for a specific language. Returns total issue count."""
@@ -390,21 +387,13 @@ def audit_language(
             console.print(f"\n[yellow]⚠ Warning:[/] English file not found: {english_path}")
             continue
 
-        result = compare_files(str(english_path), str(translated_path), fast, issue_filter)
+        result = compare_files(str(english_path), str(translated_path), issue_filter)
 
         # check for issues
         has_issues = result.missing_rules or result.untranslated_text or result.extra_rules or result.rule_differences
         if output_format == "rich":
             if has_issues:
-                if summary_only:
-                    issues = (
-                        len(result.missing_rules)
-                        + len(result.untranslated_text)
-                        + len(result.extra_rules)
-                        + len(result.rule_differences)
-                    )
-                else:
-                    issues = print_warnings(result, file_name)
+                issues = print_warnings(result, file_name)
                 if issues > 0:
                     files_with_issues += 1
                 total_issues += issues

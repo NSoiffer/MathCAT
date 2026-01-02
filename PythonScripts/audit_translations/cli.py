@@ -45,18 +45,8 @@ Examples:
     )
     parser.add_argument("--output", help="Write output to a file instead of stdout")
     parser.add_argument(
-        "--fast",
-        action="store_true",
-        help="Skip structural diffs and extra rules for a quicker translation-focused audit",
-    )
-    parser.add_argument(
         "--only",
         help="Comma-separated issue types: missing, untranslated, extra, diffs, all",
-    )
-    parser.add_argument(
-        "--summary-only",
-        action="store_true",
-        help="Show only the summary (rich output only)",
     )
     parser.add_argument(
         "--severity",
@@ -86,15 +76,6 @@ Examples:
                     sys.exit(1)
                 issue_filter = set(tokens)
 
-        if args.fast and issue_filter is None:
-            issue_filter = {"missing", "untranslated"}
-        elif args.fast and issue_filter and {"extra", "diffs"} & issue_filter:
-            console.print("\n[red]Error:[/] --fast cannot be combined with extra or diffs")
-            sys.exit(1)
-
-        if args.summary_only and args.format != "rich":
-            console.print("\n[red]Error:[/] --summary-only is only valid with --format rich")
-            sys.exit(1)
         if args.severity and args.format == "rich":
             console.print("\n[red]Error:[/] --severity is only valid with non-rich formats")
             sys.exit(1)
@@ -118,10 +99,8 @@ Examples:
             args.specific_file,
             args.format,
             args.output,
-            args.fast,
             args.rules_dir,
             issue_filter,
-            args.summary_only,
             severity_filter,
         )
 

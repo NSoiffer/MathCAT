@@ -62,10 +62,8 @@ python -m audit_translations --list
 * `--file`: Audits a single specific file instead of the whole directory.
 * `--format`: Output format (`rich`, `jsonl`, `csv`, `tasks`).
 * `--output`: Write output to a file instead of stdout.
-* `--fast`: Skip structural diffs and extra rules for quicker translation-focused audits.
 * `--rules-dir`: Override the Rules/Languages directory path.
 * `--only`: Filter issue types (comma-separated): `missing`, `untranslated`, `extra`, `diffs`, `all`.
-* `--summary-only`: Show only the summary (rich output only).
 * `--severity`: Filter severities in non-rich output (`high`, `medium`, `low`, `all`).
 * **Summary Stats:** Provides a statistical summary after every run.
 
