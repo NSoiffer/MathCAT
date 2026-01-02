@@ -12,6 +12,7 @@ def load_jsonl(text: str) -> list[dict]:
 
 
 def test_jsonl_output_matches_golden():
+    """Ensure jsonl output matches golden."""
     base_dir = Path(__file__).parent
     fixtures_dir = base_dir / "fixtures"
     english_dir = fixtures_dir / "en"

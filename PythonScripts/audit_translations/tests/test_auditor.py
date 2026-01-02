@@ -15,6 +15,7 @@ def make_rule(name: str, tag: str, line: int, raw: str) -> RuleInfo:
 
 
 def test_collect_issues_fields() -> None:
+    """Ensure collect issues fields."""
     missing = make_rule("missing", "mo", 10, "missing raw")
     extra = make_rule("extra", "mi", 20, "extra raw")
     untranslated = make_rule("untranslated", "mn", 30, "untranslated raw")
