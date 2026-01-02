@@ -309,7 +309,7 @@
           children:
           - intent:
               name: "logarithm-with-base"
-              attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
+              attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")', id='concat(@id, \"-log-base\")'"
               children: [x: "*[2]"]  # grab the base
           - x: "*[3]"       # grab the exponent
 
@@ -691,7 +691,7 @@
       children:
       - intent:
           name: "indexed-by"
-          attrs: "DEBUG(data-intent-property='concat(data-intent-property, \":infix:\")', data-id-offset='1')"
+          attrs: "data-intent-property='concat(data-intent-property, \":infix:\")', id='concat(@id, \"-indexed-by\")'"
           children:
             - x: "*[1]"
             - x: "*[2]"
@@ -833,7 +833,7 @@
           children: 
           - intent:
               name: "mrow"
-              attrs: "data-id-offset='2'"
+              attrs: "id='concat(@id, \"-mrow\")'"
               children: [x: "*[not(contains(@intent, ':equation-label'))]"]
 
 -

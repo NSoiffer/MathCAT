@@ -223,10 +223,9 @@
       if: "$ReadZoomLevel !=-1"
       then:
       - set_variables: [ReadZoomLevel: "0"]
-  - test:
-      if: "string-length(.) > 1 and $MatchCounter = 1 and $NavNodeOffset = 0"
-      then: [set_variables: [NavNodeOffset: "1"]]
-  - set_variables: [NavNode: "@id"]
+  - set_variables:
+      - NavNode: "@id"
+      - NavNodeOffset: "IfThenElse(string-length(.) > 1 and $MatchCounter = 1 and $NavNodeOffset = 0, '1', '0')"
 
 # special case of zooming into a table -- move to the first row (if only one row, first column)
 - name: zoom-in-table
@@ -236,12 +235,7 @@
   - with:
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
-  - test:
-      if: "count(*)=1"
-      then: 
-      - set_variables: [NavNode: "*[1]/*[1]/@id"]
-      else:
-      - set_variables: [NavNode: "*[1]/@id"]
+  - set_variables: [NavNode: "IfThenElse(count(*)=1, (*[1]/*[1]/@id), (*[1]/@id))"]
 
 - name: zoom-in-mrow-in-math
   # zooming in only once is meaningless because 'math' has only a single child and it was spoken at the math level -- dig inside and do it again 
@@ -255,7 +249,6 @@
 
 - # For msqrt and menclose, if the single child isn't an mrow, don't zoom in
   name: zoom-in-again
-  # If there is only one child, this isn't an interesting move -- zoom in again
   tag: "*"
   match:
   - "($NavCommand = 'ZoomIn' or "
@@ -271,7 +264,7 @@
       if: "not(*[1][self::m:mrow or @data-from-mathml='mrow'])"
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "IfThenElse(count(*)=0, $Move2D, $Move2D)"]   # phrase('in' the denominator)
+          variables: [Move2D: "'in'", Child2D: "IfThenElse($NavCommand = 'MovePreviousZoom', (*[last()]), (*[1]))"]   # phrase('in' the denominator)
           replace: [x: "IfThenElse($NavCommand = 'MovePreviousZoom', 1, $Child2D)"]
   - test:
       if: "$NavCommand = 'MovePreviousZoom'"
@@ -303,7 +296,9 @@
           variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator)
           replace: [x: "."]
       # "(...)" to get around some weird parse bug"
-      - set_variables: [NavNode: "*[1]/@id", NavNodeOffset: "IfThenElse(*[1]/@data-id-offset, (*[1]/@data-id-offset), '0')"]
+      - set_variables: 
+          - NavNode: "*[1]/@id"
+          - NavNodeOffset: "IfThenElse(*[1]/@data-id-offset, (*[1]/@data-id-offset), '0')"
 
 
 - name: zoom-in-simple
@@ -314,8 +309,11 @@
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
   - test:
-      if: "$MatchCounter > 1 and IsNode(., '2D') "
-      then: [set_variables: [NavNode: "@id"]]   # time to stop, not going "in" to next thing, so before "Move2D"
+      if: "$MatchCounter > 1 and IsNode(., '2D')"
+      then:
+      - set_variables:       # time to stop, not going "in" to next thing, so before "Move2D"
+          - NavNode: "@id"
+          - NavNodeOffset: "IfThenElse(@data-id-offset, @data-id-offset, '0')"
       else:
       - with:
           variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator)
@@ -418,7 +416,10 @@
   - test:
     - if: "count(*)> 1 or IsNode(., 'leaf') or
            @data-from-mathml='msqrt' or self::m:msqrt or @data-from-mathml='menclose' or self::m:menclose"
-      then: [set_variables: [NavNode: "@id"]]
+      then:
+      - set_variables:
+          - NavNode: "@id"
+          - NavNodeOffset: "IfThenElse(@data-id-offset, @data-id-offset, '0')"
       else: [x: "*[1]"]
 
 - name: move-next-zoom-not-enhanced
@@ -433,7 +434,9 @@
       # - with:
       #     variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]    # phrase('in' the denominator)
       #     replace: [x: ".."]
-      - set_variables: [NavNode: "@id"]
+      - set_variables:
+          - NavNode: "@id"
+          - NavNodeOffset: "IfThenElse(@data-id-offset, @data-id-offset, '0')"
       else:
       - with:
           variables: [Move2D: "'in'", Child2D: "*[1]"]                        # phrase('in' the denominator)
@@ -452,7 +455,9 @@
       # - with:
       #     variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]     # phrase('in' the denominator)
       #     replace: [x: ".."]
-      - set_variables: [NavNode: "@id"]
+      - set_variables:
+          - NavNode: "@id"
+          - NavNodeOffset: "IfThenElse(@data-id-offset, @data-id-offset, '0')"
       else:
       - with:
           variables: [Move2D: "'in'", Child2D: "*[last()]"]                     # phrase('in' the denominator)
@@ -461,8 +466,6 @@
 
 # ********* ZoomOut  ***************
 - name: zoom-out-default
-
-
   tag: mtd
   match: "$Move2D = '' and ($NavCommand = 'ZoomOut')"
   replace:
@@ -474,7 +477,9 @@
   #   # if we let the speech rules speak the row, it is given just the MathML for the row, so the row # will always be '1'
   # - x: "count(../preceding-sibling::*)+1"
   # - pause: medium
-  - set_variables: [NavNode: "../@id"]
+  - set_variables:
+      - NavNode: "../@id"
+      - NavNodeOffset: "IfThenElse(../@data-id-offset, ../@data-id-offset, '0')"
 
 - name: zoom-out
   # a row around a single element -- these might duplicate the position/offset, so we jump an extra level here  
@@ -485,7 +490,7 @@
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
   - test:
-    - if: "$NavNodeOffset > 0"  # Inside leaf -- just reset offset
+    - if: "$NavNodeOffset > 0 and IsNode(., 'leaf')"  # Inside leaf -- just reset offset, intent offset doesn't change
       then:
       - set_variables: [NavNodeOffset: "0"]
       # NavNode remains the same
@@ -493,16 +498,18 @@
       then: [x: ".."] # auto-zoom: move out a level and retry
       else:
       - with:
-          variables: [Move2D: "'out of'", Child2D: "."]
+          variables: [Move2D: "'out of'", Child2D: "."]   # phrase('out of' the denominator)
           replace: [x: ".."]
       - test:
           if: "parent::m:mtd"
           then: [x: ".."]
           else:
           - test:
-              if: "$ReadZoomLevel!=-1"
+              if: "DEBUG($ReadZoomLevel)!=-1"
               then: [set_variables: [ReadZoomLevel: "DistanceFromLeaf(.., true, $NavMode!='Character')"]]
-          - set_variables: [NavNode: "../@id"]
+          - set_variables:
+              - NavNode: "../@id"
+              - NavNodeOffset: "IfThenElse(../@data-id-offset, ../@data-id-offset, '0')"
 
 # ********* MoveStart/End  ***************
 - name: math-move-to-start-or-end

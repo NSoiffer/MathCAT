@@ -61,15 +61,12 @@ const ILLEGAL_NODE_ID: &str = "!not set";     // an illegal 'id' value
 impl Default for NavigationPosition {
     fn default() -> Self {
         NavigationPosition {
-            current_node: ILLEGAL_NODE_ID.to_string(), 
-            current_node_offset: 0    
+            current_node: ILLEGAL_NODE_ID.to_string(),
+            current_node_offset: 0
         }
      }
 }
 
-impl NavigationPosition {
-    
-}
 
 #[derive(Debug, Clone)]
 pub struct NavigationState {
@@ -251,7 +248,7 @@ fn convert_last_char_to_number(str: &str) -> usize {
 fn get_node_by_id<'a>(mathml: Element<'a>, pos: &NavigationPosition) -> Option<Element<'a>> {
     if let Some(mathml_id) = mathml.attribute_value("id") {
         if mathml_id == pos.current_node.as_str() &&
-           (crate::xpath_functions::is_leaf(mathml) ||
+           (crate::xpath_functions::is_leaf(mathml) || 
             mathml.attribute_value(ID_OFFSET).unwrap_or("0") == pos.current_node_offset.to_string()) {
             return Some(mathml);
         }
@@ -449,18 +446,19 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
     });
 
     fn get_start_node<'m>(mathml: Element<'m>, nav_state: &RefMut<NavigationState>) -> Result<Element<'m>>  {
-        let (start_node_id, start_node_offset) = match nav_state.top() {
-            None => (mathml.attribute_value("id").unwrap(), 0usize),
-            Some( (position, _) ) => (position.current_node.as_str(), position.current_node_offset),
+        let element = match nav_state.top() {
+            None => {
+                let nav_position = NavigationPosition { current_node: mathml.attribute_value("id").unwrap().to_string(), current_node_offset: 0 };
+                get_node_by_id(mathml, &nav_position)
+            },
+            Some( (position, _) ) => get_node_by_id(mathml, position),
         };
 
-        let temp_pos = NavigationPosition { current_node: start_node_id.to_string(), current_node_offset: start_node_offset };
-
-        return match get_node_by_id(mathml, &temp_pos) {
+        return match element {
             Some(node) => Ok(node),
             None => {
-                bail!("Internal Error: didn't find id/offset '{}' while attempting to start navigation. MathML is\n{}",
-                      &temp_pos, mml_to_string(mathml));
+                bail!("Internal Error: didn't find id/offset '{:?}' while attempting to start navigation. MathML is\n{}",
+                      nav_state.top().map(|t| t.0), mml_to_string(mathml));
             }
         };
     }
@@ -505,9 +503,10 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                 while name(found_node) != "math" {
                     found_node = get_parent(found_node);
                     // debug!("found_node:\n{}", mml_to_string(found_node));
-                    let found_id = found_node.attribute_value("id").unwrap_or_default().to_string();
-                    let found_offset = found_node.attribute_value(ID_OFFSET).unwrap_or_default().parse::<usize>().unwrap_or_default();
-                    let temp_pos = NavigationPosition { current_node: found_id.clone(), current_node_offset: found_offset };
+                    let temp_pos = NavigationPosition {
+                        current_node: found_node.attribute_value("id").unwrap_or_default().to_string().clone(),
+                        current_node_offset: found_node.attribute_value(ID_OFFSET).unwrap_or_default().parse::<usize>().unwrap_or_default(),
+                    };
                     if let Some(intent_node) = get_node_by_id(nav_intent, &temp_pos) {
                         found_node = intent_node;
                         break;
@@ -576,8 +575,10 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
 
         if nav_command.starts_with("SetPlacemarker") {
             let new_node_id = get_nav_node(context, "NavNode", intent, start_node, nav_command, &nav_state.mode)?;
-            let offset = context_get_int_variable(context, "NavNodeOffset", intent)?;
-            nav_state.place_markers[convert_last_char_to_number(nav_command)] = NavigationPosition{ current_node: new_node_id, current_node_offset: offset};
+            nav_state.place_markers[convert_last_char_to_number(nav_command)] = NavigationPosition{
+                current_node: new_node_id,
+                current_node_offset: context_get_int_variable(context, "NavNodeOffset", intent)?,
+            }
         }
 
         let nav_mathml = get_node_by_id(intent, &nav_position);
@@ -679,7 +680,8 @@ fn speak(mathml: Element, intent: Element, nav_position: &NavigationPosition, li
             }
         }
         // debug!("speak (literal): nav_node_id={}, mathml=\n{}", nav_node_id, mml_to_string(mathml));
-        let speech = crate::speech::speak_mathml(mathml, &nav_position.current_node, nav_position.current_node_offset);
+        let speech = crate::speech::speak_mathml(mathml,
+                &nav_position.current_node, nav_position.current_node_offset);
         // debug!("speech from speak: {:?}", speech);
         return speech;
     } else {
@@ -1311,6 +1313,7 @@ mod tests {
     
     #[test]
     fn move_to_start() -> Result<()> {
+        init_logger();
         let mathml_str = "<math id='math'><mfrac id='mfrac'>
                 <mrow id='num'><msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup><mo id='factorial'>!</mo></mrow>
                 <mi id='denom'>d</mi>
@@ -1425,6 +1428,97 @@ mod tests {
             assert_eq!("move left; out of base; plus", test_command("MovePrevious", mathml, "id-3"));
 
             return Ok( () );
+        });
+    }
+        
+    #[test]
+    fn zoom_logbase() -> Result<()> {
+        let mathml_str = "<math display='block' id='id-0'>
+            <mrow displaystyle='true' id='id-1'>
+                <msub id='id-2'>
+                    <mi id='id-3'>log</mi>
+                    <mn id='id-4'>2</mn>
+                </msub>
+                <mo data-changed='added' id='id-5'>&#x2061;</mo>
+                <mi id='id-6'>x</mi>a
+            </mrow>
+            </math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            assert_eq!("zoom in; the log base 2", test_command("ZoomIn", mathml, "id-2"));
+            assert_eq!("zoom in; in base; 2", test_command("ZoomIn", mathml, "id-4"));
+            assert_eq!("zoomed in all of the way; 2", test_command("ZoomIn", mathml, "id-4"));
+            debug!("Now zooming out");
+            assert_eq!("zoom out; out of base; the log base 2", test_command("ZoomOut", mathml, "id-2"));
+            assert_eq!("zoom out; the log base 2, of x", test_command("ZoomOut", mathml, "id-1"));
+            assert_eq!("zoomed out all of the way; the log base 2, of x", test_command("ZoomOut", mathml, "id-1"));
+            return Ok( () );
+        });
+    }
+        
+    #[test]
+    fn zoom_logbase_power() -> Result<()> {
+        let mathml_str = "<math display='block' id='id-0'>
+            <mrow displaystyle='true' id='id-1'>
+                <msubsup id='id-2'>
+                    <mi id='id-3'>log</mi>
+                    <mn id='id-4'>2</mn>
+                    <mn id='id-5'>3</mn>
+                </msubsup>
+                <mo data-changed='added' id='id-6'>&#x2061;</mo>
+                <mi id='id-7'>x</mi>
+            </mrow>
+            </math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            assert_eq!("zoom in; the log base 2, cubed", test_command("ZoomIn", mathml, "id-2"));
+            assert_eq!("zoom in; in base; the log base 2", test_command("ZoomIn", mathml, "id-2-log-base"));
+            assert_eq!("zoom in; in base; 2", test_command("ZoomIn", mathml, "id-4"));
+            assert_eq!("zoomed in all of the way; 2", test_command("ZoomIn", mathml, "id-4"));
+            debug!("Now zooming out");
+            assert_eq!("zoom out; out of base; the log base 2", test_command("ZoomOut", mathml, "id-2-log-base"));
+            assert_eq!("zoom out; out of base; the log base 2, cubed", test_command("ZoomOut", mathml, "id-2"));
+            assert_eq!("zoom out; the log base 2, cubed of x", test_command("ZoomOut", mathml, "id-1"));
+            assert_eq!("zoomed out all of the way; the log base 2, cubed of x", test_command("ZoomOut", mathml, "id-1"));
+            return Ok( () );
+        });
+    }
+        
+    #[test]
+    fn zoom_msubsup() -> Result<()> {
+        // msubsup is trickier because it creates an intent within an intent, so offsets need to be handled properly
+        let mathml_str = "<math id='math'><msubsup id='msubsup'><mi id='base'>𝑥</mi><mn id='sub'>1</mn><mn id='sup'>2</mn></msubsup></math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
+            debug!("Enhanced mode");
+            do_commands(mathml)?;
+            set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
+            debug!("Simple mode");
+            do_commands(mathml)?;
+            set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
+            debug!("Character mode");
+            assert_eq!("zoom in; in base; x", test_command("ZoomIn", mathml, "base"));
+            assert_eq!("zoom out; out of base; x sub 1 super 2 end super", test_command("ZoomOut", mathml, "msubsup"));
+            return Ok( () );
+
+        /// Enhanced and Simple mode should behave the same
+        fn do_commands(mathml: Element) -> Result<()> {
+            assert_eq!("zoom in; in base; x sub 1", test_command("ZoomIn", mathml, "msubsup-indexed-by"));
+            assert_eq!("zoom in; in base; x", test_command("ZoomIn", mathml, "base"));
+            assert_eq!("zoomed in all of the way; x", test_command("ZoomIn", mathml, "base"));
+            debug!("Now zooming out");
+            assert_eq!("zoom out; out of base; x sub 1", test_command("ZoomOut", mathml, "msubsup-indexed-by"));
+            assert_eq!("zoom out; out of base; x sub 1, squared", test_command("ZoomOut", mathml, "msubsup"));
+            assert_eq!("zoomed out all of the way; x sub 1, squared", test_command("ZoomOut", mathml, "msubsup"));
+            return Ok( () );
+        }
         });
     }
         
@@ -1637,7 +1731,6 @@ mod tests {
     
     #[test]
     fn move_inside_leaves() -> Result<()> {
-        init_logger();
         let mathml_str = "<math display='block' id='id-0'>
                 <mrow id='id-1'>
                     <mfrac id='id-2'>
@@ -2290,7 +2383,7 @@ mod tests {
             assert_eq!(speech, "move right; in part 2; k");
             let speech = test_command("MoveNext", mathml, "id-5");
             assert_eq!(speech, "cannot move right, end of math");
-            let speech = test_command("ZoomOut", mathml, "id-1");
+            let speech = test_command("ZoomOut", mathml, "id-1-literal-0");
             assert_eq!(speech, "zoom out; out of part 2; n choose k");
 
             set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
@@ -2301,8 +2394,52 @@ mod tests {
             assert_eq!(speech, "move right; in part 2; k");
             let speech = test_command("MoveNext", mathml, "id-5");
             assert_eq!(speech, "cannot move right, end of math");
-            let speech = test_command("ZoomOut", mathml, "id-1");
+            let speech = test_command("ZoomOut", mathml, "id-1-literal-0");
             assert_eq!(speech, "zoom out; out of part 2; n choose k");
+
+            return Ok( () );
+        });
+    }
+
+    #[test]
+    fn matrix_literal_intent() -> Result<()> {
+        let mathml_str = r#"<math display='block' id='id-0'>
+            <mrow intent='$m' id='id-1'>
+                <mo id='id-2'>(</mo>
+                <mtable arg='m' intent='_diagonal:prefix(1,2,3)' id='id-3'>
+                <mtr id='id-4'>
+                    <mtd id='id-5'><mn id='id-6'>1</mn></mtd>
+                    <mtd id='id-7'><mn id='id-8'>0</mn></mtd>
+                    <mtd id='id-9'><mn id='id-10'>0</mn></mtd>
+                </mtr>
+                <mtr id='id-11'>
+                    <mtd id='id-12'><mn id='id-13'>0</mn></mtd>
+                    <mtd id='id-14'><mn id='id-15'>2</mn></mtd>
+                    <mtd id='id-16'><mn id='id-17'>0</mn></mtd>
+                </mtr>
+                <mtr id='id-18'>
+                    <mtd id='id-19'><mn id='id-20'>0</mn></mtd>
+                    <mtd id='id-21'><mn id='id-22'>0</mn></mtd>
+                    <mtd id='id-23'><mn id='id-24'>3</mn></mtd>
+                </mtr>
+                </mtable>
+                <mo id='id-25'>)</mo>
+            </mrow>
+        </math>"#;
+        init_default_prefs(mathml_str, "Simple");
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            let speech = test_command("ZoomIn", mathml, "id-3-literal-1");
+            assert_eq!(speech, "zoom in; 1");
+            let speech = test_command("MoveNext", mathml, "id-3-literal-2");
+            assert_eq!(speech, "move right; 2");
+            let speech = test_command("MoveNext", mathml, "id-3-literal-3");
+            assert_eq!(speech, "move right; 3");
+            let speech = test_command("MoveNext", mathml, "id-3-literal-3");
+            assert_eq!(speech, "cannot move right, end of math");
+            let speech = test_command("ZoomOut", mathml, "id-3-literal-0");
+            assert_eq!(speech, "zoom out; diagonal 1 2 3");
 
             return Ok( () );
         });

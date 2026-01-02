@@ -67,6 +67,7 @@
     "root": "root; root index",
     "msub": "base; subscript",
     "sub": "base; subscript",
+    "logarithm-with-base": "base",
     "indexed-by": "base; subscript",
     "msup": "base; superscript",
     "say-super": "base; superscript",
