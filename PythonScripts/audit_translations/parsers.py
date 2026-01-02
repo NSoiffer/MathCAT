@@ -36,6 +36,92 @@ def parse_yaml_file(file_path: str) -> Tuple[List[RuleInfo], str]:
     return rules, content
 
 
+def strip_inline_comment(value: str) -> str:
+    """Strip inline comments while respecting quoted text."""
+    in_single = False
+    in_double = False
+    i = 0
+    while i < len(value):
+        ch = value[i]
+        if ch == "'" and not in_double:
+            if in_single and i + 1 < len(value) and value[i + 1] == "'":
+                i += 2
+                continue
+            in_single = not in_single
+        elif ch == '"' and not in_single:
+            if in_double and i > 0 and value[i - 1] == '\\':
+                i += 1
+                continue
+            in_double = not in_double
+        elif ch == '#' and not in_single and not in_double:
+            return value[:i].rstrip()
+        i += 1
+    return value.rstrip()
+
+
+def extract_inline_value(value: str) -> str:
+    """Extract a YAML-style inline value, preserving quotes with inner quotes."""
+    value = value.strip()
+    if not value:
+        return ''
+    if value[0] in ("'", '"'):
+        quote = value[0]
+        buf = []
+        i = 1
+        while i < len(value):
+            ch = value[i]
+            if quote == '"' and ch == '\\' and i + 1 < len(value):
+                if value[i + 1] in ('"', '\\'):
+                    buf.append(value[i + 1])
+                    i += 2
+                    continue
+                buf.append(ch)
+                i += 1
+                continue
+            if quote == "'" and ch == "'" and i + 1 < len(value) and value[i + 1] == "'":
+                buf.append("'")
+                i += 2
+                continue
+            if ch == quote:
+                return ''.join(buf)
+            buf.append(ch)
+            i += 1
+        return ''.join(buf)
+    return strip_inline_comment(value)
+
+
+def extract_variable_names_from_inline(inline: str) -> List[str]:
+    """Extract variable names from an inline variables list, ignoring quoted values."""
+    names = []
+    in_single = False
+    in_double = False
+    unquoted = []
+    i = 0
+    while i < len(inline):
+        ch = inline[i]
+        if ch == "'" and not in_double:
+            if in_single and i + 1 < len(inline) and inline[i + 1] == "'":
+                i += 2
+                continue
+            in_single = not in_single
+            i += 1
+            continue
+        if ch == '"' and not in_single:
+            if in_double and i > 0 and inline[i - 1] == '\\':
+                i += 1
+                continue
+            in_double = not in_double
+            i += 1
+            continue
+        if not in_single and not in_double:
+            unquoted.append(ch)
+        i += 1
+
+    for name in re.findall(r'([A-Za-z_][\w-]*)\s*:', ''.join(unquoted)):
+        names.append(name)
+    return names
+
+
 def parse_rules_file(content: str) -> List[RuleInfo]:
     """Parse a standard rules file with name/tag entries"""
     rules = []
@@ -68,7 +154,7 @@ def parse_rules_file(content: str) -> List[RuleInfo]:
                 if tag is None:
                     tag_match = tag_pattern.match(lines[j])
                     if tag_match:
-                        tag_value = tag_match.group(1).strip()
+                        tag_value = strip_inline_comment(tag_match.group(1).strip())
                         # Handle array tags like [mo, mtext]
                         if tag_value.startswith('['):
                             tag = tag_value
@@ -198,10 +284,9 @@ def extract_match_pattern(content: str) -> str:
         stripped = line.strip()
         if stripped.startswith('match:'):
             in_match = True
-            # Check if it's a single-line match: "pattern"
-            inline = re.search(r'match:\s*["\']([^"\']+)["\']', line)
-            if inline:
-                return inline.group(1)
+            inline_value = stripped[len('match:'):].strip()
+            if inline_value:
+                return extract_inline_value(inline_value)
             continue
         if in_match:
             # Stop at next top-level key (replace:, variables:, tag:, etc.)
@@ -209,10 +294,8 @@ def extract_match_pattern(content: str) -> str:
                 break
             # Collect match array items
             if stripped.startswith('- '):
-                # Extract quoted content from array item
-                quoted = re.search(r'-\s*["\']([^"\']+)["\']', stripped)
-                if quoted:
-                    match_lines.append(quoted.group(1))
+                item_value = stripped[2:].strip()
+                match_lines.append(extract_inline_value(item_value))
 
     return ' '.join(match_lines)
 
@@ -220,18 +303,49 @@ def extract_match_pattern(content: str) -> str:
 def extract_conditions(content: str) -> List[str]:
     """Extract all if/else conditions from a rule"""
     conditions = []
-    for match in re.finditer(r'if:\s*["\']([^"\']+)["\']', content):
-        conditions.append(match.group(1))
+    for line in content.split('\n'):
+        match = re.match(r'^\s*(?:else_)?if:\s*(.+)$', line)
+        if match:
+            value = extract_inline_value(match.group(1))
+            if value:
+                conditions.append(value)
     return conditions
 
 
 def extract_variables(content: str) -> List[Tuple[str, str]]:
     """Extract variable definitions from a rule"""
     variables = []
-    for match in re.finditer(r'variables:\s*\[([^\]]+)\]', content, re.DOTALL):
-        var_block = match.group(1)
-        for var_match in re.finditer(r'(\w+):\s*["\']([^"\']+)["\']', var_block):
-            variables.append((var_match.group(1), var_match.group(2)))
+    lines = content.split('\n')
+    in_vars = False
+    vars_indent = 0
+    for line in lines:
+        stripped = line.strip()
+        if not in_vars:
+            if stripped.startswith('variables:'):
+                inline = stripped[len('variables:'):].strip()
+                if inline.startswith('['):
+                    for name in extract_variable_names_from_inline(inline):
+                        variables.append((name, ''))
+                else:
+                    in_vars = True
+                    vars_indent = len(line) - len(line.lstrip())
+            continue
+
+        if not stripped or stripped.startswith('#'):
+            continue
+
+        indent = len(line) - len(line.lstrip())
+        if indent <= vars_indent and not stripped.startswith('-'):
+            in_vars = False
+            continue
+
+        entry = stripped
+        if entry.startswith('- '):
+            entry = entry[2:].lstrip()
+
+        name_match = re.match(r'([A-Za-z_][\w-]*):', entry)
+        if name_match:
+            variables.append((name_match.group(1), ''))
     return variables
 
 

@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from rich.console import Console
+from rich.markup import escape
 from rich.panel import Panel
 from rich.table import Table
 
@@ -98,21 +99,23 @@ def compare_files(english_path: str, translated_path: str) -> ComparisonResult:
 
 def print_rule_item(rule: RuleInfo, context: str = ""):
     if rule.name is None:
-        console.print(f"      [dim]•[/] [yellow]\"{rule.key}\"[/] [dim](line {rule.line_number}{context})[/]")
+        console.print(f"      [dim]•[/] [yellow]\"{escape(rule.key)}\"[/] [dim](line {rule.line_number}{context})[/]")
     else:
-        console.print(f"      [dim]•[/] [cyan]{rule.name}[/] [dim][{rule.tag}][/] [dim](line {rule.line_number}{context})[/]")
+        tag = rule.tag or "unknown"
+        console.print(f"      [dim]•[/] [cyan]{escape(rule.name)}[/] [dim][{escape(tag)}][/] [dim](line {rule.line_number}{context})[/]")
 
 
 def print_diff_item(diff: RuleDifference):
     """Print a single rule difference"""
     rule = diff.english_rule
     if rule.name is None:
-        console.print(f"      [dim]•[/] [yellow]\"{rule.key}\"[/] [dim](line {rule.line_number} en, {diff.translated_rule.line_number} tr)[/]")
+        console.print(f"      [dim]•[/] [yellow]\"{escape(rule.key)}\"[/] [dim](line {rule.line_number} en, {diff.translated_rule.line_number} tr)[/]")
     else:
-        console.print(f"      [dim]•[/] [cyan]{rule.name}[/] [dim][{rule.tag}][/] [dim](line {rule.line_number} en, {diff.translated_rule.line_number} tr)[/]")
+        tag = rule.tag or "unknown"
+        console.print(f"      [dim]•[/] [cyan]{escape(rule.name)}[/] [dim][{escape(tag)}][/] [dim](line {rule.line_number} en, {diff.translated_rule.line_number} tr)[/]")
     console.print(f"          [dim]{diff.description}:[/]")
-    console.print(f"          [green]en:[/] {diff.english_snippet}")
-    console.print(f"          [red]tr:[/] {diff.translated_snippet}")
+    console.print(f"          [green]en:[/] {escape(diff.english_snippet)}")
+    console.print(f"          [red]tr:[/] {escape(diff.translated_snippet)}")
 
 
 def print_warnings(result: ComparisonResult, file_name: str) -> int:
@@ -127,7 +130,7 @@ def print_warnings(result: ComparisonResult, file_name: str) -> int:
                       ("red", "✗") if result.translated_rule_count == 0 else ("yellow", "⚠")
         console.print()
         console.rule(style="cyan")
-        console.print(f"[{style}]{icon}[/] [bold]{file_name}[/]")
+        console.print(f"[{style}]{icon}[/] [bold]{escape(file_name)}[/]")
         console.print(f"  [dim]English: {result.english_rule_count} rules  →  Translated: {result.translated_rule_count} rules[/]")
         console.rule(style="cyan")
 
@@ -142,7 +145,7 @@ def print_warnings(result: ComparisonResult, file_name: str) -> int:
         for rule, texts in result.untranslated_text:
             print_rule_item(rule)
             for text in texts:
-                console.print(f"          [dim]→[/] [yellow]\"{text}\"[/]")
+                console.print(f"          [dim]→[/] [yellow]\"{escape(text)}\"[/]")
             issues += 1
 
     if result.rule_differences:
@@ -171,6 +174,7 @@ def print_warnings(result: ComparisonResult, file_name: str) -> int:
         console.print(f"\n  [blue]ℹ[/] [bold]Extra Rules[/] [[blue]{len(result.extra_rules)}[/]] [dim](may be intentional)[/]")
         for rule in result.extra_rules:
             print_rule_item(rule)
+            issues += 1
 
     return issues
 
@@ -257,7 +261,7 @@ def list_languages():
 
     for lang_dir in sorted(get_rules_dir().iterdir()):
         if lang_dir.is_dir() and lang_dir.name != "en":
-            count = len(list(lang_dir.glob("*.yaml")))
+            count = len(get_yaml_files(lang_dir))
             color = "green" if count >= 7 else "yellow" if count >= 4 else "red"
             table.add_row(lang_dir.name, f"[{color}]{count}[/] files")
 
