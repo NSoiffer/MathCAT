@@ -1,0 +1,5 @@
+- name: struct-empty
+  tag: mi
+  match: ".//m:mi"
+  replace:
+    - T: "x"

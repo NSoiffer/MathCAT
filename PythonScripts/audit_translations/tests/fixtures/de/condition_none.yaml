@@ -1,0 +1,10 @@
+- name: condition-none
+  tag: mi
+  match: ".//m:mi"
+  replace:
+    - test:
+        if: ~
+        then:
+          - T: "foo"
+        else:
+          - T: "bar"
