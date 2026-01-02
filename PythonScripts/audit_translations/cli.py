@@ -5,22 +5,13 @@ Handles argument parsing and the main entry point.
 """
 
 import argparse
-import io
 import sys
 
 from .auditor import audit_language, list_languages, console
 
 
-def setup_encoding():
-    """Ensure UTF-8 output on Windows"""
-    if sys.platform == 'win32':
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
-
-
 def main():
     """Main entry point for the audit tool"""
-    setup_encoding()
 
     parser = argparse.ArgumentParser(
         description="Audit MathCAT translation files against English originals",
