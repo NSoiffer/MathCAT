@@ -64,7 +64,6 @@ python -m audit_translations --list
 * `--output`: Write output to a file instead of stdout.
 * `--rules-dir`: Override the Rules/Languages directory path.
 * `--only`: Filter issue types (comma-separated): `missing`, `untranslated`, `extra`, `diffs`, `all`.
-* `--severity`: Filter severities in non-rich output (`high`, `medium`, `low`, `all`).
 * **Summary Stats:** Provides a statistical summary after every run.
 
 **Examples:**

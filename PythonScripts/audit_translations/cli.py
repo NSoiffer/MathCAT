@@ -48,10 +48,6 @@ Examples:
         "--only",
         help="Comma-separated issue types: missing, untranslated, extra, diffs, all",
     )
-    parser.add_argument(
-        "--severity",
-        help="Comma-separated severities: high, medium, low, all (non-rich only)",
-    )
 
     args = parser.parse_args()
 
@@ -76,24 +72,6 @@ Examples:
                     sys.exit(1)
                 issue_filter = set(tokens)
 
-        if args.severity and args.format == "rich":
-            console.print("\n[red]Error:[/] --severity is only valid with non-rich formats")
-            sys.exit(1)
-
-        severity_filter = None
-        if args.severity:
-            tokens = [token.strip().lower() for token in args.severity.split(",") if token.strip()]
-            if "all" not in tokens:
-                allowed = {"high", "medium", "low"}
-                unknown = set(tokens) - allowed
-                if unknown:
-                    console.print(
-                        "\n[red]Error:[/] Unknown severities: "
-                        + ", ".join(sorted(unknown))
-                    )
-                    sys.exit(1)
-                severity_filter = set(tokens)
-
         audit_language(
             args.language,
             args.specific_file,
@@ -101,7 +79,6 @@ Examples:
             args.output,
             args.rules_dir,
             issue_filter,
-            severity_filter,
         )
 
 

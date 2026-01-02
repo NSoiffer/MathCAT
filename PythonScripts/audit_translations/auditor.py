@@ -26,7 +26,6 @@ ISSUE_FIELDS = [
     "file",
     "issue_type",
     "diff_type",
-    "severity",
     "rule_name",
     "rule_tag",
     "rule_key",
@@ -37,13 +36,6 @@ ISSUE_FIELDS = [
     "translated_snippet",
     "untranslated_texts",
 ]
-
-SEVERITY_BY_TYPE = {
-    "missing_rule": "high",
-    "untranslated_text": "high",
-    "rule_difference": "medium",
-    "extra_rule": "low",
-}
 
 
 def get_rules_dir(rules_dir: Optional[str] = None) -> Path:
@@ -185,7 +177,6 @@ def collect_issues(
         issue.update(
             issue_type="missing_rule",
             diff_type="",
-            severity=SEVERITY_BY_TYPE["missing_rule"],
             line_en=rule.line_number,
             description="Rule present in English but missing in translation",
             english_snippet="",
@@ -201,7 +192,6 @@ def collect_issues(
         issue.update(
             issue_type="extra_rule",
             diff_type="",
-            severity=SEVERITY_BY_TYPE["extra_rule"],
             line_tr=rule.line_number,
             description="Rule present in translation but missing in English",
             english_snippet="",
@@ -217,7 +207,6 @@ def collect_issues(
         issue.update(
             issue_type="untranslated_text",
             diff_type="",
-            severity=SEVERITY_BY_TYPE["untranslated_text"],
             line_tr=rule.line_number,
             description="Lowercase t/ot/ct keys indicate untranslated text",
             english_snippet="",
@@ -234,7 +223,6 @@ def collect_issues(
         issue.update(
             issue_type="rule_difference",
             diff_type=diff.diff_type,
-            severity=SEVERITY_BY_TYPE["rule_difference"],
             line_en=diff.english_rule.line_number,
             line_tr=diff.translated_rule.line_number,
             description=diff.description,
@@ -341,7 +329,6 @@ def audit_language(
     output_path: Optional[str] = None,
     rules_dir: Optional[str] = None,
     issue_filter: Optional[set[str]] = None,
-    severity_filter: Optional[set[str]] = None,
 ) -> int:
     """Audit translations for a specific language. Returns total issue count."""
     rules_dir_path = get_rules_dir(rules_dir)
@@ -402,8 +389,6 @@ def audit_language(
         else:
             include_raw = output_format == "tasks"
             issues_list = collect_issues(result, file_name, language, include_raw=include_raw)
-            if severity_filter:
-                issues_list = [issue for issue in issues_list if issue.get("severity") in severity_filter]
             for issue in issues_list:
                 writer.write(issue)
             if issues_list:

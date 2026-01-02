@@ -14,7 +14,7 @@ def make_rule(name: str, tag: str, line: int, raw: str) -> RuleInfo:
     )
 
 
-def test_collect_issues_includes_severity_and_raw() -> None:
+def test_collect_issues_includes_raw() -> None:
     missing = make_rule("missing", "mo", 10, "missing raw")
     extra = make_rule("extra", "mi", 20, "extra raw")
     untranslated = make_rule("untranslated", "mn", 30, "untranslated raw")
@@ -43,15 +43,11 @@ def test_collect_issues_includes_severity_and_raw() -> None:
     issues = collect_issues(result, "file.yaml", "xx", include_raw=True)
     by_type = {issue["issue_type"]: issue for issue in issues}
 
-    assert by_type["missing_rule"]["severity"] == "high"
     assert by_type["missing_rule"]["english_raw"] == "missing raw"
 
-    assert by_type["extra_rule"]["severity"] == "low"
     assert by_type["extra_rule"]["translated_raw"] == "extra raw"
 
-    assert by_type["untranslated_text"]["severity"] == "high"
     assert by_type["untranslated_text"]["translated_raw"] == "untranslated raw"
 
-    assert by_type["rule_difference"]["severity"] == "medium"
     assert by_type["rule_difference"]["english_raw"] == "diff en raw"
     assert by_type["rule_difference"]["translated_raw"] == "diff tr raw"
