@@ -16,6 +16,7 @@ use std::time::SystemTime;
 use crate::definitions::read_definitions_file;
 use crate::errors::*;
 use crate::prefs::*;
+use crate::xpath_functions::is_leaf;
 use yaml_rust::{YamlLoader, Yaml, yaml::Hash};
 use crate::tts::*;
 use crate::infer_intent::*;
@@ -2432,9 +2433,8 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                     self.context_stack.push(pattern.var_defs.clone(), mathml)?;
                 }
                 let result = if self.nav_node_offset > 0 &&
-                            self.nav_node_id == mathml.attribute_value("id").unwrap_or_default() &&
-                            crate::xpath_functions::is_leaf(mathml) {
-                    let ch = crate::canonicalize::as_text(mathml).chars().nth(self.nav_node_offset-1).unwrap();
+                            self.nav_node_id == mathml.attribute_value("id").unwrap_or_default() && is_leaf(mathml) {
+                    let ch = crate::canonicalize::as_text(mathml).chars().nth(self.nav_node_offset-1).unwrap_or_default();
                     let ch = self.replace_single_char(ch, mathml)?;
                     // debug!("find_match: ch={} from '{}'; matched pattern name/tag: {}/{} with nav_node_offset={}",
                     //     ch, crate::canonicalize::as_text(mathml),
@@ -2492,14 +2492,19 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 
     fn nav_node_adjust<T:TreeOrString<'c, 'm, T>>(&self, speech: T, mathml: Element<'c>) -> T {
         if let Some(id) = mathml.attribute_value("id") {
-            // let offset = mathml.attribute_value(ID_OFFSET).unwrap_or("0");
             if self.nav_node_id == id {
-                if self.speech_rules.name == RulesFor::Braille {
-                    let highlight_style =  self.speech_rules.pref_manager.borrow().pref_to_string("BrailleNavHighlight");
-                    return T::highlight_braille(speech, highlight_style);
-                } else {
-                    // debug!("nav_node_adjust: marking nav speech for id='{}' offset='{}'", id, self.nav_node_offset);
-                    return T::mark_nav_speech(speech)
+                let offset = mathml.attribute_value(crate::navigate::ID_OFFSET).unwrap_or("0");
+                debug!("nav_node_adjust: id/name='{}/{}' offset?='{}'", id, name(mathml),
+                    self.nav_node_offset.to_string().as_str() == offset
+                );
+                if is_leaf(mathml) || self.nav_node_offset.to_string().as_str() == offset {
+                    if self.speech_rules.name == RulesFor::Braille {
+                        let highlight_style =  self.speech_rules.pref_manager.borrow().pref_to_string("BrailleNavHighlight");
+                        return T::highlight_braille(speech, highlight_style);
+                    } else {
+                        debug!("nav_node_adjust: id='{}' offset='{}/{}'", id, self.nav_node_offset, offset);
+                        return T::mark_nav_speech(speech)
+                    }
                 }
             }
         }
