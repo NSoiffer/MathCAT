@@ -73,9 +73,9 @@
             else: [t: "восклицательный знак"]   	#  0x21	(en: 'exclamation point', google translation)
         else: [t: "факториал"]                  	#  0x21	(en: 'factorial', google translation)
           
- - "\"": [t: "цитата"]                          	#  0x22	(en: 'quotation mark', google translation)
+ - "\"": [t: "кавычка"]                          	#  0x22	(en: 'quotation mark', google translation)
  - "#": [t: "число"]                            	#  0x23	(en: 'number', google translation)
- - "$": [t: "доллары"]                          	#  0x24	(en: 'dollars', google translation)
+ - "$": [t: "доллар"]                          	#  0x24	(en: 'dollars', google translation)
  - "%": [t: "процент"]                          	#  0x25	(en: 'percent')
  - "&": [t: "ampersand"]                        	#  0x26	(google translation)
  - "'": [t: "штрих"]                            	#  0x27	(en: 'apostrophe')
@@ -99,8 +99,8 @@
  - "*":                                         	#  0x2a
     test:
         if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='skip-super']"
-        then: [t: "звезда"]                     	#  0x2a	(en: 'star', google translation)
-        else: [t: "раз"]                        	#  0x2a	(en: 'times', google translation)
+        then: [t: "звёздочка"]                     	#  0x2a	(en: 'star', google translation)
+        else: [t: "умножить"]                        	#  0x2a	(en: 'times', google translation)
  - "+": [t: "плюс"]                             	#  0x2b	(en: 'plus')
  - ",":                                         	#  0x2c
     # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
@@ -128,7 +128,7 @@
         else: [t: "точка"]                      	# 	(en: 'dot', google translation)
  - "/": [t: "разделить на"]                     	#  0x2f	(en: 'divided by')
  - ":": [t: "двоеточие"]                        	#  0x3a	(en: 'colon')
- - ";": [t: "полуколон"]                        	#  0x3b	(en: 'semicolon', google translation)
+ - ";": [t: "точка с запятой"]                        	#  0x3b	(en: 'semicolon', google translation)
  - "<":                                         	#  0x3c
      - test: 
          if: "$Verbosity!='Terse'"
@@ -215,7 +215,7 @@
  - "×":                                         	#  0xd7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
-        then: [t: "раз"]                        	# 	(en: 'times', google translation)
+        then: [t: "умножить"]                        	# 	(en: 'times', google translation)
         else_test:
             if: $ClearSpeak_MultSymbolX = 'By'
             then: [t: "к"]                      	# 	(en: 'by', google translation)
@@ -292,7 +292,7 @@
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
             - "../*[1][.='…']"
-        then: [t: "точка точка дот"]            	# 	(en: 'dot dot dot', google translation)
+        then: [t: "точка точка точка"]            	# 	(en: 'dot dot dot', google translation)
         else_test:                              	#  must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"
             then: [t: "и так далее"]            	# 	(en: 'and so on', google translation)
@@ -320,7 +320,7 @@
  - "ℋℛℓ":                                       	#  0x210b
     - t: "сценарий"                             	# 	(en: 'script', google translation)
     - spell: "translate('.', 'ℋℛℓ', 'HRl')"
- - "ℎ": [t: "планка постоянная"]                	#  0x210e	(en: 'planck constant', google translation)
+ - "ℎ": [t: "постоянная планка"]                	#  0x210e	(en: 'planck constant', google translation)
  - "ℜ":                                         	#  0x211c
     - t: "фрактур"                              	# 	(en: 'fraktur', google translation)
     - spell: "'R'"
@@ -333,15 +333,15 @@
     - spell: "translate('.', 'ⅆⅇⅈⅉ', 'deij')"
 
  - "←": [t: "стрелка влево"]                    	#  0x2190	(en: 'leftwards arrow', google translation)
- - "↑": [t: "вверх стрелой"]                    	#  0x2191	(en: 'upwards arrow', google translation)
+ - "↑": [t: "стрелка вверх"]                    	#  0x2191	(en: 'upwards arrow', google translation)
  - "→":                                         	#  0x2192
      - test:
         if: "ancestor::*[2][self::m:limit]"
         then: [t: "подходы"]                    	# 	(en: 'approaches', google translation)
-        else: [t: "правая стрелка"]             	# 	(en: 'right arrow', google translation)
+        else: [t: "стрелка вправо"]             	# 	(en: 'right arrow', google translation)
 
- - "↓": [t: "вниз стрелы"]                      	#  0x2193	(en: 'downwards arrow', google translation)
- - "⇒": [t: "права двойная стрелка"]            	#  0x21d2	(en: 'rightwards double arrow', google translation)
+ - "↓": [t: "стрелка вниз"]                      	#  0x2193	(en: 'downwards arrow', google translation)
+ - "⇒": [t: "двойная стрелка вправо"]            	#  0x21d2	(en: 'rightwards double arrow', google translation)
  - "∀": [t: "для всех"]                         	#  0x2200	(en: 'for all')
  - "∂":                                         	#  0x2202
      - test: 

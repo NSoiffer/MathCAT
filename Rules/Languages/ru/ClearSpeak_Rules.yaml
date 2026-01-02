@@ -185,7 +185,7 @@
       if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
       then:
       - pause: short
-      - t: "конец фракции"      # phrase(7 over 8 'end fraction')
+      - t: "конец дроби"      # phrase(7 over 8 'end fraction')
       - pause: short
 
 - # fraction with text or numbers followed by text in both numerator and denominator
@@ -213,28 +213,28 @@
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
       then:
       - pause: short
-      - t: "конец фракции"      # phrase(7 over 8 'end fraction')
+      - t: "конец дроби"      # phrase(7 over 8 'end fraction')
       - pause: short
 
 - name: default
   tag: fraction
   match: "."
   replace:
-  - ot: "квадратный тут 25"      # phrase(5 is 'the' square toot of 25)
-  - t: "фракция с числителем"      # phrase(the 'fraction with numerator' 6)
+  - ot: "квадратный корень из 25"      # phrase(5 is 'the' square root of 25)
+  - t: "дробь с числителем"      # phrase(the 'fraction with numerator' 6)
   - test:
       if: not(IsNode(*[1], 'simple'))
       then: [pause: medium]
   - x: "*[1]"
   - pause: medium
-  - t: "и знаменатель"      # phrase(the fraction with numerator 5 'and denominator' 8)
+  - t: "и знаменателем"      # phrase(the fraction with numerator 5 'and denominator' 8)
   - x: "*[2]"
   - pause: long
   - test:
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='GeneralEndFrac'"
       then:
       - pause: short
-      - t: "конечной фракцией"      # phrase(the fraction with 3 over 4 'end fraction')
+      - t: "конец дроби"      # phrase(the fraction with 3 over 4 'end fraction')
       - pause: short
 
 # rules for functions raised to a power
@@ -263,7 +263,7 @@
   - test:
       if: "*[2][.='2']"
       then: [t: "квадрат"]      # phrase(25 equals 5 'squared')
-      else: [t: "кубиками"]      # phrase(625 equals 5 'cubed')
+      else: [t: "куб"]      # phrase(625 equals 5 'cubed')
 
 - name: function-power
   tag: power
@@ -289,7 +289,7 @@
   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
   replace:
   - x: "*[1]"
-  - t: "поднято до показателя"      # phrase(5 'raised to the exponent' x plus 1)
+  - t: "возведено в степень"      # phrase(5 'raised to the exponent' x plus 1)
   - pause: short
   - x: "*[2]"
   - pause: short
@@ -318,7 +318,7 @@
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
-  - t: "кубик"      # phrase(5 'cubed' equals 125)
+  - t: "куб"      # phrase(5 'cubed' equals 125)
 
 - name: simple-integer
   tag: power
@@ -332,7 +332,7 @@
       else: {x: "*[2]"}
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [t: "власти"]      # phrase(2 raised to the 'power' 7)
+      then: [t: "степени"]      # phrase(2 raised to the 'power' 7)
 
 - name: simple-negative-integer
   tag: power
@@ -346,7 +346,7 @@
   - x: "*[2]"
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [t: "власти"]      # phrase(2 raised to the 'power' 7)
+      then: [t: "степени"]      # phrase(2 raised to the 'power' 7)
 
 - name: simple-var
   tag: power
@@ -358,7 +358,7 @@
   - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [t: "власти"]      # phrase(2 raised to the 'power' 7)
+      then: [t: "степени"]      # phrase(2 raised to the 'power' 7)
 
 # match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
 #   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
@@ -383,9 +383,9 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - t: "поднят до"      # phrase(x 'raised to the' second power)
+  - t: "возведено в"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  - t: "сила"      # phrase(x raised to the second 'power')
+  - t: "степень"      # phrase(x raised to the second 'power')
 
 - # - [xxx]^n
   name: nested-negative-squared-or-cubed
@@ -404,9 +404,9 @@
   - "     ]"
   replace:
   - x: "*[1]"
-  - t: "поднят до"      # phrase(x 'raised to the' second power)
+  - t: "возведено в"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  - t: "сила"      # phrase(x raised to the second 'power')
+  - t: "степень"      # phrase(x raised to the second 'power')
 
 - # [xxx] var^n
   name: nested-var-squared-or-cubed
