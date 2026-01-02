@@ -1,0 +1,8 @@
+- name: struct-rule
+  tag: mi
+  match: ".//m:mi"
+  replace:
+    - test:
+        if: "@intent='foo'"
+        then:
+          - T: "foo"

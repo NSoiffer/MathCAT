@@ -1,0 +1,7 @@
+- name: vars-rule
+  tag: mo
+  match: ".//m:mo"
+  variables:
+    v2: "@intent"
+  replace:
+    - T: "x"
