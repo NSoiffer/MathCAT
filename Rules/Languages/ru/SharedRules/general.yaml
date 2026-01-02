@@ -13,7 +13,7 @@
   - test:
     - if: "*[2][.='+']"
       then: [t: "положительных"]      # phrase(set of all 'positive' integers less than 10)
-      else: [t: "негативных"]      # phrase(set of all 'negative' integers less than minus 10)
+      else: [t: "отрицательных"]      # phrase(set of all 'negative' integers less than minus 10)
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][.='ℂ']"
@@ -23,7 +23,7 @@
     - else_if: "*[1][.='ℚ']"
       then: [t: "рациональные числа"]      # phrase('rational numbers' are the fraction of 2 integers)
     - else_if: "*[1][.='ℝ']"
-      then: [t: "реальные числа"]      # phrase('real numbers' can be both positive and negative)
+      then: [t: "действительные числа"]      # phrase('real numbers' can be both positive and negative)
     - else_if: "*[1][.='ℤ']"
       then: [t: "целые числа"]      # phrase(positive 'integers' are natural numbers above 0)
       else: [x: "*[1][text()]"] # shouldn't happen
@@ -63,7 +63,7 @@
     - else_if: ".='ℚ'"
       then: [t: "рациональные числа"]      # phrase('the rational numbers' are the fraction of 2 integers)
     - else_if: ".='ℝ'"
-      then: [t: "реальные числа"]      # phrase('the real numbers' can be both positive and negative)
+      then: [t: "действительные числа"]      # phrase('the real numbers' can be both positive and negative)
     - else_if: ".='ℤ'"
       then: [t: "целые числа"]      # phrase('the integers' are natural numbers above 0)
       else: [x: "text()"] # shouldn't happen
@@ -73,14 +73,14 @@
   match: "."
   replace:
   - bookmark: "@id"
-  - t: "реальная часть"      # phrase('the real part' of a complex number does not include the imaginary part)
+  - t: "действительная часть"      # phrase('the real part' of a complex number does not include the imaginary part)
 
 - name: imaginary-part
   tag: imaginary-part
   match: "."
   replace:
   - bookmark: "@id"
-  - t: "воображаемая часть"      # phrase('the imaginary part' is part of a complex number)
+  - t: "комплексная часть"      # phrase('the imaginary part' is part of a complex number)
 
 # rules on scripted vertical bars ('evaluated at')
 - name: evaluated-at-2
