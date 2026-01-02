@@ -362,8 +362,8 @@
 - "∂": # 0x2202
     - test:
         if: "$Verbosity='Terse'"
-        then: { T: parsial }
-        else: { T: turunan parsial }
+        then: [ T: parsial ]
+        else: [ T: turunan parsial ]
 - "∃": [T: ada] # 0x2203
 - "∄": [T: tidak ada] # 0x2204
 - "∅": [T: himpunan kosong] # 0x2205
@@ -499,15 +499,15 @@
 - "≡": # 0x2261
     - test:
         if: "$Verbosity!='Terse'"
-        then: { T: identik dengan }
+        then: [ T: identik dengan ]
 - "≤": # 0x2264
     - test:
         if: "$Verbosity!='Terse'"
-        then: { T: kurang dari atau sama dengan }
+        then: [ T: kurang dari atau sama dengan ]
 - "≥": # 0x2265
     - test:
         if: "$Verbosity!='Terse'"
-        then: { T: lebih besar dari atau sama dengan }
+        then: [ T: lebih besar dari atau sama dengan ]
 - "≦": [T: kurang dari lebih sama dengan] # 0x2266
 - "≧": [T: lebih besar dari lebih sama dengan] # 0x2267
 - "≺": [T: mendahului] # 0x227a
@@ -515,11 +515,11 @@
 - "⊂": # 0x2282
     - test:
         if: "$Verbosity!='Terse'"
-        then: { T: himpunan bagian dari }
+        then: [ T: himpunan bagian dari ]
 - "⊃": # 0x2283
     - test:
         if: "$Verbosity!='Terse'"
-        then: { T: memuat himpunan }
+        then: [ T: memuat himpunan ]
 - "⊄": # 0x2284
     - test:
         if: "$Verbosity!='Terse'"
@@ -531,12 +531,12 @@
 - "⊆": # 0x2286
     - test:
         if: "$Verbosity!='Terse'"
-        then: { T: himpunan bagian dari atau sama dengan }
+        then: [ T: himpunan bagian dari atau sama dengan ]
 - "⊇": # 0x2287
     - test:
         if: "$Verbosity!='Terse'"
-        then: { T: memuat himpunan atau sama dengan }
+        then: [ T: memuat himpunan atau sama dengan ]
 - "≈": # 0x2248
     - test:
         if: "$Verbosity!='Terse'"
-        then: { T: mendekati }
+        then: [ T: mendekati ]

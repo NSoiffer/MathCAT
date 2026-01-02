@@ -35,7 +35,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: dari}
+          then: [T: dari]
       - x: "*[1]"
 
 - name: overview-default
@@ -46,11 +46,11 @@
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][.='2']"
-        then: {T: akar kuadrat}
+        then: [T: akar kuadrat]
       - else_if: "*[2][.='3']"
-        then: {T: akar pangkat tiga}
+        then: [T: akar pangkat tiga]
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: 'ToOrdinal(*[2])'}, {T: akar}]
+        then: [x: 'ToOrdinal(*[2])', T: akar]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -59,13 +59,13 @@
           - x: "*[2]"
           - pronounce: [text: " ", ipa: "θ", sapi5: " ", eloquence: " "]  # in Indonesian no need -th
           # - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"] 
-          else: {x: "*[2]"}
+          else: [x: "*[2]"]
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: dari}
+          then: [T: dari]
       - x: "*[1]"
 
 - name: matrix-override
@@ -76,8 +76,8 @@
   replace:
   - test:
       if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
-      then: {T: determinan}
-      else: {T: matriks}
+      then: [T: determinan]
+      else: [T: matriks]
   - T: ""
   - x: count(*[2]/*)
   - T: kali
@@ -99,7 +99,7 @@
   replace:
   - insert:
       nodes: "*"
-      replace: [{pause: auto}]
+      replace: [pause: auto]
 
 - name: long-mrow
   tag: mrow

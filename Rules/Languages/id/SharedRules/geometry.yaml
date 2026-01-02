@@ -37,7 +37,7 @@
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{T: ''}]
+      then: [T: '']
   - T: 'busur'
   - x: "*[1]"
   - x: "*[2]"

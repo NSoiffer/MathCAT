@@ -15,12 +15,12 @@
 - name: default
   tag: math
   match: "."
-  replace: [{x: "*[1]"}]
+  replace: [x: "*[1]"]
 
 - name: default
   tag: [mi, mn, mo, mtext]
   match: "."
-  replace: [{x: text()}]
+  replace: [x: text()]
 
 - name: default
   tag: mfrac
@@ -45,7 +45,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "of"}
+          then: [t: "of"]
       - x: "*[1]"
 
 - name: default
@@ -56,25 +56,25 @@
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][.='2']"
-        then: {t: "square root"}
+        then: [t: "square root"]
       - else_if: "*[2][.='3']"
-        then: {t: "cube root"}
+        then: [t: "cube root"]
       - else_if: "*[2][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
-        then: [{x: "ToOrdinal(*[2])"}, {t: "root"}]
+        then: [x: "ToOrdinal(*[2])", t: "root"]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-          else: {x: "*[2]"}
+          - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
+          else: [x: "*[2]"]
       - t: "root"
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "of"}
+          then: [t: "of"]
       - x: "*[1]"
 
 - name: default
@@ -89,8 +89,8 @@
   - x: count(*[2]/*[self::m:mtr][1]/*)
   - test:
       if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
-      then: {t: "determinant"}
-      else: {t: "matrix"}
+      then: [t: "determinant"]
+      else: [t: "matrix"]
 
 - name: default
   tag: mtable
@@ -108,7 +108,7 @@
   replace:
   - insert:
       nodes: "*"
-      replace: [{pause: auto}]
+      replace: [pause: auto]
 
 - name: long-mrow
   tag: mrow

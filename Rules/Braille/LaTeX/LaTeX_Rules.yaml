@@ -120,7 +120,7 @@
   #  - test:
   #     if: .[self::m:mlabeledtr]
   #     then: [x: "*[position()>1]"]
-  #     else: {x: "*"}
+  #     else: [x: "*"]
   - x: "*"
   - test: 
       if: "following-sibling::*"

@@ -19,20 +19,20 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: ""}      # phrase('the' square root of 25)
+      then: [T: ""]      # phrase('the' square root of 25)
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - bookmark: "*[1]/@id"
       - test:
           if: parent::*[self::m:minus and count(*)=1]
-          then: [{T: "negatiivinen"}]      # phrase(minus 4 is a 'negative' number)
-          else: [{T: "positiivinen"}]      # phrase(10 is a 'positive' number)
+          then: [T: "negatiivinen"]      # phrase(minus 4 is a 'negative' number)
+          else: [T: "positiivinen"]      # phrase(10 is a 'positive' number)
   - T: "neliöjuuri"      # phrase(8 is the 'square root' of 64)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: ""}      # phrase(the square root 'of' 5)
-      else: {pause: short}
+      then: [T: ""]      # phrase(the square root 'of' 5)
+      else: [pause: short]
   - x: "*[1]"
   - test:
     - if: "$ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
@@ -41,8 +41,8 @@
       - T: "loppu juuri"      # phrase(the square root of x 'end root')
       - pause: medium
     - else_if: "IsNode(*[1], 'simple')"
-      then: [{pause: short}]
-      else: [{pause: long}]
+      then: [pause: short]
+      else: [pause: long]
 
 - name: default
   tag: root
@@ -50,40 +50,40 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: ""}      # phrase(6 is 'the' square root of 36)
+      then: [T: ""]      # phrase(6 is 'the' square root of 36)
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - test:
           if: "parent::*[(self::m:minus or self::m:plus) and count(*)=1]"
-          then: [{bookmark: "parent/@id"}]
+          then: [bookmark: "parent/@id"]
       - test:
           if: parent::m:minus
-          then: [{T: "negatiivinen"}]      # phrase(minus 6 is a 'negative' number)
-          else: [{T: "positiivinen"}]      # phrase(10 is a 'positive' number)
+          then: [T: "negatiivinen"]      # phrase(minus 6 is a 'negative' number)
+          else: [T: "positiivinen"]      # phrase(10 is a 'positive' number)
   - test:
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][.='2']"
-        then: {T: "neliöjuuri"}      # phrase(5 is the 'square root' of 25)
+        then: [T: "neliöjuuri"]      # phrase(5 is the 'square root' of 25)
       - else_if: "*[2][.='3']"
-        then: {T: "kuutiojuuri"}      # phrase(5 is the 'cube root' of 625)
+        then: [T: "kuutiojuuri"]      # phrase(5 is the 'cube root' of 625)
       - else_if: "*[2][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
         then_test:
             if: "*[2][.<=20]"
-            then: [{x: "ToOrdinal(*[2])"}, {T: "juuri"}]      # phrase(the square 'root' of 25)
-            else: [{x: "*[2]"}, {T: "juuri"}]      # phrase(the square 'root' of 25)
+            then: [x: "ToOrdinal(*[2])", T: "juuri"]      # phrase(the square 'root' of 25)
+            else: [x: "*[2]", T: "juuri"]      # phrase(the square 'root' of 25)
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - PRONOUNCE: [{text: "nes"}, {ipa: "nes"}, {sapi5: "nes"}, {eloquence: "nes"}]
-          else: {x: "*[2]"}
+          - PRONOUNCE: [text: "nes", ipa: "nes", sapi5: "nes", eloquence: "nes"]
+          else: [x: "*[2]"]
       - T: "juuri"      # phrase(the square 'root' of 36)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: ""}      # phrase(the square root 'of' 36)
+      then: [T: ""]      # phrase(the square root 'of' 36)
   - x: "*[1]"
   - test:
       if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
@@ -93,8 +93,8 @@
       - pause: medium
       else_test:
         if: IsNode(*[1], 'simple')
-        then: [{pause: short}]
-        else: [{pause: long}]
+        then: [pause: short]
+        else: [pause: long]
 
 # The 'negative' rule interacts with the msqrt/mroot rules as those might pick off this case ("the negative square root of x")
 - name: negative_and_positive
@@ -105,13 +105,13 @@
       if:
       - "*[1][self::m:square-root or self::m:root] and"
       - "($ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd')"
-      then: {T: ""}
+      then: [T: ""]
       else:
       - bookmark: "@id"
       - test:
           if: "self::m:minus"
-          then: [{T: "negatiivinen"}]      # phrase(minus 5 is a 'negative' number)
-          else: [{T: "positiivinen"}]      # phrase(7 is a 'positive' number)
+          then: [T: "negatiivinen"]      # phrase(minus 5 is a 'negative' number)
+          else: [T: "positiivinen"]      # phrase(7 is a 'positive' number)
   - x: "*[1]"
 
 # Fraction rules
@@ -162,7 +162,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [{OT: ""}]
+          then: [OT: ""]
       - T: "murtoluku"      # phrase(the 'fraction' with 3 over 4)
   - x: "*[1]"
   - T: "per"      # phrase(the fraction 3 'over' 4)
@@ -211,7 +211,7 @@
   - T: "murtoluku osoittaja"      # phrase(the 'fraction with numerator' 6)
   - test:
       if: not(IsNode(*[1], 'simple'))
-      then: {pause: medium}
+      then: [pause: medium]
   - x: "*[1]"
   - pause: medium
   - T: "ja nimittäjä"      # phrase(the fraction with numerator 5 'and denominator' 8)
@@ -233,11 +233,11 @@
   replace:
   - test:
       if: $ClearSpeak_Trig = 'TrigInverse'
-      then: [{T: "käänteis"}, {x: "*[1]"}, {bookmark: "*[2]/@id"}]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
+      then: [T: "käänteis", x: "*[1]", bookmark: "*[2]/@id"]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
       else_test:
         if: $ClearSpeak_Trig = 'ArcTrig'
-        then: [{bookmark: "*[2]/@id"}, {T: "arkus"}, {x: "*[1]"}]      # phrase(the 'arc' of a circle)
-        else: [{bookmark: "*[2]/@id"}, {T: "käänteis"}, {x: "*[1]"}] # default/Auto      # phrase(8 over 5 is the 'inverse' of 5 over 8)
+        then: [bookmark: "*[2]/@id", T: "arkus", x: "*[1]"]      # phrase(the 'arc' of a circle)
+        else: [bookmark: "*[2]/@id", T: "käänteis", x: "*[1]"] # default/Auto      # phrase(8 over 5 is the 'inverse' of 5 over 8)
 
 - name: function-squared-or-cubed
   tag: power
@@ -250,8 +250,8 @@
   - test:
       if: "*[2][.='2']"
       # better way?
-      then: {T: "toiseen"}      # phrase(25 equals 5 'squared')
-      else: {T: "kolmanteen"}      # phrase(625 equals 5 'cubed')
+      then: [T: "toiseen"]      # phrase(25 equals 5 'squared')
+      else: [T: "kolmanteen"]      # phrase(625 equals 5 'cubed')
 
 # FI: this grammar doesn't work in Finnish, so commented out
 # - name: function-power
@@ -261,12 +261,12 @@
 #   replace:
 #   - test:
 #       if: "$Verbosity!='Terse'"
-#       then: {T: ""}      # phrase('the' third power of 2)
+#       then: [T: ""]      # phrase('the' third power of 2)
 #   - bookmark: "*[2]/@id"
 #   - test:
 #       if: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
-#       then: [{x: "ToOrdinal(*[2])"}]
-#       else: [{x: "*[2]"}]
+#       then: [x: "ToOrdinal(*[2])"]
+#       else: [x: "*[2]"]
 #   - T: "potenssi"      # phrase(the third 'power of' 6)
 #   - pause: short
 #   - x: "*[1]"
@@ -319,11 +319,11 @@
   - x: "*[2]"
   # - test:
   #     if: "*[2][.>0]"
-  #     then: {x: "ToOrdinal(*[2])"}
-  #     else: {x: "*[2]"}
+  #     then: [x: "ToOrdinal(*[2])"]
+  #     else: [x: "*[2]"]
   # - test:
   #     if: "$ClearSpeak_Exponents != 'Ordinal'"
-  #     then: [{T: ""}]      # phrase(2 raised to the 'power' 7)
+  #     then: [T: ""]      # phrase(2 raised to the 'power' 7)
 
 - name: simple-negative-integer
   tag: power
@@ -337,7 +337,7 @@
   - x: "*[2]"
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{T: ""}]      # phrase(2 raised to the 'power' 7)
+      then: [T: ""]      # phrase(2 raised to the 'power' 7)
 
 - name: simple-var
   tag: power
@@ -346,10 +346,10 @@
   - x: "*[1]"
   - T: "potenssiin"     # phrase(3 raised 'to the' power 7)
   - x: "*[2]"
-  # - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}] # FI: no need to pronounce
+  # - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"] # FI: no need to pronounce
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{T: ""}]      # phrase(2 raised to the 'power' 7)
+      then: [T: ""]      # phrase(2 raised to the 'power' 7)
 
 # match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
 #   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
@@ -475,12 +475,12 @@
   name: ClearSpeak-absolute-value
   tag: absolute-value
   match: "."
-  variables: [{WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinaliteetti', 'itseisarvo')"}]
+  variables: [WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinaliteetti', 'itseisarvo')"]
   replace:
   # FI: not needed
   # - test:
   #     if: "$Verbosity!='Terse'"
-  #     then: {T: ""}      # phrase('the' absolute value of 25)
+  #     then: [T: ""]      # phrase('the' absolute value of 25)
   - x: "$WordToSay"
   # FI: not needed
   # - T: ""      # phrase(the absolute value 'of' 25)
@@ -499,22 +499,22 @@
   replace:
   - test:
     - if: "count(*)=0"
-      then: [{T: "tyhjä joukko"}]      # phrase('the empty set')
+      then: [T: "tyhjä joukko"]      # phrase('the empty set')
     - else_if: "count(*)=2"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: ""}      # phrase('the' empty set)
+          then: [T: ""]      # phrase('the' empty set)
       - T: "tyhjä joukko"      # phrase(the 'empty set')
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: ""}      # phrase('the' set of all integers)
+          then: [T: ""]      # phrase('the' set of all integers)
       - T: "joukko"      # phrase(this is a 'set of' numbers)
       - test:
           if: $ClearSpeak_Sets != 'woAll'
-          then: [{T: "kaikilla"}]      # phrase(the set of 'all' integers)
+          then: [T: "kaikilla"]      # phrase(the set of 'all' integers)
       - x: "*[1]/*[1]"
       - T: "siten että"      # phrase(the set S 'such that' x is less than y)
       - x: "*[1]/*[3]"
@@ -524,7 +524,7 @@
           then:
           - test:
               if: "$Verbosity!='Terse'"
-              then: {T: ""}      # phrase('the' set of integers)
+              then: [T: ""]      # phrase('the' set of integers)
           - T: "joukko"      # phrase(this is a 'set' of integers)
       - x: "*[1]"
 
@@ -549,7 +549,7 @@
       then:
       - test:
           if: "starts-with(name(.), 'open')"
-          then: [{T: "ei"}]      # phrase(the interval from a to b 'not' including b)
+          then: [T: "ei"]      # phrase(the interval from a to b 'not' including b)
       - T: "sisältäen"      # phrase(the interval from a to b not 'including' b)
       - x: "*[1]"
     # logic to deal with [not] arg #1
@@ -557,10 +557,10 @@
       if: "not($is_intervals_start_infinity or $is_intervals_end_infinity)"
       then_test:
       - if: "name(.)='open-interval'"
-        then: [{T: "tai"}]      # phrase(the interval including a 'or' b )
+        then: [T: "tai"]      # phrase(the interval including a 'or' b )
       - else_if: "name(.)='closed-interval'"
-        then: [{T: "ja"}]      # phrase(the interval including a 'and' b)
-        else: [{T: "mutta"}]      # phrase(the interval including a 'but' not b)
+        then: [T: "ja"]      # phrase(the interval including a 'and' b)
+        else: [T: "mutta"]      # phrase(the interval including a 'but' not b)
     # some ugly logic dealing with connectives: or, but, but, and (cleaner to be part of next clause?)
   - test:
       if: not($is_intervals_end_infinity)
@@ -571,7 +571,7 @@
           then:
           - test:
               if: "name(.) = 'open-interval' or name(.) = 'closed-open-interval'"
-              then: [{T: "ei"}]      # phrase(the interval 'not' including a)
+              then: [T: "ei"]      # phrase(the interval 'not' including a)
           - T: "sisältäen"      # phrase(the interval not 'including' a)
       - x: "*[2]"
 
@@ -658,43 +658,43 @@
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: "tapausta"}]    # FI: plural
-                else: [{T: "tapaus"}]     # phrase(this is the first 'case' of three cases) # FI: singular
+                then: [T: "tapausta"]    # FI: plural
+                else: [T: "tapaus"]     # phrase(this is the first 'case' of three cases) # FI: singular
         - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: "riviä"}]    # FI: plural
-                else: [{T: "rivi"}]      # phrase(this is the first 'line' of three lines) # FI: singular
+                then: [T: "riviä"]    # FI: plural
+                else: [T: "rivi"]      # phrase(this is the first 'line' of three lines) # FI: singular
         - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: "ehtoa"}]    # FI: plural
-                else: [{T: "ehto"}]      # phrase(this is the first 'contraint' of three contrains) # FI: singular
+                then: [T: "ehtoa"]    # FI: plural
+                else: [T: "ehto"]      # phrase(this is the first 'contraint' of three contrains) # FI: singular
         - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: "yhtälöä"}]    # FI: plural
-                else: [{T: "yhtälö"}]     # phrase(this is the first 'equation' of three equations) # FI: singular
+                then: [T: "yhtälöä"]    # FI: plural
+                else: [T: "yhtälö"]     # phrase(this is the first 'equation' of three equations) # FI: singular
         - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: "riviä"}]    # FI: plural
-                else: [{T: "rivi"}]     # phrase(this is the first 'row' of three rows) # FI: singular
+                then: [T: "riviä"]    # FI: plural
+                else: [T: "rivi"]     # phrase(this is the first 'row' of three rows) # FI: singular
         - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: "vaihetta"}]    # FI: plural
-                else: [{T: "vaihe"}]      # phrase(this is the first 'step' of three steps)
+                then: [T: "vaihetta"]    # FI: plural
+                else: [T: "vaihe"]      # phrase(this is the first 'step' of three steps)
       #     # else 'None -- don't say anything'
       # FI: following doesn't work for Finnish, new logic implemented above
       # - test:
       #   - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-      #     then: [{ct: "s"}] # plural      # phrase(shown by the letter 's')
+      #     then: [ct: "s"] # plural      # phrase(shown by the letter 's')
       - pause: short
   - x: "*"
 
@@ -705,17 +705,17 @@
   - pause: medium
   - test:
     - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
-      then: [{T: "tapaus"}]      # phrase(in this  'case' x is not equal to y)
+      then: [T: "tapaus"]      # phrase(in this  'case' x is not equal to y)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
-      then: [{T: "rivi"}]      # phrase(the straight 'line' between x and y)
+      then: [T: "rivi"]      # phrase(the straight 'line' between x and y)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
-      then: [{T: "ehto"}]      # phrase(there is a 'constraint' on possible values)
+      then: [T: "ehto"]      # phrase(there is a 'constraint' on possible values)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
-      then: [{T: "yhtälö"}]      # phrase(the 'equation' pi r squared gives the area of a circle)
+      then: [T: "yhtälö"]      # phrase(the 'equation' pi r squared gives the area of a circle)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
-      then: [{T: "rivillä"}]      # phrase(the values on the top 'row' are relevant)
+      then: [T: "rivillä"]      # phrase(the values on the top 'row' are relevant)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
-      then: [{T: "vaihe"}]      # phrase(this is a 'step' by step process) # FI: new logic needed for Finnish
+      then: [T: "vaihe"]      # phrase(this is a 'step' by step process) # FI: new logic needed for Finnish
       # else 'None -- don't say anything'
   - test:
       if: "$ClearSpeak_MultiLineLabel != 'None'"
@@ -729,11 +729,11 @@
       - pause: medium
   - test:
       if: .[self::m:mlabeledtr]
-      then: [{x: "*[position()>1]"}]
-      else: {x: "*"}
+      then: [x: "*[position()>1]"]
+      else: [x: "*"]
   - test:
       if: "$ClearSpeak_MultiLineLabel != 'None'"
-      then: [{pause: long}]
+      then: [pause: long]
 
 - name: ClearSpeak_Functions_None
   tag: mo
@@ -743,8 +743,8 @@
   replace:
     test:
       if: "$ClearSpeak_ImpliedTimes = 'None'"
-      then: [{T: ""}]
-      else: [{T: "kertaa"}]      # phrase(5 'times' 3 equals 15)
+      then: [T: ""]
+      else: [T: "kertaa"]      # phrase(5 'times' 3 equals 15)
 
 - name: no-times
   tag: mo

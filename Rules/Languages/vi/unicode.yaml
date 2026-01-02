@@ -326,8 +326,8 @@
  - "∂":                                          # 0x2202
       - test: 
          if: "$Verbosity='Terse'"
-         then: {T: phần}
-         else: {T: đạo hàm riêng}
+         then: [T: phần]
+         else: [T: đạo hàm riêng]
  - "∃": [T: tồn tại ít nhất]                        # 0x2203
  - "∄": [T: không tồn tại]                # 0x2204
  - "∅": [T: tập hợp rỗng]                           # 0x2205
@@ -474,15 +474,15 @@
  - "≡":                                          # 0x2261
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {T: trùng với}
+         then: [T: trùng với]
  - "≤": [T: nhỏ hơn hoặc bằng]                                         # 0x2264
      #- test: 
          #if: "$Verbosity!='Terse'"
-         #then: {T: nhỏ hơn hoặc bằng}
+         #then: [T: nhỏ hơn hoặc bằng]
  - "≥": [T: lớn hơn hoặc bằng]                                         # 0x2265
      #- test: 
          #if: "$Verbosity!='Terse'"
-         #then: {T: lớn hơn hoặc bằng}
+         #then: [T: lớn hơn hoặc bằng]
  - "≦": [T: nhỏ hơn hoặc bằng]             # 0x2266
  - "≧": [T: lớn hơn hoặc bằng]          # 0x2267
  - "≺": [T: precedes]                            # 0x227a
@@ -490,11 +490,11 @@
  - "⊂": [T: chứa trong]                                         # 0x2282
      #- test: 
          #if: "$Verbosity!='Terse'"
-         #then: {T: chứa trong}
+         #then: [T: chứa trong]
  - "⊃": [T: chứa]                                         # 0x2283
      #- test: 
          #if: "$Verbosity!='Terse'"
-         #then: {T: chứa}
+         #then: [T: chứa]
  - "⊄":                                          # 0x2284
    #  - test: 
     #     if: "$Verbosity!='Terse'"
@@ -508,8 +508,8 @@
  - "⊆": [T: chứa trong hoặc bằng]                                         # 0x2286
      #- test: 
          #if: "$Verbosity!='Terse'"
-         #then: {T: chứa trong}
+         #then: [T: chứa trong]
  - "⊇": [T: chứa hoặc bằng]                                         # 0x2287
      #- test: 
          #if: "$Verbosity!='Terse'"
-         #then: {T: chứa}
+         #then: [T: chứa]

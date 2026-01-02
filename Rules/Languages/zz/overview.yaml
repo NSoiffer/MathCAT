@@ -66,8 +66,8 @@
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-          else: {x: "*[2]"}
+          - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
+          else: [x: "*[2]"]
       - t: "root"
   - test:
       if: "IsNode(*[1], 'simple')"

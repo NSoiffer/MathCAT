@@ -39,7 +39,7 @@
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{T: "el"}]
+      then: [T: "el"]
   - T: "arco"
   - x: "*[1]"
   - x: "*[2]"

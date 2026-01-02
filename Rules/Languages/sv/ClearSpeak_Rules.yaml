@@ -23,12 +23,12 @@
       - bookmark: "*[1]/@id"
       - test:
           if: parent::*[self::m:minus and count(*)=1]
-          then: [{T: "negativa"}]      # phrase(minus 4 is a 'negative' number)
-          else: [{T: "positiva"}]      # phrase(10 is a 'positive' number)
+          then: [T: "negativa"]      # phrase(minus 4 is a 'negative' number)
+          else: [T: "positiva"]      # phrase(10 is a 'positive' number)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: "kvadratroten ur"}      # phrase(the square root 'of' 5)
-      else: {T: "roten ur"}
+      then: [T: "kvadratroten ur"]      # phrase(the square root 'of' 5)
+      else: [T: "roten ur"]
   - x: "*[1]"
   - test:
     - if: "$ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
@@ -37,8 +37,8 @@
       - T: "slut rot"      # phrase(the square root of x 'end root')
       - pause: medium
     - else_if: "IsNode(*[1], 'simple')"
-      then: [{pause: short}]
-      else: [{pause: long}]
+      then: [pause: short]
+      else: [pause: long]
 
 - name: default
   tag: root
@@ -49,20 +49,20 @@
       then:
       - test:
           if: "parent::*[(self::m:minus or self::m:plus) and count(*)=1]"
-          then: [{bookmark: "parent/@id"}]
+          then: [bookmark: "parent/@id"]
       - test:
           if: parent::m:minus
-          then: [{T: "negativa"}]      # phrase(minus 6 is a 'negative' number)
-          else: [{T: "positiva"}]      # phrase(10 is a 'positive' number)
+          then: [T: "negativa"]      # phrase(minus 6 is a 'negative' number)
+          else: [T: "positiva"]      # phrase(10 is a 'positive' number)
   - test:
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][.='2']"
-        then: {T: "kvadratroten"}      # phrase(5 is the 'square root' of 25)
+        then: [T: "kvadratroten"]      # phrase(5 is the 'square root' of 25)
       - else_if: "*[2][.='3']"
-        then: {T: "kubikroten"}        # phrase(5 is the 'cube root' of 625)
+        then: [T: "kubikroten"]        # phrase(5 is the 'cube root' of 625)
       - else_if: "*[2][not(contains(., ','))]"   # SWEDISH: Changed decimal point to comma.
-        then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]      # phrase(the square 'root' of 25)
+        then: [x: "ToOrdinal(*[2])", T: "roten"]      # phrase(the square 'root' of 25)
       else:
       - T: "roten av grad"      # phrase(the square 'root' of 36)
       - x: "*[2]"
@@ -77,8 +77,8 @@
       - pause: medium
       else_test:
         if: IsNode(*[1], 'simple')
-        then: [{pause: short}]
-        else: [{pause: long}]
+        then: [pause: short]
+        else: [pause: long]
 
 # The 'negative' rule interacts with the msqrt/mroot rules as those might pick off this case ("the negative square root of x")
 - name: negative_and_positive
@@ -89,13 +89,13 @@
       if:
       - "*[1][self::m:square-root or self::m:root] and"
       - "($ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd')"
-      then: {T: ""}
+      then: [T: ""]
       else:
       - bookmark: "@id"
       - test:
           if: "self::m:minus"
-          then: [{T: "minus"}]      # phrase(minus 5 is a 'negative' number)
-          else: [{T: "plus"}]      # phrase(7 is a 'positive' number)
+          then: [T: "minus"]      # phrase(minus 5 is a 'negative' number)
+          else: [T: "plus"]      # phrase(7 is a 'positive' number)
   - x: "*[1]"
 
 # Fraction rules
@@ -185,7 +185,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [T: "bråk"]    # [{ot: "the"}]
+          then: [T: "bråk"]    # [ot: "the"]
       - pause: short
       else:
       - test:
@@ -254,7 +254,7 @@
       - T: "täljare"
   - test:
       if: not(IsNode(*[1], 'simple'))
-      then: {pause: medium}
+      then: [pause: medium]
   - x: "*[1]"
   - pause: medium
   - test:
@@ -279,11 +279,11 @@
   replace:
   - test:
       if: $ClearSpeak_Trig = 'TrigInverse'
-      then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, {T: "invers"}]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
+      then: [x: "*[1]", bookmark: "*[2]/@id", T: "invers"]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
       else_test:
         if: $ClearSpeak_Trig = 'ArcTrig'
-        then: [{bookmark: "*[2]/@id"}, {T: "arc"}, {x: "*[1]"}]      # phrase(the 'arc' of a circle)
-        else: [{bookmark: "*[2]/@id"}, {T: "invers"}, {x: "*[1]"}] # default/Auto      # phrase(8 over 5 is the 'inverse' of 5 over 8)
+        then: [bookmark: "*[2]/@id", T: "arc", x: "*[1]"]      # phrase(the 'arc' of a circle)
+        else: [bookmark: "*[2]/@id", T: "invers", x: "*[1]"] # default/Auto      # phrase(8 over 5 is the 'inverse' of 5 over 8)
 
 
 - name: function-squared-or-cubed
@@ -296,8 +296,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][.='2']"
-      then: {T: "kvadrat"}      # phrase(25 equals 5 'squared')
-      else: {T: "kubik"}      # phrase(625 equals 5 'cubed')
+      then: [T: "kvadrat"]      # phrase(25 equals 5 'squared')
+      else: [T: "kubik"]      # phrase(625 equals 5 'cubed')
 
 - name: function-power
   tag: power
@@ -522,19 +522,19 @@
   replace:
   - test:
     - if: "count(*)=0"
-      then: [{T: "den tomma mängden"}]      # phrase('the empty set')
+      then: [T: "den tomma mängden"]      # phrase('the empty set')
     - else_if: "count(*)=2"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: "den"}      # phrase('the' empty set)
+          then: [T: "den"]      # phrase('the' empty set)
       - T: "tomma mängden"      # phrase(the 'empty set')
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
       then:
       - T: "mängden av"      # phrase(this is a 'set of' numbers)
       - test:
           if: $ClearSpeak_Sets != 'woAll'
-          then: [{T: "alla"}]      # phrase(the set of 'all' integers)
+          then: [T: "alla"]      # phrase(the set of 'all' integers)
       - x: "*[1]/*[1]"
       - T: "sådana att"      # phrase(the set S 'such that' x is less than y)
       - x: "*[1]/*[3]"
@@ -607,8 +607,8 @@
   - pause: medium
   - test:
       if: .[self::m:mlabeledtr]
-      then: [{x: "*[position()>1]"}]
-      else: {x: "*"}
+      then: [x: "*[position()>1]"]
+      else: [x: "*"]
 
 - # handle both log and ln
   name: ClearSpeak-log
@@ -658,38 +658,38 @@
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: "fall"}]
-                else: [{T: "fall"}]      # phrase(this is the first 'case' of three cases)
+                then: [T: "fall"]
+                else: [T: "fall"]      # phrase(this is the first 'case' of three cases)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: "rader"}]      # phrase(this is the first 'line' of three lines)
-                else: [{T: "rad"}]      # phrase(this is the first 'line' of three lines)
+                then: [T: "rader"]      # phrase(this is the first 'line' of three lines)
+                else: [T: "rad"]      # phrase(this is the first 'line' of three lines)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: "avgränsningar"}]      # phrase(this is the first 'constraint' of three constraints)
-                else: [{T: "avgränsning"}]      # phrase(this is the first 'constraint' of three constraints)
+                then: [T: "avgränsningar"]      # phrase(this is the first 'constraint' of three constraints)
+                else: [T: "avgränsning"]      # phrase(this is the first 'constraint' of three constraints)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: "ekvationer"}]      # phrase(this is the first 'equation' of three equations)
-                else: [{T: "ekvation"}]      # phrase(this is the first 'equation' of three equations)
+                then: [T: "ekvationer"]      # phrase(this is the first 'equation' of three equations)
+                else: [T: "ekvation"]      # phrase(this is the first 'equation' of three equations)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: "rader"}]      # phrase(this is the first 'row' of three rows)
-                else: [{T: "rad"}]      # phrase(this is the first 'row' of three rows)
+                then: [T: "rader"]      # phrase(this is the first 'row' of three rows)
+                else: [T: "rad"]      # phrase(this is the first 'row' of three rows)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: "steg"}]      # phrase(this is the first 'step' of three steps)
-                else: [{T: "steg"}]      # phrase(this is the first 'step' of three steps)
+                then: [T: "steg"]      # phrase(this is the first 'step' of three steps)
+                else: [T: "steg"]      # phrase(this is the first 'step' of three steps)
           # SWEDISH: Every expression had to be inflected separately.
       - pause: short
   - x: "*"
@@ -701,17 +701,17 @@
   - pause: medium
   - test:
     - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
-      then: [{T: "fall"}]      # phrase(in this  'case' x is not equal to y)
+      then: [T: "fall"]      # phrase(in this  'case' x is not equal to y)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
-      then: [{T: "rad"}]      # phrase(the straight 'line' between x and y)
+      then: [T: "rad"]      # phrase(the straight 'line' between x and y)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
-      then: [{T: "avgränsning"}]      # phrase(there is a 'constraint' on possible values)
+      then: [T: "avgränsning"]      # phrase(there is a 'constraint' on possible values)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
-      then: [{T: "ekvation"}]      # phrase(the 'equation' pi r squared gives the area of a circle)
+      then: [T: "ekvation"]      # phrase(the 'equation' pi r squared gives the area of a circle)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
-      then: [{T: "rad"}]      # phrase(the values on the top 'row' are relevant)
+      then: [T: "rad"]      # phrase(the values on the top 'row' are relevant)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
-      then: [{T: "steg"}]      # phrase(this is a 'step' by step process)
+      then: [T: "steg"]      # phrase(this is a 'step' by step process)
       # else 'None -- don't say anything'
   - test:
       if: "$ClearSpeak_MultiLineLabel != 'None'"
@@ -725,11 +725,11 @@
       - pause: medium
   - test:
       if: .[self::m:mlabeledtr]
-      then: [{x: "*[position()>1]"}]
-      else: {x: "*"}
+      then: [x: "*[position()>1]"]
+      else: [x: "*"]
   - test:
       if: "$ClearSpeak_MultiLineLabel != 'None'"
-      then: [{pause: long}]
+      then: [pause: long]
 
 - name: ClearSpeak_Functions_None
   tag: mo
@@ -739,8 +739,8 @@
   replace:
     test:
       if: "$ClearSpeak_ImpliedTimes = 'None'"
-      then: [{T: ""}]
-      else: [{T: "gånger"}]      # phrase(5 'times' 3 equals 15)
+      then: [T: ""]
+      else: [T: "gånger"]      # phrase(5 'times' 3 equals 15)
 
 - name: no-times
   tag: mo

@@ -459,7 +459,7 @@
   - test:
       if: "self::m:mlabeledtr"
       then: [x: "*[position()>1]"]
-      else: {x: "*"}
+      else: [x: "*"]
 
 - name: default
   tag: mtd

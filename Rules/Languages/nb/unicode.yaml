@@ -53,8 +53,8 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [{pause: short}, {T: "startparentes"}]                   #  0x28 (en: 'open', google translation)
-            else: [{pause: short}, {T: "startparentes"}]          #  0x28 (en: 'open paren')
+            then: [pause: short, T: "startparentes"]                   #  0x28 (en: 'open', google translation)
+            else: [pause: short, T: "startparentes"]          #  0x28 (en: 'open paren')
         else: [T: "venstreparentes"]            #  0x28 (en: 'left paren')
     - pause: short
  - ")":                                          #  0x29
