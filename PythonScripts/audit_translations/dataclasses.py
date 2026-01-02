@@ -5,7 +5,7 @@ Contains dataclasses for representing rules and comparison results.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Tuple, Optional
+from typing import Any, List, Tuple, Optional
 
 
 @dataclass
@@ -16,6 +16,7 @@ class RuleInfo:
     key: str             # For unicode entries, this is the character/range
     line_number: int
     raw_content: str
+    data: Optional[Any] = None
     has_untranslated_text: bool = False
     untranslated_keys: List[str] = field(default_factory=list)
     audit_ignore: bool = False

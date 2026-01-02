@@ -53,27 +53,42 @@ The tool automatically adjusts its matching logic based on the file type:
 
 **Syntax:**
 ```bash
-python audit-translations.py <language> [--file <specific_file>]
-python audit-translations.py --list
+python -m audit_translations <language> [--file <specific_file>]
+python -m audit_translations --list
 ```
 
 **Convenience Features:**
 * `--list`: Displays all available languages.
 * `--file`: Audits a single specific file instead of the whole directory.
+* `--format`: Output format (`rich`, `jsonl`, `csv`, `tasks`).
+* `--output`: Write output to a file instead of stdout.
+* `--fast`: Skip structural diffs and extra rules for quicker translation-focused audits.
+* `--rules-dir`: Override the Rules/Languages directory path.
+* `--only`: Filter issue types (comma-separated): `missing`, `untranslated`, `extra`, `diffs`, `all`.
+* `--summary-only`: Show only the summary (rich output only).
+* `--severity`: Filter severities in non-rich output (`high`, `medium`, `low`, `all`).
 * **Summary Stats:** Provides a statistical summary after every run.
 
 **Examples:**
 
 ```bash
 # List available languages
-python audit-translations.py --list
+python -m audit_translations --list
 
 # Audit all Spanish translation files
-python audit-translations.py es
+python -m audit_translations es
 
 # Audit German translations
-python audit-translations.py de
+python -m audit_translations de
 
 # Audit only a specific file
-python audit-translations.py es --file SharedRules/default.yaml
+python -m audit_translations es --file SharedRules/default.yaml
+
+# Produce JSONL output for automation or AI workflows
+python -m audit_translations es --format jsonl --output es-issues.jsonl
+
+# Produce task-focused JSONL for AI-assisted translation
+python -m audit_translations es --format tasks --output es-tasks.jsonl
+
+# Task output includes raw rule blocks to make copy/paste edits easier.
 ```
