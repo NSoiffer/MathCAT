@@ -5,7 +5,6 @@ Contains functions for comparing English and translated files,
 and for performing full language audits.
 """
 
-import csv
 import json
 import os
 import sys
@@ -20,22 +19,6 @@ from rich.table import Table
 from .dataclasses import RuleInfo, RuleDifference, ComparisonResult
 from .parsers import parse_yaml_file, diff_rules
 console = Console()
-
-ISSUE_FIELDS = [
-    "language",
-    "file",
-    "issue_type",
-    "diff_type",
-    "rule_name",
-    "rule_tag",
-    "rule_key",
-    "line_en",
-    "line_tr",
-    "description",
-    "english_snippet",
-    "translated_snippet",
-    "untranslated_texts",
-]
 
 
 def get_rules_dir(rules_dir: Optional[str] = None) -> Path:
@@ -168,7 +151,6 @@ def collect_issues(
     result: ComparisonResult,
     file_name: str,
     language: str,
-    include_raw: bool = False,
 ) -> List[dict]:
     issues = []
 
@@ -183,8 +165,6 @@ def collect_issues(
             translated_snippet="",
             untranslated_texts=[],
         )
-        if include_raw:
-            issue["english_raw"] = rule.raw_content
         issues.append(issue)
 
     for rule in result.extra_rules:
@@ -198,8 +178,6 @@ def collect_issues(
             translated_snippet="",
             untranslated_texts=[],
         )
-        if include_raw:
-            issue["translated_raw"] = rule.raw_content
         issues.append(issue)
 
     for rule, texts in result.untranslated_text:
@@ -213,8 +191,6 @@ def collect_issues(
             translated_snippet="",
             untranslated_texts=texts,
         )
-        if include_raw:
-            issue["translated_raw"] = rule.raw_content
         issues.append(issue)
 
     for diff in result.rule_differences:
@@ -230,9 +206,6 @@ def collect_issues(
             translated_snippet=diff.translated_snippet,
             untranslated_texts=[],
         )
-        if include_raw:
-            issue["english_raw"] = diff.english_rule.raw_content
-            issue["translated_raw"] = diff.translated_rule.raw_content
         issues.append(issue)
 
     return issues
@@ -240,25 +213,12 @@ def collect_issues(
 
 class IssueWriter:
     def __init__(self, output_format: str, stream: TextIO):
-        self.output_format = output_format
+        if output_format != "jsonl":
+            raise ValueError(f"Unsupported output format: {output_format}")
         self.stream = stream
-        self.csv_writer: Optional[csv.DictWriter] = None
-        if output_format == "csv":
-            self.csv_writer = csv.DictWriter(stream, fieldnames=ISSUE_FIELDS)
-            self.csv_writer.writeheader()
 
     def write(self, issue: dict) -> None:
-        if self.output_format in ("jsonl", "tasks"):
-            self.stream.write(json.dumps(issue, ensure_ascii=False) + "\n")
-        elif self.output_format == "csv" and self.csv_writer is not None:
-            row = issue.copy()
-            if row.get("untranslated_texts"):
-                row["untranslated_texts"] = "|".join(row["untranslated_texts"])
-            else:
-                row["untranslated_texts"] = ""
-            row["line_en"] = "" if row.get("line_en") is None else row["line_en"]
-            row["line_tr"] = "" if row.get("line_tr") is None else row["line_tr"]
-            self.csv_writer.writerow(row)
+        self.stream.write(json.dumps(issue, ensure_ascii=False) + "\n")
 
 
 def print_warnings(result: ComparisonResult, file_name: str) -> int:
@@ -387,8 +347,7 @@ def audit_language(
             else:
                 files_ok += 1
         else:
-            include_raw = output_format == "tasks"
-            issues_list = collect_issues(result, file_name, language, include_raw=include_raw)
+            issues_list = collect_issues(result, file_name, language)
             for issue in issues_list:
                 writer.write(issue)
             if issues_list:

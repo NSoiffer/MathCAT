@@ -14,7 +14,7 @@ def make_rule(name: str, tag: str, line: int, raw: str) -> RuleInfo:
     )
 
 
-def test_collect_issues_includes_raw() -> None:
+def test_collect_issues_fields() -> None:
     missing = make_rule("missing", "mo", 10, "missing raw")
     extra = make_rule("extra", "mi", 20, "extra raw")
     untranslated = make_rule("untranslated", "mn", 30, "untranslated raw")
@@ -40,14 +40,20 @@ def test_collect_issues_includes_raw() -> None:
         translated_rule_count=1,
     )
 
-    issues = collect_issues(result, "file.yaml", "xx", include_raw=True)
+    issues = collect_issues(result, "file.yaml", "xx")
     by_type = {issue["issue_type"]: issue for issue in issues}
 
-    assert by_type["missing_rule"]["english_raw"] == "missing raw"
+    assert by_type["missing_rule"]["line_en"] == 10
+    assert by_type["missing_rule"]["line_tr"] is None
+    assert "english_raw" not in by_type["missing_rule"]
 
-    assert by_type["extra_rule"]["translated_raw"] == "extra raw"
+    assert by_type["extra_rule"]["line_tr"] == 20
+    assert "translated_raw" not in by_type["extra_rule"]
 
-    assert by_type["untranslated_text"]["translated_raw"] == "untranslated raw"
+    assert by_type["untranslated_text"]["untranslated_texts"] == ["x"]
+    assert "translated_raw" not in by_type["untranslated_text"]
 
-    assert by_type["rule_difference"]["english_raw"] == "diff en raw"
-    assert by_type["rule_difference"]["translated_raw"] == "diff tr raw"
+    assert by_type["rule_difference"]["diff_type"] == "match"
+    assert by_type["rule_difference"]["english_snippet"] == "a"
+    assert by_type["rule_difference"]["translated_snippet"] == "b"
+    assert "english_raw" not in by_type["rule_difference"]

@@ -39,7 +39,7 @@ Examples:
     parser.add_argument("--rules-dir", help="Override Rules/Languages directory path")
     parser.add_argument(
         "--format",
-        choices=["rich", "jsonl", "csv", "tasks"],
+        choices=["rich", "jsonl"],
         default="rich",
         help="Output format (default: rich)",
     )

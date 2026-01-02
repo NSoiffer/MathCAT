@@ -60,7 +60,7 @@ python -m audit_translations --list
 **Convenience Features:**
 * `--list`: Displays all available languages.
 * `--file`: Audits a single specific file instead of the whole directory.
-* `--format`: Output format (`rich`, `jsonl`, `csv`, `tasks`).
+* `--format`: Output format (`rich`, `jsonl`).
 * `--output`: Write output to a file instead of stdout.
 * `--rules-dir`: Override the Rules/Languages directory path.
 * `--only`: Filter issue types (comma-separated): `missing`, `untranslated`, `extra`, `diffs`, `all`.
@@ -84,8 +84,4 @@ python -m audit_translations es --file SharedRules/default.yaml
 # Produce JSONL output for automation or AI workflows
 python -m audit_translations es --format jsonl --output es-issues.jsonl
 
-# Produce task-focused JSONL for AI-assisted translation
-python -m audit_translations es --format tasks --output es-tasks.jsonl
-
-# Task output includes raw rule blocks to make copy/paste edits easier.
 ```
