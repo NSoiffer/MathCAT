@@ -1,0 +1,5 @@
+- name: space-rule
+  tag: mo
+  match: ".//m:mo"
+  replace:
+    - T: "space"

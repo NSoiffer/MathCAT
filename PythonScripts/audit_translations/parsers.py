@@ -5,7 +5,7 @@ Handles parsing of rule files and unicode files to extract rule information.
 """
 
 import os
-from typing import Any, List, Tuple
+from typing import Any, List, Optional, Tuple
 
 from ruamel.yaml import YAML
 from ruamel.yaml.scanner import ScannerError
@@ -19,7 +19,7 @@ def is_unicode_file(file_path: str) -> bool:
     return basename in ("unicode.yaml", "unicode-full.yaml")
 
 
-def parse_yaml_file(file_path: str) -> Tuple[List[RuleInfo], str]:
+def parse_yaml_file(file_path: str, strict: bool = False) -> Tuple[List[RuleInfo], str]:
     """
     Parse a YAML file and extract rules.
     Returns list of RuleInfo and the raw file content.
@@ -35,6 +35,8 @@ def parse_yaml_file(file_path: str) -> Tuple[List[RuleInfo], str]:
     try:
         data = yaml.load(content)
     except ScannerError as exc:
+        if strict:
+            raise exc
         if "\t" in content:
             sanitized = content.replace("\t", "    ")
             data = yaml.load(sanitized)

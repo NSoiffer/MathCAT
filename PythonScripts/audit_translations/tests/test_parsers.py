@@ -1,6 +1,8 @@
 """Tests for parsers.py"""
 
+import pytest
 from ruamel.yaml import YAML
+from ruamel.yaml.scanner import ScannerError
 
 from ..dataclasses import RuleInfo
 from ..parsers import (
@@ -144,6 +146,20 @@ class TestParseRulesFile:
         rules, _ = parse_yaml_file(str(file_path))
         assert len(rules) == 1
         assert rules[0].name == "tabbed"
+
+    def test_parse_yaml_file_strict_rejects_tabs(self, tmp_path):
+        content = """- name: tabbed
+  tag: mo
+  match: "."
+  replace:
+    - t: "x"\t# tab before comment
+"""
+        file_path = tmp_path / "tabbed.yaml"
+        file_path.write_text(content, encoding="utf-8")
+        from ..parsers import parse_yaml_file
+
+        with pytest.raises(ScannerError):
+            parse_yaml_file(str(file_path), strict=True)
 
 
 class TestParseUnicodeFile:

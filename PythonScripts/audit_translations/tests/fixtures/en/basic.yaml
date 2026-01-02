@@ -1,0 +1,11 @@
+- name: rule-1
+  tag: mo
+  match: ".//m:mi"
+  replace:
+    - t: "equals"
+
+- name: rule-2
+  tag: mn
+  match: ".//m:mn"
+  replace:
+    - t: "number"
