@@ -114,22 +114,24 @@ def compare_files(
     )
 
 
-def print_rule_item(rule: RuleInfo, context: str = ""):
+def rule_label(rule: RuleInfo) -> str:
     if rule.name is None:
-        console.print(f"      [dim]•[/] [yellow]\"{escape(rule.key)}\"[/] [dim](line {rule.line_number}{context})[/]")
-    else:
-        tag = rule.tag or "unknown"
-        console.print(f"      [dim]•[/] [cyan]{escape(rule.name)}[/] [dim][{escape(tag)}][/] [dim](line {rule.line_number}{context})[/]")
+        return f"[yellow]\"{escape(rule.key)}\"[/]"
+    tag = rule.tag or "unknown"
+    return f"[cyan]{escape(rule.name)}[/] [dim][{escape(tag)}][/]"
+
+
+def print_rule_item(rule: RuleInfo, context: str = ""):
+    console.print(f"      [dim]•[/] {rule_label(rule)} [dim](line {rule.line_number}{context})[/]")
 
 
 def print_diff_item(diff: RuleDifference):
     """Print a single rule difference"""
     rule = diff.english_rule
-    if rule.name is None:
-        console.print(f"      [dim]•[/] [yellow]\"{escape(rule.key)}\"[/] [dim](line {rule.line_number} en, {diff.translated_rule.line_number} tr)[/]")
-    else:
-        tag = rule.tag or "unknown"
-        console.print(f"      [dim]•[/] [cyan]{escape(rule.name)}[/] [dim][{escape(tag)}][/] [dim](line {rule.line_number} en, {diff.translated_rule.line_number} tr)[/]")
+    console.print(
+        f"      [dim]•[/] {rule_label(rule)} "
+        f"[dim](line {rule.line_number} en, {diff.translated_rule.line_number} tr)[/]"
+    )
     console.print(f"          [dim]{diff.description}:[/]")
     console.print(f"          [green]en:[/] {escape(diff.english_snippet)}")
     console.print(f"          [red]tr:[/] {escape(diff.translated_snippet)}")
@@ -226,16 +228,16 @@ def print_warnings(result: ComparisonResult, file_name: str) -> int:
     issues = 0
 
     has_issues = result.missing_rules or result.untranslated_text or result.extra_rules or result.rule_differences
+    if not has_issues:
+        return issues
 
-    if has_issues:
-        # File header
-        style, icon = ("green", "✓") if result.translated_rule_count == result.english_rule_count else \
-                      ("red", "✗") if result.translated_rule_count == 0 else ("yellow", "⚠")
-        console.print()
-        console.rule(style="cyan")
-        console.print(f"[{style}]{icon}[/] [bold]{escape(file_name)}[/]")
-        console.print(f"  [dim]English: {result.english_rule_count} rules  →  Translated: {result.translated_rule_count} rules[/]")
-        console.rule(style="cyan")
+    style, icon = ("green", "✓") if result.translated_rule_count == result.english_rule_count else \
+                  ("red", "✗") if result.translated_rule_count == 0 else ("yellow", "⚠")
+    console.print()
+    console.rule(style="cyan")
+    console.print(f"[{style}]{icon}[/] [bold]{escape(file_name)}[/]")
+    console.print(f"  [dim]English: {result.english_rule_count} rules  →  Translated: {result.translated_rule_count} rules[/]")
+    console.rule(style="cyan")
 
     if result.missing_rules:
         console.print(f"\n  [red]✗[/] [bold]Missing Rules[/] [[red]{len(result.missing_rules)}[/]] [dim](in English but not in translation)[/]")
@@ -252,26 +254,14 @@ def print_warnings(result: ComparisonResult, file_name: str) -> int:
             issues += 1
 
     if result.rule_differences:
-        # Group differences by type for clearer output
-        by_type: dict[str, list[RuleDifference]] = {}
-        for diff in result.rule_differences:
-            by_type.setdefault(diff.diff_type, []).append(diff)
-
         total_diffs = len(result.rule_differences)
-        console.print(f"\n  [magenta]≠[/] [bold]Rule Differences[/] [[magenta]{total_diffs}[/]] [dim](structural differences between en and translation)[/]")
-
-        type_labels = {
-            'match': 'Match Pattern',
-            'condition': 'Conditions',
-            'structure': 'Structure',
-            'variables': 'Variables'
-        }
-        for diff_type, diffs in by_type.items():
-            label = type_labels.get(diff_type, diff_type)
-            console.print(f"\n    [dim]{label} ({len(diffs)}):[/]")
-            for diff in diffs:
-                print_diff_item(diff)
-                issues += 1
+        console.print(
+            f"\n  [magenta]≠[/] [bold]Rule Differences[/] "
+            f"[[magenta]{total_diffs}[/]] [dim](structural differences between en and translation)[/]"
+        )
+        for diff in result.rule_differences:
+            print_diff_item(diff)
+            issues += 1
 
     if result.extra_rules:
         console.print(f"\n  [blue]ℹ[/] [bold]Extra Rules[/] [[blue]{len(result.extra_rules)}[/]] [dim](may be intentional)[/]")
