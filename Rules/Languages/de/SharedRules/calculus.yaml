@@ -1,5 +1,22 @@
 ---
 
+- name: laplacian
+  tag: laplacian
+  match: "count(*) <= 1"   # can be on ∇^2 or on enclosing mrow
+  replace:
+  - T: "Laplace-Operator"      # phrase('laplacian' of x)
+  - test:
+      if: "count(*) = 1"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: [T: "von"]             # phrase(function 'of' one variable)
+      - test:
+          if: "not(IsNode(*[1], 'leaf'))"
+          then: [pause: short]
+      - x: "*[1]"
+
+
 - name: divergence
   tag: divergence
   match: "."
