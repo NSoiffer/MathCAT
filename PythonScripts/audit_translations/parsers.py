@@ -8,6 +8,7 @@ import os
 from typing import Any, List, Tuple
 
 from ruamel.yaml import YAML
+from ruamel.yaml.scanner import ScannerError
 
 from .dataclasses import RuleInfo, RuleDifference
 
@@ -31,7 +32,14 @@ def parse_yaml_file(file_path: str) -> Tuple[List[RuleInfo], str]:
 
     yaml = YAML()
     yaml.preserve_quotes = True
-    data = yaml.load(content)
+    try:
+        data = yaml.load(content)
+    except ScannerError as exc:
+        if "\t" in content:
+            sanitized = content.replace("\t", "    ")
+            data = yaml.load(sanitized)
+        else:
+            raise exc
 
     if is_unicode_file(file_path):
         rules = parse_unicode_file(content, data)

@@ -130,6 +130,21 @@ class TestParseRulesFile:
         rules = parse_rules_file(content, data)
         assert rules[0].tag == "[mo, mtext]"
 
+    def test_parse_yaml_file_handles_tabs(self, tmp_path):
+        content = """- name: tabbed
+  tag: mo
+  match: "."
+  replace:
+    - t: "x"\t# tab before comment
+"""
+        file_path = tmp_path / "tabbed.yaml"
+        file_path.write_text(content, encoding="utf-8")
+        from ..parsers import parse_yaml_file
+
+        rules, _ = parse_yaml_file(str(file_path))
+        assert len(rules) == 1
+        assert rules[0].name == "tabbed"
+
 
 class TestParseUnicodeFile:
     def test_parses_single_char_entry(self):
