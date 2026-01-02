@@ -306,7 +306,7 @@
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
             - "../*[1][.='…']"
-        then: [t: "точка точка дот"]            	# 	(en: 'dot dot dot', google translation)
+        then: [t: "точка точка точка"]            	# 	(en: 'dot dot dot', google translation)
         else_test:                              	#  must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"
             then: [t: "и так далее"]            	# 	(en: 'and so on', google translation)
@@ -319,7 +319,7 @@
  - "‴": [t: "тройной штрих"]                    	#  0x2034	(en: 'triple prime')
  - "‵": [t: "обратный штрих"]                   	#  0x2035	(en: 'reversed prime')
  - "‶": [t: "обратный двойной штрих"]           	#  0x2036	(en: 'reversed double prime')
- - "‷": [t: "обратный тройной простой"]         	#  0x2037	(en: 'reversed triple prime', google translation)
+ - "‷": [t: "обратный тройной штрих"]         	#  0x2037	(en: 'reversed triple prime', google translation)
  - "‸": [t: "в"]                                	#  0x2038	(en: 'to the', google translation)
  - "‹": [t: "одиночный левый угол угла цитата"] 	#  0x2039	(en: 'single left pointing angle quote mark', google translation)
  - "›": [t: "одиночный правый угол цитата цитата"]	#  0x203a	(en: 'single right pointing angle quote mark', google translation)
@@ -331,20 +331,20 @@
  - "‿": [t: "под галстуком"]                    	#  0x203F	(en: 'under tie', google translation)
  - "⁀": [t: "галстук"]                          	#  0x2040	(en: 'tie', google translation)
  - "⁎": [t: "низкий звездочка"]                 	#  0x204e	(en: 'low asterisk', google translation)
- - "⁏": [t: "обратный полуколон"]               	#  0x204f	(en: 'reversed semicolon', google translation)
+ - "⁏": [t: "обратная точка с запятой"]               	#  0x204f	(en: 'reversed semicolon', google translation)
  - "⁐": [t: "закрыть"]                          	#  0x2050	(en: 'close up', google translation)
  - "⁑": [t: "две вертикальные звездочки"]       	#  0x2051	(en: 'two vertical asterisks', google translation)
  - "⁒": [t: "коммерческий минус знак"]          	#  0x2052	(en: 'commercial minus sign', google translation)
  - "⁗": [t: "четырехкратный prime"]             	#  0x2057	(en: 'quadruple prime', google translation)
  - "⁠": [t: ""]                                 	#  0x2060
- - "⁰": [t: "к нулевой власти"]                 	#  0x2070	(en: 'to the zeroth power', google translation)
+ - "⁰": [t: "к нулевой степени"]                 	#  0x2070	(en: 'to the zeroth power', google translation)
  - "ⁱ": [t: "к силе эйхт"]                      	#  0x2071	(en: 'to the eihth power', google translation)
- - "⁴": [t: "к четвертой силе"]                 	#  0x2074	(en: 'to the fourth power', google translation)
- - "⁵": [t: "к пятой силе"]                     	#  0x2075	(en: 'to the fifth power', google translation)
- - "⁶": [t: "к шестой силе"]                    	#  0x2076	(en: 'to the sixth power', google translation)
- - "⁷": [t: "к седьмой власти"]                 	#  0x2077	(en: 'to the seventh power', google translation)
- - "⁸": [t: "к ath power"]                      	#  0x2078	(en: 'to the eighth power', google translation)
- - "⁹": [t: "к девятой силе"]                   	#  0x2079	(en: 'to the ninth power', google translation)
+ - "⁴": [t: "к четвёртой степени"]                 	#  0x2074	(en: 'to the fourth power', google translation)
+ - "⁵": [t: "к пятой степени"]                     	#  0x2075	(en: 'to the fifth power', google translation)
+ - "⁶": [t: "к шестой степени"]                    	#  0x2076	(en: 'to the sixth power', google translation)
+ - "⁷": [t: "к седьмой степении"]                 	#  0x2077	(en: 'to the seventh power', google translation)
+ - "⁸": [t: "к восьмой степени"]                      	#  0x2078	(en: 'to the eighth power', google translation)
+ - "⁹": [t: "к девятой степени"]                   	#  0x2079	(en: 'to the ninth power', google translation)
  - "⁺": [t: "superscript plus sign"]            	#  0x207a	(google translation)
  - "⁻": [t: "superscript минус"]                	#  0x207b	(en: 'superscript minus', google translation)
  - "⁼": [t: "superscript equals sign"]          	#  0x207c	(google translation)
@@ -875,7 +875,7 @@
          then: [t: "является"]                  	# 	(en: 'is', google translation)
      - t: "приблизительно равно или равно"      	# 	(en: 'approximately equal or equal to')
  - "≋": [t: "тройная тильда"]                   	#  0x224b	(en: 'triple tilde')
- - "≌": [t: "все равно"]                        	#  0x224c	(en: 'are all equal to')
+ - "≌": [t: "конгруэнтно"]                        	#  0x224c	(en: 'are all equal to')
  - "≍":                                         	#  0x224d
      - test: 
          if: "$Verbosity!='Terse'"
