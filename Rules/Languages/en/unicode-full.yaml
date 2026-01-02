@@ -3732,7 +3732,7 @@
  - "﹤": [t: "small less than"]                     # 0xfe64
  - "﹥": [t: "small greater than"]                  # 0xfe65
  - "﹦": [t: "small equals"]                        # 0xfe66
- - "＋": [t: "equals sign"]                         # 0xff0b
+ - "＋": [t: "fullwidth plus sign"]                 # 0xff0b
  - "＜": [t: "less than"]                           # 0xff1c
  - "＝": [t: "equals"]                              # 0xff1d
  - "＞": [t: "greater than"]                        # 0xff1e
