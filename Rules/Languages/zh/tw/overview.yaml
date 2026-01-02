@@ -37,7 +37,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: ""}
+          then: [T: ""]
       - x: "*[1]"
 
 - name: overview-default
@@ -51,24 +51,24 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: "的"}
+          then: [T: "的"]
   - test:
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][.='2']"
-        then: {T: "平方根"}
+        then: [T: "平方根"]
       - else_if: "*[2][.='3']"
-        then: {T: "立方根"}
+        then: [T: "立方根"]
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "*[2]"}, {T: "次方根"}]
-      - else: [{x: "*[2]"}, {T: "次方根"}]
+        then: [x: "*[2]", T: "次方根"]
+      - else: [x: "*[2]", T: "次方根"]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-          else: {x: "*[2]"}
+          #- pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
+          else: [x: "*[2]"]
       - T: "次方根"
 
 - name: matrix-override
@@ -83,8 +83,8 @@
   - x: count(*[2]/*[self::m:mtr][1]/*)
   - test:
       if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
-      then: {T: "行列式"}
-      else: {T: "矩陣"}
+      then: [T: "行列式"]
+      else: [T: "矩陣"]
 
 - name: overview-default
   tag: mtable
@@ -102,7 +102,7 @@
   replace:
   - insert:
       nodes: "*"
-      replace: [{pause: auto}]
+      replace: [pause: auto]
 
 - name: long-mrow
   tag: mrow

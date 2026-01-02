@@ -19,20 +19,20 @@
   replace:
   #  - test:
   #         if: "$Verbosity!='Terse'"
-  #         then: {T: the}
+  #         then: [T: the]
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - bookmark: "*[1]/@id"
       - test:
           if: "parent::*[self::m:minus and count(*)=1]"
-          then: [{T: âm}]
-          else: [{T: dương}]
+          then: [T: âm]
+          else: [T: dương]
   - T: căn bậc hai
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: của}
-      else: {pause: short}
+      then: [T: của]
+      else: [pause: short]
   - x: "*[1]"
   - test:
     - if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
@@ -41,8 +41,8 @@
       - T: hết căn
       - pause: medium
     - else_if: IsNode(*[1], 'simple')
-      then: [{pause: short}]
-      else: [{pause: long}]
+      then: [pause: short]
+      else: [pause: long]
 
 - name: default
   tag: root
@@ -50,37 +50,37 @@
   replace:
   # - test:
   #         if: "$Verbosity!='Terse'"
-  #         then: {T: the}
+  #         then: [T: the]
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - test:
           if: "count(*)=1 and (parent::m:minus or parent::m:plus)"
-          then: [{bookmark: "parent/@id"}]
+          then: [bookmark: "parent/@id"]
       - test:
           if: parent::m:minus
-          then: [{T: âm}]
-          else: [{T: dương}]
+          then: [T: âm]
+          else: [T: dương]
   - test:
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][.='2']"
-        then: {T: căn bậc hai}
+        then: [T: căn bậc hai]
       - else_if: "*[2][.='3']"
-        then: {T: căn bậc ba}
+        then: [T: căn bậc ba]
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{T: "căn bậc"}, {x: "ToOrdinal(*[2])"}]
+        then: [T: "căn bậc", x: "ToOrdinal(*[2])"]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-          else: {x: "*[2]"}
+          #- pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
+          else: [x: "*[2]"]
       - T: căn
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: của}
+      then: [T: của]
   - x: "*[1]"
   - test:
       if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
@@ -90,8 +90,8 @@
       - pause: medium
       else_test:
         if: IsNode(*[1], 'simple')
-        then: [{pause: short}]
-        else: [{pause: long}]
+        then: [pause: short]
+        else: [pause: long]
 
 # The 'negative' rule interacts with the msqrt/mroot rules as those might pick off this case ("the negative square root of x")
 - name: negative_and_positive
@@ -102,13 +102,13 @@
       if:
       - "*[1][self::m:square-root or self::m:root] and"
       - "($ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd')"
-      then: {T: ""}
+      then: [T: ""]
       else:
       - bookmark: "@id"
       - test:
           if: "self::m:minus and count(*)=1"
-          then: [{T: âm}]
-          else: [{T: dương}]
+          then: [T: âm]
+          else: [T: dương]
   - x: "*[1]"
 
 # Fraction rules
@@ -136,7 +136,7 @@
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
   - "*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
   - "*[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
-  replace: [{x: ToCommonFraction(.)}]
+  replace: [x: ToCommonFraction(.)]
 
 - name: common-fraction-mixed-number
   tag: fraction
@@ -145,7 +145,7 @@
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
   - "*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
   - "*[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
-  replace: [{x: ToCommonFraction(.)}]
+  replace: [x: ToCommonFraction(.)]
 
 - name: fraction-over-simple
   tag: fraction
@@ -159,7 +159,7 @@
       then:
       #- test:
       #    if: "$Verbosity!='Terse'"
-      #    then: [{ot: "the"}]
+      #    then: [ot: "the"]
       - T: "phân số"
   - x: "*[1]"
   - T: trên
@@ -208,7 +208,7 @@
   - T: phân số có tử là
   - test:
       if: not(IsNode(*[1], 'simple'))
-      then: {pause: medium}
+      then: [pause: medium]
   - x: "*[1]"
   - pause: medium
   - T: và mẫu là
@@ -230,11 +230,11 @@
   replace:
   - test:
       if: $ClearSpeak_Trig = 'TrigInverse'
-      then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, {T: hàm nghịch đảo}]
+      then: [x: "*[1]", bookmark: "*[2]/@id", T: hàm nghịch đảo]
       else_test:
         if: $ClearSpeak_Trig = 'ArcTrig'
-        then: [{bookmark: "*[2]/@id"}, {T: hàm lượng giác ngược}, {x: "*[1]"}]
-        else: [{bookmark: "*[2]/@id"}, {T: hàm nghịch đảo}, {x: "*[1]"}] # default/Auto
+        then: [bookmark: "*[2]/@id", T: hàm lượng giác ngược, x: "*[1]"]
+        else: [bookmark: "*[2]/@id", T: hàm nghịch đảo, x: "*[1]"] # default/Auto
 
 
 - name: log-base-power
@@ -266,8 +266,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][.='2']"
-      then: {T: bình phương}
-      else: {T: lập phương}
+      then: [T: bình phương]
+      else: [T: lập phương]
 - name: function-power
   tag: power
   match:
@@ -275,12 +275,12 @@
   replace:
   # - test: 
   #    if: "$Verbosity!='Terse'"
-  #    then: {T: the}
+  #    then: [T: the]
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][self::m:mn][not(contains(., '.'))]"
-      then: [{x: "ToOrdinal(*[2])"}]
-      else: [{x: "*[2]"}]
+      then: [x: "ToOrdinal(*[2])"]
+      else: [x: "*[2]"]
   - T: mũ
   - pause: short
   - x: "*[1]"
@@ -331,8 +331,8 @@
   - T: mũ
   - test:
       if: "*[2][.>0]"
-      then: {x: "ToOrdinal(*[2])"}
-      else: {x: "*[2]"}
+      then: [x: "ToOrdinal(*[2])"]
+      else: [x: "*[2]"]
 - name: simple-negative-integer
   tag: power
   match:
@@ -345,7 +345,7 @@
   - x: "*[2]"
   #- test:
       #if: "$ClearSpeak_Exponents != 'Ordinal'"
-      #then: [{T: "lũy thừa"}]
+      #then: [T: "lũy thừa"]
 
 - name: simple-var
   tag: power
@@ -354,10 +354,10 @@
   - x: "*[1]"
   - T: mũ
   - x: "*[2]"
-  #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  #- pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
   #- test:
       #if: "$ClearSpeak_Exponents != 'Ordinal'"
-      #then: [{T: "lũy thừa"}]
+      #then: [T: "lũy thừa"]
 
 # match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
 #   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
@@ -483,11 +483,11 @@
   name: ClearSpeak-absolute-value
   tag: absolute-value
   match: "."
-  variables: [{WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Tập họp', 'tập họp', 'giá trị tuyệt đối')"}] # T: translate the words in single quotes
+  variables: [WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Tập họp', 'tập họp', 'giá trị tuyệt đối')"] # T: translate the words in single quotes
   replace:
   #- test:
   #    if: "$Verbosity!='Terse'"
-  #    then: {t: the}
+  #    then: [t: the]
   - x: "$WordToSay"
   - T: "của"
   - x: "*[1]"
@@ -505,18 +505,18 @@
   replace:
   - test:
     - if: "count(*)=0"
-      then: [{T: "tập hợp rỗng"}]
+      then: [T: "tập hợp rỗng"]
     - else_if: "count(*)=2"
       then:
       #  - test: 
       #    if: "$Verbosity!='Terse'"
-      #   then: {T: the}
+      #   then: [T: the]
       - T: tập hợp rỗng
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
       then:
       # - test: 
       #   if: "$Verbosity!='Terse'"
-      #  then: {T: the}
+      #  then: [T: the]
       - T: tập hợp của
       - x: "*[1]/*[1]"
         #- test:
@@ -529,7 +529,7 @@
           if: $ClearSpeak_Sets != 'SilentBracket'
           then:
           #       if: "$Verbosity!='Terse'"
-          #      then: {T: the}
+          #      then: [T: the]
           - T: tập hợp
             #     - test: 
       - x: "*[1]"
@@ -555,7 +555,7 @@
       then:
       - test:
           if: "starts-with(name(.), 'open')"
-          then: [{T: "không"}]
+          then: [T: "không"]
       - T: "bao gồm"
       - x: "*[1]"
     # logic to deal with [not] arg #1
@@ -563,10 +563,10 @@
       if: "not($is_intervals_start_infinity or $is_intervals_end_infinity)"
       then_test:
       - if: "name(.)='open-interval'"
-        then: [{T: hoặc}]
+        then: [T: hoặc]
       - else_if: "name(.)='closed-interval'"
-        then: [{T: và}]
-        else: [{T: trừ}]
+        then: [T: và]
+        else: [T: trừ]
     # some ugly logic dealing with connectives: or, but, but, and (cleaner to be part of next clause?)
   - test:
       if: not($is_intervals_end_infinity)
@@ -577,7 +577,7 @@
           then:
           - test:
               if: "name(.) = 'open-interval' or name(.) = 'closed-open-interval'"
-              then: [{T: "không"}]
+              then: [T: "không"]
           - T: "bao gồm"
       - x: "*[2]"
 
@@ -608,8 +608,8 @@
   - pause: medium
   - test:
       if: .[self::m:mlabeledtr]
-      then: [{x: "*[position()>1]"}]
-      else: {x: "*"}
+      then: [x: "*[position()>1]"]
+      else: [x: "*"]
 - name: matrix-default
   tag: mtd
   match: "parent::*[parent::m:matrix or parent::m:determinant]"
@@ -627,10 +627,10 @@
   - test:
     # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
     - if: count(following-sibling::*) > 0
-      then: {pause: short}
+      then: [pause: short]
     - else_if: count(../following-sibling::*) > 0
-      then: {pause: medium}
-      else: {pause: long}
+      then: [pause: medium]
+      else: [pause: long]
 
 - name: ClearSpeak-multi-line
   tag: [piecewise, system-of-equations, lines] # these are ignored in favor of the ClearSpeak prefs
@@ -640,21 +640,21 @@
   - x: "count(*)"
   - test:
     - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
-      then: [{T: "trường hợp"}]
+      then: [T: "trường hợp"]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case 
-      then: [{T: "dòng"}]
+      then: [T: "dòng"]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
-      then: [{T: "ràng buộc"}]
+      then: [T: "ràng buộc"]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
-      then: [{T: "biểu thức"}]
+      then: [T: "biểu thức"]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
-      then: [{T: "hàng"}]
+      then: [T: "hàng"]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
-      then: [{T: "bước"}]
+      then: [T: "bước"]
       # else 'None -- don't say anything'
   #- test:
     #- if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-      #then: [{ct: "s"}] # plural
+      #then: [ct: "s"] # plural
   - pause: short
   - x: "*"
 
@@ -664,17 +664,17 @@
   replace:
   - test:
     - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
-      then: [{T: "trường hợp"}]
+      then: [T: "trường hợp"]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case 
-      then: [{T: "dòng"}]
+      then: [T: "dòng"]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
-      then: [{T: "ràng buộc"}]
+      then: [T: "ràng buộc"]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
-      then: [{T: "biểu thức"}]
+      then: [T: "biểu thức"]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
-      then: [{T: "hàng"}]
+      then: [T: "hàng"]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
-      then: [{T: "bước"}]
+      then: [T: "bước"]
       # else 'None -- don't say anything'
   - test:
       if: "$ClearSpeak_MultiLineLabel != 'None'"
@@ -688,11 +688,11 @@
       - pause: medium
   - test:
       if: .[self::m:mlabeledtr]
-      then: [{x: "*[position()>1]"}]
-      else: {x: "*"}
+      then: [x: "*[position()>1]"]
+      else: [x: "*"]
   - test:
       if: "$ClearSpeak_MultiLineLabel != 'None'"
-      then: [{pause: long}]
+      then: [pause: long]
 
 - name: ClearSpeak_Functions_None
   tag: mo
@@ -702,8 +702,8 @@
   replace:
     test:
       if: "$ClearSpeak_ImpliedTimes = 'None'"
-      then: [{T: ""}]
-      else: [{T: nhân}]
+      then: [T: ""]
+      else: [T: nhân]
 
 - name: no-times
   tag: mo

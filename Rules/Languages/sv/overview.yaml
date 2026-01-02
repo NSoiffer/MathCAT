@@ -35,7 +35,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: "ur"}
+          then: [T: "ur"]
       - x: "*[1]"
 
 - name: overview-default
@@ -46,11 +46,11 @@
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][.='2']"
-        then: {T: "kvadratroten"}
+        then: [T: "kvadratroten"]
       - else_if: "*[2][.='3']"
-        then: {T: "kubikroten"}
+        then: [T: "kubikroten"]
       - else_if: "*[2][not(contains(., ','))]"
-        then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]
+        then: [x: "ToOrdinal(*[2])", T: "roten"]
       else:
       - T: "roten av grad"
       - x: "*[2]"
@@ -59,7 +59,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: "ur"}
+          then: [T: "ur"]
       - x: "*[1]"
 
 - name: matrix-override
@@ -73,8 +73,8 @@
   - x: count(*[2]/*[self::m:mtr][1]/*)
   - test:
       if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
-      then: {T: "determinant"}
-      else: {T: "matris"}
+      then: [T: "determinant"]
+      else: [T: "matris"]
 
 - name: overview-default
   tag: mtable
@@ -91,7 +91,7 @@
   replace:
   - insert:
       nodes: "*"
-      replace: [{pause: auto}]
+      replace: [pause: auto]
 
 - name: long-mrow
   tag: mrow

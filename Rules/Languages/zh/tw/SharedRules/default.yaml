@@ -94,11 +94,11 @@
   - x: "*[2]"
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - T: "分之"               # phrase("the fraction x 'over' y")
   - test:
       if: "not(IsNode(*[2],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - x: "*[1]"
   - pause: short
   - T: "結束分數"          # phrase("start of fraction x over y 'end over'")
@@ -439,8 +439,8 @@
   - pause: medium
   - test:
       if: self::m:mlabeledtr
-      then: [{x: "*[position()>1]"}]
-      else: {x: "*"}
+      then: [x: "*[position()>1]"]
+      else: [x: "*"]
 
 - name: default
   tag: mtd
@@ -459,10 +459,10 @@
   - test:
     # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
     - if: count(following-sibling::*) > 0
-      then: {pause: short}
+      then: [pause: short]
     - else_if: count(../following-sibling::*) > 0
-      then: {pause: medium}
-      else: {pause: long}
+      then: [pause: medium]
+      else: [pause: long]
 
 
 - name: empty-box

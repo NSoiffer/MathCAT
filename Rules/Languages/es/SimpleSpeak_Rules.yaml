@@ -20,17 +20,17 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: "la"}    # phrase('the' square root of x)
+      then: [T: "la"]    # phrase('the' square root of x)
   - T: "raíz cuadrada"      # phrase(the 'square root' of x)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: "de"}   # phrase(the square root 'of' x)
-      else: {pause: short}
+      then: [T: "de"]   # phrase(the square root 'of' x)
+      else: [pause: short]
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
-      then: [{pause: short}]
-      else: [{T: "fin de raíz"}, {pause: short}]  # phrase(the square root of x 'end root')
+      then: [pause: short]
+      else: [T: "fin de raíz", pause: short]  # phrase(the square root of x 'end root')
 
 - name: default
   tag: root
@@ -38,32 +38,32 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{T: la}]
+      then: [T: la]
   - test:
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][.='2']"
-        then: [{T: "raíz cuadrada"}]
+        then: [T: "raíz cuadrada"]
       - else_if: "*[2][.='3']"
-        then: [{T: "raíz cúbica"}]
+        then: [T: "raíz cúbica"]
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {T: "raíz"}]
+        then: [x: "ToOrdinal(*[2])", T: "raíz"]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-          else: [{x: "*[2]"}]
+          - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
+          else: [x: "*[2]"]
       - T: raíz
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{T: "de"}]
+      then: [T: "de"]
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
-      then: [{pause: short}]
-      else: [{T: "fin de raíz"}, {pause: short}]
+      then: [pause: short]
+      else: [T: "fin de raíz", pause: short]
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
@@ -72,14 +72,14 @@
   match:
   - "*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
   - "*[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]"
-  replace: [{x: ToCommonFraction(.)}]
+  replace: [x: ToCommonFraction(.)]
 - name: common-fraction-mixed-number
   tag: fraction
   match:
   - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
   - "*[1][self::m:mn][not(contains(., '.'))]   and"
   - "*[2][self::m:mn][not(contains(., '.'))]"
-  replace: [{x: ToCommonFraction(.)}]
+  replace: [x: ToCommonFraction(.)]
 
 
 # Units (e.g., meters per second, m^2/s^2, (3m^2)/s)
@@ -118,11 +118,11 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - T: "partido por"
   - test:
       if: "not(IsNode(*[2],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - x: "*[2]"
   - pause: short
   - T: "fin de fracción"
@@ -152,7 +152,7 @@
         if: "$Verbosity='Verbose'"
         then: [T: "elevado al cuadrado"]
         else: [T: "al cuadrado"]
-      else: {T: "cúbica"}
+      else: [T: "cúbica"]
 - name: function-power
   tag: power
   match:
@@ -160,12 +160,12 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: la}
+      then: [T: la]
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][self::m:mn][not(contains(., '.'))]"
-      then: [{x: "ToOrdinal(*[2])"}]
-      else: [{x: "*[2]"}]
+      then: [x: "ToOrdinal(*[2])"]
+      else: [x: "*[2]"]
   - T: "potencia de"
   - pause: short
   - x: "*[1]"
@@ -183,7 +183,7 @@
         if: "$Verbosity='Verbose'"
         then: [T: "elevado al cuadrado"]
         else: [T: "al cuadrado"]
-      else: {T: "cúbica"}
+      else: [T: "cúbica"]
 
 - name: simple-integer
   tag: power
@@ -193,8 +193,8 @@
   - T: "a la"
   - test:
       if: "*[2][.>0]"
-      then: {x: "ToOrdinal(*[2])"}
-      else: {x: "*[2]"}
+      then: [x: "ToOrdinal(*[2])"]
+      else: [x: "*[2]"]
 - name: simple-negative-integer
   tag: power
   match:
@@ -211,7 +211,7 @@
   - x: "*[1]"
   - T: "a la"
   - x: "*[2]"
-  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
 
 - name: simple
   tag: power
@@ -258,13 +258,13 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: el}
+          then: [T: el]
       - T: "conjunto vacío"
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: el}
+          then: [T: el]
       - T: "conjunto completo"
       - x: "*[1]/*[1]"
       - T: "tal que"
@@ -272,7 +272,7 @@
       else:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: el}
+          then: [T: el]
       - T: "conjunto"
       - x: "*[1]"
 

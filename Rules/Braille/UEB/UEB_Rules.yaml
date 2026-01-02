@@ -170,7 +170,7 @@
    - test:
       if: .[self::m:mlabeledtr]
       then: [x: "*[position()>1]"]
-      else: {x: "*"}
+      else: [x: "*"]
    - test: 
       if: "count(parent::*) > 1"
       then: [t: "⠠"]

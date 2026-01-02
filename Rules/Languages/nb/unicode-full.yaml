@@ -268,7 +268,7 @@
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'абвгдежзийклмнопрстуфхцчшщъыьэюя')", {pause: short}]
+        replace: [spell: "translate('.', 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'абвгдежзийклмнопрстуфхцчшщъыьэюя')", pause: short]
  - "а": [T: "a"]                                    #  0x430    (google: 'а')
  - "б": [T: "be"]                                   #  0x431    (google: 'vara')
  - "в": [T: "ve"]                                   #  0x432
@@ -3640,14 +3640,14 @@
             - if: "$SpeechStyle != 'ClearSpeak'"
               then_test:
                   if: "$DefaultToGiven"
-                  then: [{pause: short}, {T: "gitt"}]
+                  then: [pause: short, T: "gitt"]
                   else: [T: "vertikal strek"]
             - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
               then: [T: "vertikal strek"]
             - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
               then: [T: "slik at"]
             - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
-              then: [{pause: short}, {T: "gitt"}] 
+              then: [pause: short, T: "gitt"] 
             - else: [T: "deler"]                   
  - "～": [T: "tilde"]                               # 0xff5e
  - "￢": [T: "ikke"]                                 # 0xffe2

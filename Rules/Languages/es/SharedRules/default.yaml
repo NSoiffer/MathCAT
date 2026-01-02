@@ -96,11 +96,11 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - T: "partido por"
   - test:
       if: "not(IsNode(*[2],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - x: "*[2]"
   - pause: short
   - T: "fracción final"

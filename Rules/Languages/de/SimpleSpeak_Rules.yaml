@@ -66,7 +66,7 @@
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+          - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
           else: [x: "*[2]"]
       - T: "wurzel"        # phrase(the square 'root' of)
   - test:
@@ -211,8 +211,8 @@
   - T: "zu dem"      # phrase(15 raised 'to the' second power equals 225)
   - test:
       if: "*[2][.>0]"
-      then: {x: "ToOrdinal(*[2])"}
-      else: {x: "*[2]"}
+      then: [x: "ToOrdinal(*[2])"]
+      else: [x: "*[2]"]
 - name: simple-negative-integer
   tag: power
   match:
@@ -229,7 +229,7 @@
   - x: "*[1]"
   - T: "hoch"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
-  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
 
 - name: simple
   tag: power

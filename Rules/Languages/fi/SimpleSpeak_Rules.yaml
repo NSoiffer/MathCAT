@@ -20,17 +20,17 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: ""}    # phrase('the' square root of x)
+      then: [T: ""]    # phrase('the' square root of x)
   - T: "neliöjuuri"      # phrase(the 'square root' of x)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: ""}   # phrase(the square root 'of' x) # FI: no need
-      else: {pause: short}
+      then: [T: ""]   # phrase(the square root 'of' x) # FI: no need
+      else: [pause: short]
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
-      then: [{pause: short}]
-      else: [{T: "loppu juuri"}, {pause: short}]  # phrase(start the square root of x 'end of root')
+      then: [pause: short]
+      else: [T: "loppu juuri", pause: short]  # phrase(start the square root of x 'end of root')
 
 - name: default
   tag: root
@@ -38,36 +38,36 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{T: ""}]
+      then: [T: ""]
   - test:
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][.='2']"
-        then: [{T: "neliöjuuri"}]        # phrase(the 'square root' of x)
+        then: [T: "neliöjuuri"]        # phrase(the 'square root' of x)
       - else_if: "*[2][.='3']"
-        then: [{T: "kuutiojuuri"}]        # phrase(the 'cube root' of x)
+        then: [T: "kuutiojuuri"]        # phrase(the 'cube root' of x)
       - else_if: "*[2][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
         then_test:
             if: "*[2][.<=20]"
-            then: [{x: "ToOrdinal(*[2])"}, {T: "juuri"}]      # phrase(the square 'root' of 25)
-            else: [{x: "*[2]"}, {T: "juuri"}]      # phrase(the square 'root' of 25)
+            then: [x: "ToOrdinal(*[2])", T: "juuri"]      # phrase(the square 'root' of 25)
+            else: [x: "*[2]", T: "juuri"]      # phrase(the square 'root' of 25)
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
           # How to handle pronounce?
-          - PRONOUNCE: [{text: "nes"}, {ipa: "nes"}, {sapi5: "nes"}, {eloquence: "nes"}]
-          else: [{x: "*[2]"}]
+          - PRONOUNCE: [text: "nes", ipa: "nes", sapi5: "nes", eloquence: "nes"]
+          else: [x: "*[2]"]
       - T: "juuri"        # phrase(the square 'root' of)
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{T: ""}]        # phrase(the square root 'of' x) # FI: no need
+      then: [T: ""]        # phrase(the square root 'of' x) # FI: no need
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
-      then: [{pause: short}]
-      else: [{T: "loppu juuri"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
+      then: [pause: short]
+      else: [T: "loppu juuri", pause: short]      # phrase(start the fifth root of x 'end of root')
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
@@ -129,11 +129,11 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - T: "per"      # phrase(the fraction 3 'over' 4)
   - test:
       if: "not(IsNode(*[2],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - x: "*[2]"
   - pause: short
   - T: "loppu murtoluku"      # phrase(start 7 over 8 'end of fraction')
@@ -159,8 +159,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][.=2]"
-      then: {T: "toiseen"}      # phrase(5 'squared' equals 25)
-      else: {T: "kolmanteen"}      # phrase(5 'cubed' equals 125)
+      then: [T: "toiseen"]      # phrase(5 'squared' equals 25)
+      else: [T: "kolmanteen"]      # phrase(5 'cubed' equals 125)
 
 # FI: This grammar doesn't work in Finnish so commented out
 # - name: function-power
@@ -170,12 +170,12 @@
 #   replace:
 #   - test:
 #       if: "$Verbosity!='Terse'"
-#       then: {T: ""}      # # phrase('the' fourth power of 10)
+#       then: [T: ""]      # # phrase('the' fourth power of 10)
 #   - bookmark: "*[2]/@id"
 #   - test:
 #       if: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
-#       then: [{x: "ToOrdinal(*[2])"}]
-#       else: [{x: "*[2]"}]
+#       then: [x: "ToOrdinal(*[2])"]
+#       else: [x: "*[2]"]
 #   - T: "potenssi"      # phrase(the fourth 'power of' 2)
 #   - pause: short
 #   - x: "*[1]"
@@ -189,8 +189,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][.=2]"
-      then: {T: "toiseen"}      # phrase(5 'squared' equals 25)
-      else: {T: "kolmanteen"}      # phrase(5 'cubed' equals 125)
+      then: [T: "toiseen"]      # phrase(5 'squared' equals 25)
+      else: [T: "kolmanteen"]      # phrase(5 'cubed' equals 125)
 
 # FI: toOrdinal isn't natural in Finnish in this form, so commented out. If there was more sophisticated conjugation on other words, it could work.
 # - name: simple-integer
@@ -201,8 +201,8 @@
 #   - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
 #   - test:
 #       if: "*[2][.>0]"
-#       then: {x: "ToOrdinal(*[2])"} # FI: when is this triggered?
-#       else: {x: "*[2]"}
+#       then: [x: "ToOrdinal(*[2])"] # FI: when is this triggered?
+#       else: [x: "*[2]"]
 
 - name: simple-negative-integer
   tag: power
@@ -221,7 +221,7 @@
   - x: "*[1]"
   - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
-  # - PRONOUNCE: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  # - PRONOUNCE: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
 
 - name: simple
   tag: power
@@ -269,13 +269,13 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: ""}      # phrase('the' empty set)
+          then: [T: ""]      # phrase('the' empty set)
       - T: "tyhjä joukko"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: ""}      # phrase('the' set of all integers)
+          then: [T: ""]      # phrase('the' set of all integers)
       - T: "joukko"      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
       - T: "siten että"      # phrase(x 'such that' x is less than y)
@@ -283,7 +283,7 @@
       else:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: ""}      # phrase('the' set of integers)
+          then: [T: ""]      # phrase('the' set of integers)
       - T: "joukko"      # phrase(here is a 'set' of numbers)
       - x: "*[1]"
 

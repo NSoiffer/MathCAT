@@ -57,8 +57,8 @@
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - pronounce: [{text: "-te"}, {ipa: "te"}, {sapi5: "te"}, {eloquence: "T"}]
-          else: {x: "*[2]"}
+          - pronounce: [text: "-te", ipa: "te", sapi5: "te", eloquence: "T"]
+          else: [x: "*[2]"]
       - T: "wurzel"
   - test:
       if: "IsNode(*[1], 'simple')"

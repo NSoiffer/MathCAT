@@ -12,21 +12,21 @@
     #   - test:
   - test:
     - if: "*[2][.='+']"
-      then: [{T: "dương"}]
-      else: [{T: "âm"}]
+      then: [T: "dương"]
+      else: [T: "âm"]
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][.='ℂ']"
-      then: [{T: số phức}]
+      then: [T: số phức]
     - else_if: "*[1][.='ℕ']"
-      then: [{T: số tự nhiên}]
+      then: [T: số tự nhiên]
     - else_if: "*[1][.='ℚ']"
-      then: [{T: số hữu tỷ}]
+      then: [T: số hữu tỷ]
     - else_if: "*[1][.='ℝ']"
-      then: [{T: số thực}]
+      then: [T: số thực]
     - else_if: "*[1][.='ℤ']"
-      then: [{T: số nguyên}]
-      else: [{x: "*[1][text()]"}] # shouldn't happen
+      then: [T: số nguyên]
+      else: [x: "*[1][text()]"] # shouldn't happen
 
 - name: dimension-number-sets
 
@@ -37,16 +37,16 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][.='ℂ']"
-      then: [{T: "C"}]
+      then: [T: "C"]
     - else_if: "*[1][.='ℕ']"
-      then: [{T: "N"}]
+      then: [T: "N"]
     - else_if: "*[1][.='ℚ']"
-      then: [{T: "Q"}]
+      then: [T: "Q"]
     - else_if: "*[1][.='ℝ']"
-      then: [{T: "R"}]
+      then: [T: "R"]
     - else_if: "*[1][.='ℤ']"
-      then: [{T: "Z"}]
-      else: [{x: "*[1][text()]"}] # shouldn't happen
+      then: [T: "Z"]
+      else: [x: "*[1][text()]"] # shouldn't happen
   - bookmark: "*[2]/@id"
   - x: "*[2]"
 
@@ -57,16 +57,16 @@
   - bookmark: "@id"
   - test:
     - if: ".='ℂ'"
-      then: [{T: số phức}]
+      then: [T: số phức]
     - else_if: ".='ℕ'"
-      then: [{T: số tự nhiên}]
+      then: [T: số tự nhiên]
     - else_if: ".='ℚ'"
-      then: [{T: số hữu tỷ}]
+      then: [T: số hữu tỷ]
     - else_if: ".='ℝ'"
-      then: [{T: số thực}]
+      then: [T: số thực]
     - else_if: ".='ℤ'"
-      then: [{T: số nguyên}]
-      else: [{x: text()}] # shouldn't happen
+      then: [T: số nguyên]
+      else: [x: text()] # shouldn't happen
 
 - name: real-part
   tag: real-part
@@ -122,12 +122,12 @@
   #      - T: "the" 
   - test:
     - if: "name(.)='open-interval'"
-      then: [{T: "mở"}]
+      then: [T: "mở"]
     - else_if: "name(.)='open-closed-interval'"
-      then: [{T: "đóng mở"}]
+      then: [T: "đóng mở"]
     - else_if: "name(.)='closed-interval'"
-      then: [{T: "được đóng"}]
-      else: [{T: "mở đóng"}]  # closed-open-interval
+      then: [T: "được đóng"]
+      else: [T: "mở đóng"]  # closed-open-interval
   - test:
       if: "$Verbosity!='Terse'"
       then:
@@ -159,7 +159,7 @@
   replace:
   # - test:
   #     if: "$Verbosity!='Terse'"
-  #     then: [{T: the}]
+  #     then: [T: the]
   - x: "*[1]"
     #   - test: 
   - T: từ
@@ -168,7 +168,7 @@
   - x: "*[3]"
   - test:
       if: "following-sibling::*"
-      then: [{T: của}]
+      then: [T: của]
 
 - name: bigop-under
   tag: large-op
@@ -176,13 +176,13 @@
   replace:
   # - test:
   #     if: "$Verbosity!='Terse'"
-  #     then: [{T: the}]
+  #     then: [T: the]
   - x: "*[1]"
   - T: trên
   - x: "*[2]"
   - test:
       if: "following-sibling::*"
-      then: [{T: của}]
+      then: [T: của]
 
 - name: largeop
   tag: mrow
@@ -190,7 +190,7 @@
   replace:
   # - test:
   #     if: "$Verbosity!='Terse'"
-  #     then: [{T: the}]
+  #     then: [T: the]
   - x: "*[1]"
   - T: của
   - x: "*[2]"
@@ -203,16 +203,16 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "chỉ số dưới"}
-      else: {T: "chỉ số dưới"}
+      then: [T: "chỉ số dưới"]
+      else: [T: "chỉ số dưới"]
   - x: "*[2]"
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then:
       - test:
           if: "$Verbosity='Terse'"
-          then: {T: "hết chỉ số dưới"}        # (en: "end sub")
-          else: {T: "hết chỉ số dưới"}              # (en: "end subscript")
+          then: [T: "hết chỉ số dưới"]        # (en: "end sub")
+          else: [T: "hết chỉ số dưới"]              # (en: "end subscript")
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -221,8 +221,8 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: {T: "chỉ số trên"}
-        else: {T: "chỉ số trên"}
+        then: [T: "chỉ số trên"]
+        else: [T: "chỉ số trên"]
   - x: "*[3]"
   - pause: short
 
@@ -326,8 +326,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: cô sin}
-      else: {T: cô sin}
+      then: [T: cô sin]
+      else: [T: cô sin]
 - name: tan
   tag: mi
   match: ".='tan' or .='tg'"
@@ -335,8 +335,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: tang}
-      else: {T: tang}
+      then: [T: tang]
+      else: [T: tang]
 - name: sec
   tag: mi
   match: ".='sec'"
@@ -344,8 +344,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: sin đảo}
-      else: {T: sin đảo}
+      then: [T: sin đảo]
+      else: [T: sin đảo]
 - name: csc
   tag: mi
   match: ".='csc'"
@@ -353,8 +353,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: cô sin đảo}
-      else: {T: cô sin đảo}
+      then: [T: cô sin đảo]
+      else: [T: cô sin đảo]
 - name: cot
   tag: mi
   match: ".='cot'"
@@ -362,8 +362,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: cô tang}
-      else: {T: cô tang}
+      then: [T: cô tang]
+      else: [T: cô tang]
 
 - name: sinh
   tag: mi
@@ -372,8 +372,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: sin híp bơ bôn}
-      else: {T: sin híp bơ bôn}
+      then: [T: sin híp bơ bôn]
+      else: [T: sin híp bơ bôn]
 - name: cosh
   tag: mi
   match: ".='cosh'"
@@ -381,8 +381,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: cô sin híp bơ bôn}
-      else: {T: cô sin híp bơ bôn}
+      then: [T: cô sin híp bơ bôn]
+      else: [T: cô sin híp bơ bôn]
 - name: tanh
   tag: mi
   match: ".='tanh'"
@@ -390,8 +390,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: tang híp bơ bôn}
-      else: {T: tang híp bơ bôn}
+      then: [T: tang híp bơ bôn]
+      else: [T: tang híp bơ bôn]
 - name: sech
   tag: mi
   match: ".='sech'"
@@ -399,8 +399,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: xê can híp bơ bôn}
-      else: {T: xê can híp bơ bôn}
+      then: [T: xê can híp bơ bôn]
+      else: [T: xê can híp bơ bôn]
 - name: csch
   tag: mi
   match: ".='csch'"
@@ -408,8 +408,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: cô xê can híp bơ bôn}
-      else: {T: cô xê can híp bơ bôn}
+      then: [T: cô xê can híp bơ bôn]
+      else: [T: cô xê can híp bơ bôn]
 - name: coth
   tag: mi
   match: ".='coth'"
@@ -417,8 +417,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: cô tang híp bơ bôn}
-      else: {T: cô tang híp bơ bôn}
+      then: [T: cô tang híp bơ bôn]
+      else: [T: cô tang híp bơ bôn]
 - name: arcsin
   tag: mi
   match: ".='arcsin'"
@@ -470,10 +470,10 @@
   - x: "count(*)"
   - test:
     - if: "self::m:piecewise"
-      then: [{T: "trường hợp"}]
+      then: [T: "trường hợp"]
     - else_if: "self::m:system-of-equations"
-      then: [{T: "biểu thức"}]
-      else: [{T: "dòng"}]
+      then: [T: "biểu thức"]
+      else: [T: "dòng"]
     #- test:
     #- if: "count(*) > 1"
     #then: [ct: "s"]    # plural
@@ -487,10 +487,10 @@
   - pause: medium
   - test:
     - if: "parent::m:piecewise"
-      then: [{T: "trường hợp"}]
+      then: [T: "trường hợp"]
     - else_if: "parent::m:system-of-equations"
-      then: [{T: "biểu thức"}]
-      else: [{T: "dòng"}]
+      then: [T: "biểu thức"]
+      else: [T: "dòng"]
   - x: "count(preceding-sibling::*)+1"
   - test:
       if: .[self::m:mlabeledtr]
@@ -500,8 +500,8 @@
   - pause: medium
   - test:
       if: .[self::m:mlabeledtr]
-      then: [{x: "*[position()>1]"}]
-      else: {x: "*"}
+      then: [x: "*[position()>1]"]
+      else: [x: "*"]
 
 - name: default-multiline
   tag: mtd
@@ -511,10 +511,10 @@
   - test:
     # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
     - if: count(following-sibling::*) > 0
-      then: {pause: short}
+      then: [pause: short]
     - else_if: count(../following-sibling::*) > 0
-      then: {pause: medium}
-      else: {pause: long}
+      then: [pause: medium]
+      else: [pause: long]
 
 # Matrix/Determinant rules
 # matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
@@ -523,13 +523,13 @@
 - name: 1x1-matrix
 
   tag: [matrix, determinant]
-  variables: [{IsColumnSilent: true()}]
+  variables: [IsColumnSilent: true()]
   match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
   replace:
   - test:
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
-      then: {T: định thức}
-      else: {T: ma trận}
+      then: [T: định thức]
+      else: [T: ma trận]
     #   - OT: the
   - T: "1 1"
   - T: có đầu vào là
@@ -538,7 +538,7 @@
 # simpler reading methods for smaller matrices if the entries are simple
 - name: 2-or-3x1-matrix
   tag: matrix
-  variables: [{IsColumnSilent: true()}]
+  variables: [IsColumnSilent: true()]
   match:
   - "$ClearSpeak_Matrix != 'SpeakColNum' and " # "simple" isn't used for this preference
   - "*[self::m:mtr][count(*) = 1] and " # one column
@@ -547,8 +547,8 @@
   replace:
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: véc tơ}
-      else: {T: ma trận}
+      then: [T: véc tơ]
+      else: [T: ma trận]
     #   - T: the
   - x: count(*)
   - T: 1 cột
@@ -560,12 +560,12 @@
       - T: "kết thúc"
       - test:
           if: $ClearSpeak_Matrix = 'EndVector'
-          then: {T: véc tơ}
-          else: {T: ma trận}
+          then: [T: véc tơ]
+          else: [T: ma trận]
 
 - name: default-column-matrix
   tag: matrix
-  variables: [{IsColumnSilent: true()}]
+  variables: [IsColumnSilent: true()]
   match: "*[self::m:mtr][count(*) = 1]"
   replace:
   #- T: the
@@ -573,17 +573,17 @@
   - T: nhân 1 cột
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: véc tơ}
-      else: {T: ma trận}
+      then: [T: véc tơ]
+      else: [T: ma trận]
   - pause: long
   - x: "*" # select the rows (mtr)
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
-      then: [{T: "hết ma trận"}]
+      then: [T: "hết ma trận"]
 
 - name: 1x2-or-3-matrix
   tag: matrix
-  variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum'"}]
+  variables: [IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum'"]
   match:
   - "$ClearSpeak_Matrix != 'SpeakColNum' and " # "simple" isn't used for this preference
   - count(*)=1  and # one row
@@ -595,8 +595,8 @@
   - T: "dòng"
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: véc tơ}
-      else: {T: ma trận}
+      then: [T: véc tơ]
+      else: [T: ma trận]
   - pause: long
   - x: "*/*"
   - test:
@@ -605,18 +605,18 @@
       - T: "hết"
       - test:
           if: $ClearSpeak_Matrix = 'EndMatrix'
-          then: {T: ma trận}
-          else: {T: véc tơ}
+          then: [T: ma trận]
+          else: [T: véc tơ]
 
 - name: default-row-matrix
   tag: matrix
-  variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
+  variables: [IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"]
   match: "count(*)=1" # one row
   replace:
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: véc tơ}
-      else: {T: ma trận}
+      then: [T: véc tơ]
+      else: [T: ma trận]
   - T: một nhân
   - x: "count(*/*)"
   - T: "dòng"
@@ -629,8 +629,8 @@
       - T: "hết"
       - test:
           if: $ClearSpeak_Matrix = 'EndMatrix'
-          then: {T: ma trận}
-          else: {T: véc tơ}
+          then: [T: ma trận]
+          else: [T: véc tơ]
 
 - name: simple-small-matrix
   tag: [matrix, determinant]
@@ -638,13 +638,13 @@
   - "$ClearSpeak_Matrix != 'SpeakColNum' and " # "simple" isn't used for this preference
   - (count(*)<=3 and count(*[1]/*)<=3) and # no bigger than a 3x3 matrix
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
-  variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum'"}]
+  variables: [IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum'"]
   replace:
   #- T: the
   - test:
       if: "self::m:determinant"
-      then: {T: định thức}
-      else: {T: ma trận}
+      then: [T: định thức]
+      else: [T: ma trận]
   - x: count(*)
   - T: nhân
   - x: count(*[self::m:mtr][1]/*)
@@ -656,19 +656,19 @@
       - T: hết
       - test:
           if: "self::m:determinant"
-          then: {T: định thức}
-          else: {T: ma trận}
+          then: [T: định thức]
+          else: [T: ma trận]
 
 - name: default-matrix
   tag: [matrix, determinant]
-  variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
+  variables: [IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"]
   match: "."
   replace:
   #- T: the
   - test:
       if: "self::m:determinant"
-      then: {T: định thức}
-      else: {T: ma trận}
+      then: [T: định thức]
+      else: [T: ma trận]
   - x: "count(*)"
   - T: nhân
   - x: "count(*[self::m:mtr][1]/*)"
@@ -680,8 +680,8 @@
       - T: hết
       - test:
           if: "self::m:determinant"
-          then: {T: định thức}
-          else: {T: ma trận}
+          then: [T: định thức]
+          else: [T: ma trận]
 
 - name: chemistry-msub
 
@@ -692,10 +692,10 @@
   - x: "*[3]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{T: "dưới"}]
+      then: [T: "dưới"]
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{T: ""}]
+        then: [T: ""]
   #- x: "*[3]"
 
 - name: chemistry-msup
@@ -706,14 +706,14 @@
   - x: "*[3]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{T: "trên"}]
+      then: [T: "trên"]
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{T: ""}]
+        then: [T: ""]
   #- x: "*[3]"
   - test:
       if: "following-sibling::*[1][.='+' or .='-']" # a little lazy -- assumes chemistry superscripts end with + or -
-      then: [{pause: medium}]
+      then: [pause: medium]
 
 - # Instead, we just deal with up to two prescripts and up to four postscripts (repeating blocks of similar code [UGLY!])
   # This hopefully covers all reasonable cases...
@@ -737,10 +737,10 @@
           - x: "$Prescripts[2]"
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{T: "trên"}]
+              then: [T: "trên"]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{T: ""}]
+                then: [T: ""]
           #- x: "$Prescripts[2]"
           - pause: "short"
       - test:
@@ -749,10 +749,10 @@
           - x: "$Prescripts[1]"
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{T: "dưới"}]
+              then: [T: "dưới"]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{T: ""}]
+                then: [T: ""]
           #- x: "$Prescripts[1]"
           - pause: "short"
       - test:
@@ -764,10 +764,10 @@
               - x: "$Prescripts[4]"
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{T: "trên"}]
+                  then: [T: "trên"]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{T: ""}]
+                    then: [T: ""]
               #- x: "$Prescripts[4]"
               - pause: "short"
           - test:
@@ -776,10 +776,10 @@
               - x: "$Prescripts[3]"
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{T: "dưới"}]
+                  then: [T: "dưới"]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{T: ""}]
+                    then: [T: ""]
               #- x: "$Prescripts[3]"
               - pause: "short"
   - x: "*[1]" # base
@@ -792,10 +792,10 @@
           - x: "$Postscripts[1]"
           - test:
               if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
-              then: [{T: "dưới"}]
+              then: [T: "dưới"]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{T: ""}]
+                then: [T: ""]
           #- x: "$Postscripts[1]"
           - pause: "short"
       - test:
@@ -804,10 +804,10 @@
           - x: "$Postscripts[2]"
           - test:
               if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
-              then: [{T: "trên"}]
+              then: [T: "trên"]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{T: ""}]
+                then: [T: ""]
           #- x: "$Postscripts[2]"
           - pause: "short"
       - test:
@@ -819,10 +819,10 @@
               - x: "$Postscripts[3]"
               - test:
                   if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
-                  then: [{T: "dưới"}]
+                  then: [T: "dưới"]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{T: ""}]
+                    then: [T: ""]
               #- x: "$Postscripts[3]"
               - pause: "short"
           - test:
@@ -831,10 +831,10 @@
               - x: "$Postscripts[4]"
               - test:
                   if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
-                  then: [{T: "trên"}]
+                  then: [T: "trên"]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{T: ""}]
+                    then: [T: ""]
               #- x: "$Postscripts[4]"
               - pause: "short"
           - test:
@@ -846,10 +846,10 @@
                   - x: "$Postscripts[5]"
                   - test:
                       if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
-                      then: [{T: "dưới"}]
+                      then: [T: "dưới"]
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{T: ""}]
+                        then: [T: ""]
                   #- x: "$Postscripts[5]"
                   - pause: "short"
               - test:
@@ -858,10 +858,10 @@
                   - x: "$Postscripts[6]"
                   - test:
                       if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
-                      then: [{T: "trên"}]
+                      then: [T: "trên"]
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{T: ""}]
+                        then: [T: ""]
                   #- x: "$Postscripts[6]"
                   - pause: "short"
               - test:
@@ -873,10 +873,10 @@
                       - x: "$Postscripts[7]"
                       - test:
                           if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
-                          then: [{T: "dưới"}]
+                          then: [T: "dưới"]
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{T: ""}]
+                            then: [T: ""]
                       #- x: "$Postscripts[7]"
                       - pause: "short"
                   - test:
@@ -885,15 +885,15 @@
                       - x: "$Postscripts[8]"
                       - test:
                           if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
-                          then: [{T: "trên"}]
+                          then: [T: "trên"]
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{T: ""}]
+                            then: [T: ""]
                       #- x: "$Postscripts[8]"
                       - pause: "short"
       - test:
           if: "$Postscripts[last()][not(self::m:none)] and following-sibling::*[1][.='+' or .='-']"
-          then: [{pause: medium}]
+          then: [pause: medium]
 
 - name: chemistry
 
@@ -918,12 +918,12 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: ".='s'"
-      then: [{T: "thể rắn"}]
+      then: [T: "thể rắn"]
     - else_if: ".='l'"
-      then: [{T: "thể lỏng"}]
+      then: [T: "thể lỏng"]
     - else_if: ".='g'"
-      then: [{T: "thể khí"}]
-      else: [{T: "thể lỏng"}] # (aq)
+      then: [T: "thể khí"]
+      else: [T: "thể lỏng"] # (aq)
   - pause: short
 
 - name: chemical-formula-operator-bond
@@ -934,14 +934,14 @@
   - bookmark: "@id"
   - test:
     - if: ".='-' or .=':'"
-      then: [{T: "nối đơn"}]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
+      then: [T: "nối đơn"]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
     - else_if: ".='=' or .='∷'"
-      then: [{T: "nối đôi"}]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
+      then: [T: "nối đôi"]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
     - else_if: ".='≡'"
-      then: [{T: "nối ba"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
+      then: [T: "nối ba"]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
     - else_if: ".='≣'"
-      then: [{T: "nối bốn"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
-      else: [{x: "text()"}]
+      then: [T: "nối bốn"]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
+      else: [x: "text()"]
 
 - name: chemical-formula-operator
   tag: chemical-formula-operator
@@ -959,14 +959,14 @@
     - if: ".='→' or .='⟶'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: [{T: "cho ra"}]      # phrase(hydrogen and oxygen 'forms' water )
-        else: [{T: "phản ứng cho ra"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
+        then: [T: "cho ra"]      # phrase(hydrogen and oxygen 'forms' water )
+        else: [T: "phản ứng cho ra"]      # phrase(hydrogen and oxygen 'reacts to form' water)
     - else_if: ".='⇌' or .='\u1f8d2'"
-      then: [{T: "mũi tên hai chiều"}]      # phrase(a reactant 'is in equilibrium with' a product)
+      then: [T: "mũi tên hai chiều"]      # phrase(a reactant 'is in equilibrium with' a product)
     - else_if: ".='\u1f8d4'"
-      then: [{T: "mũi tên chiều bên trái"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
+      then: [T: "mũi tên chiều bên trái"]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
     - else_if: ".='\u1f8d3'"
-      then: [{T: "mũi tên chiều bên phải"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
+      then: [T: "mũi tên chiều bên phải"]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
       else: [x: "*"]
 
 - name: chemical-equation-operator

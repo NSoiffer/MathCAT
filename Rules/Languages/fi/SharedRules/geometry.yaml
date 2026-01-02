@@ -38,7 +38,7 @@
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{T: ""}]            # phrase('the' arc A B C)
+      then: [T: ""]            # phrase('the' arc A B C)
   - T: "kaari"                        # phrase(the 'arc' A B C)
   - x: "*[1]"
   - x: "*[2]"

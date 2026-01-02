@@ -450,8 +450,8 @@
   - T: "sinus hyperbolicus"
   #- test:
       #if: "$Verbosity='Terse'"
-      #then: {T: "sin hype"}                # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
-      #else: {T: "sinus hyperbolicus"}      # phrase(the 'hyperbolic sine' is used in mathematics) 
+      #then: [T: "sin hype"]                # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
+      #else: [T: "sinus hyperbolicus"]      # phrase(the 'hyperbolic sine' is used in mathematics) 
 
 - name: cosh
   tag: mi
@@ -461,8 +461,8 @@
   - T: "cosinus hyperbolicus"
   #- test:
       #if: "$Verbosity='Terse'"
-      #then: {T: "cos hype"}                  # phrase('cosh' is an abbreviation of hyperbolic cosine)
-      #else: {T: "cosinus hyperbolicus"}      # phrase(the 'hyperbolic cosine' is a mathematical function) 
+      #then: [T: "cos hype"]                  # phrase('cosh' is an abbreviation of hyperbolic cosine)
+      #else: [T: "cosinus hyperbolicus"]      # phrase(the 'hyperbolic cosine' is a mathematical function) 
 
 - name: tanh
   tag: mi
@@ -472,8 +472,8 @@
   - T: "tangens hyperbolicus"
   #- test:
       #if: "$Verbosity='Terse'"
-      #then: {T: "tan hype"}                  # phrase('tanch' is shorthand for hyperbolic tangent)
-      #else: {T: "tangens hyperbolicus"}      # phrase('hyperbolic tangent' is a mathematical function)
+      #then: [T: "tan hype"]                  # phrase('tanch' is shorthand for hyperbolic tangent)
+      #else: [T: "tangens hyperbolicus"]      # phrase('hyperbolic tangent' is a mathematical function)
 
 - name: sech
   tag: mi
@@ -483,8 +483,8 @@
   - T: "sekans hyperbolicus"
   #- test:
       #if: "$Verbosity='Terse'"
-      #then: {T: "sec hype"}                   # phrase('sheck' is shorthand for hyperbolic secant)
-      #else: {T: "sekans hyperbolicus"}        # phrase('hyperbolic secant' is a mathematical function) 
+      #then: [T: "sec hype"]                   # phrase('sheck' is shorthand for hyperbolic secant)
+      #else: [T: "sekans hyperbolicus"]        # phrase('hyperbolic secant' is a mathematical function) 
 
 - name: csch
   tag: mi
@@ -494,8 +494,8 @@
   - T: "cosekans hyperbolicus"
   #- test:
       #if: "$Verbosity='Terse'"
-      #then: {T: "cosec hype"}                   # phrase('cosheck' is shorthand for hyperbolic cosecant)
-      #else: {T: "cosekans hyperbolicus"}        # phrase('hyperbolic cosecant' is a mathematical function) 
+      #then: [T: "cosec hype"]                   # phrase('cosheck' is shorthand for hyperbolic cosecant)
+      #else: [T: "cosekans hyperbolicus"]        # phrase('hyperbolic cosecant' is a mathematical function) 
 
 - name: coth
   tag: mi
@@ -505,8 +505,8 @@
   - T: "cotangens hyperbolicus"
   #- test:
       #if: "$Verbosity='Terse'"
-      #then: {T: "cotan hype"}                  # phrase('cotanch' is shorthand for hyperbolic cotangent)
-      #else: {T: "cotangens hyperbolicus"}      # phrase(the 'hyperbolic cotangent' is a mathematical function) 
+      #then: [T: "cotan hype"]                  # phrase('cotanch' is shorthand for hyperbolic cotangent)
+      #else: [T: "cotangens hyperbolicus"]      # phrase(the 'hyperbolic cotangent' is a mathematical function) 
 
 # NORWEGIAN: Added this rule from English version
 - name: exponential

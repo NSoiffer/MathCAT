@@ -15,11 +15,11 @@
       replace:
       - test:
           if: "$MathRate = 100"
-          then: [{x: "*"}]
+          then: [x: "*"]
           else:
           - rate:
               value: "$MathRate"
-              replace: [{x: "*"}]
+              replace: [x: "*"]
 
 - name: empty-mrow
   tag: mrow
@@ -33,7 +33,7 @@
   replace:
   - insert:
       nodes: "*"
-      replace: [{pause: auto}]
+      replace: [pause: auto]
 
 - name: default
   tag: mn
@@ -70,7 +70,7 @@
 - name: default
   tag: mstyle
   match: "."
-  replace: [{x: "*"}]
+  replace: [x: "*"]
 
 - name: simple-sub
   tag: indexed-by
@@ -88,7 +88,7 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-      then: [{T: 'indeks'}]
+      then: [T: 'indeks']
   - x: "*[2]"
 
 - name: default
@@ -108,7 +108,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [{T: 'diubah'}]
+      then: [T: 'diubah']
   - x: "*[1]"
   - T: 'dengan'
   - x: "*[2]"
@@ -120,7 +120,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [{T: 'diubah'}]
+      then: [T: 'diubah']
   - x: "*[1]"
   - T: 'dengan'
   - x: "*[2]"
@@ -132,7 +132,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [{T: 'diubah'}]
+      then: [T: 'diubah']
   - T: 'dengan'
   - x: "*[1]"
   - pause: medium
@@ -177,7 +177,7 @@
               - x: "$Prescripts[1]"
           - test:
               if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
-              then: [{T: "dan"}]
+              then: [T: "dan"]
           - test:
               if: "not($Prescripts[2][self::m:none])"
               then:
@@ -194,7 +194,7 @@
                   - x: "$Prescripts[3]"
               - test:
                   if: "not($Prescripts[3][self::m:none] or $Prescripts[4][self::m:none])"
-                  then: [{T: "dan"}]
+                  then: [T: "dan"]
               - test:
                   if: "not($Prescripts[4][self::m:none])"
                   then:
@@ -219,7 +219,7 @@
               then:
               - test:
                   if: "$Prescripts"
-                  then: [{T: "dan"}]
+                  then: [T: "dan"]
               - T: "dengan"
               - x: "count($Postscripts) div 2"
               - T: "postskrip"
@@ -231,7 +231,7 @@
               - x: "$Postscripts[1]"
           - test:
               if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
-              then: [{T: "dan"}]
+              then: [T: "dan"]
           - test:
               if: "not($Postscripts[2][self::m:none])"
               then:
@@ -247,7 +247,7 @@
                   - x: "$Postscripts[3]"
               - test:
                   if: "not($Postscripts[3][self::m:none] or $Postscripts[4][self::m:none])"
-                  then: [{T: "dan"}]
+                  then: [T: "dan"]
               - test:
                   if: "not($Postscripts[4][self::m:none])"
                   then:
@@ -263,7 +263,7 @@
                       - x: "$Postscripts[5]"
                   - test:
                       if: "not($Postscripts[5][self::m:none] or $Postscripts[6][self::m:none])"
-                      then: [{T: "dan"}]
+                      then: [T: "dan"]
                   - test:
                       if: "not($Postscripts[6][self::m:none])"
                       then:
@@ -279,7 +279,7 @@
                           - x: "$Postscripts[7]"
                       - test:
                           if: "not($Postscripts[7][self::m:none] or $Postscripts[8][self::m:none])"
-                          then: [{T: "dan"}]
+                          then: [T: "dan"]
                       - test:
                           if: "not($Postscripts[8][self::m:none])"
                           then:
@@ -303,14 +303,14 @@
   - x: count(*)
   - test:
       if: count(*)=1
-      then: {T: 'baris'}
-      else: {T: 'baris'}
+      then: [T: 'baris']
+      else: [T: 'baris']
   - T: dan
   - x: "$NumColumns"
   - test:
       if: "$NumColumns"
-      then: {T: 'kolom'}
-      else: {T: 'kolom'}
+      then: [T: 'kolom']
+      else: [T: 'kolom']
   - pause: long
   - x: "*"
 
@@ -340,101 +340,101 @@
   replace:
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
-      then: [{T: kotak}, {pause: short}]
+      then: [T: kotak, pause: short]
   - test:
       if: ".[contains(@notation,'roundedbox')]"
-      then: [{T: kotak bulat}, {pause: short}]
+      then: [T: kotak bulat, pause: short]
   - test:
       if: ".[contains(@notation,'circle')]"
-      then: [{T: lingkaran}, {pause: short}]
+      then: [T: lingkaran, pause: short]
   - test:
       if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or contains(concat(' ', normalize-space(@notation), ' '), ' right ') or contains(@notation,'top') or contains(@notation,'bottom') ]"
       then:
       - T: baris aktif
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
-          then: [{T: kiri}, {pause: short}]
+          then: [T: kiri, pause: short]
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
-          then: [{T: kanan}, {pause: short}]
+          then: [T: kanan, pause: short]
       - test:
           if: ".[contains(@notation,'top')]"
-          then: [{T: atas}, {pause: short}]
+          then: [T: atas, pause: short]
       - test:
           if: ".[contains(@notation,'bottom')]"
-          then: [{T: bawah}, {pause: short}]
+          then: [T: bawah, pause: short]
   - test:
       if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
       then:
       - test:
           if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
-          then: [{spell: x}, {pause: short}] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+          then: [spell: x, pause: short] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
           else:
           - test:
               if: ".[contains(@notation,'updiagonalstrike')]"
-              then: [{T: diagonal ke atas}, {pause: short}]
+              then: [T: diagonal ke atas, pause: short]
           - test:
               if: ".[contains(@notation,'downdiagonalstrike')]"
-              then: [{T: diagonal ke bawah}, {pause: short}]
+              then: [T: diagonal ke bawah, pause: short]
       - test:
           if: ".[contains(@notation,'verticalstrike')]"
-          then: [{T: vertikal}, {pause: short}]
+          then: [T: vertikal, pause: short]
       - test:
           if: ".[contains(@notation,'horizontalstrike')]"
-          then: [{T: horizontal}, {pause: short}]
+          then: [T: horizontal, pause: short]
       - T: mencoret
       - pause: short
   - test:
       if: ".[contains(@notation,'uparrow')]"
-      then: [{T: panah atas}, {pause: short}]
+      then: [T: panah atas, pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
-      then: [{T: panah bawah}, {pause: short}]
+      then: [T: panah bawah, pause: short]
   - test:
       if: ".[contains(@notation,'leftarrow')]"
-      then: [{T: panah kiri}, {pause: short}]
+      then: [T: panah kiri, pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
-      then: [{T: panah kanan}, {pause: short}]
+      then: [T: panah kanan, pause: short]
   - test:
       if: ".[contains(@notation,'northeastarrow')]"
-      then: [{T: panah timur laut}, {pause: short}]
+      then: [T: panah timur laut, pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
-      then: [{T: panah tenggara}, {pause: short}]
+      then: [T: panah tenggara, pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
-      then: [{T: panah barat daya}, {pause: short}]
+      then: [T: panah barat daya, pause: short]
   - test:
       if: ".[contains(@notation,'northwestarrow')]"
-      then: [{T: panah barat laut}, {pause: short}]
+      then: [T: panah barat laut, pause: short]
   - test:
       if: ".[contains(@notation,'updownarrow')]"
-      then: [{T: panah vertikal ujung ganda}, {pause: short}]
+      then: [T: panah vertikal ujung ganda, pause: short]
   - test:
       if: ".[contains(@notation,'leftrightarrow')]"
-      then: [{T: panah horizontal ujung ganda}, {pause: short}]
+      then: [T: panah horizontal ujung ganda, pause: short]
   - test:
       if: ".[contains(@notation,'northeastsouthwestarrow')]"
-      then: [{T: panah diagonal atas ujung ganda}, {pause: short}]
+      then: [T: panah diagonal atas ujung ganda, pause: short]
   - test:
       if: ".[contains(@notation,'northwestsoutheastarrow')]"
-      then: [{T: panah diagonal bawah ujung ganda}, {pause: short}]
+      then: [T: panah diagonal bawah ujung ganda, pause: short]
   - test:
       if: ".[contains(@notation,'actuarial')]"
-      then: [{T: simbol aktuaria}, {pause: short}]
+      then: [T: simbol aktuaria, pause: short]
   - test:
       if: ".[contains(@notation,'madrub')]"
-      then: [{T: simbol faktorial arab}, {pause: short}]
+      then: [T: simbol faktorial arab, pause: short]
   - test:
       if: ".[contains(@notation,'phasorangle')]"
-      then: [{T: sudut fasor}, {pause: short}]
+      then: [T: sudut fasor, pause: short]
   - test:
       if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']" # default
-      then: [{T: simbol pembagian panjang}, {pause: short}]
+      then: [T: simbol pembagian panjang, pause: short]
   - test:
       if: ".[contains(@notation,'radical')]"
-      then: [{T: akar pangkat dua}, {pause: short}]
+      then: [T: akar pangkat dua, pause: short]
   - T: melampirkan
   - test:
       if: "*[self::m:mtext and .=' ']"
@@ -442,7 +442,7 @@
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
-      then: [{T: penutup akhir}]
+      then: [T: penutup akhir]
   - pause: short
 
 - name: semantics

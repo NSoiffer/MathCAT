@@ -15,11 +15,11 @@
       replace:
       - test:
           if: "$MathRate = 100"
-          then: [{x: "*"}]
+          then: [x: "*"]
           else:
           - rate:
               value: "$MathRate"
-              replace: [{x: "*"}]
+              replace: [x: "*"]
 
 - name: empty-mrow
   tag: mrow
@@ -33,7 +33,7 @@
   replace:
   - insert:
       nodes: "*"
-      replace: [{pause: auto}]
+      replace: [pause: auto]
 
 - name: default
   tag: mn
@@ -85,7 +85,7 @@
 - name: default
   tag: mstyle
   match: "."
-  replace: [{x: "*"}]
+  replace: [x: "*"]
 
 
 - name: literal-simple
@@ -111,11 +111,11 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - T: "trên"               # phrase("the fraction x 'over' y")
   - test:
       if: "not(IsNode(*[2],'leaf'))"
-      then: [{pause: short}]
+      then: [pause: short]
   - x: "*[2]"
   - pause: short
   - T: "hết phân số"          # phrase("start of fraction x over y 'end over'")
@@ -180,7 +180,7 @@
   - x: "*[2]"
   - test:
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-      then: [{T: " "}]
+      then: [T: " "]
 
 - name: literal
   tag: msub
@@ -222,7 +222,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [{T: " "}]
+      then: [T: " "]
   - x: "*[1]"
   #- T: "với"
   #- x: "*[2]"
@@ -249,7 +249,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [{T: " "}]
+      then: [T: " "]
   - x: "*[1]"
   #- T: "với"
   #- x: "*[2]"
@@ -261,7 +261,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [{T: " "}]
+      then: [T: " "]
   - x: "*[1]"
   #- T: "với"
   #- x: "*[2]"
@@ -305,7 +305,7 @@
               - x: "$Prescripts[1]"
           - test:
               if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
-              then: [{T: "và"}]
+              then: [T: "và"]
           - test:
               if: "not($Prescripts[2][self::m:none])"
               then:
@@ -322,7 +322,7 @@
                   - x: "$Prescripts[3]"
               - test:
                   if: "not($Prescripts[3][self::m:none] or $Prescripts[4][self::m:none])"
-                  then: [{T: "và"}]
+                  then: [T: "và"]
               - test:
                   if: "not($Prescripts[4][self::m:none])"
                   then:
@@ -347,7 +347,7 @@
               then:
               - test:
                   if: "$Prescripts"
-                  then: [{T: "và"}]
+                  then: [T: "và"]
               - T: "với"
               - x: "count($Postscripts) div 2"
               - T: "chỉ số sau"
@@ -359,7 +359,7 @@
               - x: "$Postscripts[1]"
           - test:
               if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
-              then: [{T: "và"}]
+              then: [T: "và"]
           - test:
               if: "not($Postscripts[2][self::m:none])"
               then:
@@ -375,7 +375,7 @@
                   - x: "$Postscripts[3]"
               - test:
                   if: "not($Postscripts[3][self::m:none] or $Postscripts[4][self::m:none])"
-                  then: [{T: "và"}]
+                  then: [T: "và"]
               - test:
                   if: "not($Postscripts[4][self::m:none])"
                   then:
@@ -391,7 +391,7 @@
                       - x: "$Postscripts[5]"
                   - test:
                       if: "not($Postscripts[5][self::m:none] or $Postscripts[6][self::m:none])"
-                      then: [{T: "và"}]
+                      then: [T: "và"]
                   - test:
                       if: "not($Postscripts[6][self::m:none])"
                       then:
@@ -407,7 +407,7 @@
                           - x: "$Postscripts[7]"
                       - test:
                           if: "not($Postscripts[7][self::m:none] or $Postscripts[8][self::m:none])"
-                          then: [{T: "và"}]
+                          then: [T: "và"]
                       - test:
                           if: "not($Postscripts[8][self::m:none])"
                           then:
@@ -431,14 +431,14 @@
   - x: count(*)
   - test:
       if: count(*)=1
-      then: {T: "dòng"}
-      else: {T: "dòng"}
+      then: [T: "dòng"]
+      else: [T: "dòng"]
   - T: và
   - x: "$NumColumns"
   - test:
       if: "$NumColumns"
-      then: {T: "cột"}
-      else: {T: "cột"}
+      then: [T: "cột"]
+      else: [T: "cột"]
   - pause: long
   - x: "*"
 
@@ -460,8 +460,8 @@
   - pause: medium
   - test:
       if: self::m:mlabeledtr
-      then: [{x: "*[position()>1]"}]
-      else: {x: "*"}
+      then: [x: "*[position()>1]"]
+      else: [x: "*"]
 
 - name: default
   tag: mtd
@@ -480,10 +480,10 @@
   - test:
     # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
     - if: count(following-sibling::*) > 0
-      then: {pause: short}
+      then: [pause: short]
     - else_if: count(../following-sibling::*) > 0
-      then: {pause: medium}
-      else: {pause: long}
+      then: [pause: medium]
+      else: [pause: long]
 
 
 - name: empty-box
@@ -502,102 +502,102 @@
   replace:
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
-      then: [{T: hộp}, {pause: short}]
+      then: [T: hộp, pause: short]
   - test:
       if: ".[contains(@notation,'roundedbox')]"
-      then: [{T: hộp tròn}, {pause: short}]
+      then: [T: hộp tròn, pause: short]
   - test:
       if: ".[contains(@notation,'circle')]"
-      then: [{T: hình tròn}, {pause: short}]
+      then: [T: hình tròn, pause: short]
   - test:
       if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or contains(concat(' ', normalize-space(@notation), ' '), ' right ') or contains(@notation,'top') or contains(@notation,'bottom') ]"
       then:
       - T: đường trên
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
-          then: [{T: trái}, {pause: short}]
+          then: [T: trái, pause: short]
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
-          then: [{T: phải}, {pause: short}]
+          then: [T: phải, pause: short]
       - test:
           if: ".[contains(@notation,'top')]"
-          then: [{T: trên}, {pause: short}]
+          then: [T: trên, pause: short]
       - test:
           if: ".[contains(@notation,'bottom')]"
-          then: [{T: đáy}, {pause: short}]
+          then: [T: đáy, pause: short]
   - test:
       if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
       then:
       - T: đường cắt
       - test:
           if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
-          then: [{SPELL: "'x'"}, {pause: short}] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+          then: [SPELL: "'x'", pause: short] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
           else:
           - test:
               if: ".[contains(@notation,'updiagonalstrike')]"
-              then: [{T: chéo lên}, {pause: short}]
+              then: [T: chéo lên, pause: short]
           - test:
               if: ".[contains(@notation,'downdiagonalstrike')]"
-              then: [{T: chéo xuống}, {pause: short}]
+              then: [T: chéo xuống, pause: short]
       - test:
           if: ".[contains(@notation,'verticalstrike')]"
-          then: [{T: thẳng đứng}, {pause: short}]
+          then: [T: thẳng đứng, pause: short]
       - test:
           if: ".[contains(@notation,'horizontalstrike')]"
-          then: [{T: ngang}, {pause: short}]
+          then: [T: ngang, pause: short]
       #- T: đường cắt
       - pause: short
   - test:
       if: ".[contains(@notation,'uparrow')]"
-      then: [{T: mũi tên lên}, {pause: short}]
+      then: [T: mũi tên lên, pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
-      then: [{T: mũi tên xuống}, {pause: short}]
+      then: [T: mũi tên xuống, pause: short]
   - test:
       if: ".[contains(@notation,'leftarrow')]"
-      then: [{T: mũi tên trái}, {pause: short}]
+      then: [T: mũi tên trái, pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
-      then: [{T: mũi tên phải}, {pause: short}]
+      then: [T: mũi tên phải, pause: short]
   - test:
       if: ".[contains(@notation,'northeastarrow')]"
-      then: [{T: mũi tên đông bắc}, {pause: short}]
+      then: [T: mũi tên đông bắc, pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
-      then: [{T: mũi tên đông nam}, {pause: short}]
+      then: [T: mũi tên đông nam, pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
-      then: [{T: mũi tên tây nam}, {pause: short}]
+      then: [T: mũi tên tây nam, pause: short]
   - test:
       if: ".[contains(@notation,'northwestarrow')]"
-      then: [{T: mũi tên tây bắc}, {pause: short}]
+      then: [T: mũi tên tây bắc, pause: short]
   - test:
       if: ".[contains(@notation,'updownarrow')]"
-      then: [{T: mũi tên đứng kết đôi}, {pause: short}]
+      then: [T: mũi tên đứng kết đôi, pause: short]
   - test:
       if: ".[contains(@notation,'leftrightarrow')]"
-      then: [{T: mũi tên ngang kết đôi}, {pause: short}]
+      then: [T: mũi tên ngang kết đôi, pause: short]
   - test:
       if: ".[contains(@notation,'northeastsouthwestarrow')]"
-      then: [{T: mũi tên chéo lên kết đôi}, {pause: short}]
+      then: [T: mũi tên chéo lên kết đôi, pause: short]
   - test:
       if: ".[contains(@notation,'northwestsoutheastarrow')]"
-      then: [{T: mũi tên chéo xuống kết đôi}, {pause: short}]
+      then: [T: mũi tên chéo xuống kết đôi, pause: short]
   - test:
       if: ".[contains(@notation,'actuarial')]"
-      then: [{T: ký hiệu phân tích}, {pause: short}]
+      then: [T: ký hiệu phân tích, pause: short]
   - test:
       if: ".[contains(@notation,'madrub')]"
-      then: [{T: ký hiệu giai thừa ả rập}, {pause: short}]
+      then: [T: ký hiệu giai thừa ả rập, pause: short]
   - test:
       if: ".[contains(@notation,'phasorangle')]"
-      then: [{T: góc phasor}, {pause: short}]
+      then: [T: góc phasor, pause: short]
   - test:
       if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']" # default
-      then: [{T: ký hiệu chia dài}, {pause: short}]
+      then: [T: ký hiệu chia dài, pause: short]
   - test:
       if: ".[contains(@notation,'radical')]"
-      then: [{T: căn bậc hai}, {pause: short}]
+      then: [T: căn bậc hai, pause: short]
   - T: bọc
   - test:
       if: "*[self::m:mtext and .=' ']"
@@ -605,7 +605,7 @@
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
-      then: [{T: hết bọc}]
+      then: [T: hết bọc]
   - pause: short
 
 - name: semantics
