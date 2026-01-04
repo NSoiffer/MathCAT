@@ -4487,33 +4487,39 @@ mod canonicalize_tests {
 				<mi mathvariant='fraktur'>0yACHIRZ</mi> <mo>,</mo>	<!-- 0 stays as ASCII -->
 				<mi mathvariant='bold-fraktur'>nC</mi> <mo>,</mo>
 				<mi mathvariant='script'>ABEFHILMRegow</mi> <mo>,</mo>
-				<mi mathvariant='bold-script'>fG*</mi>				<!-- '*' shouldn't change -->
+				<msup>
+					<mi mathvariant='bold-script'>fG</mi>
+					<mo mathvariant='bold-script'>*</mo>				<!-- '*' shouldn't change -->
+				</msup>
 			</math>";
         let target_str = "<math>
-				<mrow data-changed='added'>
-					<mi mathvariant='normal'>sin</mi>
-					<mo >,</mo>
-					<mi mathvariant='italic'>bB4</mi>
-					<mo>,</mo>
-					<mi mathvariant='bold'>𝐚</mi>
-					<mo>,</mo>
-					<mi mathvariant='bold'>𝐙</mi>
-					<mo>,</mo>
-					<mn mathvariant='bold'>𝟏𝟗=𝟗</mn>
-					<mo>,</mo>
-					<mn mathvariant='double-struck'>𝟘𝟚𝟜𝟞𝟠𝟡</mn>
-					<mo>,</mo>
-					<mi mathvariant='double-struck'>𝕪𝕫ℂℍℕℙℚℝℤ</mi>
-					<mo>,</mo>
-					<mi mathvariant='fraktur'>0𝔶𝔄ℭℌℑℜℨ</mi>
-					<mo>,</mo>
-					<mi mathvariant='bold-fraktur'>𝖓𝕮</mi>
-					<mo>,</mo>
-					<mi mathvariant='script'>𝒜ℬℰℱℋℐℒℳℛℯℊℴ𝓌</mi>
-					<mo>,</mo>
-					<mi mathvariant='bold-script'>𝓯𝓖*</mi>
-				</mrow>
-			</math>";
+			<mrow data-changed='added'>
+				<mi mathvariant='normal'>sin</mi>
+				<mo >,</mo>
+				<mi mathvariant='italic'>bB4</mi>
+				<mo>,</mo>
+				<mi mathvariant='bold'>𝐚</mi>
+				<mo>,</mo>
+				<mi mathvariant='bold'>𝐙</mi>
+				<mo>,</mo>
+				<mn mathvariant='bold'>𝟏𝟗=𝟗</mn>
+				<mo>,</mo>
+				<mn mathvariant='double-struck'>𝟘𝟚𝟜𝟞𝟠𝟡</mn>
+				<mo>,</mo>
+				<mi mathvariant='double-struck'>𝕪𝕫ℂℍℕℙℚℝℤ</mi>
+				<mo>,</mo>
+				<mi mathvariant='fraktur'>0𝔶𝔄ℭℌℑℜℨ</mi>
+				<mo>,</mo>
+				<mi mathvariant='bold-fraktur'>𝖓𝕮</mi>
+				<mo>,</mo>
+				<mi mathvariant='script'>𝒜ℬℰℱℋℐℒℳℛℯℊℴ𝓌</mi>
+				<mo>,</mo>
+				<msup>
+					<mi mathvariant='bold-script'>𝓯𝓖</mi>
+					<mo mathvariant='bold-script'>*</mo>				<!-- '*' shouldn't change -->
+				</msup>
+			</mrow>
+		</math>";
 		assert!(are_strs_canonically_equal(test_str, target_str, &[]));
 	}
 	
