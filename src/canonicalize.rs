@@ -1389,9 +1389,13 @@ impl CanonicalizeContext {
 
 		/// looks for pairs of (letter, pseudoscript) such as x' or p'q' all inside of a single token element
 		fn split_apart_pseudo_scripts<'a>(mi: Element<'a>) -> Option<Element<'a>> {
+			lazy_static!{
+				static ref IS_DEGREES_C_or_F: Regex = Regex::new(r"[°º][CF]").unwrap();
+			}
+
 			let text = as_text(mi);
 			debug!("split_apart_pseudo_scripts: start text=\"{text}\"");
-			if !text.chars().any (|c| PSEUDO_SCRIPTS.contains(&c)) {
+			if !text.chars().any(|c| PSEUDO_SCRIPTS.contains(&c)) || IS_DEGREES_C_or_F.is_match(text) {
 				return None;
 			}
 
