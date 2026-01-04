@@ -858,6 +858,8 @@ impl CanonicalizeContext {
 						as_element(following_siblings[0]).remove_from_parent();
 					}
 					return Some(mathml);
+				} else if let Some(result) = split_apart_pseudo_scripts(mathml) {
+						return Some(result);
 				} else if let Some(result) = merge_arc_trig(mathml) {
 						return Some(result);
 				} else if IS_PRIME.is_match(text) {
@@ -1383,6 +1385,50 @@ impl CanonicalizeContext {
 			}
 			return mathml;
 		}
+
+
+		/// looks for pairs of (letter, pseudoscript) such as x' or p'q' all inside of a single token element
+		fn split_apart_pseudo_scripts<'a>(mi: Element<'a>) -> Option<Element<'a>> {
+			let text = as_text(mi);
+			debug!("split_apart_pseudo_scripts: start text=\"{text}\"");
+			if !text.chars().any (|c| PSEUDO_SCRIPTS.contains(&c)) {
+				return None;
+			}
+
+			let document = mi.document();
+			// create pairs of text
+			let chars = text.chars();
+    		let next_chars = text.chars().skip(1);
+			let result = chars.zip(next_chars).map(|(a, b)|
+						if a.is_alphabetic() && PSEUDO_SCRIPTS.contains(&b) {
+							// create msup
+							debug!("split_apart_pseudo_scripts: msup {a}, {b}");
+							let base = create_mathml_element(&document, "mi");
+							base.set_text(&a.to_string());
+							let script = create_mathml_element(&document, "mo");
+							script.set_text(&b.to_string());
+							let msup = create_mathml_element(&document, "msup");
+							msup.append_child(base);
+							msup.append_child(script);
+							msup
+						} else {
+							// create an mi "ab"
+							debug!("split_apart_pseudo_scripts: mi {a}, {b}");
+							let new_mi = create_mathml_element(&document, "mi");
+							let mut new_mi_text = String::with_capacity(6);		// likely will fit almost all cases
+							new_mi_text.push(a);
+							new_mi_text.push(b);
+							new_mi.set_text(&new_mi_text);
+							new_mi
+						} )
+				.collect::<Vec<Element>>();
+			if result.len() == 1 {
+				return Some( result[0] );
+			} else {
+				return Some( replace_children(mi, result) );
+			}
+		}
+
 
 		/// If 'mathml' is a scripted element and has an mrow for a base,
 		///   attach any prescripts to the first element in mrow
@@ -2519,13 +2565,14 @@ impl CanonicalizeContext {
 			return result;
 		}
 
+		// from https://www.w3.org/TR/MathML3/chapter7.html#chars.pseudo-scripts
+		static PSEUDO_SCRIPTS: phf::Set<char> = phf_set! {
+			'\"', '\'', '*', '`', 'ª', '°', '²', '³', '´', '¹', 'º',
+			'‘', '’', '“', '”', '„', '‟',
+			'′', '″', '‴', '‵', '‶', '‷', '⁗',
+		};
+
 		fn handle_pseudo_scripts(mrow: Element) -> Element {
-			// from https://www.w3.org/TR/MathML3/chapter7.html#chars.pseudo-scripts
-			static PSEUDO_SCRIPTS: phf::Set<&str> = phf_set! {
-				"\"", "'", "*", "`", "ª", "°", "²", "³", "´", "¹", "º",
-				"‘", "’", "“", "”", "„", "‟",
-				"′", "″", "‴", "‵", "‶", "‷", "⁗",
-			};
 	
 			assert!(name(mrow) == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(name(mrow)), "non-mrow passed to handle_pseudo_scripts: {}", mml_to_string(mrow));
 			let mut children = mrow.children();
@@ -2574,29 +2621,46 @@ impl CanonicalizeContext {
 			fn is_pseudo_script(child: Element) -> bool {
 				if name(child) == "mo" {
 					let text = as_text(child);
-					if PSEUDO_SCRIPTS.contains(as_text(child)) {
-						// don't script a pseudo-script
-						let preceding_siblings = child.preceding_siblings();
-						if !preceding_siblings.is_empty() {
-							let last_child = as_element(preceding_siblings[preceding_siblings.len()-1]);
-							if name(last_child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(last_child)) {
-								return false;
+					if let Some(ch) = single_char(text) {
+						if PSEUDO_SCRIPTS.contains(&ch) {
+							// don't script a pseudo-script
+							let preceding_siblings = child.preceding_siblings();
+							if !preceding_siblings.is_empty() {
+								let last_child = as_element(preceding_siblings[preceding_siblings.len()-1]);
+								if name(last_child) == "mo" {
+									if let Some(ch) = single_char(as_text(last_child)) {
+										if PSEUDO_SCRIPTS.contains(&ch) {
+											return false;
+										}
+									}
+								}
 							}
-						}
-						if text == "*" {
-							// could be infix "*" -- this is a weak check to see if what follows is potentially an operand
-							let following_siblings = child.following_siblings();
-							if  following_siblings.is_empty() {
+							if text == "*" {
+								// could be infix "*" -- this is a weak check to see if what follows is potentially an operand
+								let following_siblings = child.following_siblings();
+								if  following_siblings.is_empty() {
+									return true;
+								}
+								let first_child = as_element(following_siblings[0]);
+								return name(first_child) != "mo" || ["(", "[", "{"].contains(&text);
+							} else {
 								return true;
 							}
-							let first_child = as_element(following_siblings[0]);
-							return name(first_child) != "mo" || ["(", "[", "{"].contains(&text);
-						} else {
-							return true;
 						}
 					}
 				}
 				return false;
+
+				/// An efficient method to get the char from a string if it is just one char or fail
+				fn single_char(text: &str) -> Option<char> {
+					let mut chars = text.chars();
+					let ch = chars.next();
+					if ch.is_none() || chars.next().is_some() {
+						return None;		// not one character
+					} else {
+						return ch;
+					}
+				}
 			}
 
 		}
