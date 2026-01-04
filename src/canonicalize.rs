@@ -882,12 +882,10 @@ impl CanonicalizeContext {
 
 				if let Some(result) = merge_arc_trig(mathml) {
 					return Some(result);
-				};
-			
-				if let Some(result) = split_points(mathml) {
+				} else if let Some(result) = split_points(mathml) {
 					return Some(result);
 				}
-				
+
 				let text = as_text(mathml);
 				if !text.trim().is_empty() && is_roman_number_match(text) && is_roman_numeral_number_context(mathml) {
 					// people tend to set them in a non-italic font and software makes that 'mtext'
@@ -6347,6 +6345,13 @@ mod canonicalize_tests {
 		  </mrow>
 		</mrow>
 	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str, &[]));
+	}
+
+	#[test]
+    fn pseudo_scripts_in_mi() {
+        let test_str = "<math><mrow><mi>p'</mi><mo>=</mo><mi>µ°C</mi></mrow></math>";
+        let target_str = "<math><mrow><msup><mi>p</mi><mo>′</mo></msup><mo>=</mo><mi>µ°C</mi></mrow></math>";
         assert!(are_strs_canonically_equal(test_str, target_str, &[]));
 	}
 
