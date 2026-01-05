@@ -1392,7 +1392,7 @@ impl CanonicalizeContext {
 			}
 
 			let text = as_text(mi);
-			debug!("split_apart_pseudo_scripts: start text=\"{text}\"");
+			// debug!("split_apart_pseudo_scripts: start text=\"{text}\"");
 			if !text.chars().any(|c| PSEUDO_SCRIPTS.contains(&c)) || IS_DEGREES_C_or_F.is_match(text) {
 				return None;
 			}
@@ -1404,7 +1404,6 @@ impl CanonicalizeContext {
 			let result = chars.zip(next_chars).map(|(a, b)|
 						if a.is_alphabetic() && PSEUDO_SCRIPTS.contains(&b) {
 							// create msup
-							debug!("split_apart_pseudo_scripts: msup {a}, {b}");
 							let base = create_mathml_element(&document, "mi");
 							base.set_text(&a.to_string());
 							let script = create_mathml_element(&document, "mo");
@@ -1415,7 +1414,6 @@ impl CanonicalizeContext {
 							msup
 						} else {
 							// create an mi "ab"
-							debug!("split_apart_pseudo_scripts: mi {a}, {b}");
 							let new_mi = create_mathml_element(&document, "mi");
 							let mut new_mi_text = String::with_capacity(6);		// likely will fit almost all cases
 							new_mi_text.push(a);
@@ -2900,11 +2898,11 @@ impl CanonicalizeContext {
 			fn is_grouped_base(mrow_children: &[ChildOfElement]) -> Option<usize> {
 				// FIX: this really belongs in canonicalization pass, not the clean pass
 				let i_last = mrow_children.len()-1;
-				let last_child = as_element(mrow_children[i_last]);
+				let last_child = get_possible_embellished_node(as_element(mrow_children[i_last]));
 				if name(last_child) == "mo" &&
 				   CanonicalizeContext::find_operator(None, last_child, None, None, None).is_right_fence() {
 					for i_child in (0..i_last).rev() {
-						let child = as_element(mrow_children[i_child]);
+						let child = get_possible_embellished_node(as_element(mrow_children[i_child]));
 						if name(child) == "mo" &&
 						   CanonicalizeContext::find_operator(None, child, None, None, None).is_left_fence() {
 							// FIX: should make sure left and right match. Should also count for nested parens
@@ -4016,12 +4014,14 @@ impl CanonicalizeContext {
 				top_of_stack.add_child_to_mrow(current_child, current_op);
 				// debug!("shift_stack: after adding right fence to mrow:\n{}", mml_to_string(mrow));
 				new_current_op = OperatorPair::new();							// treat matched brackets as operand
-				new_current_child = mrow;	
+				new_current_child = mrow;
 				let children = mrow.children();
-				// debug!("looking for left fence: len={}, {:#?}", children.len(), self.find_operator(as_element(children[0]),None, None, Some(as_element(children[1])) ));
-				if children.len() == 2 && (name(as_element(children[0])) != "mo" ||
-				   !CanonicalizeContext::find_operator(Some(self), as_element(children[0]),
-								None, Some(as_element(children[0])), Some(mrow) ).is_left_fence()) {
+				let base_of_first_child = get_possible_embellished_node(as_element(children[0]));
+				// debug!("looking for left fence: len={}, {:#?}", children.len(), CanonicalizeContext::find_operator(Some(self), base_of_first_child, None, Some(as_element(children[0])), Some(mrow)));
+				if children.len() == 2 &&
+				   (name(base_of_first_child) != "mo" ||
+				    !CanonicalizeContext::find_operator(Some(self), base_of_first_child, None,
+														Some(as_element(children[0])), Some(mrow)).is_left_fence()) {
 					// the mrow did *not* start with an open (hence no push)
 					// since parser really wants balanced parens to keep stack state right, we do a push here
 					parse_stack.push( StackInfo::new(mrow.document()) );
@@ -6252,6 +6252,14 @@ mod canonicalize_tests {
 					<mo stretchy='true'>¯</mo>
 				</munder>
 			</mrow></math>";
+		assert!(are_strs_canonically_equal(test_str, target_str, &[]));
+	}
+
+	#[test]
+	fn parse_scripted_open_paren_439() {
+		// this was a "typo" bug that should have looking embellished base
+        let test_str = r#"<math><mrow><msub><mo>(</mo><mn>2</mn></msub><mo>)</mo></mrow></math>"#;
+    	let target_str = "<math><mrow><msub><mo>(</mo><mn>2</mn></msub><mo>)</mo></mrow></math>";
 		assert!(are_strs_canonically_equal(test_str, target_str, &[]));
 	}
 
