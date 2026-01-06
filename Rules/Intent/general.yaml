@@ -387,9 +387,9 @@
           if: "*[1][self::m:mrow]"
           then_test:
               if: "*[2][self::m:mrow]"
-              then: [t: "\u1f8d2"]    # this is currently unassigned and may get used by UTC at some point (<=>)
-              else: [t: "\u1f8d4"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
-          else: [t: "\u1f8d3"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
+              then: [t: "\u1f8d2"]    # new in Unicode 17.0 (<=>)
+              else: [t: "\u1f8d4"]    # new in Unicode 17.0  (<<=>)
+          else: [t: "\u1f8d3"]        # new in Unicode 17.0  (<==>>)
 
 -
   # need to include the name of the element so the rules know whether to say "sub" or "super"
@@ -487,7 +487,8 @@
   name: chemical-arrow-op
   tag: [mo]
   # FIX: this is a duplicate of the list in chemistry.rs. Probably should pull out and add to definitions.yaml
-  match: "@data-chem-equation-op and translate(., '→➔←⟶⟵⤻⇋⇌↿↾⇃⇂⥮⥯⇷⇸⤉⤈⥂⥄', '')=''"
+  # Note: the chars that don't probably display are 0x1f8d2 - 0x1f8d4 (Unicode 17 equilibrium arrows)
+  match: "@data-chem-equation-op and translate(., '→➔←⟶⟵⤻⇋⇌↿↾⇃⇂⥮⥯⇷⇸⤉⤈⥂⥄🣒🣓🣔', '')=''" 
   replace:
   - intent:
       name: "chemical-arrow-operator"
