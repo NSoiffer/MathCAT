@@ -387,9 +387,9 @@
           if: "*[1][self::m:mrow]"
           then_test:
               if: "*[2][self::m:mrow]"
-              then: [t: "\u1f8d2"]    # new in Unicode 17.0 (<=>)
-              else: [t: "\u1f8d4"]    # new in Unicode 17.0  (<<=>)
-          else: [t: "\u1f8d3"]        # new in Unicode 17.0  (<==>>)
+              then: [t: "🣒"]    # new in Unicode 17.0 (<=>)
+              else: [t: 🣔"]    # new in Unicode 17.0  (<<=>)
+          else: [t: "🣓"]        # new in Unicode 17.0  (<==>>)
 
 -
   # need to include the name of the element so the rules know whether to say "sub" or "super"

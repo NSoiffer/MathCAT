@@ -1040,11 +1040,11 @@
         if: "$Verbosity='Terse'"
         then: [T: "bildar"]      # phrase(hydrogen and oxygen 'forms' water )
         else: [T: "reaktion bildar"]      # phrase(hydrogen and oxygen 'reacts to form' water)
-    - else_if: ".='⇌' or .='\u1f8d2'"
+    - else_if: ".='⇌' or .='🣒'"
       then: [T: "är i jämvikt med"]      # phrase(a reactant 'is in equilibrium with' a product)
-    - else_if: ".='\u1f8d4'"
+    - else_if: ".='🣔'"
       then: [T: "är i jämvikt med, vänsterförskjuten"]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
-    - else_if: ".='\u1f8d3'"
+    - else_if: ".='🣓'"
       then: [T: "är i jämvikt med, högerförskjuten"]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
       else: [x: "*"]
 

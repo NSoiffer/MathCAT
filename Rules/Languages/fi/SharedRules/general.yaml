@@ -1016,11 +1016,11 @@
         if: "$Verbosity='Terse'" 
         then: [t: "muodostaa"]      # phrase(hydrogen and oxygen 'forms' water ) 
         else: [t: "reagoi"]      # phrase(hydrogen and oxygen 'reacts to form' water) 
-    - else_if: ".='⇌' or .='\u1f8d2'" 
+    - else_if: ".='⇌' or .='🣒'"
       then: [t: "on tasapainossa"]      # phrase(a reactant 'is in equilibrium with' a product) 
-    - else_if: ".='\u1f8d4'" 
+    - else_if: ".='🣔'"
       then: [t: "on tasapainoissa vasemmalle"]      # phrase(the reactant 'is in equilibrium biased to the left with' the product) 
-    - else_if: ".='\u1f8d3'" 
+    - else_if: ".='🣓'"
       then: [t: "on tasapainossa oikealle"]      # phrase(the reactant 'is in equilibrium biased to the right with' the product) 
       else: [x: "*"] 
 
