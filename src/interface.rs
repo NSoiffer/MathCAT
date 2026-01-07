@@ -188,18 +188,19 @@ pub fn get_overview_text() -> Result<String> {
 
 /// Get the value of the named preference.
 /// None is returned if `name` is not a known preference.
-pub fn get_preference(name: String) -> Result<String> {
+pub fn get_preference(name: impl AsRef<str>) -> Result<String> {
     enable_logs();
+    let name = name.as_ref();
     use crate::prefs::NO_PREFERENCE;
     return crate::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow();
         let pref_manager = rules.pref_manager.borrow();
-        let mut value = pref_manager.pref_to_string(&name);
+        let mut value = pref_manager.pref_to_string(name);
         if value == NO_PREFERENCE {
-            value = pref_manager.pref_to_string(&name);
+            value = pref_manager.pref_to_string(name);
         }
         if value == NO_PREFERENCE {
-            bail!("No preference named '{}'", &name);
+            bail!("No preference named '{}'", name);
         } else {
             return Ok(value);
         }
@@ -226,10 +227,11 @@ pub fn get_preference(name: String) -> Result<String> {
 /// A value can be overwritten by calling this function again with a different value.
 ///
 /// Be careful setting preferences -- these potentially override user settings, so only preferences that really need setting should be set.
-pub fn set_preference(name: String, value: String) -> Result<()> {
+pub fn set_preference(name: impl AsRef<str>, value: impl AsRef<str>) -> Result<()> {
     enable_logs();
+    let name = name.as_ref();
     // "LanguageAuto" allows setting the language dir without actually changing the value of "Language" from Auto
-    let mut value = value;
+    let mut value = value.as_ref().to_string();
     if name == "Language" || name == "LanguageAuto" {
         // check the format
         if value != "Auto" {
@@ -274,14 +276,14 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
         }
         let lower_case_value = value.to_lowercase();
         if lower_case_value == "true" || lower_case_value == "false" {
-            pref_manager.set_api_boolean_pref(&name, value.to_lowercase() == "true");
+            pref_manager.set_api_boolean_pref(name, value.to_lowercase() == "true");
         } else {
-            match name.as_str() {
+            match name {
                 "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch" | "MathRate" | "PauseFactor" => {
-                    pref_manager.set_api_float_pref(&name, to_float(&name, &value)?)
+                    pref_manager.set_api_float_pref(name, to_float(name, &value)?)
                 }
                 _ => {
-                    pref_manager.set_string_pref(&name, &value)?;
+                    pref_manager.set_string_pref(name, &value)?;
                 }
             }
         };
@@ -301,14 +303,14 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
 /// Get the braille associated with the MathML that was set by [`set_mathml`].
 /// The braille returned depends upon the preference for the `code` preference (default `Nemeth`).
 /// If 'nav_node_id' is given, it is highlighted based on the value of `BrailleNavHighlight` (default: `EndPoints`)
-pub fn get_braille(nav_node_id: String) -> Result<String> {
+pub fn get_braille(nav_node_id: impl AsRef<str>) -> Result<String> {
     enable_logs();
     // use std::time::{Instant};
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
-        let braille = crate::braille::braille_mathml(mathml, &nav_node_id)?.0;
+        let braille = crate::braille::braille_mathml(mathml, nav_node_id.as_ref())?.0;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok(braille);
     });
@@ -418,9 +420,9 @@ pub fn do_navigate_keypress(
 ///   `MoveTo0`, `MoveTo1`, `MoveTo2`, `MoveTo3`, `MoveTo4`, `MoveTo5`, `MoveTo6`, `MoveTo7`, `MoveTo8`, `MoveTo9`
 ///
 /// When done with Navigation, call with `Exit`
-pub fn do_navigate_command(command: String) -> Result<String> {
+pub fn do_navigate_command(command: impl AsRef<str>) -> Result<String> {
     enable_logs();
-    let command = NAV_COMMANDS.get_key(&command); // gets a &'static version of the command
+    let command = NAV_COMMANDS.get_key(command.as_ref()); // gets a &'static version of the command
     if command.is_none() {
         bail!("Unknown command in call to DoNavigateCommand()");
     };
@@ -434,12 +436,12 @@ pub fn do_navigate_command(command: String) -> Result<String> {
 
 /// Given an 'id' and an offset (for tokens), set the navigation node to that id.
 /// An error is returned if the 'id' doesn't exist
-pub fn set_navigation_node(id: String, offset: usize) -> Result<()> {
+pub fn set_navigation_node(id: impl AsRef<str>, offset: usize) -> Result<()> {
     enable_logs();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
-        return set_navigation_node_from_id(mathml, id, offset);
+        return set_navigation_node_from_id(mathml, id.as_ref(), offset);
     });
 }
 

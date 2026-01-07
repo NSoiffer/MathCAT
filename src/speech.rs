@@ -3,29 +3,29 @@
 //! The speech rules call out to the preferences and tts modules and the dividing line is not always clean.
 //! A number of useful utility functions used by other modules are defined here.
 #![allow(clippy::needless_return)]
-use std::path::PathBuf;
-use std::collections::HashMap;
+use crate::canonicalize::{as_element, create_mathml_element, name, set_mathml_name, MATHML_FROM_NAME_ATTR};
+use crate::definitions::read_definitions_file;
+use crate::errors::*;
+use crate::infer_intent::*;
+use crate::prefs::*;
+use crate::pretty_print::{mml_to_string, yaml_to_string};
+use crate::shim_filesystem::{canonicalize_shim, read_to_string_shim};
+use crate::tts::*;
+use crate::xpath_functions::is_leaf;
+use regex::Regex;
 use std::cell::{RefCell, RefMut};
+use std::collections::HashMap;
+use std::fmt;
+use std::path::Path;
+use std::path::PathBuf;
+use std::rc::Rc;
+use std::time::SystemTime;
 use sxd_document::dom::{ChildOfElement, Document, Element};
 use sxd_document::{Package, QName};
 use sxd_xpath::context::Evaluation;
-use sxd_xpath::{Factory, Value, XPath};
 use sxd_xpath::nodeset::Node;
-use std::fmt;
-use std::time::SystemTime;
-use crate::definitions::read_definitions_file;
-use crate::errors::*;
-use crate::prefs::*;
-use crate::xpath_functions::is_leaf;
-use yaml_rust::{YamlLoader, Yaml, yaml::Hash};
-use crate::tts::*;
-use crate::infer_intent::*;
-use crate::pretty_print::{mml_to_string, yaml_to_string};
-use std::path::Path;
-use std::rc::Rc;
-use crate::shim_filesystem::{read_to_string_shim, canonicalize_shim};
-use crate::canonicalize::{as_element, create_mathml_element, set_mathml_name, name, MATHML_FROM_NAME_ATTR};
-use regex::Regex;
+use sxd_xpath::{Factory, Value, XPath};
+use yaml_rust::{yaml::Hash, Yaml, YamlLoader};
 
 
 pub const NAV_NODE_SPEECH_NOT_FOUND: &str = "NAV_NODE_NOT_FOUND";
@@ -2885,16 +2885,16 @@ cfg_if::cfg_if! {if #[cfg(not(feature = "include-zip"))] {
         use crate::interface::*;
         // initialize and move to a directory where making a time change doesn't really matter
         set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        set_preference("Language".to_string(), "zz-aa".to_string()).unwrap();
+        set_preference("Language", "zz-aa").unwrap();
         // not much is support in zz
         if let Err(e) = set_mathml("<math><mi>x</mi></math>".to_string()) {
             error!("{}", crate::errors_to_string(&e));
             panic!("Should not be an error in setting MathML")
         }
 
-        set_preference("CheckRuleFiles".to_string(), "All".to_string()).unwrap();
+        set_preference("CheckRuleFiles", "All").unwrap();
         assert!(!is_file_time_same(), "file's time did not get updated");
-        set_preference("CheckRuleFiles".to_string(), "None".to_string()).unwrap();
+        set_preference("CheckRuleFiles", "None").unwrap();
         assert!(is_file_time_same(), "file's time was wrongly updated (preference 'CheckRuleFiles' should have prevented updating)");
 
         // change a file, cause read_files to be called, and return if MathCAT noticed the change and updated its time

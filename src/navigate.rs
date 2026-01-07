@@ -3,21 +3,21 @@
 #![allow(clippy::needless_return)]
 
 use std::cell::{Ref, RefCell, RefMut};
-use sxd_xpath::context::Evaluation;
-use sxd_xpath::Value;
 use sxd_document::dom::Element;
 use sxd_document::Package;
+use sxd_xpath::context::Evaluation;
+use sxd_xpath::Value;
 
-use std::fmt;
-use crate::canonicalize::{name, get_parent};
-use crate::pretty_print::mml_to_string;
-use crate::speech::{NAVIGATION_RULES, CONCAT_INDICATOR, CONCAT_STRING, SpeechRules, SpeechRulesWithContext};
+use crate::canonicalize::{get_parent, name};
+use crate::errors::*;
 use crate::infer_intent::add_fixity_children;
 use crate::interface::copy_mathml;
+use crate::pretty_print::mml_to_string;
+use crate::speech::{SpeechRules, SpeechRulesWithContext, CONCAT_INDICATOR, CONCAT_STRING, NAVIGATION_RULES};
+use phf::phf_set;
+use std::fmt;
 #[cfg(not(target_family = "wasm"))]
 use std::time::Instant;
-use crate::errors::*;
-use phf::phf_set;
 
 pub const ID_OFFSET: &str = "data-id-offset";
 
@@ -266,15 +266,16 @@ fn get_node_by_id<'a>(mathml: Element<'a>, pos: &NavigationPosition) -> Option<E
 
 /// Search the mathml for the id and set the navigation node to that id
 /// Resets the navigation stack
-pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -> Result<()> {
-    let pos = NavigationPosition { current_node: id.clone(), current_node_offset: offset };
+pub fn set_navigation_node_from_id(mathml: Element, id: &str, offset: usize) -> Result<()> {
+    let current_node = id.to_string();
+    let pos = NavigationPosition { current_node: current_node.clone(), current_node_offset: offset };
     let node = get_node_by_id(mathml, &pos);
     if node.is_some() {
         return NAVIGATION_STATE.with(|nav_state| {
             let mut nav_state = nav_state.borrow_mut();
             nav_state.reset();
             nav_state.push(NavigationPosition{
-                current_node: id,
+                current_node,
                 current_node_offset: offset
             }, "None");
             return Ok( () );
@@ -1017,13 +1018,13 @@ mod tests {
 
     fn init_default_prefs(mathml: &str, nav_mode_default: &str) {
         set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        set_preference("NavMode".to_string(), nav_mode_default.to_string()).unwrap();
-        set_preference("NavVerbosity".to_string(), "Verbose".to_string()).unwrap();
-        set_preference("AutoZoomOut".to_string(), "True".to_string()).unwrap();
-        set_preference("Language".to_string(), "en".to_string()).unwrap();
-        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
-        set_preference("Verbosity".to_string(), "Medium".to_string()).unwrap();
-        set_preference("Overview".to_string(), "False".to_string()).unwrap();
+        set_preference("NavMode", nav_mode_default).unwrap();
+        set_preference("NavVerbosity", "Verbose").unwrap();
+        set_preference("AutoZoomOut", "True").unwrap();
+        set_preference("Language", "en").unwrap();
+        set_preference("SpeechStyle", "SimpleSpeak").unwrap();
+        set_preference("Verbosity", "Medium").unwrap();
+        set_preference("Overview", "False").unwrap();
         set_mathml(mathml.to_string()).unwrap();
     }
 
@@ -1121,14 +1122,14 @@ mod tests {
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            set_preference("NavMode".to_string(), "Enhanced".to_string())?;
+            set_preference("NavMode", "Enhanced")?;
             debug!("\n------EnhancedMode----------");
             test_command("ZoomIn", mathml, "id-2");
             test_command("ZoomIn", mathml, "id-5");
             test_command("ZoomIn", mathml, "id-6");
             
             // repeat, but this time with "Simple
-            set_preference("NavMode".to_string(), "Simple".to_string())?;
+            set_preference("NavMode", "Simple")?;
             debug!("\n------SimpleMode----------");
             test_command("ZoomOutAll", mathml, "id-1");
             test_command("ZoomIn", mathml, "id-4");
@@ -1226,13 +1227,13 @@ mod tests {
                 }, "None")
             });
 
-            set_preference("NavMode".to_string(), "Character".to_string())?;
+           set_preference("NavMode", "Character")?;
             test_command("MoveStart", mathml, "id-2");
             test_command("MoveEnd", mathml, "id-7");
-            set_preference("NavMode".to_string(), "Simple".to_string())?;
+           set_preference("NavMode", "Simple")?;
             test_command("MoveStart", mathml, "id-2");
             test_command("MoveEnd", mathml, "id-7");
-            set_preference("NavMode".to_string(), "Enhanced".to_string())?;
+           set_preference("NavMode", "Enhanced")?;
             test_command("MoveStart", mathml, "id-2");
             test_command("MovePrevious", mathml, "id-2");
             test_command("MoveEnd", mathml, "id-4");
@@ -1267,13 +1268,13 @@ mod tests {
                 }, "None")
             });
 
-            set_preference("NavMode".to_string(), "Character".to_string())?;
+           set_preference("NavMode", "Character")?;
             test_command("MoveLineStart", mathml, "id-5");
             test_command("MoveLineEnd", mathml, "id-8");
-            set_preference("NavMode".to_string(), "Simple".to_string())?;
+           set_preference("NavMode", "Simple")?;
             test_command("MoveLineStart", mathml, "id-4");
             test_command("MoveLineEnd", mathml, "id-8");
-            set_preference("NavMode".to_string(), "Enhanced".to_string())?;
+           set_preference("NavMode", "Enhanced")?;
             test_command("MoveLineStart", mathml, "id-4");
             test_command("MoveLineEnd", mathml, "id-8");
             test_command("MoveEnd", mathml, "id-3");
@@ -1369,7 +1370,7 @@ mod tests {
                     current_node_offset: 0
                 }, "None")
             });
-            set_preference("NavMode".to_string(), "Enhanced".to_string())?;
+            set_preference("NavMode", "Enhanced")?;
             test_command("MoveNext", mathml, "id-5");
 
             // reset start and test Simple
@@ -1379,7 +1380,7 @@ mod tests {
                     current_node_offset: 0
                 }, "None")
             });
-            set_preference("NavMode".to_string(), "Simple".to_string())?;
+            set_preference("NavMode", "Simple")?;
             test_command("MoveNext", mathml, "id-5");
 
             // reset start and test Character
@@ -1389,7 +1390,7 @@ mod tests {
                     current_node_offset: 0
                 }, "None")
             });
-            set_preference("NavMode".to_string(), "Character".to_string())?;
+            set_preference("NavMode", "Character")?;
             test_command("MoveNext", mathml, "id-4");
             test_command("MoveNext", mathml, "id-5");
             return Ok( () );
@@ -1496,13 +1497,13 @@ mod tests {
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
+            set_preference("NavMode", "Enhanced").unwrap();
             debug!("Enhanced mode");
             do_commands(mathml)?;
-            set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
+            set_preference("NavMode", "Simple").unwrap();
             debug!("Simple mode");
             do_commands(mathml)?;
-            set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
+            set_preference("NavMode", "Character").unwrap();
             debug!("Character mode");
             assert_eq!("zoom in; in base; x", test_command("ZoomIn", mathml, "base"));
             assert_eq!("zoom out; out of base; x sub 1 super 2 end super", test_command("ZoomOut", mathml, "msubsup"));
@@ -1629,11 +1630,11 @@ mod tests {
             let mathml = get_element(&*package_instance);
             debug!("Character mode");
             do_commands(mathml)?;
-            set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
+            set_preference("NavMode", "Simple").unwrap();
             debug!("Simple mode");
             test_command("ZoomIn", mathml, "id-3");  // zooms to the first parenthesis
             do_commands(mathml)?;
-            set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
+            set_preference("NavMode", "Enhanced").unwrap();
             debug!("Enhanced mode");
             test_command("ZoomIn", mathml, "id-4");
             test_command("MoveNext", mathml, "id-6");
@@ -1678,9 +1679,9 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             do_commands(mathml)?;
-            set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
+            set_preference("NavMode", "Simple").unwrap();
             do_commands(mathml)?;
-            set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
+            set_preference("NavMode", "Enhanced").unwrap();
             test_command("ZoomIn", mathml, "id-2");
             test_command("MoveNext", mathml, "id-6");
             test_command("MovePrevious", mathml, "id-2");
@@ -1808,7 +1809,7 @@ mod tests {
         </mrow>
        </math>";
         init_default_prefs(mathml_str, "Simple");
-        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        set_preference("SpeechStyle", "ClearSpeak").unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -2028,7 +2029,7 @@ mod tests {
                 <mi id='denom'>d</mi>
             </mfrac></math>";
         init_default_prefs(mathml_str, "Enhanced");
-        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        set_preference("SpeechStyle", "ClearSpeak").unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -2066,7 +2067,7 @@ mod tests {
         </mrow>
        </math>";
         init_default_prefs(mathml_str, "Enhanced");
-        set_preference("AutoZoomOut".to_string(), "False".to_string())?;
+        set_preference("AutoZoomOut", "False")?;
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -2092,7 +2093,7 @@ mod tests {
             </mrow>
         </math>";
         init_default_prefs(mathml_str, "Enhanced");
-        set_preference("AutoZoomOut".to_string(), "False".to_string())?;
+        set_preference("AutoZoomOut", "False")?;
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -2130,7 +2131,7 @@ mod tests {
 
         fn test_mode(mathml_str: &str, mode: &str) -> Result<()> {
             init_default_prefs(mathml_str, mode);
-            set_preference("AutoZoomOut".to_string(), "False".to_string())?;
+            set_preference("AutoZoomOut", "False")?;
             return MATHML_INSTANCE.with(|package_instance| {
                 debug!("--- Testing mode {mode} ---");
                 let package_instance = package_instance.borrow();
@@ -2256,7 +2257,7 @@ mod tests {
             </mrow>
         </math>";
         init_default_prefs(mathml_str, "Enhanced");
-        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        set_preference("SpeechStyle", "ClearSpeak").unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -2294,7 +2295,7 @@ mod tests {
         </mrow>
        </math>";
         init_default_prefs(mathml_str, "Enhanced");
-        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        set_preference("SpeechStyle", "ClearSpeak").unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -2307,7 +2308,7 @@ mod tests {
             assert_eq!(speech, "zoom out; 2 cases; case 1; negative x comma; if x is less than 0; case 2; positive x comma; if x, is greater than or equal to 0");
             let speech = test_command("ZoomIn", mathml, "row-1");
             assert_eq!(speech, "zoom in; case 1; negative x comma; if x is less than 0");
-            set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
+            set_preference("NavMode", "Character").unwrap();
             let speech = test_command("MovePrevious", mathml, "open");
             assert_eq!(speech, "move left; open brace");
             return Ok( () );
@@ -2332,7 +2333,7 @@ mod tests {
             </msup>
         </math>";
         init_default_prefs(mathml_str, "Enhanced");
-        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        set_preference("SpeechStyle", "ClearSpeak").unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -2357,7 +2358,7 @@ mod tests {
                     </mrow>
                 </math>";
         init_default_prefs(mathml_str, "Character");
-        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        set_preference("SpeechStyle", "ClearSpeak").unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -2375,7 +2376,7 @@ mod tests {
             // let speech = test_command("ZoomOut", mathml, "id-1");
             // assert_eq!(speech, "zoom out; open paren n over k, close paren");
 
-            set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
+            set_preference("NavMode", "Simple").unwrap();
             debug!("Simple mode");
             let speech = test_command("ZoomIn", mathml, "id-4");
             assert_eq!(speech, "zoom in; in part 1; n");
@@ -2386,7 +2387,7 @@ mod tests {
             let speech = test_command("ZoomOut", mathml, "id-1-literal-0");
             assert_eq!(speech, "zoom out; out of part 2; n choose k");
 
-            set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
+            set_preference("NavMode", "Enhanced").unwrap();
             debug!("Enhanced mode");
             let speech = test_command("ZoomIn", mathml, "id-4");
             assert_eq!(speech, "zoom in; in part 1; n");
@@ -2458,7 +2459,7 @@ mod tests {
                 </mrow>
             </math>";
         init_default_prefs(mathml_str, "Enhanced");
-        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        set_preference("SpeechStyle", "ClearSpeak").unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -2470,7 +2471,7 @@ mod tests {
             assert_eq!(speech, "zoom in; in absolute value; x");
             let speech = test_command("MoveNext", mathml, "x");
             assert_eq!(speech, "cannot move right, end of math");
-            set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
+            set_preference("NavMode", "Character").unwrap();
             let speech = test_command("MoveNext", mathml, "end");
             assert_eq!(speech, "move right; vertical line");
             let speech = test_command("MoveLineStart", mathml, "2");
@@ -2494,7 +2495,7 @@ mod tests {
             </mrow>
         </math>";
         init_default_prefs(mathml_str, "Enhanced");
-        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+        set_preference("SpeechStyle", "SimpleSpeak").unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -2522,7 +2523,7 @@ mod tests {
             </mrow>
         </math>";
         init_default_prefs(mathml_str, "Enhanced");
-        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+        set_preference("SpeechStyle", "SimpleSpeak").unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -2547,7 +2548,7 @@ mod tests {
             </mrow>
             </math>";
         init_default_prefs(mathml_str, "Simple");
-        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+        set_preference("SpeechStyle", "SimpleSpeak").unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -2593,9 +2594,9 @@ mod tests {
 
         fn test_language(lang: &str, mathml_str: &str) {
             init_default_prefs(mathml_str, "Enhanced");
-            set_preference("Language".to_string(), lang.to_string()).unwrap();
+            set_preference("Language", lang).unwrap();
 
-            set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
+            set_preference("NavMode", "Enhanced").unwrap();
             MATHML_INSTANCE.with(|package_instance| {
                 let package_instance = package_instance.borrow();
                 let mathml = get_element(&*package_instance);
@@ -2606,8 +2607,8 @@ mod tests {
                 test_command("MovePrevious", mathml, "term");
                 test_command("ZoomOutAll", mathml, "contents");
             });
-    
-            set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
+
+            set_preference("NavMode", "Simple").unwrap();
             MATHML_INSTANCE.with(|package_instance: &RefCell<Package>| {
                 let package_instance = package_instance.borrow();
                 let mathml = get_element(&*package_instance);
@@ -2619,8 +2620,8 @@ mod tests {
                 test_command("MovePrevious", mathml, "2");
                 test_command("ZoomOutAll", mathml, "contents");
             });
-            
-            set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
+
+            set_preference("NavMode", "Character").unwrap();
             MATHML_INSTANCE.with(|package_instance| {
                 let package_instance = package_instance.borrow();
                 let mathml = get_element(&*package_instance);
@@ -2635,8 +2636,8 @@ mod tests {
             });
             
             // simple sanity check that "overview.yaml" doesn't have a syntax error
-            set_preference("Overview".to_string(), "True".to_string()).unwrap();
-            set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
+            set_preference("Overview", "True").unwrap();
+            set_preference("NavMode", "Character").unwrap();
             MATHML_INSTANCE.with(|package_instance| {
                 let package_instance = package_instance.borrow();
                 let mathml = get_element(&*package_instance);

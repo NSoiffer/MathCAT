@@ -62,7 +62,7 @@ pub fn get_overview_text() -> Result<String>
 
 /// Get the value of the named preference.
 /// None is returned if `name` is not a known preference.
-pub fn get_preference(name: String) -> Result<String>
+pub fn get_preference(name: impl AsRef<str>) -> Result<String>
 
 /// Set a MathCAT preference. The preference name should be a known preference name.
 /// The value should either be a string or a number (depending upon the preference being set)
@@ -92,7 +92,7 @@ pub fn get_preference(name: String) -> Result<String>
 /// A value can be overwritten by calling this function again with a different value.
 /// 
 /// FIX: Some preferences are both API and user preferences and something such as '!name' should be used for overrides. Not implemented yet.
-pub fn set_preference(name: String, value: String) -> Result<()>
+pub fn set_preference(name: impl AsRef<str>, value: impl AsRef<str>) -> Result<()>
 
 /// Given a key code along with the modifier keys, the current node is moved accordingly (or value reported in some cases).
 /// `key` is the [keycode](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode#constants_for_keycode_value) for the key (in JavaScript, `ev.key_code`)
@@ -132,7 +132,7 @@ pub fn do_navigate_keypress(key: usize, shift_key: bool, control_key: bool, alt_
 /// `MoveTo0`, `MoveTo1`, `MoveTo2`, `MoveTo3`, `MoveTo4`, `MoveTo5`, `MoveTo6`, `MoveTo7`, `MoveTo8`, `MoveTo9`
 /// 
 /// When done with Navigation, call with `Exit`
-pub fn do_navigate_command(command: String) -> Result<String>
+pub fn do_navigate_command(command: impl AsRef<str>) -> Result<String>
 
 /// Return the MathML associated with the current (navigation) node.
 /// The returned result is the `id` of the node and the offset (0-based) from that node (not yet implemented)

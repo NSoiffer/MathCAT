@@ -5,16 +5,16 @@
 //! The implementation of the module is on hold until the MathML committee figures out how it wants to do this.
 #![allow(clippy::needless_return)]
 
-use sxd_document::dom::*;
-use crate::prefs::PreferenceManager;
-use crate::speech::SpeechRulesWithContext;
-use crate::canonicalize::{as_element, as_text, name, create_mathml_element, set_mathml_name, INTENT_ATTR, MATHML_FROM_NAME_ATTR};
+use crate::canonicalize::{as_element, as_text, create_mathml_element, name, set_mathml_name, INTENT_ATTR, MATHML_FROM_NAME_ATTR};
 use crate::errors::*;
-use std::fmt;
+use crate::prefs::PreferenceManager;
 use crate::pretty_print::mml_to_string;
+use crate::speech::SpeechRulesWithContext;
 use crate::xpath_functions::is_leaf;
-use regex::Regex;
 use phf::phf_set;
+use regex::Regex;
+use std::fmt;
+use sxd_document::dom::*;
 
 const IMPLICIT_FUNCTION_NAME: &str = "apply-function";
 
@@ -628,8 +628,8 @@ mod tests {
 		// this forces initialization
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         // crate::speech::SpeechRules::initialize_all_rules().unwrap();
-        set_preference("IntentErrorRecovery".to_string(), intent_error_recovery.to_string()).unwrap();
-        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();      // avoids possibility of "LiteralSpeak"
+        set_preference("IntentErrorRecovery", intent_error_recovery).unwrap();
+        set_preference("SpeechStyle", "SimpleSpeak").unwrap();      // avoids possibility of "LiteralSpeak"
         let package1 = &parser::parse(mathml).expect("Failed to parse test input");
         let mathml = get_element(package1);
         trim_element(mathml, false);
