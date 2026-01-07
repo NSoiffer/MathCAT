@@ -6,8 +6,14 @@ import json
 import os
 import sys
 
-from googletrans.models import Translated
+# Using googletrans package
+# from googletrans.models import Translated
+# from googletrans import Translator
+# GoogleTranslate = Translator(service_urls=["translate.google.us"])
+# TranslatorName = "google"
+
 from typing import Coroutine, Any
+from unittest import result
 sys.stdout.reconfigure(encoding='utf-8')
 
 
@@ -19,25 +25,21 @@ sys.stdout.reconfigure(encoding='utf-8')
 #   People mentioned fixes, but the project seems dead
 # The google translate is done via googletrans
 # Note: needed to use 'pip install googletrans==4.0.0-rc1' and there is some concern this package might go away
-from googletrans import Translator
-GoogleTranslate = Translator(service_urls=["translate.google.us"])
 
 ''' In some manual testing, DeepL seems to do better than Google Translate
  deepl requires an API key.
- There is a free tier, but it won't do a full translation in the monthly free tier (50K chars/month)
- There are ~76k chars to translate, with ~62k of them being in unicode-full.yaml
- The lowest paid tier gives 300k chars/month for $10.50, so four translations/month if no problems.
- Maybe run unicode-full.yaml through Google and the rest through DeepL?
+ There is a free tier: it is limited to 500K chars/month)
+ There are ~76k chars to translate (ignoring phrases with context), with ~62k of them being in unicode-full.yaml.
+ So the free tier might be enough for a few languages every month.
+ The lowest paid tier is $5.49/month + $25 per 1m chars. It provides access to better models.
  Below is sample DeepL code -- commented out for now.
  '''
-# import deepl
-# import os
+import deepl
 
-# # 1. Set up the Translator
-# # It's best practice to use an environment variable for your API key.
-# # You can set this variable: DEEPL_AUTH_KEY="YOUR_API_KEY"
-# auth_key = os.getenv("DEEPL_AUTH_KEY", "YOUR_API_KEY") 
-# translator = deepl.Translator(auth_key)
+# 1. Set up the Translator
+auth_key = os.getenv("DEEPL_KEY") 
+DeepLTranslate = deepl.Translator(auth_key)
+TranslatorName = "DeepL"
 
 # # 2. Define the text and target language
 # text_to_translate = "Hello, world!"
@@ -45,7 +47,7 @@ GoogleTranslate = Translator(service_urls=["translate.google.us"])
 
 # # 3. Call the translation method
 # # Omitting 'source_lang' allows DeepL to auto-detect the language.
-# result = translator.translate_text(
+# result = DeepLTranslate.translate_text(
 #     text_to_translate,
 #     target_lang=target_language
 # )
@@ -54,6 +56,7 @@ GoogleTranslate = Translator(service_urls=["translate.google.us"])
 # print(f"Original Text: {text_to_translate}")
 # print(f"Translated Text: {result.text}")
 # print(f"Source Language Detected: {result.detected_source_lang}")
+# print(f"Billed chars: {result.billed_characters}")
 
 # Google allows up to 500K chars translation/month, so using a key likely would be free anyway
 
@@ -70,12 +73,12 @@ GoogleTranslate = Translator(service_urls=["translate.google.us"])
 # The solution I've adopted is a bit ugly in that the two passes have some duplication.
 
 
-def translate_char(ch: str, ignore_ch: bool, en_text: str, mathplayer: dict, sre: dict, access8: dict, google: dict):
+def translate_char(ch: str, ignore_ch: bool, en_text: str, mathplayer: dict, sre: dict, access8: dict, translator: dict):
     mp_trans = mathplayer[ch] if ch in mathplayer else ''
     sre_trans = sre[ch] if ch in sre else ''
     access8_trans = access8[ch] if ch in access8 else ''
     # don't bother do the translation if mp and sre agree
-    google_trans = ''
+    translator_trans = ''
     # print(f"mp_trans/sre_trans/access8_trans: '{mp_trans}/{sre_trans}/{access8_trans}'")
     if ignore_ch or mp_trans != sre_trans or mp_trans == '':
         en_text = en_text.replace("eigh", "a").replace("Eigh", "A").replace("cap", "uppercase").replace("paren", "parenthesis")
@@ -84,18 +87,18 @@ def translate_char(ch: str, ignore_ch: bool, en_text: str, mathplayer: dict, sre
             sre_trans = ''
             access8_trans = ''
         if len(en_text) > 1:
-            google_trans = google[en_text]
+            translator_trans = translator[en_text]
             # print("Google Translation:('{}') = '{}'".format(en_text, google_trans))
         else:
-            google_trans = ch
+            translator_trans = ch
 
-    return (mp_trans, sre_trans, access8_trans, google_trans)
+    return (mp_trans, sre_trans, access8_trans, translator_trans)
 
 
 TextToTranslate = re.compile('t: "([^"]+)"')
 
 
-def translate_char_line(ch: str, line: str, mathplayer: dict, sre: dict, access8: dict, google: dict):
+def translate_char_line(ch: str, line: str, mathplayer: dict, sre: dict, access8: dict, translator: dict):
     # using a closure for this is ugly
     result = {}
 
@@ -103,23 +106,23 @@ def translate_char_line(ch: str, line: str, mathplayer: dict, sre: dict, access8
         if match_obj:
             alternatives = []
             ignore_ch = line.find('then:') >= 0   # usually an alternative to what mp and sre would say
-            mp_trans, sre_trans, access8_trans, google_trans = translate_char(
-                ch, ignore_ch, match_obj.group(1), mathplayer, sre, access8, google
+            mp_trans, sre_trans, access8_trans, translator_trans = translate_char(
+                ch, ignore_ch, match_obj.group(1), mathplayer, sre, access8, translator
             )
-            # print("ch='{}', mp/sre/access8/google='{}'/'{}'/'{}'/'{}'\n"
-            #       .format(ch, mp_trans, sre_trans, access8_trans, google_trans))
-            if mp_trans == '' and sre_trans == '' and access8_trans == '' and google_trans == '':
+            # print("ch='{}', mp/sre/access8/translator='{}'/'{}'/'{}'/'{}'\n"
+            #       .format(ch, mp_trans, sre_trans, access8_trans, translator_trans))
+            if mp_trans == '' and sre_trans == '' and access8_trans == '' and translator_trans == '':
                 translation = match_obj.group(1)       # found nothing (can this happen?)
             elif mp_trans == '' and sre_trans == '' and access8_trans == '':
-                translation = google_trans
-                alternatives.append("google translation")
+                translation = translator_trans
+                alternatives.append(f"{TranslatorName} translation")
             elif mp_trans == sre_trans and mp_trans != '':
-                translation = mp_trans      # skip the google translation because mp and sre agree
-            elif google_trans == mp_trans and google_trans != '':
+                translation = mp_trans      # skip the translator translation because mp and sre agree
+            elif translator_trans == mp_trans and translator_trans != '':
                 translation = mp_trans
                 if sre_trans:
                     alternatives.append("SRE: '{}'".format(sre_trans))
-            elif google_trans == sre_trans and google_trans != '':
+            elif translator_trans == sre_trans and translator_trans != '':
                 translation = sre_trans
                 if mp_trans:
                     alternatives.append("MathPlayer: '{}'".format(mp_trans))
@@ -128,16 +131,16 @@ def translate_char_line(ch: str, line: str, mathplayer: dict, sre: dict, access8
                 translation = sre_trans
                 if mp_trans:
                     alternatives.append("MathPlayer: '{}'".format(mp_trans))
-                alternatives.append("google: '{}'".format(google_trans))
+                alternatives.append(f"{TranslatorName}: '{translator_trans}'")
             elif mp_trans:
                 translation = mp_trans
                 if sre_trans:
                     alternatives.append("SRE: '{}'".format(sre_trans))
-                alternatives.append("google: '{}'".format(google_trans))
+                alternatives.append(f"{TranslatorName}: '{translator_trans}'")
             elif access8_trans:
                 translation = access8_trans
-            else:       # only translation comes from google
-                translation = google_trans
+            else:       # only translation comes from translator
+                translation = translator_trans
 
             result['original'] = match_obj.group(1)
             result['translation'] = translation
@@ -199,11 +202,11 @@ def gather_words_in_char_def(lines: list, lang: str, mathplayer: dict, sre: dict
 
 
 # echo lines, substituting for any "t:"
-def process_char_def(lines: list, mathplayer: dict, sre: dict, access8: dict, google: dict, out_stream):
+def process_char_def(lines: list, mathplayer: dict, sre: dict, access8: dict, translator: dict, out_stream):
     match = CharDefStart.match(lines[0])
     ch = match.group(1) if match else ''
     for line in lines:
-        translated_line, details = translate_char_line(ch, line, mathplayer, sre, access8, google)
+        translated_line, details = translate_char_line(ch, line, mathplayer, sre, access8, translator)
         if translated_line:
             # make comments that don't start a line mostly align
             i_comment_char = translated_line.find('#')
@@ -263,7 +266,8 @@ def translate_words(words_to_translate: set[str], lang):
         # translate doesn't handle a list properly -- use ".\n" to separate words
         word_string = ".\n".join(list(words))
         # chunk_translations = translate(words, from_lang='en', to_lang=lang, url=TRANSLATE_URL)
-        result = GoogleTranslate.translate(word_string, src='en', dest=lang)
+        # result = GoogleTranslate.translate(word_string, src='en', dest=lang)
+        result = DeepLTranslate.translate_text(word_string, source_lang='EN', target_lang=lang.upper())
         translated_words_str = result.text.lower()
         # Chinese has "." translated to "。"
         translated_words_str = translated_words_str.replace('。', '.')
@@ -300,7 +304,7 @@ def translate_words(words_to_translate: set[str], lang):
     return translations
 
 
-def create_new_file(file_to_translate: str, output_file: str, mathplayer: dict, sre: dict, access8: dict, google: dict):
+def create_new_file(file_to_translate: str, output_file: str, mathplayer: dict, sre: dict, access8: dict, translator: dict):
     with open(file_to_translate, 'r', encoding='utf8') as in_stream:
         with open(output_file, 'w', encoding='utf8') as out_stream:
             lines = in_stream.readlines()
@@ -310,7 +314,7 @@ def create_new_file(file_to_translate: str, output_file: str, mathplayer: dict, 
                 # print("\niLines={}\n{}".format(iLine, list(map(lambda l: l+"\n", char_def_lines))))
                 if len(char_def_lines) == 0:
                     break
-                process_char_def(char_def_lines, mathplayer, sre, access8, google, out_stream)
+                process_char_def(char_def_lines, mathplayer, sre, access8, translator, out_stream)
                 iLine += len(char_def_lines)
 
 
@@ -322,9 +326,9 @@ def build_new_translation(path_to_mathcat: str, lang: str, unicode_file_name: st
     file_lang_to_translate = lang if lang == 'vi' or lang == 'id' else 'en'      # these are already partially translated
     file_to_translate = "{}/Rules/Languages/{}/{}.yaml".format(path_to_mathcat, file_lang_to_translate, unicode_file_name)
     words_to_translate = collect_words_to_translate(file_to_translate, lang, mathplayer, access8, sre)
-    google = translate_words(words_to_translate, lang)
-    print("Translations: MathPlayer={}, SRE={}, Access8={}, Google={}".format(len(mathplayer), len(sre), len(access8), len(google)))
-    create_new_file(file_to_translate, "{}/{}.yaml".format(lang, unicode_file_name), mathplayer, sre, access8, google)
+    translator = translate_words(words_to_translate, lang)
+    print("Translations: MathPlayer={}, SRE={}, Access8={}, Translator={}".format(len(mathplayer), len(sre), len(access8), len(translator)))
+    create_new_file(file_to_translate, "{}/{}.yaml".format(lang, unicode_file_name), mathplayer, sre, access8, translator)
 
 
 def get_sre_unicode_dict(path: str, lang: str):
@@ -333,13 +337,16 @@ def get_sre_unicode_dict(path: str, lang: str):
         full_path = path + "\\" + lang + "\\" + "symbols" + "\\"
         for filename in os.listdir(full_path):
             with open(full_path+filename, 'r', encoding='utf8') as in_stream:
-                # print( "\nReading file {}".format(path+filename) )
+                # print( "\nReading file {}".format(full_path+filename) )
                 sre_data = json.load(in_stream)
                 for sre_entry in sre_data:
                     # entries we care about look like {"key": "2212", "mappings": {"default": {"default": "menos"}}}
                     if "key" in sre_entry and "default" in sre_entry["mappings"]:
                         key = chr(int(sre_entry["key"], base=16))
-                        dict[key] = sre_entry["mappings"]["default"]["default"]
+                        if "default" in sre_entry["mappings"]["default"]:
+                            dict[key] = sre_entry["mappings"]["default"]["default"]
+                        else:
+                            print(f"In file {full_path+filename}: no default mapping for key={sre_entry['key']}")
         return dict
     except OSError:
         print(f"SRE not present: lang={lang}")
@@ -560,10 +567,10 @@ ACCESS8_Location = r"C:\dev\Access8Math\addon\globalPlugins\Access8Math\locale"
 # (sre_only, mp_only, differ, same) = dict_compare("fr", get_sre_unicode_dict(SRE_Location, "fr"), get_mathplayer_unicode_dict(MP_Location, "fr"))
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
 
-language = "pl"
+language = "fr"
 # build_new_translation("..", language, "unicode")
-# build_new_translation("..", language, "unicode-full")
+build_new_translation("..", language, "unicode-full")
 
 # see translate_definitions comments -- you need to manually copy the file to google translate.
-translate_definitions("..", language)
+# translate_definitions("..", language)
 # build_euro("euro")

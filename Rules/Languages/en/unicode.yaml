@@ -534,7 +534,7 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "is"]
-     - t:  "less than or equal to"
+     - t: "less than or equal to"
  - "≥":                                          # 0x2265
      - test: 
          if: "$Verbosity!='Terse'"

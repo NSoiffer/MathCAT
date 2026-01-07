@@ -158,6 +158,7 @@
   - x: "*[1]"
   - t: "from"      # phrase(subtracting 5 'from' 10 gives 5)
   - x: "*[2]"
+  - pause: short
   - t: "to"      # phrase(adding 6 'to' 6 equals  12)
   - x: "*[3]"
   - test:

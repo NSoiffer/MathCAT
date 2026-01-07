@@ -1,3 +1,5 @@
+#![allow(clippy::needless_return)]
+
 //! A library for generating speech and braille from MathML
 //! 
 //! Typical usage is:
@@ -64,7 +66,6 @@ pub fn init_logger() {
         .init();
 }
 
-#[cfg(test)]
 /// Build Absolute path to rules dir for testing
 pub fn abs_rules_dir_path() -> String {
     cfg_if::cfg_if! {
@@ -78,8 +79,7 @@ pub fn abs_rules_dir_path() -> String {
     }
 }
 
-#[cfg(test)]
-pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, block_separators: &str, decimal_separators: &str) -> bool {
+pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, ignore_attrs: &[&str], block_separators: &str, decimal_separators: &str) -> bool {
     use crate::{interface::*, pretty_print::mml_to_string};
     use sxd_document::parser;
     use crate::canonicalize::canonicalize;
@@ -101,15 +101,13 @@ pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, block_se
     trim_element(mathml_target, false);
     // debug!("target:\n{}", mml_to_string(mathml_target));
 
-    match is_same_element(mathml_test, mathml_target) {
+    match is_same_element(mathml_test, mathml_target, ignore_attrs) {
         Ok(_) => return true,
         Err(e) => panic!("{}\nResult:\n{}\nTarget:\n{}", e, mml_to_string(mathml_test), mml_to_string(mathml_target)),
     }
 }
 
-#[cfg(test)]
-// sets locale to be US standard
-pub fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
-    return are_strs_canonically_equal_with_locale(test, target, ", \u{00A0}\u{202F}", ".");
+/// sets locale to be US standard
+pub fn are_strs_canonically_equal(test: &str, target: &str, ignore_attrs: &[&str]) -> bool {
+    return are_strs_canonically_equal_with_locale(test, target, ignore_attrs, ", \u{00A0}\u{202F}", ".");
 }
-

@@ -855,7 +855,7 @@ fn is_same_doc(doc1: &Document, doc2: &Document) -> Result<()> {
         match c1 {
             ChildOfRoot::Element(e1) => {
                 if let ChildOfRoot::Element(e2) = c2 {
-                    is_same_element(*e1, *e2)?;
+                    is_same_element(*e1, *e2, &[])?;
                 } else {
                     bail!("child #{}, first is element, second is something else", i);
                 }
@@ -889,7 +889,7 @@ fn is_same_doc(doc1: &Document, doc2: &Document) -> Result<()> {
 /// returns Ok() if two Documents are equal or some info where they differ in the Err
 // Not really meant to be public -- used by tests in some packages
 #[allow(dead_code)]
-pub fn is_same_element(e1: Element, e2: Element) -> Result<()> {
+pub fn is_same_element(e1: Element, e2: Element, ignore_attrs: &[&str]) -> Result<()> {
     enable_logs();
     if name(e1) != name(e2) {
         bail!("Names not the same: {}, {}", name(e1), name(e2));
@@ -906,7 +906,7 @@ pub fn is_same_element(e1: Element, e2: Element) -> Result<()> {
         );
     }
 
-    if let Err(e) = attrs_are_same(e1.attributes(), e2.attributes()) {
+    if let Err(e) = attrs_are_same(e1.attributes(), e2.attributes(), ignore_attrs) {
         bail!("In element {}, {}", name(e1), e);
     }
 
@@ -914,7 +914,7 @@ pub fn is_same_element(e1: Element, e2: Element) -> Result<()> {
         match c1 {
             ChildOfElement::Element(child1) => {
                 if let ChildOfElement::Element(child2) = c2 {
-                    is_same_element(*child1, *child2)?;
+                    is_same_element(*child1, *child2, ignore_attrs)?;
                 } else {
                     bail!("{} child #{}, first is element, second is something else", name(e1), i);
                 }
@@ -955,7 +955,13 @@ pub fn is_same_element(e1: Element, e2: Element) -> Result<()> {
     return Ok(());
 
     /// compares attributes -- '==' didn't seems to work
-    fn attrs_are_same(attrs1: Vec<Attribute>, attrs2: Vec<Attribute>) -> Result<()> {
+    fn attrs_are_same(attrs1: Vec<Attribute>, attrs2: Vec<Attribute>, ignore: &[&str]) -> Result<()> {
+        let attrs1 = attrs1.iter()
+                .filter(|a| !ignore.contains(&a.name().local_part())).cloned()
+                .collect::<Vec<Attribute>>();
+        let attrs2 = attrs2.iter()
+                .filter(|a| !ignore.contains(&a.name().local_part())).cloned()
+                .collect::<Vec<Attribute>>();
         if attrs1.len() != attrs2.len() {
             bail!("Attributes have different length: {:?} != {:?}", attrs1, attrs2);
         }

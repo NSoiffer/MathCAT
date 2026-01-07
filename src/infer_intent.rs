@@ -636,7 +636,7 @@ mod tests {
             }
         };
         debug!("result:\n{}", mml_to_string(result));
-        match is_same_element(result, target) {
+        match is_same_element(result, target, &[]) {
 			Ok(_) => return true,
 			Err(e) => panic!("{}:\nresult: {}target: {}", e, mml_to_string(result), mml_to_string(target)),
 		}

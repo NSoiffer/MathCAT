@@ -6,6 +6,7 @@ extern crate lazy_static;
 use lazy_static::lazy_static;
 pub use libmathcat::interface::*;
 
+
 #[allow(dead_code)] 
 pub fn init_logger() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug"))
@@ -197,7 +198,7 @@ pub fn test_intent(mathml: &str, target: &str, test_prefs: Vec<(&str, &str)>) {
     //    'id' and 'data-id-added'; leaving 'data-from-mathml' as that is used by the code
     clean_attrs(computed_intent);
 
-    match is_same_element(computed_intent, target) {
+    match is_same_element(computed_intent, target, &[]) {
         Ok(_) => return ,
         Err(e) => {
             println!("target:\n{}", libmathcat::pretty_print::mml_to_string(target));
@@ -222,3 +223,29 @@ pub fn test_intent(mathml: &str, target: &str, test_prefs: Vec<(&str, &str)>) {
     }
 }
 
+/// This is a prototype function to test whether 'from_braille' (or whatever gets called) is cannonically the same as 'mathml'
+#[allow(dead_code)]     // used in testing
+#[allow(non_snake_case)]
+pub fn test_from_braille(code: &str, mathml: &str, braille: &str) {
+    set_rules_dir(abs_rules_dir_path()).unwrap();
+    set_preference("DecimalSeparator".to_string(), "Auto".to_string()).unwrap();
+    set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
+    set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
+    set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
+    set_preference("LaTeX_UseShortName".to_string(), "false".to_string()).unwrap();
+    // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
+    // log::debug!("\nsetting Language");
+    match code {
+        "Vietnam" => set_preference("Language".to_string(), "vi".to_string()).unwrap(),
+        "CMU" => set_preference("Language".to_string(), "es".to_string()).unwrap(),
+        "UEB" | "Nemeth" | _ => set_preference("Language".to_string(), "en".to_string()).unwrap(),
+    }
+    if let Err(e) = set_mathml(mathml.to_string()) {
+        panic!("{}", errors_to_string(&e));
+    };
+
+    // FIX: call from_braille
+    // let braille = from_braille(....);
+    assert!(libmathcat::are_strs_canonically_equal(mathml, braille, &["data-changed", "data-id-added"]));
+
+}
