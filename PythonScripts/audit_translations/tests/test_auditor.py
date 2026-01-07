@@ -1,6 +1,8 @@
-"""Tests for auditor helpers."""
+"""
+Tests for auditor helpers.
+"""
 
-from ..auditor import collect_issues
+from ..auditor import collect_issues, compare_files, console, get_yaml_files, list_languages
 from ..dataclasses import ComparisonResult, RuleDifference, RuleInfo
 
 
@@ -58,3 +60,113 @@ def test_collect_issues_fields() -> None:
     assert by_type["rule_difference"]["english_snippet"] == "a"
     assert by_type["rule_difference"]["translated_snippet"] == "b"
     assert "english_raw" not in by_type["rule_difference"]
+
+
+def test_compare_files_merges_region_rules(tmp_path) -> None:
+    """
+    Ensures region rule files merge with base language before comparison.
+
+    Confirms region overrides are recognized alongside base translations.
+    Prevents false positives when content is split across directories.
+    """
+    rules_dir = tmp_path / "Rules" / "Languages"
+    english_dir = rules_dir / "en"
+    lang_dir = rules_dir / "zz"
+    region_dir = lang_dir / "aa"
+    english_dir.mkdir(parents=True)
+    lang_dir.mkdir(parents=True)
+    region_dir.mkdir(parents=True)
+
+    english_file = english_dir / "base.yaml"
+    translated_file = lang_dir / "base.yaml"
+    translated_region_file = region_dir / "base.yaml"
+
+    english_file.write_text(
+        """- name: base-one
+  tag: mo
+  match: "."
+  replace:
+    - t: "one"
+- name: base-two
+  tag: mi
+  match: "."
+  replace:
+    - t: "two"
+""",
+        encoding="utf-8",
+    )
+
+    translated_file.write_text(
+        """- name: base-one
+  tag: mo
+  match: "."
+  replace:
+    - T: "eins"
+""",
+        encoding="utf-8",
+    )
+
+    translated_region_file.write_text(
+        """- name: base-two
+  tag: mi
+  match: "."
+  replace:
+    - T: "zwei"
+""",
+        encoding="utf-8",
+    )
+
+    result = compare_files(
+        str(english_file),
+        str(translated_file),
+        None,
+        str(translated_region_file),
+    )
+
+    assert result.missing_rules == []
+    assert result.extra_rules == []
+
+
+def test_get_yaml_files_includes_region(tmp_path) -> None:
+    """
+    Ensures get_yaml_files merges base and region file lists.
+
+    Verifies both root and SharedRules entries are discovered.
+    Confirms region-only files are added with their own relative paths.
+    """
+    lang_dir = tmp_path / "lang"
+    region_dir = lang_dir / "aa"
+    (lang_dir / "SharedRules").mkdir(parents=True)
+    region_dir.mkdir(parents=True)
+
+    (lang_dir / "base.yaml").write_text("---", encoding="utf-8")
+    (lang_dir / "SharedRules" / "shared.yaml").write_text("---", encoding="utf-8")
+    (region_dir / "unicode.yaml").write_text("---", encoding="utf-8")
+
+    files = get_yaml_files(lang_dir, region_dir)
+    assert set(files) == {"base.yaml", "SharedRules/shared.yaml", "unicode.yaml"}
+
+
+def test_list_languages_includes_region_codes(tmp_path) -> None:
+    """
+    Ensures list_languages reports region variants.
+
+    Confirms region directories appear alongside base language entries.
+    Protects CLI output from hiding available variants.
+    """
+    rules_dir = tmp_path / "Rules" / "Languages"
+    (rules_dir / "en").mkdir(parents=True)
+    lang_dir = rules_dir / "zz"
+    region_dir = lang_dir / "aa"
+    lang_dir.mkdir(parents=True)
+    region_dir.mkdir(parents=True)
+
+    (lang_dir / "file.yaml").write_text("---", encoding="utf-8")
+    (region_dir / "region.yaml").write_text("---", encoding="utf-8")
+
+    with console.capture() as capture:
+        list_languages(str(rules_dir))
+    output = capture.get()
+
+    assert "zz" in output
+    assert "zz-aa" in output

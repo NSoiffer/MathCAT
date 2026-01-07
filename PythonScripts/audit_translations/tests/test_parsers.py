@@ -1,4 +1,6 @@
-"""Tests for parsers.py"""
+"""
+Tests for parsers.py.
+"""
 
 import pytest
 from ruamel.yaml import YAML
@@ -61,6 +63,22 @@ class TestFindUntranslatedTextKeys:
     def test_ignores_uppercase_T(self):
         """Ensure ignores uppercase T."""
         content = {"T": "translated"}
+        assert find_untranslated_text_values(content) == []
+
+    def test_finds_spell_and_pronounce(self):
+        """Detects lowercase spell and pronounce markers.
+
+        Extends coverage beyond basic t/ot/ct fields.
+        Flags auxiliary translation-bearing keys."""
+        content = {"spell": "alpha", "pronounce": "beta"}
+        assert set(find_untranslated_text_values(content)) == {"alpha", "beta"}
+
+    def test_ignores_uppercase_variants(self):
+        """Ignores uppercase variants of extended markers.
+
+        Honors already-verified spell/pronounce/IfThenElse content.
+        Avoids double-reporting translated data."""
+        content = {"PRONOUNCE": "gamma", "IFTHENELSE": "delta"}
         assert find_untranslated_text_values(content) == []
 
     def test_ignores_variable_references(self):
@@ -142,6 +160,20 @@ class TestParseRulesFile:
         """Ensure handles array tag."""
         content = """- name: multi-tag
   tag: [mo, mtext]
+  match: "."
+"""
+        yaml = YAML()
+        data = yaml.load(content)
+        rules = parse_rules_file(content, data)
+        assert rules[0].tag == "[mo, mtext]"
+
+    def test_sorts_tag_lists(self):
+        """Normalizes unordered tag lists for stable comparison.
+
+        Confirms sorting prevents false positives in diffs.
+        Keeps tag-based keys consistent across translations."""
+        content = """- name: multi-tag
+  tag: [mtext, mo]
   match: "."
 """
         yaml = YAML()

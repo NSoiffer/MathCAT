@@ -9,7 +9,7 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Iterable, List, Optional, TextIO
+from typing import Iterable, List, Optional, TextIO, Tuple
 
 from rich.console import Console
 from rich.markup import escape
@@ -21,6 +21,20 @@ from .parsers import parse_yaml_file, diff_rules
 console = Console()
 
 
+def normalize_language(language: str) -> str:
+    """Return a normalized language code (lowercase, '-' separators)."""
+    return language.lower().replace("_", "-")
+
+
+def split_language(language: str) -> Tuple[str, Optional[str]]:
+    """Split a language code into base and optional region."""
+    normalized = normalize_language(language)
+    if "-" in normalized:
+        base, region = normalized.split("-", 1)
+        return base, region or None
+    return normalized, None
+
+
 def get_rules_dir(rules_dir: Optional[str] = None) -> Path:
     """Get the Rules/Languages directory path"""
     if rules_dir:
@@ -30,20 +44,24 @@ def get_rules_dir(rules_dir: Optional[str] = None) -> Path:
     return package_dir.parent.parent / "Rules" / "Languages"
 
 
-def get_yaml_files(lang_dir: Path) -> List[str]:
-    """Get all YAML files to audit for a language"""
-    files = []
+def get_yaml_files(lang_dir: Path, region_dir: Optional[Path] = None) -> List[str]:
+    """Get all YAML files to audit for a language, including region overrides."""
+    files: set[str] = set()
 
-    # Direct files in the language directory
-    for f in lang_dir.glob("*.yaml"):
-        if f.name != "prefs.yaml":  # Skip prefs.yaml as it's not translated
-            files.append(str(f.relative_to(lang_dir)))
+    def collect_from(directory: Path, root: Path) -> None:
+        if not directory.exists():
+            return
+        for f in directory.glob("*.yaml"):
+            if f.name != "prefs.yaml":  # Skip prefs.yaml as it's not translated
+                files.add(str(f.relative_to(root)))
+        shared_dir = directory / "SharedRules"
+        if shared_dir.exists():
+            for f in shared_dir.glob("*.yaml"):
+                files.add(str(f.relative_to(root)))
 
-    # SharedRules subdirectory
-    shared_dir = lang_dir / "SharedRules"
-    if shared_dir.exists():
-        for f in shared_dir.glob("*.yaml"):
-            files.append(str(f.relative_to(lang_dir)))
+    collect_from(lang_dir, lang_dir)
+    if region_dir:
+        collect_from(region_dir, region_dir)
 
     return sorted(files)
 
@@ -52,15 +70,33 @@ def compare_files(
     english_path: str,
     translated_path: str,
     issue_filter: Optional[set[str]] = None,
+    translated_region_path: Optional[str] = None,
+    english_region_path: Optional[str] = None,
 ) -> ComparisonResult:
     """Compare English and translated YAML files"""
 
-    english_rules, _ = parse_yaml_file(english_path)
+    def load_rules(path: Optional[str]) -> List[RuleInfo]:
+        if path and os.path.exists(path):
+            rules, _ = parse_yaml_file(path)
+            return rules
+        return []
 
-    if os.path.exists(translated_path):
-        translated_rules, _ = parse_yaml_file(translated_path)
-    else:
-        translated_rules = []
+    def merge_rules(base_rules: List[RuleInfo], region_rules: List[RuleInfo]) -> List[RuleInfo]:
+        if not region_rules:
+            return base_rules
+        merged = {r.key: r for r in base_rules}
+        for rule in region_rules:
+            merged[rule.key] = rule
+        return list(merged.values())
+
+    english_rules = merge_rules(
+        load_rules(english_path),
+        load_rules(english_region_path),
+    )
+    translated_rules = merge_rules(
+        load_rules(translated_path),
+        load_rules(translated_region_path),
+    )
 
     # Create lookup dictionaries
     english_by_key = {r.key: r for r in english_rules}
@@ -283,7 +319,11 @@ def audit_language(
     """Audit translations for a specific language. Returns total issue count."""
     rules_dir_path = get_rules_dir(rules_dir)
     english_dir = rules_dir_path / "en"
-    translated_dir = rules_dir_path / language
+
+    base_language, region = split_language(language)
+    translated_dir = rules_dir_path / base_language
+    translated_region_dir = translated_dir / region if region else None
+    english_region_dir = english_dir / region if region else None
 
     if not english_dir.exists():
         console.print(f"\n[red]✗ Error:[/] English rules directory not found: {english_dir}")
@@ -293,8 +333,12 @@ def audit_language(
         console.print(f"\n[red]✗ Error:[/] Translation directory not found: {translated_dir}")
         sys.exit(1)
 
+    if region and not (translated_region_dir and translated_region_dir.exists()):
+        console.print(f"\n[red]✗ Error:[/] Region directory not found: {translated_region_dir}")
+        sys.exit(1)
+
     # Get list of files to audit
-    files = [specific_file] if specific_file else get_yaml_files(english_dir)
+    files = [specific_file] if specific_file else get_yaml_files(english_dir, english_region_dir)
 
     if output_format == "rich":
         # Print header
@@ -319,12 +363,20 @@ def audit_language(
     for file_name in files:
         english_path = english_dir / file_name
         translated_path = translated_dir / file_name
+        translated_region_path = translated_region_dir / file_name if translated_region_dir else None
+        english_region_path = english_region_dir / file_name if english_region_dir else None
 
         if not english_path.exists():
             console.print(f"\n[yellow]⚠ Warning:[/] English file not found: {english_path}")
             continue
 
-        result = compare_files(str(english_path), str(translated_path), issue_filter)
+        result = compare_files(
+            str(english_path),
+            str(translated_path),
+            issue_filter,
+            str(translated_region_path) if translated_region_path and translated_region_path.exists() else None,
+            str(english_region_path) if english_region_path and english_region_path.exists() else None,
+        )
 
         # check for issues
         has_issues = result.missing_rules or result.untranslated_text or result.extra_rules or result.rule_differences
@@ -381,11 +433,20 @@ def list_languages(rules_dir: Optional[str] = None):
     table.add_column("Language", justify="center", style="cyan")
     table.add_column("YAML files", justify="right")
 
-    for lang_dir in sorted(get_rules_dir(rules_dir).iterdir()):
-        if lang_dir.is_dir() and lang_dir.name != "en":
-            count = len(get_yaml_files(lang_dir))
-            color = "green" if count >= 7 else "yellow" if count >= 4 else "red"
-            table.add_row(lang_dir.name, f"[{color}]{count}[/] files")
+    rules_dir_path = get_rules_dir(rules_dir)
+    for lang_dir in sorted(rules_dir_path.iterdir()):
+        if not lang_dir.is_dir() or lang_dir.name == "en":
+            continue
+        base_count = len(get_yaml_files(lang_dir))
+        color = "green" if base_count >= 7 else "yellow" if base_count >= 4 else "red"
+        table.add_row(lang_dir.name, f"[{color}]{base_count}[/] files")
+
+        for region_dir in sorted(lang_dir.iterdir()):
+            if region_dir.is_dir():
+                code = f"{lang_dir.name}-{region_dir.name}"
+                count = len(get_yaml_files(lang_dir, region_dir))
+                region_color = "green" if count >= 7 else "yellow" if count >= 4 else "red"
+                table.add_row(code, f"[{region_color}]{count}[/] files")
 
     console.print(table)
     console.print("\n  [dim]Reference: en (English) - base translation[/]\n")

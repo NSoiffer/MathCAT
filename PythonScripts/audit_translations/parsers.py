@@ -56,7 +56,8 @@ def format_tag(tag_value: Any) -> Optional[str]:
     if tag_value is None:
         return None
     if isinstance(tag_value, list):
-        return "[" + ", ".join(str(item) for item in tag_value) + "]"
+        normalized = sorted(str(item).strip() for item in tag_value)
+        return "[" + ", ".join(normalized) + "]"
     return str(tag_value)
 
 
@@ -152,10 +153,11 @@ def has_audit_ignore(content: str) -> bool:
 
 def find_untranslated_text_values(node: Any) -> List[str]:
     """
-    Find lowercase text keys (t, ot, ct) that should be uppercase in translations.
+    Find lowercase text keys (t, ot, ct, spell, pronounce, ifthenelse) that should be uppercase in translations.
     Returns list of the untranslated text values found.
     """
     untranslated: List[str] = []
+    translation_keys = {"t", "ot", "ct", "spell", "pronounce", "ifthenelse"}
 
     def should_add(text: str) -> bool:
         if not text.strip():
@@ -169,7 +171,7 @@ def find_untranslated_text_values(node: Any) -> List[str]:
     def walk(value: Any) -> None:
         if isinstance(value, dict):
             for key, child in value.items():
-                if key in ("t", "ot", "ct") and isinstance(child, str):
+                if isinstance(key, str) and key.lower() in translation_keys and not key.isupper() and isinstance(child, str):
                     if should_add(child):
                         untranslated.append(child)
                 walk(child)
