@@ -1,0 +1,10 @@
+- name: condition-none
+  tag: mi
+  match: ".//m:mi"
+  replace:
+    - test:
+        if: "@intent='foo'"
+        then:
+          - T: "foo"
+        else:
+          - T: "bar"
