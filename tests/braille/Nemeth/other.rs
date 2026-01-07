@@ -81,7 +81,7 @@ fn find_baseline_indicator_bug_364() {
     set_rules_dir(abs_rules_dir_path()).unwrap();
     set_preference("BrailleNavHighlight", "Off").unwrap();
     set_preference("BrailleCode", "Nemeth").unwrap();
-    if let Err(e) = set_mathml(expr.to_string()) {
+    if let Err(e) = set_mathml(expr) {
         panic!("{}", errors_to_string(&e));
     };
     match get_navigation_node_from_braille_position(4) {

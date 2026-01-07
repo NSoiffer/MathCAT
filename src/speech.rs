@@ -2887,7 +2887,7 @@ cfg_if::cfg_if! {if #[cfg(not(feature = "include-zip"))] {
         set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         set_preference("Language", "zz-aa").unwrap();
         // not much is support in zz
-        if let Err(e) = set_mathml("<math><mi>x</mi></math>".to_string()) {
+        if let Err(e) = set_mathml("<math><mi>x</mi></math>") {
             error!("{}", crate::errors_to_string(&e));
             panic!("Should not be an error in setting MathML")
         }
