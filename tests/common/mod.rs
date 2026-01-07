@@ -1,8 +1,8 @@
 //!  Useful functionality for testing
-extern crate lazy_static;
 #[cfg(test)]
 
 use regex::Regex;
+extern crate lazy_static;
 use lazy_static::lazy_static;
 pub use libmathcat::interface::*;
 

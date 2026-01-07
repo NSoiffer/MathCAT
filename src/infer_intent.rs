@@ -5,16 +5,16 @@
 //! The implementation of the module is on hold until the MathML committee figures out how it wants to do this.
 #![allow(clippy::needless_return)]
 
-use crate::canonicalize::{as_element, as_text, create_mathml_element, name, set_mathml_name, INTENT_ATTR, MATHML_FROM_NAME_ATTR};
-use crate::errors::*;
-use crate::prefs::PreferenceManager;
-use crate::pretty_print::mml_to_string;
-use crate::speech::SpeechRulesWithContext;
-use crate::xpath_functions::is_leaf;
-use phf::phf_set;
-use regex::Regex;
-use std::fmt;
 use sxd_document::dom::*;
+use crate::prefs::PreferenceManager;
+use crate::speech::SpeechRulesWithContext;
+use crate::canonicalize::{as_element, as_text, name, create_mathml_element, set_mathml_name, INTENT_ATTR, MATHML_FROM_NAME_ATTR};
+use crate::errors::*;
+use std::fmt;
+use crate::pretty_print::mml_to_string;
+use crate::xpath_functions::is_leaf;
+use regex::Regex;
+use phf::phf_set;
 
 const IMPLICIT_FUNCTION_NAME: &str = "apply-function";
 

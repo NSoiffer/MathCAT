@@ -16,20 +16,24 @@
 //! 
 //! To get the MathML associated with the current navigation node, call [`get_navigation_mathml`].
 //! To just get the `id` and offset from the id of the current navigation node, call [`get_navigation_mathml_id`].
-#[macro_use]
-extern crate bitflags;
-#[macro_use]
-extern crate cfg_if;
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate log;
 ///
 /// This module re-exports anyhow types. Use `bail!` for early returns and
 /// `context()`/`with_context()` on Result to add context (replacing old `chain_err()`).
 pub mod errors {
-    pub use anyhow::{anyhow, bail, Context, Error, Result};
+    pub use anyhow::{anyhow, bail, Error, Result, Context};
 }
+
+#[macro_use]
+extern crate lazy_static;
+
+#[macro_use]
+extern crate bitflags;
+
+#[macro_use]
+extern crate log;
+
+#[macro_use]
+extern crate cfg_if;
 
 
 pub mod interface;

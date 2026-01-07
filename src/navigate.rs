@@ -3,21 +3,21 @@
 #![allow(clippy::needless_return)]
 
 use std::cell::{Ref, RefCell, RefMut};
-use sxd_document::dom::Element;
-use sxd_document::Package;
 use sxd_xpath::context::Evaluation;
 use sxd_xpath::Value;
+use sxd_document::dom::Element;
+use sxd_document::Package;
 
-use crate::canonicalize::{get_parent, name};
-use crate::errors::*;
+use std::fmt;
+use crate::canonicalize::{name, get_parent};
+use crate::pretty_print::mml_to_string;
+use crate::speech::{NAVIGATION_RULES, CONCAT_INDICATOR, CONCAT_STRING, SpeechRules, SpeechRulesWithContext};
 use crate::infer_intent::add_fixity_children;
 use crate::interface::copy_mathml;
-use crate::pretty_print::mml_to_string;
-use crate::speech::{SpeechRules, SpeechRulesWithContext, CONCAT_INDICATOR, CONCAT_STRING, NAVIGATION_RULES};
-use phf::phf_set;
-use std::fmt;
 #[cfg(not(target_family = "wasm"))]
 use std::time::Instant;
+use crate::errors::*;
+use phf::phf_set;
 
 pub const ID_OFFSET: &str = "data-id-offset";
 

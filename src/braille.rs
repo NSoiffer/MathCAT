@@ -1,18 +1,18 @@
 #![allow(clippy::needless_return)]
-use crate::canonicalize::get_parent;
+use strum_macros::Display;
+use sxd_document::dom::{Element, ChildOfElement};
+use sxd_document::Package;
 use crate::definitions::SPEECH_DEFINITIONS;
 use crate::errors::*;
-use crate::prefs::PreferenceManager;
 use crate::pretty_print::mml_to_string;
-use crate::speech::{braille_replace_chars, make_quoted_string, SpeechRulesWithContext, BRAILLE_RULES};
-use phf::{phf_map, phf_set};
-use regex::{Captures, Regex, RegexSet};
-use std::borrow::Cow;
+use crate::prefs::PreferenceManager;
 use std::cell::Ref;
+use regex::{Captures, Regex, RegexSet};
+use phf::{phf_map, phf_set};
+use crate::speech::{BRAILLE_RULES, SpeechRulesWithContext, braille_replace_chars, make_quoted_string};
+use crate::canonicalize::get_parent;
+use std::borrow::Cow;
 use std::ops::Range;
-use strum_macros::Display;
-use sxd_document::dom::{ChildOfElement, Element};
-use sxd_document::Package;
 
 static UEB_PREFIXES: phf::Set<char> = phf_set! {
     '⠼', '⠈', '⠘', '⠸', '⠐', '⠨', '⠰', '⠠',

@@ -19,18 +19,18 @@
 //! Note: there are a number of public 'get_xxx' functions that really are meant to be public only to the [crate::speech] module as speech needs access
 //! to the preferences to generate the speech.
 #![allow(clippy::needless_return)]
-extern crate dirs;
+use yaml_rust::{Yaml, YamlLoader};
 use crate::pretty_print::yaml_to_string;
 use crate::tts::TTS;
-use yaml_rust::{Yaml, YamlLoader};
-use crate::errors::*;
-use crate::shim_filesystem::*;
-use crate::speech::{as_str_checked, FileAndTime, RulesFor};
-use phf::phf_set;
+extern crate dirs;
 use std::cell::RefCell;
-use std::collections::{HashMap, HashSet};
-use std::path::{Path, PathBuf};
 use std::rc::Rc;
+use std::path::{Path, PathBuf};
+use crate::speech::{as_str_checked, RulesFor, FileAndTime};
+use std::collections::{HashMap, HashSet};
+use phf::phf_set;
+use crate::shim_filesystem::*;
+use crate::errors::*;
 
 /// Use to indicate preference not found with Preference::to_string()
 pub static NO_PREFERENCE: &str = "\u{FFFF}";
