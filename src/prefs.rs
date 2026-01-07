@@ -1077,15 +1077,15 @@ cfg_if::cfg_if! {if #[cfg(not(feature = "include-zip"))] {
             // now test with the interface
             {
                 use crate::interface::{set_preference, get_preference};
-                set_preference("Language".to_string(), "zz".to_string()).unwrap();
-                set_preference("ClearSpeak_AbsoluteValue".to_string(), "Cardinality".to_string()).unwrap();
-                set_preference("Overview".to_string(), "true".to_string()).unwrap();
-                set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
-                assert_eq!(&get_preference("Language".to_string()).unwrap(), "zz");
-                assert_eq!(&get_preference("ClearSpeak_AbsoluteValue".to_string()).unwrap(), "Cardinality");
-                assert_eq!(&get_preference("Overview".to_string()).unwrap(), "true");
-                assert_eq!(&get_preference("BrailleCode".to_string()).unwrap(), "UEB");
-                assert!(&get_preference("X_Y_Z".to_string()).is_err());
+                set_preference("Language", "zz").unwrap();
+                set_preference("ClearSpeak_AbsoluteValue", "Cardinality").unwrap();
+                set_preference("Overview", "true").unwrap();
+                set_preference("BrailleCode", "UEB").unwrap();
+                assert_eq!(&get_preference("Language").unwrap(), "zz");
+                assert_eq!(&get_preference("ClearSpeak_AbsoluteValue").unwrap(), "Cardinality");
+                assert_eq!(&get_preference("Overview").unwrap(), "true");
+                assert_eq!(&get_preference("BrailleCode").unwrap(), "UEB");
+                assert!(&get_preference("X_Y_Z").is_err());
 
             }
         });
@@ -1098,14 +1098,14 @@ cfg_if::cfg_if! {if #[cfg(not(feature = "include-zip"))] {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
         });
-        crate::interface::set_preference("Language".to_string(), "en".to_string()).unwrap();
-        crate::interface::set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        crate::interface::set_preference("Language", "en").unwrap();
+        crate::interface::set_preference("SpeechStyle", "ClearSpeak").unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let pref_manager = pref_manager.borrow_mut();
             assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Speech)), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
         });
 
-        crate::interface::set_preference("Language".to_string(), "zz".to_string()).unwrap();
+        crate::interface::set_preference("Language", "zz").unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let pref_manager = pref_manager.borrow_mut();
             assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Speech)), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
@@ -1144,7 +1144,7 @@ cfg_if::cfg_if! {if #[cfg(not(feature = "include-zip"))] {
             assert_eq!(merged_prefs.get("Verbosity").unwrap().as_str().unwrap(), "Terse");
         });
 
-        crate::interface::set_preference("NavVerbosity".to_string(), "Terse".to_string()).unwrap();
+        crate::interface::set_preference("NavVerbosity", "Terse").unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let pref_manager = pref_manager.borrow_mut();
             let merged_prefs = pref_manager.merge_prefs();

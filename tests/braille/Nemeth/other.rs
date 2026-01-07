@@ -79,8 +79,8 @@ fn find_baseline_indicator_bug_364() {
         </mrow>
     </math>"#;
     set_rules_dir(abs_rules_dir_path()).unwrap();
-    set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
-    set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
+    set_preference("BrailleNavHighlight", "Off").unwrap();
+    set_preference("BrailleCode", "Nemeth").unwrap();
     if let Err(e) = set_mathml(expr.to_string()) {
         panic!("{}", errors_to_string(&e));
     };

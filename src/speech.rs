@@ -2885,16 +2885,16 @@ cfg_if::cfg_if! {if #[cfg(not(feature = "include-zip"))] {
         use crate::interface::*;
         // initialize and move to a directory where making a time change doesn't really matter
         set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        set_preference("Language".to_string(), "zz-aa".to_string()).unwrap();
+        set_preference("Language", "zz-aa").unwrap();
         // not much is support in zz
         if let Err(e) = set_mathml("<math><mi>x</mi></math>".to_string()) {
             error!("{}", crate::errors_to_string(&e));
             panic!("Should not be an error in setting MathML")
         }
 
-        set_preference("CheckRuleFiles".to_string(), "All".to_string()).unwrap();
+        set_preference("CheckRuleFiles", "All").unwrap();
         assert!(!is_file_time_same(), "file's time did not get updated");
-        set_preference("CheckRuleFiles".to_string(), "None".to_string()).unwrap();
+        set_preference("CheckRuleFiles", "None").unwrap();
         assert!(is_file_time_same(), "file's time was wrongly updated (preference 'CheckRuleFiles' should have prevented updating)");
 
         // change a file, cause read_files to be called, and return if MathCAT noticed the change and updated its time
