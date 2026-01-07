@@ -954,11 +954,11 @@
         if: "name(preceding-sibling::*[1]) = 'chemical-nuclide'"
         then: [T: "membusuk menjadi"]
         else: [T: "hasil"]
-    - else_if: ".='⇌' or .='🣒'"
+    - else_if: ".='⇌' or .='🣑'" # U+01F8D1
       then: [T: "berada dalam kesetimbangan dengan"]
-    - else_if: ".='🣔'"
+    - else_if: ".='🣓'" # U+1F8D3
       then: [T: "berada dalam kesetimbangan bias ke kiri dengan"]
-    - else_if: ".='🣓'"
+    - else_if: ".='🣒'" # U+1F8D2
       then: [T: "berada dalam kesetimbangan bias ke kanan dengan"]
       else: [x: .]
 
