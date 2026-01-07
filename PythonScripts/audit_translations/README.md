@@ -9,6 +9,9 @@ The tool analyzes rule files to detect the following issues:
 * **Missing Rules:** Rules present in the master English file but missing in the target translation.
 * **Extra Rules:** Rules present in the translation but absent in English (flagged as potentially intentional language-specific additions).
 * **Untranslated Text:** Detects text keys that still use **lowercase** formatting, indicating they haven't been verified or translated yet.
+* **Rule Differences:** Structural changes (match expressions, conditions, variables, or test/replace layout) between English and the translation.
+
+Add `# audit-ignore` to a rule block to suppress auditing that rule.
 
 ---
 
@@ -53,15 +56,15 @@ The tool automatically adjusts its matching logic based on the file type:
 
 **Syntax:**
 ```bash
-python -m audit_translations <language> [--file <specific_file>]
-python -m audit_translations --list
+uv run python -m audit_translations <language> [--file <specific_file>]
+uv run python -m audit_translations --list
 ```
 
 **Convenience Features:**
 * `--list`: Displays all available languages.
+  * Region variants are shown as `lang-region` (e.g., `zz-aa`) based on subdirectories under `Rules/Languages/<lang>`.
 * `--file`: Audits a single specific file instead of the whole directory.
-* `--format`: Output format (`rich`, `jsonl`).
-* `--output`: Write output to a file instead of stdout.
+* `--format`: Output format (`rich`, `jsonl`). `--output` is honored only for `jsonl`; rich output always prints to the console.
 * `--rules-dir`: Override the Rules/Languages directory path.
 * `--only`: Filter issue types (comma-separated): `missing`, `untranslated`, `extra`, `diffs`, `all`.
 * **Summary Stats:** Provides a statistical summary after every run.
@@ -70,18 +73,20 @@ python -m audit_translations --list
 
 ```bash
 # List available languages
-python -m audit_translations --list
+uv run python -m audit_translations --list
 
 # Audit all Spanish translation files
-python -m audit_translations es
+uv run python -m audit_translations es
 
 # Audit German translations
-python -m audit_translations de
+uv run python -m audit_translations de
 
 # Audit only a specific file
-python -m audit_translations es --file SharedRules/default.yaml
+uv run python -m audit_translations es --file SharedRules/default.yaml
 
 # Produce JSONL output for automation or AI workflows
-python -m audit_translations es --format jsonl --output es-issues.jsonl
+uv run python -m audit_translations es --format jsonl --output es-issues.jsonl
 
+# Audit a regional variant (merges Rules/Languages/de and Rules/Languages/de/CH)
+uv run python -m audit_translations de-CH
 ```
