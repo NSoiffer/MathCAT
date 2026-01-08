@@ -77,6 +77,7 @@ use std::string::ToString;
 use std::str::FromStr;
 use strum_macros::{Display, EnumString};
 use regex::Regex;
+use std::sync::LazyLock;
 use sxd_xpath::Value;
 
 const MIN_PAUSE:f64 = 50.0;         // ms -- avoids clutter of putting out pauses that probably can't be heard
@@ -595,9 +596,7 @@ impl TTS {
     /// The computation is based on the length of the speech strings (after removing tagging).
     /// There is a bias towards pausing more _after_ longer strings.
     pub fn compute_auto_pause(&self, prefs: &PreferenceManager, before: &str, after: &str) -> String {
-        lazy_static! {
-            static ref REMOVE_XML: Regex = Regex::new(r"<.+?>").unwrap();    // punctuation ending with a '.'
-        }
+        static REMOVE_XML: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"<.+?>").unwrap()); // punctuation ending with a '.'
         let before_len;
         let after_len;
         match self {
@@ -653,10 +652,8 @@ impl TTS {
 
     fn merge_pauses_none(&self, str: &str) -> String {
         // punctuation used for pauses is ",", ";" 
-        lazy_static! {
-            static ref SPACES: Regex = Regex::new(r"\s+([;,])").unwrap();   // two or more pauses
-            static ref MULTIPLE_PAUSES: Regex = Regex::new(r"([,;][,;]+)").unwrap();   // two or more pauses
-        }
+        static SPACES: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\s+([;,])").unwrap()); // two or more pauses
+        static MULTIPLE_PAUSES: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"([,;][,;]+)").unwrap()); // two or more pauses
         // we reduce all sequences of two or more pauses to a single medium pause
         let merges_string = SPACES.replace_all(str, "$1").to_string();
         let merges_string = MULTIPLE_PAUSES.replace_all(&merges_string, ";").to_string();
@@ -680,19 +677,15 @@ impl TTS {
     }
 
     fn merge_pauses_sapi5(&self, str: &str) -> String {
-        lazy_static! {
-            static ref CONSECUTIVE_BREAKS: Regex = Regex::new(r"(<silence msec[^>]+?> *){2,}").unwrap();   // two or more pauses
-            static ref PAUSE_AMOUNT: Regex = Regex::new(r"msec=.*?(\d+)").unwrap();   // amount after 'time'
-        }
+        static CONSECUTIVE_BREAKS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(<silence msec[^>]+?> *){2,}").unwrap()); // two or more pauses
+        static PAUSE_AMOUNT: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"msec=.*?(\d+)").unwrap()); // amount after 'time'
         let replacement = |amount: usize| format!("<silence msec=='{amount}ms'/>");
         return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
     }
 
     fn merge_pauses_ssml(&self, str: &str) -> String {
-        lazy_static! {
-            static ref CONSECUTIVE_BREAKS: Regex = Regex::new(r"(<break time=[^>]+?> *){2,}").unwrap();   // two or more pauses
-            static ref PAUSE_AMOUNT: Regex = Regex::new(r"time=.*?(\d+)").unwrap();   // amount after 'time'
-        }
+        static CONSECUTIVE_BREAKS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(<break time=[^>]+?> *){2,}").unwrap()); // two or more pauses
+        static PAUSE_AMOUNT: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"time=.*?(\d+)").unwrap()); // amount after 'time'
         let replacement = |amount: usize| format!("<break time='{amount}ms'/>");
         return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
     }
