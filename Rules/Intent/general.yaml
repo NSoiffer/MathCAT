@@ -389,7 +389,7 @@
               if: "*[2][self::m:mrow]"
               then: [t: "🣑"]    # new in Unicode 17.0 (<=>) U+1F8D1
               else: [t: "🣓"]    # new in Unicode 17.0  (<<=>) U+1F8D3
-          else: [t: "🣒"]        # new in Unicode 17.0  (<==>>) U+1F8D2
+          else: [t: "🣒"]        # new in Unicode 17.0  (<=>>) U+1F8D2
 
 -
   # need to include the name of the element so the rules know whether to say "sub" or "super"
