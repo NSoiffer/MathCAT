@@ -382,7 +382,7 @@ pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>)
 pub fn get_presentation_element(element: Element) -> (usize, Element) {
 	assert_eq!(name(element), "semantics");
 	let children = element.children();
-	if let Some( (i, child) ) = children.iter().enumerate().find(|(_, &child)| 
+	if let Some( (i, child) ) = children.iter().enumerate().find(|&(_, &child)|
 			if let Some(encoding) = as_element(child).attribute_value("encoding") {
 				encoding == "MathML-Presentation"
 			} else {
@@ -1502,7 +1502,7 @@ impl CanonicalizeContext {
 			let n = children.len();
 			let i_mprescripts =
 				if let Some((i,_)) = children.iter().enumerate()
-					.find(|(_,&el)| name(as_element(el)) == "mprescripts") { i } else { n };
+					.find(|&(_,&el)| name(as_element(el)) == "mprescripts") { i } else { n };
 			let has_misplaced_mprescripts = i_mprescripts & 1 == 0;  // should be first, third, ... child
 			let mut has_proper_number_of_children = if i_mprescripts == n { n & 1 == 0} else { n & 1 != 0 }; // should be odd else even #
 			if has_misplaced_mprescripts || !has_proper_number_of_children || has_none_none_script_pair(&children) {

@@ -1139,7 +1139,7 @@ mod tests {
     fn can_recover_from_invalid_set_rules_dir() {
         use std::env;
         // MathCAT will check the env var "MathCATRulesDir" as an override, so the following test might succeed if we don't override the env var
-        env::set_var("MathCATRulesDir", "MathCATRulesDir");
+        unsafe { env::set_var("MathCATRulesDir", "MathCATRulesDir"); }
         assert!(set_rules_dir("someInvalidRulesDir".to_string()).is_err());
         assert!(
             set_rules_dir(super::super::abs_rules_dir_path()).is_ok(),
