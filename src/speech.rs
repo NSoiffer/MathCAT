@@ -2734,9 +2734,17 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
             unicode = rules.unicode_full.borrow();
             replacements = unicode.get( &ch_as_u32 );
             if replacements.is_none() {
+              self.translate_count = 0;     // not in loop
+              if rules.translate_single_chars_only {  // speech
                 // debug!("*** Did not find unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
-                 self.translate_count = 0;     // not in loop
                 return Ok(String::from(ch));   // no replacement, so just return the char and hope for the best
+              } else { // braille -- must turn into braille dots
+                // Emulate what NVDA does: generate (including single quotes) '\xhhhh' or '\yhhhhhh'
+                let ch_as_int = ch as u32;
+                let prefix_indicator = if ch_as_int < 1<<16 {'x'} else {'y'};
+                debug!("replace_single_char: {}",format!("'\\{prefix_indicator}{:x}'", ch_as_int));
+                return self.replace_chars( &format!("'\\{prefix_indicator}{:x}'", ch_as_int), mathml);
+              }
             }
         };
 
