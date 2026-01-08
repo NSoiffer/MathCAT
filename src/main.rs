@@ -224,11 +224,11 @@ fn main() {
   set_preference("Bookmark", "false").unwrap();
   set_preference("SpeechStyle", "ClearSpeak").unwrap();
   info!("Languages: {}", libmathcat::interface::get_supported_languages().join(", "));
-  info!("Speech styles: {}", libmathcat::interface::get_supported_speech_styles("ClearSpeak".to_string()).join(", "));
+  info!("Speech styles: {}", libmathcat::interface::get_supported_speech_styles("ClearSpeak").join(", "));
   info!("BrailleCodes: {}", libmathcat::interface::get_supported_braille_codes().join(", "));
   // set_preference("DecimalSeparators", ",").unwrap();
   // set_preference("BlockSeparators", ". ").unwrap();
-  if let Err(e) = set_mathml(expr.to_string()) {
+  if let Err(e) = set_mathml(expr) {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
 
@@ -308,7 +308,7 @@ fn timing_test(expr: &str, n_loops: usize) {
   let n_loops_float = n_loops as f64;
   let instant = Instant::now();
   for _ in 0..n_loops {
-    if let Err(e) = set_mathml(expr.to_string()) {
+    if let Err(e) = set_mathml(expr) {
       panic!("Error: exiting -- {}", errors_to_string(&e));
     };
     match get_spoken_text() {
@@ -324,7 +324,7 @@ fn timing_test(expr: &str, n_loops: usize) {
 
   let instant = Instant::now();
   for _ in 0..n_loops {
-    if let Err(e) = set_mathml(expr.to_string()) {
+    if let Err(e) = set_mathml(expr) {
       panic!("Error: exiting -- {}", errors_to_string(&e));
     };
   }
@@ -350,7 +350,7 @@ fn timing_test(expr: &str, n_loops: usize) {
   }
   info!("Time taken (time for {} braille averaged over {} loops): {}ms", get_preference("BrailleCode").unwrap(), n_loops, instant.elapsed().as_millis() as f64/n_loops_float);
 
-    if let Err(e) = set_mathml(expr.to_string()) {
+    if let Err(e) = set_mathml(expr) {
       panic!("Error: exiting -- {}", errors_to_string(&e));
     };
   set_preference("BrailleCode", "Nemeth").unwrap();

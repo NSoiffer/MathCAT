@@ -43,7 +43,7 @@ fn strip_spaces(str: &str) -> String {
 
 #[allow(dead_code)]     // used in testing
 fn check_answer(test: &str, target: &str, failure_message: &str) {
-    if let Err(e) = set_mathml(test.to_string()) {
+    if let Err(e) = set_mathml(test) {
         panic!("{}", errors_to_string(&e));
     };
     match get_spoken_text() {
@@ -123,7 +123,7 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
         "CMU" => set_preference("Language", "es").unwrap(),
         "UEB" | "Nemeth" | _ => set_preference("Language", "en").unwrap(),
     }
-    if let Err(e) = set_mathml(mathml.to_string()) {
+    if let Err(e) = set_mathml(mathml) {
         panic!("{}", errors_to_string(&e));
     };
     match get_braille("") {
@@ -151,7 +151,7 @@ pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &st
         set_preference(pref_name, pref_value).unwrap();
     };
 
-    if let Err(e) = set_mathml(mathml.to_string()) {
+    if let Err(e) = set_mathml(mathml) {
         panic!("{}", errors_to_string(&e));
     };
     match get_braille("") {
@@ -240,7 +240,7 @@ pub fn test_from_braille(code: &str, mathml: &str, braille: &str) {
         "CMU" => set_preference("Language", "es").unwrap(),
         "UEB" | "Nemeth" | _ => set_preference("Language", "en").unwrap(),
     }
-    if let Err(e) = set_mathml(mathml.to_string()) {
+    if let Err(e) = set_mathml(mathml) {
         panic!("{}", errors_to_string(&e));
     };
 
