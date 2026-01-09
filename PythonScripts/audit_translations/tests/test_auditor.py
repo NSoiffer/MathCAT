@@ -2,7 +2,9 @@
 Tests for auditor helpers.
 """
 
-from ..auditor import collect_issues, compare_files, console, get_yaml_files, list_languages
+from pathlib import Path
+
+from ..auditor import collect_issues, compare_files, console, get_yaml_files, list_languages, print_warnings
 from ..dataclasses import ComparisonResult, RuleDifference, RuleInfo
 
 
@@ -179,3 +181,41 @@ def test_list_languages_includes_region_codes(tmp_path) -> None:
 
     assert "zz" in output
     assert "zz-aa" in output
+
+
+def test_print_warnings_omits_snippets_when_not_verbose() -> None:
+    """
+    Ensure the print_warnings output matches the non-verbose golden snapshot.
+    """
+    base_dir = Path(__file__).parent
+    fixtures_dir = base_dir / "fixtures"
+    golden_path = base_dir / "golden" / "rich" / "structure_diff_nonverbose.golden"
+    result = compare_files(
+        str(fixtures_dir / "en" / "structure_diff.yaml"),
+        str(fixtures_dir / "de" / "structure_diff.yaml"),
+    )
+
+    with console.capture() as capture:
+        print_warnings(result, "structure_diff.yaml", verbose=False)
+    output = capture.get()
+
+    assert output == golden_path.read_text(encoding="utf-8")
+
+
+def test_print_warnings_includes_snippets_when_verbose() -> None:
+    """
+    Ensure the print_warnings output matches the verbose golden snapshot.
+    """
+    base_dir = Path(__file__).parent
+    fixtures_dir = base_dir / "fixtures"
+    golden_path = base_dir / "golden" / "rich" / "structure_diff_verbose.golden"
+    result = compare_files(
+        str(fixtures_dir / "en" / "structure_diff.yaml"),
+        str(fixtures_dir / "de" / "structure_diff.yaml"),
+    )
+
+    with console.capture() as capture:
+        print_warnings(result, "structure_diff.yaml", verbose=True)
+    output = capture.get()
+
+    assert output == golden_path.read_text(encoding="utf-8")
