@@ -36,7 +36,7 @@ def test_collect_issues_fields() -> None:
     result = ComparisonResult(
         missing_rules=[missing],
         extra_rules=[extra],
-        untranslated_text=[(untranslated, ["x"])],
+        untranslated_text=[(untranslated, [("t", "x", 31)])],
         rule_differences=[diff],
         file_path="",
         english_rule_count=1,
@@ -46,19 +46,28 @@ def test_collect_issues_fields() -> None:
     issues = collect_issues(result, "file.yaml", "xx")
     by_type = {issue["issue_type"]: issue for issue in issues}
 
-    assert by_type["missing_rule"]["line_en"] == 10
-    assert by_type["missing_rule"]["line_tr"] is None
+    assert by_type["missing_rule"]["issue_line_en"] == 10
+    assert by_type["missing_rule"]["issue_line_tr"] is None
+    assert by_type["missing_rule"]["rule_line_en"] == 10
+    assert by_type["missing_rule"]["rule_line_tr"] is None
     assert "english_raw" not in by_type["missing_rule"]
 
-    assert by_type["extra_rule"]["line_tr"] == 20
+    assert by_type["extra_rule"]["issue_line_tr"] == 20
+    assert by_type["extra_rule"]["rule_line_tr"] == 20
     assert "translated_raw" not in by_type["extra_rule"]
 
     assert by_type["untranslated_text"]["untranslated_texts"] == ["x"]
+    assert by_type["untranslated_text"]["issue_line_tr"] == 31
+    assert by_type["untranslated_text"]["rule_line_tr"] == 30
     assert "translated_raw" not in by_type["untranslated_text"]
 
     assert by_type["rule_difference"]["diff_type"] == "match"
     assert by_type["rule_difference"]["english_snippet"] == "a"
     assert by_type["rule_difference"]["translated_snippet"] == "b"
+    assert by_type["rule_difference"]["issue_line_en"] == 40
+    assert by_type["rule_difference"]["issue_line_tr"] == 41
+    assert by_type["rule_difference"]["rule_line_en"] == 40
+    assert by_type["rule_difference"]["rule_line_tr"] == 41
     assert "english_raw" not in by_type["rule_difference"]
 
 
