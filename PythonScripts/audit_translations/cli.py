@@ -39,6 +39,11 @@ Examples:
         "--only",
         help="Comma-separated issue types: missing, untranslated, extra, diffs, all",
     )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show detailed output including rule snippets (only affects rich format)",
+    )
 
     args = parser.parse_args()
 
@@ -70,6 +75,7 @@ Examples:
             args.output,
             args.rules_dir,
             issue_filter,
+            args.verbose,
         )
 
 

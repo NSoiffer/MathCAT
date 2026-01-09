@@ -161,16 +161,17 @@ def print_rule_item(rule: RuleInfo, context: str = ""):
     console.print(f"      [dim]•[/] {rule_label(rule)} [dim](line {rule.line_number}{context})[/]")
 
 
-def print_diff_item(diff: RuleDifference):
+def print_diff_item(diff: RuleDifference, verbose: bool = False):
     """Print a single rule difference"""
     rule = diff.english_rule
     console.print(
         f"      [dim]•[/] {rule_label(rule)} "
         f"[dim](line {rule.line_number} en, {diff.translated_rule.line_number} tr)[/]"
     )
-    console.print(f"          [dim]{diff.description}:[/]")
-    console.print(f"          [green]en:[/] {escape(diff.english_snippet)}")
-    console.print(f"          [red]tr:[/] {escape(diff.translated_snippet)}")
+    console.print(f"          [dim]{diff.description}[/]")
+    if verbose:
+        console.print(f"          [green]en:[/] {escape(diff.english_snippet)}")
+        console.print(f"          [red]tr:[/] {escape(diff.translated_snippet)}")
 
 
 def issue_base(rule: RuleInfo, file_name: str, language: str) -> dict:
@@ -259,7 +260,7 @@ class IssueWriter:
         self.stream.write(json.dumps(issue, ensure_ascii=False) + "\n")
 
 
-def print_warnings(result: ComparisonResult, file_name: str) -> int:
+def print_warnings(result: ComparisonResult, file_name: str, verbose: bool = False) -> int:
     """Print warnings to console. Returns count of issues found."""
     issues = 0
 
@@ -296,7 +297,7 @@ def print_warnings(result: ComparisonResult, file_name: str) -> int:
             f"[[magenta]{total_diffs}[/]] [dim](structural differences between en and translation)[/]"
         )
         for diff in result.rule_differences:
-            print_diff_item(diff)
+            print_diff_item(diff, verbose)
             issues += 1
 
     if result.extra_rules:
@@ -315,6 +316,7 @@ def audit_language(
     output_path: Optional[str] = None,
     rules_dir: Optional[str] = None,
     issue_filter: Optional[set[str]] = None,
+    verbose: bool = False,
 ) -> int:
     """Audit translations for a specific language. Returns total issue count."""
     rules_dir_path = get_rules_dir(rules_dir)
@@ -382,7 +384,7 @@ def audit_language(
         has_issues = result.missing_rules or result.untranslated_text or result.extra_rules or result.rule_differences
         if output_format == "rich":
             if has_issues:
-                issues = print_warnings(result, file_name)
+                issues = print_warnings(result, file_name, verbose)
                 if issues > 0:
                     files_with_issues += 1
                 total_issues += issues
