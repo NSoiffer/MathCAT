@@ -355,7 +355,7 @@ def print_warnings(result: ComparisonResult, file_name: str, verbose: bool = Fal
             else:
                 line_en = resolve_issue_line(diff.english_rule, diff.diff_type)
                 line_tr = resolve_issue_line(diff.translated_rule, diff.diff_type)
-            print_diff_item(diff, line_en=line_en, line_tr=line_tr)
+            print_diff_item(diff, line_en=line_en, line_tr=line_tr, verbose=verbose)
             issues += 1
 
     if result.extra_rules:
