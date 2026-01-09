@@ -1028,11 +1028,11 @@
         if: "$Verbosity='Terse'"
         then: [T: "formen"]      # phrase(hydrogen and oxygen 'forms' water )
         else: [T: "reagiert auf die form"]      # phrase(hydrogen and oxygen 'reacts to form' water)
-    - else_if: ".='⇌' or .='\u1f8d2'"
+    - else_if: ".='⇌' or .='🣑'" # U+01F8D1
       then: [T: "ist im gleichgewicht mit"]      # phrase(a reactant 'is in equilibrium with' a product)
-    - else_if: ".='\u1f8d4'"
+    - else_if: ".='🣓'" # U+1F8D3
       then: [T: "ist im gleichgewicht nach links vorgespannt mit"]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
-    - else_if: ".='\u1f8d3'"
+    - else_if: ".='🣒'" # U+1F8D2
       then: [T: "ist im gleichgewicht nach rechts vorgespannt mit"]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
       else: [x: "*"]
 

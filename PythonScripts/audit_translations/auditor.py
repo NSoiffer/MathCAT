@@ -161,16 +161,17 @@ def print_rule_item(rule: RuleInfo, issue_line: int, context: str = ""):
     console.print(f"      [dim]•[/] {rule_label(rule)} [dim](line {issue_line}{context})[/]")
 
 
-def print_diff_item(diff: RuleDifference, line_en: int, line_tr: int):
+def print_diff_item(diff: RuleDifference, line_en: int, line_tr: int, verbose: bool = False):
     """Print a single rule difference"""
     rule = diff.english_rule
     console.print(
         f"      [dim]•[/] {rule_label(rule)} "
         f"[dim](line {line_en} en, {line_tr} tr)[/]"
     )
-    console.print(f"          [dim]{diff.description}:[/]")
-    console.print(f"          [green]en:[/] {escape(diff.english_snippet)}")
-    console.print(f"          [red]tr:[/] {escape(diff.translated_snippet)}")
+    console.print(f"          [dim]{diff.description}[/]")
+    if verbose:
+        console.print(f"          [green]en:[/] {escape(diff.english_snippet)}")
+        console.print(f"          [red]tr:[/] {escape(diff.translated_snippet)}")
 
 
 def issue_base(rule: RuleInfo, file_name: str, language: str) -> dict:
@@ -306,7 +307,7 @@ class IssueWriter:
         self.stream.write(json.dumps(issue, ensure_ascii=False) + "\n")
 
 
-def print_warnings(result: ComparisonResult, file_name: str) -> int:
+def print_warnings(result: ComparisonResult, file_name: str, verbose: bool = False) -> int:
     """Print warnings to console. Returns count of issues found."""
     issues = 0
 
@@ -373,6 +374,7 @@ def audit_language(
     output_path: Optional[str] = None,
     rules_dir: Optional[str] = None,
     issue_filter: Optional[set[str]] = None,
+    verbose: bool = False,
 ) -> int:
     """Audit translations for a specific language. Returns total issue count."""
     rules_dir_path = get_rules_dir(rules_dir)
@@ -440,7 +442,7 @@ def audit_language(
         has_issues = result.missing_rules or result.untranslated_text or result.extra_rules or result.rule_differences
         if output_format == "rich":
             if has_issues:
-                issues = print_warnings(result, file_name)
+                issues = print_warnings(result, file_name, verbose)
                 if issues > 0:
                     files_with_issues += 1
                 total_issues += issues

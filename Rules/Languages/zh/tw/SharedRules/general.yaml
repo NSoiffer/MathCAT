@@ -959,11 +959,11 @@
         if: "$Verbosity='Terse'"
         then: [T: "形成"]      # phrase(hydrogen and oxygen 'forms' water )
         else: [T: "反應形成"]      # phrase(hydrogen and oxygen 'reacts to form' water)
-    - else_if: ".='⇌' or .='🣒'"
+    - else_if: ".='⇌' or .='🣑'" # U+01F8D1
       then: [T: "左右平衡"]      # phrase(a reactant 'is in equilibrium with' a product)
-    - else_if: ".='🣔'"
+    - else_if: ".='🣓'" # U+1F8D3
       then: [T: "偏左平衡"]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
-    - else_if: ".='🣓'"
+    - else_if: ".='🣒'" # U+1F8D2
       then: [T: "偏右平衡"]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
       else: [x: "*"]
 

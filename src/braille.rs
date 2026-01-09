@@ -3079,7 +3079,7 @@ mod tests {
             </mrow>
         </math>";
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        set_mathml(mathml_str.to_string()).unwrap();
+        set_mathml(mathml_str).unwrap();
         set_preference("BrailleCode", "UEB").unwrap();
         set_preference("BrailleNavHighlight", "All").unwrap();
         let braille = get_braille("id-2")?;
@@ -3135,7 +3135,7 @@ mod tests {
         </mrow>
        </math>";
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        set_mathml(mathml_str.to_string()).unwrap();
+        set_mathml(mathml_str).unwrap();
         set_preference("BrailleNavHighlight", "Off").unwrap();
 
         set_preference("BrailleCode", "Nemeth").unwrap();
@@ -3187,7 +3187,7 @@ mod tests {
     fn test_UEB_start_mode() -> Result<()> {
         let mathml_str = "<math><msup><mi>x</mi><mi>n</mi></msup></math>";
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        set_mathml(mathml_str.to_string()).unwrap();
+        set_mathml(mathml_str).unwrap();
         set_preference("BrailleCode", "UEB").unwrap();
         set_preference("UEB_START_MODE", "Grade2").unwrap();
         let braille = get_braille("")?;

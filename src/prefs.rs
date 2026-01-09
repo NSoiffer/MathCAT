@@ -1164,7 +1164,7 @@ cfg_if::cfg_if! {if #[cfg(not(feature = "include-zip"))] {
             assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "ClearSpeak");
             assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
         });
-        interface::set_mathml("<math><mo>+</mo><mn>10</mn></math>".to_string()).unwrap();
+        interface::set_mathml("<math><mo>+</mo><mn>10</mn></math>").unwrap();
         assert_eq!(interface::get_spoken_text().unwrap(), "ClearSpeak positive from zz 10");
         
         let mut file_path = PathBuf::default();

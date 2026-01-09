@@ -67,6 +67,7 @@ uv run python -m audit_translations --list
 * `--format`: Output format (`rich`, `jsonl`). `--output` is honored only for `jsonl`; rich output always prints to the console.
 * `--rules-dir`: Override the Rules/Languages directory path.
 * `--only`: Filter issue types (comma-separated): `missing`, `untranslated`, `extra`, `diffs`, `all`.
+* `--verbose`: Show detailed output including English/translated snippets for rule differences (only affects rich format; default shows summary only).
 * **Summary Stats:** Provides a statistical summary after every run.
 
 **Examples:**
@@ -89,4 +90,7 @@ uv run python -m audit_translations es --format jsonl --output es-issues.jsonl
 
 # Audit a regional variant (merges Rules/Languages/de and Rules/Languages/de/CH)
 uv run python -m audit_translations de-CH
+
+# Show detailed output with English/translated snippets for rule differences
+uv run python -m audit_translations es --verbose
 ```
