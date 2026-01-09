@@ -26,7 +26,6 @@ extern crate dirs;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::path::{Path, PathBuf};
-use std::sync::LazyLock;
 use crate::speech::{as_str_checked, RulesFor, FileAndTime};
 use std::collections::{HashMap, HashSet};
 use phf::phf_set;
@@ -36,7 +35,9 @@ use crate::errors::*;
 /// Use to indicate preference not found with Preference::to_string()
 pub static NO_PREFERENCE: &str = "\u{FFFF}";
 
-static DEFAULT_LANG: LazyLock<Yaml> = LazyLock::new(|| Yaml::String("en".to_string()));
+lazy_static! {
+    static ref DEFAULT_LANG: Yaml = Yaml::String("en".to_string());
+}
 
 
 // Preferences are recorded here
