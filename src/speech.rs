@@ -6,7 +6,6 @@
 use std::path::PathBuf;
 use std::collections::HashMap;
 use std::cell::{RefCell, RefMut};
-use std::sync::LazyLock;
 use sxd_document::dom::{ChildOfElement, Document, Element};
 use sxd_document::{Package, QName};
 use sxd_xpath::context::Evaluation;
@@ -566,13 +565,13 @@ impl InsertChildren {
 }
 
 
-static ATTR_NAME_VALUE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(
+lazy_static! {
+    static ref ATTR_NAME_VALUE: Regex = Regex::new(
         // match name='value', where name is sort of an NCNAME (see CONCEPT_OR_LITERAL in infer_intent.rs)
-        // The quotes can be either single or double quotes
+        // The quotes can be either single or double quotes 
         r#"(?P<name>[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*)\s*=\s*('(?P<value>[^']+)'|"(?P<dqvalue>[^"]+)")"#
-    ).unwrap()
-});
+    ).unwrap();
+}
 
 // structure used when "intent:" is encountered in a rule
 // the name is either a string or an xpath that needs evaluation. 99% of the time it is a string

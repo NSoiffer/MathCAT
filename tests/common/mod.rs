@@ -2,7 +2,8 @@
 #[cfg(test)]
 
 use regex::Regex;
-use std::sync::LazyLock;
+extern crate lazy_static;
+use lazy_static::lazy_static;
 pub use libmathcat::interface::*;
 
 
@@ -34,7 +35,9 @@ pub fn abs_rules_dir_path() -> String {
 // Strip spaces from 'str' so comparison doesn't need to worry about spacing
 #[allow(dead_code)]     // used in testing
 fn strip_spaces(str: &str) -> String {
-    static SPACES: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"  +").unwrap());
+    lazy_static! {
+        static ref SPACES: Regex = Regex::new(r"  +").unwrap();
+    }
     return String::from(SPACES.replace_all(str, " "));
 }
 

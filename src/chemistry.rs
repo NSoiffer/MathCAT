@@ -46,7 +46,6 @@ use std::convert::TryInto;
 use std::collections::HashSet;
 use std::cmp::Ordering;
 use crate::errors::*;
-use std::sync::LazyLock;
 
 
 pub static NOT_CHEMISTRY: isize = -10000;  // should overwhelm any positive signal
@@ -940,8 +939,10 @@ fn likely_chem_superscript(sup: Element) -> isize {
     // bullet is radical (en.wikipedia.org/wiki/Radical_(chemistry)#Depiction_in_chemical_reactions); mhchem uses dot operator
     //  these can stand alone, be followed by +/- or have a number in front "(2•)-"" [examples from mhchem documentation]
     // roman numerals are "oxidation state" and range from -4 to +9
-    static MULTIPLE_PLUS_OR_MINUS_OR_DOT: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\++$|^-+$|^\U{2212}+$|^[⋅∙•][-+\U{2212}]*$").unwrap());
-    static SINGLE_PLUS_OR_MINUS_OR_DOT: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^[+-\U{2212}⋅∙•]$").unwrap());
+    lazy_static! {
+        static ref MULTIPLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^\++$|^-+$|^\U{2212}+$|^[⋅∙•][-+\U{2212}]*$").unwrap();
+        static ref SINGLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^[+-\U{2212}⋅∙•]$").unwrap();
+    }
     static DOTS: &[char; 3] = &['⋅', '∙', '•'];
     let sup_name = name(sup);
     if sup_name == "mo" && MULTIPLE_PLUS_OR_MINUS_OR_DOT.is_match(as_text(sup)) {
@@ -1616,9 +1617,11 @@ fn is_equilibrium_constant(mut mathml: Element) -> bool {
     return name(mathml) == "mi" && as_text(mathml) == "K";
 }
 
-// Oxidation states range from -4 to 9 and are written with (a subset of) roman numerals.
-// All instances seem to be upper case that I've seen.
-static SMALL_UPPER_ROMAN_NUMERAL: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\s*^(IX|IV|V?I{0,3})\s*$").unwrap());
+lazy_static! {
+    // Oxidation states range from -4 to 9 and are written with (a subset of) roman numerals.
+    // All instances seem to be upper case that I've seen.
+    static ref SMALL_UPPER_ROMAN_NUMERAL: Regex = Regex::new(r"^\s*^(IX|IV|V?I{0,3})\s*$").unwrap();
+}
 
 /// look for "(s), "(l)", "(g)", "(aq)" (could also use [...])
 /// this might be called before canonicalization, but in clean_chemistry_mrow, we made sure "( xxx )" is grouped properly

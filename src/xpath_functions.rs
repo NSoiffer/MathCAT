@@ -23,7 +23,6 @@ use crate::definitions::{Definitions, SPEECH_DEFINITIONS, BRAILLE_DEFINITIONS};
 use regex::Regex;
 use crate::pretty_print::mml_to_string;
 use std::cell::{Ref, RefCell};
-use std::sync::LazyLock;
 use std::thread::LocalKey;
 use phf::phf_set;
 use sxd_xpath::function::Error as XPathError;
@@ -266,7 +265,9 @@ impl IsNode {
     // Returns true if 'frac' is a common fraction
     // In this case, the numerator and denominator can be no larger than 'num_limit' and 'denom_limit'
     fn is_common_fraction(frac: Element, num_limit: usize, denom_limit: usize) -> bool {
-        static ALL_DIGITS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\d+").unwrap()); // match one or more digits
+        lazy_static! {
+            static ref ALL_DIGITS: Regex = Regex::new(r"\d+").unwrap();    // match one or more digits
+        }
 
         if !is_tag(frac, "mfrac") &&  !is_tag(frac, "fraction"){
             return false;
@@ -448,7 +449,9 @@ impl ToOrdinal {
      * Returns the string representation of that number or an error message
      */
     fn convert(number: &str, fractional: bool, plural: bool) -> Option<String> {
-        static NO_DIGIT: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"[^\d]").unwrap()); // match anything except a digit
+        lazy_static! {
+            static ref NO_DIGIT: Regex = Regex::new(r"[^\d]").unwrap();    // match anything except a digit
+        }
         return SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             let numbers_large = definitions.get_vec("NumbersLarge")?;
@@ -1346,8 +1349,10 @@ pub struct FontSizeGuess;
 // 		   returns original node match isn't found
 impl FontSizeGuess {
     pub fn em_from_value(value_with_unit: &str) -> f64 {
-        // match one or more digits followed by a unit -- there are many more units, but they tend to be large and rarer(?)
-        static FONT_VALUE: LazyLock<Regex> = LazyLock::new(|| { Regex::new(r"(-?[0-9]*\.?[0-9]*)(px|cm|mm|Q|in|ppc|pt|ex|em|rem)").unwrap() });
+        lazy_static! {
+            // match one or more digits followed by a unit -- there are many more units, but they tend to be large and rarer(?)
+            static ref FONT_VALUE: Regex = Regex::new(r"(-?[0-9]*\.?[0-9]*)(px|cm|mm|Q|in|ppc|pt|ex|em|rem)").unwrap();
+        }
         let cap = FONT_VALUE.captures(value_with_unit);
         if let Some(cap) = cap {
             if cap.len() == 3 {
