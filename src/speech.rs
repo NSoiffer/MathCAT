@@ -1895,14 +1895,14 @@ impl UnicodeDef {
 
         fn substitute_ch(yaml: &Yaml, ch: &str) -> Yaml {
             return match yaml {
-                Yaml::Array(ref v) => {
+                Yaml::Array(v) => {
                     Yaml::Array(
                         v.iter()
                          .map(|e| substitute_ch(e, ch))
                          .collect::<Vec<Yaml>>()
                     )
                 },
-                Yaml::Hash(ref h) => {
+                Yaml::Hash(h) => {
                     Yaml::Hash(
                         h.iter()
                          .map(|(key,val)| (key.clone(), substitute_ch(val, ch)) )
