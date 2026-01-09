@@ -274,7 +274,7 @@ cfg_if! {
             // file_name should be path name starting at Rules dir: e.g, "Rules/en/navigate.yaml"
             OVERRIDE_FILE_NAME.with(|name| *name.borrow_mut() = file_name.to_string().replace("/", "\\"));
             OVERRIDE_FILE_CONTENTS.with(|contents| *contents.borrow_mut() = file_contents.to_string());
-            crate::interface::set_rules_dir("Rules".to_string()).unwrap();       // force reinitialization after the change
+            crate::interface::set_rules_dir("Rules").unwrap();       // force reinitialization after the change
         }
     } else {
         pub fn is_file_shim(path: &Path) -> bool {

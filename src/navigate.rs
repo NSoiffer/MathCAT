@@ -1025,7 +1025,7 @@ mod tests {
         set_preference("SpeechStyle", "SimpleSpeak").unwrap();
         set_preference("Verbosity", "Medium").unwrap();
         set_preference("Overview", "False").unwrap();
-        set_mathml(mathml.to_string()).unwrap();
+        set_mathml(mathml).unwrap();
     }
 
     #[test]

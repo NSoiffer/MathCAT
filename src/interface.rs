@@ -66,17 +66,14 @@ fn init_mathml_instance() -> RefCell<Package> {
 
 /// Set the Rules directory
 /// IMPORTANT: this should be the very first call to MathCAT. If 'dir' is an empty string, the environment var 'MathCATRulesDir' is tried.
-pub fn set_rules_dir(dir: String) -> Result<()> {
+pub fn set_rules_dir(dir: impl AsRef<str>) -> Result<()> {
     enable_logs();
     use std::path::PathBuf;
+    let dir = dir.as_ref();
     let dir = if dir.is_empty() {
-        std::env::var_os("MathCATRulesDir")
-            .unwrap_or_default()
-            .to_str()
-            .unwrap()
-            .to_string()
+        std::env::var_os("MathCATRulesDir").unwrap_or_default()
     } else {
-        dir
+        std::ffi::OsString::from(dir)
     };
     let pref_manager = crate::prefs::PreferenceManager::get();
     return pref_manager.borrow_mut().initialize(PathBuf::from(dir));
@@ -92,7 +89,7 @@ pub fn get_version() -> String {
 /// This will override any previous MathML that was set.
 /// This returns canonical MathML with 'id's set on any node that doesn't have an id.
 /// The ids can be used for sync highlighting if the `Bookmark` API preference is true.
-pub fn set_mathml(mathml_str: String) -> Result<String> {
+pub fn set_mathml(mathml_str: impl AsRef<str>) -> Result<String> {
     enable_logs();
     lazy_static! {
         // if these are present when resent to MathJaX, MathJaX crashes (https://github.com/mathjax/MathJax/issues/2822)
@@ -111,6 +108,7 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
     // This call reads all of them for the current preferences, but that's ok since they will likely be used
     crate::speech::SPEECH_RULES.with(|rules| rules.borrow_mut().read_files())?;
 
+    let mathml_str = mathml_str.as_ref();
     return MATHML_INSTANCE.with(|old_package| {
         static HTML_ENTITIES_MAPPING: phf::Map<&str, &str> = include!("entities.in");
 
@@ -535,10 +533,10 @@ pub fn get_supported_languages() -> Vec<String> {
     return language_paths;
  }
 
- pub fn get_supported_speech_styles(lang: String) -> Vec<String> {
+ pub fn get_supported_speech_styles(lang: impl AsRef<str>) -> Vec<String> {
     enable_logs();
     let rules_dir = crate::prefs::PreferenceManager::get().borrow().get_rules_dir();
-    let lang_dir = rules_dir.join("Languages").join(lang);
+    let lang_dir = rules_dir.join("Languages").join(lang.as_ref());
     let mut speech_styles = find_files_in_dir_that_ends_with_shim(&lang_dir, "_Rules.yaml");
     for file_name in &mut speech_styles {
         file_name.truncate(file_name.len() - "_Rules.yaml".len())
@@ -1103,9 +1101,9 @@ mod tests {
         // this forces initialization
         set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
 
-        let entity_str = set_mathml("<math><mrow><mo>&minus;</mo><mi>&mopf;</mi></mrow></math>".to_string()).unwrap();
+        let entity_str = set_mathml("<math><mrow><mo>&minus;</mo><mi>&mopf;</mi></mrow></math>").unwrap();
         let converted_str =
-            set_mathml("<math><mrow><mo>&#x02212;</mo><mi>&#x1D55E;</mi></mrow></math>".to_string()).unwrap();
+            set_mathml("<math><mrow><mo>&#x02212;</mo><mi>&#x1D55E;</mi></mrow></math>").unwrap();
 
         // need to remove unique ids
         lazy_static! {
@@ -1116,19 +1114,19 @@ mod tests {
         assert_eq!(entity_str, converted_str, "normal entity test failed");
 
         let entity_str = set_mathml(
-            "<math data-quot=\"&quot;value&quot;\" data-apos='&apos;value&apos;'><mi>XXX</mi></math>".to_string(),
+            "<math data-quot=\"&quot;value&quot;\" data-apos='&apos;value&apos;'><mi>XXX</mi></math>",
         )
         .unwrap();
         let converted_str =
-            set_mathml("<math data-quot='\"value\"' data-apos=\"'value'\"><mi>XXX</mi></math>".to_string()).unwrap();
+            set_mathml("<math data-quot='\"value\"' data-apos=\"'value'\"><mi>XXX</mi></math>").unwrap();
         let entity_str = ID_MATCH.replace_all(&entity_str, "");
         let converted_str = ID_MATCH.replace_all(&converted_str, "");
         assert_eq!(entity_str, converted_str, "special entities quote test failed");
 
         let entity_str =
-            set_mathml("<math><mo>&lt;</mo><mo>&gt;</mo><mtext>&amp;lt;</mtext></math>".to_string()).unwrap();
+            set_mathml("<math><mo>&lt;</mo><mo>&gt;</mo><mtext>&amp;lt;</mtext></math>").unwrap();
         let converted_str =
-            set_mathml("<math><mo>&#x003C;</mo><mo>&#x003E;</mo><mtext>&#x0026;lt;</mtext></math>".to_string())
+            set_mathml("<math><mo>&#x003C;</mo><mo>&#x003E;</mo><mtext>&#x0026;lt;</mtext></math>")
                 .unwrap();
         let entity_str = ID_MATCH.replace_all(&entity_str, "");
         let converted_str = ID_MATCH.replace_all(&converted_str, "");
@@ -1139,14 +1137,14 @@ mod tests {
     fn can_recover_from_invalid_set_rules_dir() {
         use std::env;
         // MathCAT will check the env var "MathCATRulesDir" as an override, so the following test might succeed if we don't override the env var
-        unsafe { env::set_var("MathCATRulesDir", "MathCATRulesDir"); }
-        assert!(set_rules_dir("someInvalidRulesDir".to_string()).is_err());
+        env::set_var("MathCATRulesDir", "MathCATRulesDir");
+        assert!(set_rules_dir("someInvalidRulesDir").is_err());
         assert!(
             set_rules_dir(super::super::abs_rules_dir_path()).is_ok(),
             "\nset_rules_dir to '{}' failed",
             super::super::abs_rules_dir_path()
         );
-        assert!(set_mathml("<math><mn>1</mn></math>".to_string()).is_ok());
+        assert!(set_mathml("<math><mn>1</mn></math>").is_ok());
     }
 
     #[test]

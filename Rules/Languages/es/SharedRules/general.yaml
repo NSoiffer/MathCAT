@@ -926,11 +926,11 @@
         if: "$Verbosity='Terse'"
         then: [T: "formas"]
         else: [T: "da forma"]
-    - else_if: ".='⇌' or .='🣒'"
+    - else_if: ".='⇌' or .='🣑'" # U+01F8D1
       then: [T: "está en equilibrio con"]
-    - else_if: ".='🣔'"
+    - else_if: ".='🣓'" # U+1F8D3
       then: [T: "equilibrado parcialmente hacia el lado izquierdo"]
-    - else_if: ".='🣓'"
+    - else_if: ".='🣒'" # U+1F8D2
       then: [T: "equilibrado parcialmente hacia el lado derecho"]
       else: [x: "*"]
 
