@@ -94,3 +94,7 @@ uv run python -m audit_translations de-CH
 # Show detailed output with English/translated snippets for rule differences
 uv run python -m audit_translations es --verbose
 ```
+
+### Testing
+
+```uv run python -m pytest```
