@@ -236,13 +236,11 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
         if let Some(typeform_indicator) = prefix.next() {
             if UEB_TYPEFORM_PREFIXES.contains(&typeform_indicator) {
                 return 2;
-            } else if typeform_indicator == '⠼' {
-                if let Some(user_defined_typeform_indicator) = prefix.next() {
-                    if UEB_TYPEFORM_PREFIXES.contains(&user_defined_typeform_indicator) || user_defined_typeform_indicator == '⠐' {
+            } else if typeform_indicator == '⠼' &&
+                      let Some(user_defined_typeform_indicator) = prefix.next() &&
+                      (UEB_TYPEFORM_PREFIXES.contains(&user_defined_typeform_indicator) || user_defined_typeform_indicator == '⠐') {
                         return 3;
                     }
-                }
-            }
         }
         return 0;
     }
@@ -740,9 +738,9 @@ fn nemeth_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
         //   then we need to shift the highlight to the left if what is to it's left is not whitespace (which should never be a highlight end)
         // This only happens when BrailleNavHighlight == "EndPoints".
         let highlight_style = PreferenceManager::get().borrow().pref_to_string("BrailleNavHighlight");
-        if highlight_style == "EndPoints" {
-            if let Some(last_highlighted) = braille.rfind(is_highlighted) {
-                if braille[last_highlighted..].starts_with('𝑏') {
+        if highlight_style == "EndPoints" &&
+            let Some(last_highlighted) = braille.rfind(is_highlighted) &&
+            braille[last_highlighted..].starts_with('𝑏') {
                     let i_after_baseline = last_highlighted + '𝑏'.len_utf8();
                     if i_after_baseline == braille.len() || braille[i_after_baseline..].starts_with(['W', 'w', ',', 'P']) {
                         // shift the highlight to the left after doing just the replacement (if any) that the regex below does
@@ -760,8 +758,6 @@ fn nemeth_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
                                                         &char_to_highlight);
                     }
                 }
-            }
-        }
         return REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT.replace_all(braille, "$1");
 
     }
@@ -1551,12 +1547,11 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
 
                     }
                 }
-                if mode != UEB_Mode::Grade2 && !cap_word_mode {
-                    if let Some(start) = start_g2_letter {
+                if mode != UEB_Mode::Grade2 && !cap_word_mode &&
+                   let Some(start) = start_g2_letter {
                         result = handle_contractions(&chars[start..i], result);
                         start_g2_letter = None;     // not start of char sequence
                     }
-                }
             },
         }
 
@@ -1572,11 +1567,10 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
             }
         }
     }
-    if mode == UEB_Mode::Grade2 {
-        if let Some(start) = start_g2_letter {
+    if mode == UEB_Mode::Grade2 &&
+       let Some(start) = start_g2_letter {
             result = handle_contractions(&chars[start..i], result);
         }
-    }
 
     return result;
 

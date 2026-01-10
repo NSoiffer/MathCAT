@@ -6,6 +6,7 @@
 use std::path::PathBuf;
 use std::collections::HashMap;
 use std::cell::{RefCell, RefMut};
+use std::sync::LazyLock;
 use sxd_document::dom::{ChildOfElement, Document, Element};
 use sxd_document::{Package, QName};
 use sxd_xpath::context::Evaluation;
@@ -35,8 +36,8 @@ pub const NAV_NODE_SPEECH_NOT_FOUND: &str = "NAV_NODE_NOT_FOUND";
 ///   Unlike lisp, this appended to the end of a string (more efficient)
 /// At the moment, the only use is BrailleChars(...) -- internally, it calls replace_chars and we don't want it called again.
 /// Note: an alternative to this hack is to add "xq" (execute but don't eval the result), but that's heavy-handed for the current need
-const NO_EVAL_QUOTE_CHAR: char = '\u{e00A}';            // a private space char
-const NO_EVAL_QUOTE_CHAR_AS_BYTES: [u8;3] = [0xee,0x80,0x8a];
+const NO_EVAL_QUOTE_CHAR: char = '\u{efff}';            // a private space char
+const NO_EVAL_QUOTE_CHAR_AS_BYTES: [u8;3] = [0xee,0xbf,0xbf];
 const N_BYTES_NO_EVAL_QUOTE_CHAR: usize = NO_EVAL_QUOTE_CHAR.len_utf8();
 
 /// Converts 'string' into a "quoted" string -- use is_quoted_string and unquote_string
@@ -142,7 +143,6 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
     fn nestable_speak_rules<'c, 's:'c, 'm:'c>(rules_with_context: &mut SpeechRulesWithContext<'c, 's, 'm>, mathml: Element<'c>) -> Result<String> {
         let mut speech_string = rules_with_context.match_pattern::<String>(mathml)
                     .context("Pattern match/replacement failure!")?;
-        debug!("speak_rules: nav_node_id={}, mathml id={}, speech_string='{}'", rules_with_context.nav_node_id, mathml.attribute_value("id").unwrap_or_default(), &speech_string);
         // Note: [[...]] is added around a matching child, but if the "id" is on 'mathml', the whole string is used
         if !rules_with_context.nav_node_id.is_empty() {
             // See https://github.com/NSoiffer/MathCAT/issues/174 for why we can just start the speech at the nav node
@@ -2003,11 +2003,10 @@ impl FileAndTime {
         use std::fs;
         if !cfg!(target_family = "wasm") {
             let metadata = fs::metadata(path);
-            if let Ok(metadata) = metadata {
-                if let Ok(mod_time) = metadata.modified() {
+            if let Ok(metadata) = metadata &&
+               let Ok(mod_time) = metadata.modified() {
                     return mod_time;
                 }
-            }
         }
         return SystemTime::UNIX_EPOCH
     }
@@ -2392,24 +2391,21 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         let rules = &self.speech_rules.rules;
 
         // start with priority rules that apply to any node (should be a very small number)
-        if let Some(rule_vector) = rules.get("!*") {
-            if let Some(result) = self.find_match(rule_vector, mathml)? {
+        if let Some(rule_vector) = rules.get("!*") &&
+           let Some(result) = self.find_match(rule_vector, mathml)? {
                 return Ok(result);      // found a match
             }
-        }
         
-        if let Some(rule_vector) = rules.get(tag_name) {
-            if let Some(result) = self.find_match(rule_vector, mathml)? {
+        if let Some(rule_vector) = rules.get(tag_name) &&
+           let Some(result) = self.find_match(rule_vector, mathml)? {
                 return Ok(result);      // found a match
             }
-        }
 
         // no rules for specific element, fall back to rules for "*" which *should* be present in all rule files as fallback
-        if let Some(rule_vector) = rules.get("*") {
-            if let Some(result) = self.find_match(rule_vector, mathml)? {
+        if let Some(rule_vector) = rules.get("*") &&
+           let Some(result) = self.find_match(rule_vector, mathml)? {
                 return Ok(result);      // found a match
             }
-        }
 
         // no rules matched -- poorly written rule file -- let flow through to default error
         // report error message with file name
@@ -2492,25 +2488,23 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
     }
 
     fn nav_node_adjust<T:TreeOrString<'c, 'm, T>>(&self, speech: T, mathml: Element<'c>) -> T {
-        if let Some(id) = mathml.attribute_value("id") {
-            if self.nav_node_id == id {
-                let offset = mathml.attribute_value(crate::navigate::ID_OFFSET).unwrap_or("0");
-                debug!("nav_node_adjust: id/name='{}/{}' offset?='{}'", id, name(mathml),
-                    self.nav_node_offset.to_string().as_str() == offset
-                );
-                if is_leaf(mathml) || self.nav_node_offset.to_string().as_str() == offset {
-                    if self.speech_rules.name == RulesFor::Braille {
-                        let highlight_style =  self.speech_rules.pref_manager.borrow().pref_to_string("BrailleNavHighlight");
-                        return T::highlight_braille(speech, highlight_style);
-                    } else {
-                        debug!("nav_node_adjust: id='{}' offset='{}/{}'", id, self.nav_node_offset, offset);
-                        return T::mark_nav_speech(speech)
-                    }
-                }
-            }
+      if let Some(id) = mathml.attribute_value("id") &&
+         self.nav_node_id == id {
+        let offset = mathml.attribute_value(crate::navigate::ID_OFFSET).unwrap_or("0");
+        debug!("nav_node_adjust: id/name='{}/{}' offset?='{}'", id, name(mathml),
+               self.nav_node_offset.to_string().as_str() == offset
+        );
+        if is_leaf(mathml) || self.nav_node_offset.to_string().as_str() == offset {
+          if self.speech_rules.name == RulesFor::Braille {
+            let highlight_style =  self.speech_rules.pref_manager.borrow().pref_to_string("BrailleNavHighlight");
+            return T::highlight_braille(speech, highlight_style);
+          } else {
+            debug!("nav_node_adjust: id='{}' offset='{}/{}'", id, self.nav_node_offset, offset);
+            return T::mark_nav_speech(speech)
+          }
         }
-        return speech;
-
+      }
+      return speech;
     }
     
     fn highlight_braille_string(braille: String, highlight_style: String) -> String {
@@ -2696,7 +2690,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         //         return Ok( ch.to_string() );
         //     }
         // }
-        if is_quoted_string(str) {
+        if is_quoted_string(str) {  // quoted string -- already translated (set in get_braille_chars)
             return Ok(unquote_string(str).to_string());
         }
         // in a string, avoid "a" -> "eigh", "." -> "point", etc
@@ -2721,6 +2715,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         let rules =  self.speech_rules;
         let mut unicode = rules.unicode_short.borrow();
         let mut replacements = unicode.get( &ch_as_u32 );
+        // debug!("replace_single_char: looking for unicode {} for char '{}'/{:#06x}, found: {:?}", rules.name, ch, ch_as_u32, replacements);
         if replacements.is_none() {
             // see if it in the full unicode table (if it isn't loaded already)
             let pref_manager = rules.pref_manager.borrow();
@@ -2735,9 +2730,16 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
             unicode = rules.unicode_full.borrow();
             replacements = unicode.get( &ch_as_u32 );
             if replacements.is_none() {
-                // debug!("*** Did not find unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
-                 self.translate_count = 0;     // not in loop
+              self.translate_count = 0;     // not in loop
+              // debug!("*** Did not find unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
+              if rules.translate_single_chars_only || ch.is_ascii() {  // speech or if braille, avoid loop (ASCII remains ASCII if not found)
                 return Ok(String::from(ch));   // no replacement, so just return the char and hope for the best
+              } else { // braille -- must turn into braille dots
+                // Emulate what NVDA does: generate (including single quotes) '\xhhhh' or '\yhhhhhh'
+                let ch_as_int = ch as u32;
+                let prefix_indicator = if ch_as_int < 1<<16 {'x'} else {'y'};
+                return self.replace_chars( &format!("'\\{prefix_indicator}{:06x}'", ch_as_int), mathml);
+              }
             }
         };
 

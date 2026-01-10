@@ -5,7 +5,7 @@ Handles parsing of rule files and unicode files to extract rule information.
 """
 
 import os
-from typing import Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from ruamel.yaml import YAML
 from ruamel.yaml.scanner import ScannerError
@@ -92,7 +92,8 @@ def parse_rules_file(content: str, data: Any) -> List[RuleInfo]:
     for item, raw_content, line_idx in zip(rule_items, raw_blocks, start_lines):
         rule_name = str(item.get("name"))
         tag = format_tag(item.get("tag"))
-        untranslated = find_untranslated_text_values(item)
+        untranslated_entries = find_untranslated_text_entries(item)
+        untranslated = [entry[1] for entry in untranslated_entries]
         rule_key = f"{rule_name}|{tag or 'unknown'}"
         rules.append(RuleInfo(
             name=rule_name,
@@ -103,6 +104,8 @@ def parse_rules_file(content: str, data: Any) -> List[RuleInfo]:
             data=item,
             has_untranslated_text=len(untranslated) > 0,
             untranslated_keys=untranslated,
+            untranslated_entries=untranslated_entries,
+            line_map=build_line_map(item),
             audit_ignore=has_audit_ignore(raw_content)
         ))
 
@@ -130,7 +133,8 @@ def parse_unicode_file(content: str, data: Any) -> List[RuleInfo]:
     raw_blocks = build_raw_blocks(lines, start_lines)
 
     for (char_key, value), raw_content, line_idx in zip(entries, raw_blocks, start_lines):
-        untranslated = find_untranslated_text_values(value)
+        untranslated_entries = find_untranslated_text_entries(value)
+        untranslated = [entry[1] for entry in untranslated_entries]
         rules.append(RuleInfo(
             name=None,
             tag=None,
@@ -140,6 +144,8 @@ def parse_unicode_file(content: str, data: Any) -> List[RuleInfo]:
             data=value,
             has_untranslated_text=len(untranslated) > 0,
             untranslated_keys=untranslated,
+            untranslated_entries=untranslated_entries,
+            line_map=build_line_map(value),
             audit_ignore=has_audit_ignore(raw_content)
         ))
 
@@ -181,6 +187,102 @@ def find_untranslated_text_values(node: Any) -> List[str]:
 
     walk(node)
     return untranslated
+
+
+def find_untranslated_text_entries(node: Any) -> List[Tuple[str, str, Optional[int]]]:
+    """
+    Find lowercase text keys (t, ot, ct, spell, pronounce, ifthenelse) and their line numbers.
+    Returns list of (key, text, line_number) entries. Line number is 1-based when available.
+    """
+    entries: List[Tuple[str, str, Optional[int]]] = []
+    translation_keys = {"t", "ot", "ct", "spell", "pronounce", "ifthenelse"}
+
+    def should_add(text: str) -> bool:
+        if not text.strip():
+            return False
+        if len(text) == 1 and not text.isalpha():
+            return False
+        if text.startswith('$') or text.startswith('@'):
+            return False
+        return True
+
+    def key_line(mapping: Any, key: str) -> Optional[int]:
+        if hasattr(mapping, "lc") and hasattr(mapping.lc, "data"):
+            line_info = mapping.lc.data.get(key)
+            if line_info:
+                return line_info[0] + 1
+        return None
+
+    def walk(value: Any) -> None:
+        if isinstance(value, dict):
+            for key, child in value.items():
+                if (
+                    isinstance(key, str)
+                    and key.lower() in translation_keys
+                    and not key.isupper()
+                    and isinstance(child, str)
+                ):
+                    if should_add(child):
+                        entries.append((key, child, key_line(value, key)))
+                walk(child)
+        elif isinstance(value, list):
+            for item in value:
+                walk(item)
+
+    walk(node)
+    return entries
+
+
+def build_line_map(node: Any) -> Dict[str, List[int]]:
+    """
+    Build a mapping of rule element types to line numbers.
+    Line numbers are 1-based. Missing elements are omitted.
+    """
+    line_map: Dict[str, List[int]] = {}
+    structure_tokens = {
+        "test",
+        "if",
+        "else_if",
+        "then",
+        "else",
+        "then_test",
+        "else_test",
+        "with",
+        "replace",
+        "intent",
+    }
+
+    def add_line(kind: str, line: Optional[int]) -> None:
+        if line is None:
+            return
+        line_map.setdefault(kind, []).append(line)
+
+    def key_line(mapping: Any, key: str) -> Optional[int]:
+        if hasattr(mapping, "lc") and hasattr(mapping.lc, "data"):
+            line_info = mapping.lc.data.get(key)
+            if line_info:
+                return line_info[0] + 1
+        return None
+
+    def walk(value: Any) -> None:
+        if isinstance(value, dict):
+            for key, child in value.items():
+                if isinstance(key, str):
+                    if key == "match":
+                        add_line("match", key_line(value, key))
+                    if key in ("if", "else_if"):
+                        add_line("condition", key_line(value, key))
+                    if key == "variables":
+                        add_line("variables", key_line(value, key))
+                    if key in structure_tokens:
+                        add_line(f"structure:{key}", key_line(value, key))
+                walk(child)
+        elif isinstance(value, list):
+            for item in value:
+                walk(item)
+
+    walk(node)
+    return line_map
 
 
 def normalize_match(value: Any) -> str:

@@ -77,6 +77,7 @@ use std::string::ToString;
 use std::str::FromStr;
 use strum_macros::{Display, EnumString};
 use regex::Regex;
+use std::sync::LazyLock;
 use sxd_xpath::Value;
 use std::sync::LazyLock;
 
@@ -417,15 +418,13 @@ impl TTS {
                 },
                 _ => bail!("Implementation error: found non-xpath value for spell"),
             }
-        } else if command.command == TTSCommand::Rate && self != &TTS::None {
-            if let TTSCommandValue::Number(number_value) = command.value {
-                if number_value == RATE_FROM_CONTEXT {
+        } else if command.command == TTSCommand::Rate && self != &TTS::None &&
+                  let TTSCommandValue::Number(number_value) = command.value &&
+                  number_value == RATE_FROM_CONTEXT {
                     // handle hack for $Rate -- need to look up in context
                     let rate_from_context = crate::navigate::context_get_variable(rules_with_context.get_context(), "MathRate", mathml)?.parse::<usize>().unwrap_or(100);
                     command.value = TTSCommandValue::Number(rate_from_context as f64);
                 }
-            }
-        }
 
         // evaluate any xpath value now to simplify later code
         if let TTSCommandValue::XPath(xpath) = command.value {

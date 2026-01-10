@@ -115,7 +115,7 @@ fn augenbit1_7_10 () {
 #[test]
 fn augenbit1_7_12 () {
     let expr = r#"<math><mi>cot</mi><mn>45</mn><mo>&#xB0;</mo></math>"#;
-    test_braille("ASCIIMath", expr, r"cot 45°");
+    test_braille_prefs("LaTeX", vec![("Language", "de")], expr, r"\cot 45°");
 }
 
 #[test]

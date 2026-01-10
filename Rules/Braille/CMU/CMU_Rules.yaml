@@ -28,7 +28,7 @@
       - else_if: "contains(., '\u00A0')"
         then:   # treated as a number omission -- FIX: anything to look at to increase the odds of it being digits
         - t: "N"
-        - x: "translate(., '_\u00A0', '⠰')"  # note space is removed
+        - x: "BrailleChars(translate(., '_\u00A0', '\ue020'), 'CMU')"  # note space is removed
         else: [t: "⠰⠤⠆"]
   - t: ""
 

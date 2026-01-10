@@ -47,6 +47,7 @@ use std::collections::HashSet;
 use std::cmp::Ordering;
 use std::sync::LazyLock;
 use crate::errors::*;
+use std::sync::LazyLock;
 
 
 pub static NOT_CHEMISTRY: isize = -10000;  // should overwhelm any positive signal
@@ -169,15 +170,14 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
             } else if i + 2 < old_children.len() {
                 // wrap with an mrow if we are not already an 'mrow'
                 let parent = get_parent(child); // safe since 'math' is always at root
-                if !(name(parent) == "mrow" && i == 0 && old_children.len() == 3) {
-                    if let Some(paren_mrow) = make_mrow(old_children[i..i+3].try_into().unwrap()) {
+                if !(name(parent) == "mrow" && i == 0 && old_children.len() == 3) &&
+                    let Some(paren_mrow) = make_mrow(old_children[i..i+3].try_into().unwrap()) {
                         // debug!("make_mrow added mrow");
                         new_children.push(paren_mrow);
                         i += 3;
                         changed = true;
                         continue;
                     }
-                }
             }
             if child_name == "mo" {
                 let likely_chemistry_op = likely_chem_formula_operator(child);
@@ -205,13 +205,11 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
                 } else {
                     likely_chem_equation_operator(child);   // need to mark MAYBE_CHEMISTRY for CHEMICAL_BOND tests
                 }
-            } else if child_name == "mrow" {
-                if let Some(latex_value) = child.attribute_value("data-latex") {
-                    if latex_value == r"\mathrel{\longrightleftharpoons}" {
-                        child.set_attribute_value("data-unicode", "\u{1f8d2}");
-                        child.set_attribute_value(MAYBE_CHEMISTRY, "2");    // same as is_hack_for_missing_arrows()
-                    }
-                }               
+            } else if child_name == "mrow" &&
+                      let Some(latex_value) = child.attribute_value("data-latex") &&
+                      latex_value == r"\mathrel{\longrightleftharpoons}" {
+                child.set_attribute_value("data-unicode", "\u{1f8d2}");
+                child.set_attribute_value(MAYBE_CHEMISTRY, "2");    // same as is_hack_for_missing_arrows()
             }
             i += 1;
             new_children.push(child);
@@ -278,10 +276,9 @@ fn clean_mrow_children_mark_pass(children: &[Element]) {
                     start = Some(i);
                 }
             }
-        } else if let Some(seq_start) = start {
-            if remove_operators_at_end_of_sequence(children, seq_start, i) {
-                start = None;
-            }
+        } else if let Some(seq_start) = start &&
+                  remove_operators_at_end_of_sequence(children, seq_start, i) {
+            start = None;
         }
     }
 
@@ -565,11 +562,10 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
             // let parent = get_parent(mathml);
             // debug!("After merge_element: -- parent{}", mml_to_string(parent));
 
-        } else if let Some(changed_value) = mathml.attribute_value(CHANGED_ATTR) {
-            if changed_value == ADDED_ATTR_VALUE {
-                mathml.remove_from_parent();
-                return true;
-            }
+        } else if let Some(changed_value) = mathml.attribute_value(CHANGED_ATTR) &&
+                  changed_value == ADDED_ATTR_VALUE {
+            mathml.remove_from_parent();
+            return true;
         }
         return false;
     } else if IsNode::is_scripted(mathml) &&
@@ -1370,13 +1366,11 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
                     // make sure the atomic number matches the base
                     let base = as_element(children[0]);
                     let base_name = name(base);
-                    if base_name == "mi" || base_name == "mtext" {
-                        if let Some(atomic_number) = CHEMICAL_ELEMENT_ATOMIC_NUMBER.get(as_text(base)) {
-                            if as_text(pre_subscript) == atomic_number.to_string() {
+                    if (base_name == "mi" || base_name == "mtext") &&
+                        let Some(atomic_number) = CHEMICAL_ELEMENT_ATOMIC_NUMBER.get(as_text(base)) &&
+                            as_text(pre_subscript) == atomic_number.to_string() {
                                 likelihood = CHEMISTRY_THRESHOLD;
                             }
-                        }
-                    }
                 }
             } else {
                 return NOT_CHEMISTRY;

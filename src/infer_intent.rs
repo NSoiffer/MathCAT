@@ -11,11 +11,11 @@ use crate::speech::SpeechRulesWithContext;
 use crate::canonicalize::{as_element, as_text, name, create_mathml_element, set_mathml_name, INTENT_ATTR, MATHML_FROM_NAME_ATTR};
 use crate::errors::*;
 use std::fmt;
+use std::sync::LazyLock;
 use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::is_leaf;
 use regex::Regex;
 use phf::phf_set;
-use std::sync::LazyLock;
 
 const IMPLICIT_FUNCTION_NAME: &str = "apply-function";
 
@@ -96,13 +96,12 @@ fn add_fixity(intent: Element) {
         let intent_name = name(intent);
         crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
-            if let Some(definition) = definitions.get_hashmap("IntentMappings").unwrap().get(intent_name) {
-                if let Some((fixity, _)) = definition.split_once("=") {
+            if let Some(definition) = definitions.get_hashmap("IntentMappings").unwrap().get(intent_name) &&
+                let Some((fixity, _)) = definition.split_once("=") {
                     let new_properties = (if properties.is_empty() {":"} else {properties}).to_string() + fixity + ":";
                     intent.set_attribute_value(INTENT_PROPERTY, &new_properties);
                     // debug!("Added fixity: new value '{}'", intent.attribute_value(INTENT_PROPERTY).unwrap());
-                }
-            };
+                };
         });
     }
 }
@@ -249,16 +248,16 @@ pub fn intent_speech_for_name(intent_name: &str, verbosity: &str, fixity: &str) 
 //  Furthermore an NCName cannot begin with a number, dot or minus character although they can appear later in an NCName.
 // NC_NAME defined in www.w3.org/TR/REC-xml/#sec-common-syn, but is complicated
 //   We follow NC_NAME for the basic latin block, but then allow everything
-static CONCEPT_OR_LITERAL: LazyLock<Regex> = LazyLock::new(|| { Regex::new(
-        r#"^[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#, // NC_NAME but simpler
+static CONCEPT_OR_LITERAL: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"^[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#     // NC_NAME but simpler
     ).unwrap()
 });
-static PROPERTY: LazyLock<Regex> = LazyLock::new(|| { Regex::new(
-        r#"^:[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#, // : NC_NAME
+static PROPERTY: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"^:[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#    // : NC_NAME
     ).unwrap()
 });
-static ARG_REF: LazyLock<Regex> = LazyLock::new(|| { Regex::new(
-        r#"^\$[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#, // $ NC_NAME
+static ARG_REF: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"^\$[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#   // $ NC_NAME
     ).unwrap()
 });
 static NUMBER: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"^-?[0-9]+(\.[0-9]+)?"#).unwrap());
@@ -582,8 +581,8 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(
     skip_self: bool,
     no_check_inside: bool) -> Result<Option<Element<'m>>> {
     // debug!("Looking for '{}' in\n{}", name, mml_to_string(mathml));
-    if !skip_self {
-        if let Some(arg_val) = mathml.attribute_value("arg") {
+    if !skip_self &&
+        let Some(arg_val) = mathml.attribute_value("arg") {
             // debug!("looking for '{}', found arg='{}'", name, arg_val);
             if name == arg_val {
                 // check to see if this mathml has an intent value -- if so the value is the value of its intent value
@@ -597,7 +596,6 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(
                 return Ok(None);       // don't look inside 'arg'
             }
         }
-    }
 
     if no_check_inside && mathml.attribute_value(INTENT_ATTR).is_some() {
         return Ok(None);           // don't look inside 'intent'

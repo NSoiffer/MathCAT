@@ -3,6 +3,7 @@
 #![allow(non_snake_case)]
 #![allow(clippy::needless_return)]
 use std::cell::RefCell;
+use std::sync::LazyLock;
 
 use crate::canonicalize::{as_text, create_mathml_element};
 use crate::errors::*;
@@ -18,7 +19,6 @@ use crate::shim_filesystem::{find_all_dirs_shim, find_files_in_dir_that_ends_wit
 use crate::navigate::*;
 use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::{is_leaf, IsNode};
-use std::sync::LazyLock;
 
 #[cfg(feature = "enable-logs")]
 use std::sync::Once;
@@ -114,7 +114,7 @@ pub fn set_mathml(mathml_str: impl AsRef<str>) -> Result<String> {
         let mut error_message = "".to_string(); // can't return a result inside the replace_all, so we do this hack of setting the message and then returning the error
                                                 // need to deal with character data and convert to something the parser knows
         let mathml_str =
-            HTML_ENTITIES.replace_all(&mathml_str, |cap: &Captures| match HTML_ENTITIES_MAPPING.get(&cap[1]) {
+            HTML_ENTITIES.replace_all(mathml_str, |cap: &Captures| match HTML_ENTITIES_MAPPING.get(&cap[1]) {
                 None => {
                     error_message = format!("No entity named '{}'", &cap[0]);
                     cap[0].to_string()
@@ -559,12 +559,11 @@ pub fn copy_mathml(mathml: Element) -> Element {
     });
 
     // can't use is_leaf/as_text because this is also used with the intent tree
-    if children.len() == 1 {
-        if let Some(text) = children[0].text() {
+    if children.len() == 1 &&
+       let Some(text) = children[0].text() {
         new_mathml.set_text(text.text());
         return new_mathml;
         }
-    }
 
     let mut new_children = Vec::with_capacity(children.len());
     for child in children {
@@ -810,12 +809,10 @@ pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
 
         // clean up whitespace in text nodes
         for child in &mut new_children {    
-            if let Some(element) = child.element() {
-                if is_leaf(element) {
-                    let text = as_text(element);
-                    let cleaned_text = WHITESPACE_MATCH.replace_all(text, " ").trim_matches(WHITESPACE).to_string();
-                    element.set_text(&cleaned_text);
-                }
+            if let Some(element) = child.element() && is_leaf(element) {
+                let text = as_text(element);
+                let cleaned_text = WHITESPACE_MATCH.replace_all(text, " ").trim_matches(WHITESPACE).to_string();
+                element.set_text(&cleaned_text);
             }
         }
         
@@ -1132,9 +1129,7 @@ mod tests {
     fn can_recover_from_invalid_set_rules_dir() {
         use std::env;
         // MathCAT will check the env var "MathCATRulesDir" as an override, so the following test might succeed if we don't override the env var
-        unsafe {
-            env::set_var("MathCATRulesDir", "MathCATRulesDir");
-        }
+        unsafe { env::set_var("MathCATRulesDir", "MathCATRulesDir"); }
         assert!(set_rules_dir("someInvalidRulesDir").is_err());
         assert!(
             set_rules_dir(super::super::abs_rules_dir_path()).is_ok(),
