@@ -17,7 +17,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from .dataclasses import RuleInfo, RuleDifference, ComparisonResult
-from .parsers import parse_yaml_file, diff_rules
+from .parsers import parse_yaml_file, diff_rules, extract_structure_elements
 console = Console()
 
 
@@ -127,7 +127,7 @@ def compare_files(
     if include_untranslated:
         for rule in translated_rules:
             if rule.has_untranslated_text and not rule.audit_ignore:
-                untranslated_text.append((rule, rule.untranslated_keys))
+                untranslated_text.append((rule, rule.untranslated_entries))
 
     # Find fine-grained differences in rules that exist in both files (skip if audit-ignore)
     rule_differences = []
@@ -157,16 +157,16 @@ def rule_label(rule: RuleInfo) -> str:
     return f"[cyan]{escape(rule.name)}[/] [dim][{escape(tag)}][/]"
 
 
-def print_rule_item(rule: RuleInfo, context: str = ""):
-    console.print(f"      [dim]•[/] {rule_label(rule)} [dim](line {rule.line_number}{context})[/]")
+def print_rule_item(rule: RuleInfo, issue_line: int, context: str = ""):
+    console.print(f"      [dim]•[/] {rule_label(rule)} [dim](line {issue_line}{context})[/]")
 
 
-def print_diff_item(diff: RuleDifference, verbose: bool = False):
+def print_diff_item(diff: RuleDifference, line_en: int, line_tr: int, verbose: bool = False):
     """Print a single rule difference"""
     rule = diff.english_rule
     console.print(
         f"      [dim]•[/] {rule_label(rule)} "
-        f"[dim](line {rule.line_number} en, {diff.translated_rule.line_number} tr)[/]"
+        f"[dim](line {line_en} en, {line_tr} tr)[/]"
     )
     console.print(f"          [dim]{diff.description}[/]")
     if verbose:
@@ -181,9 +181,41 @@ def issue_base(rule: RuleInfo, file_name: str, language: str) -> dict:
         "rule_name": rule.name or "",
         "rule_tag": rule.tag or "",
         "rule_key": rule.key,
-        "line_en": None,
-        "line_tr": None,
+        "issue_line_en": None,
+        "issue_line_tr": None,
+        "rule_line_en": None,
+        "rule_line_tr": None,
     }
+
+
+def first_structure_mismatch(
+    english_tokens: List[str],
+    translated_tokens: List[str],
+) -> Tuple[Optional[str], Optional[str]]:
+    min_len = min(len(english_tokens), len(translated_tokens))
+    for idx in range(min_len):
+        if english_tokens[idx] != translated_tokens[idx]:
+            return english_tokens[idx], translated_tokens[idx]
+    if len(english_tokens) > min_len:
+        return english_tokens[min_len], None
+    if len(translated_tokens) > min_len:
+        return None, translated_tokens[min_len]
+    return None, None
+
+
+def resolve_issue_line(rule: RuleInfo, kind: str, token: Optional[str] = None) -> int:
+    if kind == "match":
+        lines = rule.line_map.get("match", [])
+    elif kind == "condition":
+        lines = rule.line_map.get("condition", [])
+    elif kind == "variables":
+        lines = rule.line_map.get("variables", [])
+    elif kind == "structure" and token:
+        token_key = f"structure:{token.rstrip(':')}"
+        lines = rule.line_map.get(token_key, [])
+    else:
+        lines = []
+    return lines[0] if lines else rule.line_number
 
 
 def collect_issues(
@@ -198,7 +230,8 @@ def collect_issues(
         issue.update(
             issue_type="missing_rule",
             diff_type="",
-            line_en=rule.line_number,
+            issue_line_en=rule.line_number,
+            rule_line_en=rule.line_number,
             description="Rule present in English but missing in translation",
             english_snippet="",
             translated_snippet="",
@@ -211,7 +244,8 @@ def collect_issues(
         issue.update(
             issue_type="extra_rule",
             diff_type="",
-            line_tr=rule.line_number,
+            issue_line_tr=rule.line_number,
+            rule_line_tr=rule.line_number,
             description="Rule present in translation but missing in English",
             english_snippet="",
             translated_snippet="",
@@ -219,27 +253,40 @@ def collect_issues(
         )
         issues.append(issue)
 
-    for rule, texts in result.untranslated_text:
-        issue = issue_base(rule, file_name, language)
-        issue.update(
-            issue_type="untranslated_text",
-            diff_type="",
-            line_tr=rule.line_number,
-            description="Lowercase t/ot/ct keys indicate untranslated text",
-            english_snippet="",
-            translated_snippet="",
-            untranslated_texts=texts,
-        )
-        issues.append(issue)
+    for rule, entries in result.untranslated_text:
+        for key, text, line in entries:
+            issue = issue_base(rule, file_name, language)
+            issue.update(
+                issue_type="untranslated_text",
+                diff_type="",
+                issue_line_tr=line or rule.line_number,
+                rule_line_tr=rule.line_number,
+                description="Lowercase t/ot/ct keys indicate untranslated text",
+                english_snippet="",
+                translated_snippet="",
+                untranslated_texts=[text],
+            )
+            issues.append(issue)
 
     for diff in result.rule_differences:
         rule = diff.english_rule
         issue = issue_base(rule, file_name, language)
+        if diff.diff_type == "structure":
+            en_tokens = extract_structure_elements(diff.english_rule.data)
+            tr_tokens = extract_structure_elements(diff.translated_rule.data)
+            en_token, tr_token = first_structure_mismatch(en_tokens, tr_tokens)
+            issue_line_en = resolve_issue_line(diff.english_rule, "structure", en_token)
+            issue_line_tr = resolve_issue_line(diff.translated_rule, "structure", tr_token)
+        else:
+            issue_line_en = resolve_issue_line(diff.english_rule, diff.diff_type)
+            issue_line_tr = resolve_issue_line(diff.translated_rule, diff.diff_type)
         issue.update(
             issue_type="rule_difference",
             diff_type=diff.diff_type,
-            line_en=diff.english_rule.line_number,
-            line_tr=diff.translated_rule.line_number,
+            issue_line_en=issue_line_en,
+            issue_line_tr=issue_line_tr,
+            rule_line_en=diff.english_rule.line_number,
+            rule_line_tr=diff.translated_rule.line_number,
             description=diff.description,
             english_snippet=diff.english_snippet,
             translated_snippet=diff.translated_snippet,
@@ -279,16 +326,18 @@ def print_warnings(result: ComparisonResult, file_name: str, verbose: bool = Fal
     if result.missing_rules:
         console.print(f"\n  [red]✗[/] [bold]Missing Rules[/] [[red]{len(result.missing_rules)}[/]] [dim](in English but not in translation)[/]")
         for rule in result.missing_rules:
-            print_rule_item(rule, context=" in English")
+            print_rule_item(rule, issue_line=rule.line_number, context=" in English")
             issues += 1
 
     if result.untranslated_text:
-        console.print(f"\n  [yellow]⚠[/] [bold]Untranslated Text[/] [[yellow]{len(result.untranslated_text)}[/]] [dim](lowercase t/ot/ct keys)[/]")
-        for rule, texts in result.untranslated_text:
-            print_rule_item(rule)
-            for text in texts:
+        untranslated_count = sum(len(entries) for _, entries in result.untranslated_text)
+        console.print(f"\n  [yellow]⚠[/] [bold]Untranslated Text[/] [[yellow]{untranslated_count}[/]] [dim](lowercase t/ot/ct keys)[/]")
+        for rule, entries in result.untranslated_text:
+            for _, text, line in entries:
+                issue_line = line or rule.line_number
+                print_rule_item(rule, issue_line=issue_line)
                 console.print(f"          [dim]→[/] [yellow]\"{escape(text)}\"[/]")
-            issues += 1
+                issues += 1
 
     if result.rule_differences:
         total_diffs = len(result.rule_differences)
@@ -297,13 +346,22 @@ def print_warnings(result: ComparisonResult, file_name: str, verbose: bool = Fal
             f"[[magenta]{total_diffs}[/]] [dim](structural differences between en and translation)[/]"
         )
         for diff in result.rule_differences:
-            print_diff_item(diff, verbose)
+            if diff.diff_type == "structure":
+                en_tokens = extract_structure_elements(diff.english_rule.data)
+                tr_tokens = extract_structure_elements(diff.translated_rule.data)
+                en_token, tr_token = first_structure_mismatch(en_tokens, tr_tokens)
+                line_en = resolve_issue_line(diff.english_rule, "structure", en_token)
+                line_tr = resolve_issue_line(diff.translated_rule, "structure", tr_token)
+            else:
+                line_en = resolve_issue_line(diff.english_rule, diff.diff_type)
+                line_tr = resolve_issue_line(diff.translated_rule, diff.diff_type)
+            print_diff_item(diff, line_en=line_en, line_tr=line_tr, verbose=verbose)
             issues += 1
 
     if result.extra_rules:
         console.print(f"\n  [blue]ℹ[/] [bold]Extra Rules[/] [[blue]{len(result.extra_rules)}[/]] [dim](may be intentional)[/]")
         for rule in result.extra_rules:
-            print_rule_item(rule)
+            print_rule_item(rule, issue_line=rule.line_number)
             issues += 1
 
     return issues
@@ -401,7 +459,7 @@ def audit_language(
                 files_ok += 1
 
         total_missing += len(result.missing_rules)
-        total_untranslated += len(result.untranslated_text)
+        total_untranslated += sum(len(entries) for _, entries in result.untranslated_text)
         total_extra += len(result.extra_rules)
         total_differences += len(result.rule_differences)
 
