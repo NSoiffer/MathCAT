@@ -33,7 +33,11 @@
  - "~": [t: "\\textasciitilde𝐖"]         # 0x7e
  - " ": [t: "\\~"]                       # 0xa0
  - "¬": [t: "\\lnot𝐖"]                   # 0xac
- - "°": [t: "°"]                         # 0xb0
+ - "°":                                  # 0xb0
+     - test:
+         if: "$Language = 'de'"
+         then: [t: "°"]
+         else: [t: "\\circ"]
  - "±": [t: "\\pm𝐖"]                     # 0xb1
  - "´": [t: "\\textasciiacute𝐖"]         # 0xb4
  - "·": [t: "\\cdotp𝐖"]                  # 0xb7

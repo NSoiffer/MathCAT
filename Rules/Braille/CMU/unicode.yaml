@@ -46,6 +46,7 @@
  - "\ue00D": [t: "N⠐N⠙"]               # D 
  - "\ue00E": [t: "N⠐N⠑"]               # E 
  - "\ue00F": [t: "N⠐N⠋"]               # F 
+
 # leave room for the rest of the alphabet
  - "\ue01A": [t: "N⠨N⠁"]               # A 
  - "\ue01B": [t: "N⠨N⠃"]               # B 
@@ -53,6 +54,10 @@
  - "\ue01D": [t: "N⠨N⠙"]               # D 
  - "\ue01E": [t: "N⠨N⠑"]               # E 
  - "\ue01F": [t: "N⠨N⠋"]               # F 
+
+# Omission char -- there isn't a specific code point, so we use a private use area
+ - "\ue020": [t: "⠰"]        # omission (three dot 5s with letter indicator) 
+
 
  - "a": [t: "L⠁"]               # 0x61 
  - "b": [t: "L⠃"]               # 0x62 
