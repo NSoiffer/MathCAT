@@ -79,7 +79,6 @@ use strum_macros::{Display, EnumString};
 use regex::Regex;
 use std::sync::LazyLock;
 use sxd_xpath::Value;
-use std::sync::LazyLock;
 
 const MIN_PAUSE:f64 = 50.0;         // ms -- avoids clutter of putting out pauses that probably can't be heard
 const PAUSE_SHORT:f64 = 200.0;  // ms

@@ -47,7 +47,6 @@ use std::collections::HashSet;
 use std::cmp::Ordering;
 use std::sync::LazyLock;
 use crate::errors::*;
-use std::sync::LazyLock;
 
 
 pub static NOT_CHEMISTRY: isize = -10000;  // should overwhelm any positive signal
