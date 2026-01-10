@@ -23,11 +23,9 @@ fn zip_dir(rules_dir: &Path, archive_zip: &mut ZipWriter<File>, options: SimpleF
         let entry_path = entry.path();
 
         // .zip files return true for is_dir() -- test in case there is some leftover zip files
-        if let Some(suffix) = entry_path.extension() {
-            if suffix == "zip" {
+        if let Some(suffix) = entry_path.extension() && suffix == "zip" {
                 continue;
             }
-        }
         // println!("trying dir entry {:?}", entry_path.to_str());
         if entry_path.is_dir(){
             if let Some(dir_name) = entry_path.components().next_back() {

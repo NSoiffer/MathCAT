@@ -282,11 +282,10 @@ impl<'a, 'op:'a> StackInfo<'a, 'op> {
 		let children = self.mrow.children();
 		for &child in children.iter().rev() {
 			let child = as_element(child);
-			if let Some(value) = child.attribute_value(CHANGED_ATTR) {
-				if value == "empty_content" {
+			if let Some(value) = child.attribute_value(CHANGED_ATTR)
+				&& value == "empty_content" {
 					continue;
 				}
-			}
 			return Some(child);
 		}
 		return None;
@@ -1224,18 +1223,16 @@ impl CanonicalizeContext {
 				return false;
 			}
 
-			if let Some(intent_value) = mathml.attribute_value(INTENT_ATTR) {
-				if intent_value != "ratio" || !intent_value.starts_with('_') {
+			if let Some(intent_value) = mathml.attribute_value(INTENT_ATTR)
+				&& (intent_value != "ratio" || !intent_value.starts_with('_')) {
 					return false;
 				}
-			}
 
-			if let Some(value) = mathml.attribute_value("data-mjx-texclass") {
-				if value ==  "PUNCT" {
+			if let Some(value) = mathml.attribute_value("data-mjx-texclass")
+				&& value ==  "PUNCT" {
 					mathml.remove_attribute("data-mjx-texclass");
 					mathml.set_attribute_value(SPACE_AFTER, "true");	// signal to at least Nemeth rules that this is punctuation
 				}
-			}
 
 			let preceding = mathml.preceding_siblings();
 			let following = mathml.following_siblings();
@@ -1250,18 +1247,16 @@ impl CanonicalizeContext {
 			}
 			// only want want one "∷"
 			let is_before = is_proportional_before_colon(preceding.iter().rev());
-			if let Some(is_before) = is_before {
-				if !is_before {
+			if let Some(is_before) = is_before
+				&& !is_before {
 					return false;
 				}
-			}
 			let is_before = is_before.is_some();		// move this to true/false (found/not found)
 			let is_after = is_proportional_before_colon(following.iter());
-			if let Some(is_after) = is_after {
-				if !is_after {
+			if let Some(is_after) = is_after
+				&& !is_after {
 					return false;
 				}
-			}
 			let is_after = is_after.is_some();		// move this to true/false (found/not found)
 			return is_before ^ is_after;
 
@@ -1278,11 +1273,10 @@ impl CanonicalizeContext {
 							"∷" | "::" => return Some(true),		// "::" might not be canonicalized yet
 							"∶" => return Some(false),
 							_ => {
-								if let Some(op) = OPERATORS.get(text) {
-									if op.priority < *PROPORTIONAL_PRIORITY {
+								if let Some(op) = OPERATORS.get(text)
+									&& op.priority < *PROPORTIONAL_PRIORITY {
 										return None;		// no "∷"
 									}
-								}
 							},
 						}
 					}
@@ -2112,20 +2106,18 @@ impl CanonicalizeContext {
 				let function_names = definitions.get_hashset("FunctionNames").unwrap();
 				// UEB seems to think "Sin" (etc) is used for "sin", so we move to lower case
 				// function name might be (wrongly) set to italic math alphanumeric chars, including bold italic
-				if let Some(ascii_text) = CanonicalizeContext::math_alphanumeric_to_ascii(&text) {
-					if function_names.contains(&ascii_text.to_lowercase()) {
+				if let Some(ascii_text) = CanonicalizeContext::math_alphanumeric_to_ascii(&text)
+					&& function_names.contains(&ascii_text.to_lowercase()) {
 						return Some(merge_from_text(mi, &ascii_text, &following_mi_siblings));
 					}
-				}
 				if function_names.contains(&text) {
 					return Some(merge_from_text(mi, &text, &following_mi_siblings));
 				}
 				// unlike "FunctionNames", "KnownWords" might not exist
-				if let Some(word_map) = definitions.get_hashset("KnownWords") {
-					if word_map.contains(&text) {
+				if let Some(word_map) = definitions.get_hashset("KnownWords")
+					&& word_map.contains(&text) {
 						return Some(merge_from_text(mi, &text, &following_mi_siblings));
 					}
-				}
 				return None;
 			}) {
 				return answer;
@@ -2284,11 +2276,10 @@ impl CanonicalizeContext {
 				return false;		// not at end
 			}
 			let parent = mrow.parent().unwrap().element();
-			if let Some(math) = parent {
-				if name(math) != "math" {
+			if let Some(math) = parent
+				&& name(math) != "math" {
 					return false;			// mrow inside something else -- not at end
 				}
-			}
 
 			let last_child = as_element(last_child);
 			// debug!("ignore_final_punctuation: last child={}", mml_to_string(last_child));
@@ -2369,14 +2360,13 @@ impl CanonicalizeContext {
 							degree_child = None;
 						},
 						text  => {
-							if let Some(degree_child) = degree_child {
-								if text == "C" || text == "F" {
+							if let Some(degree_child) = degree_child
+								&& (text == "C" || text == "F") {
 									// merge the degree child with the current child
 									degree_child.set_text(if text == "C" { "℃" } else { "℉" });
 									child.remove_from_parent();
 								}
 								// merge the degree child with the current child
-							}
 							degree_child = None;	
 						},
 					}
@@ -2621,19 +2611,17 @@ impl CanonicalizeContext {
 			fn is_pseudo_script(child: Element) -> bool {
 				if name(child) == "mo" {
 					let text = as_text(child);
-					if let Some(ch) = single_char(text) {
-						if PSEUDO_SCRIPTS.contains(&ch) {
+					if let Some(ch) = single_char(text)
+						&& PSEUDO_SCRIPTS.contains(&ch) {
 							// don't script a pseudo-script
 							let preceding_siblings = child.preceding_siblings();
 							if !preceding_siblings.is_empty() {
 								let last_child = as_element(preceding_siblings[preceding_siblings.len()-1]);
-								if name(last_child) == "mo" {
-									if let Some(ch) = single_char(as_text(last_child)) {
-										if PSEUDO_SCRIPTS.contains(&ch) {
+								if name(last_child) == "mo" &&
+								   let Some(ch) = single_char(as_text(last_child))
+										&& PSEUDO_SCRIPTS.contains(&ch) {
 											return false;
 										}
-									}
-								}
 							}
 							if text == "*" {
 								// could be infix "*" -- this is a weak check to see if what follows is potentially an operand
@@ -2647,7 +2635,6 @@ impl CanonicalizeContext {
 								return true;
 							}
 						}
-					}
 				}
 				return false;
 
@@ -3026,12 +3013,11 @@ impl CanonicalizeContext {
 				return mi;		// avoid mapping mathvariant for function names
 			}
 			// function name might be (wrongly) set to italic math alphanumeric chars, including bold italic
-			if let Some(ascii_text) = CanonicalizeContext::math_alphanumeric_to_ascii(mi_text) {
-				if names.contains(&ascii_text) {
+			if let Some(ascii_text) = CanonicalizeContext::math_alphanumeric_to_ascii(mi_text)
+				&& names.contains(&ascii_text) {
 					mi.set_text(&ascii_text);
 					return mi
 				}
-			}
 
 			if variant.is_none() {
 				return mi;
@@ -3425,11 +3411,10 @@ impl CanonicalizeContext {
 			} else if let Some(next_op_info) = op_info.next {
 				if next_op_info.is_operator_type(op_type) {
 					return next_op_info;
-				} else if let Some(last_op_info) = next_op_info.next {
-					if last_op_info.is_operator_type(op_type) {
+				} else if let Some(last_op_info) = next_op_info.next
+					&& last_op_info.is_operator_type(op_type) {
 						return last_op_info;
 					}
-				}
 			}
 
 			// didn't find op_info that matches -- if type is not forced, then return first value (any is probably ok) 
@@ -4258,13 +4243,12 @@ impl CanonicalizeContext {
 								} else {
 									OperatorPair{ ch: "\u{2062}", op: &IMPLIED_TIMES }
 								};
-						if let Some(attr_val) = base_of_child.attribute_value(CHANGED_ATTR) {
-							if attr_val == "data-was-mo" {
+						if let Some(attr_val) = base_of_child.attribute_value(CHANGED_ATTR)
+							&& attr_val == "data-was-mo" {
 								// it really should be an operator
 								base_of_child.remove_attribute(CHANGED_ATTR);
 								set_mathml_name(base_of_child, "mo");
 							}
-						}
 						if name(base_of_child) == "mo" {
 							current_op.ch = as_text(base_of_child);
 							// debug!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);

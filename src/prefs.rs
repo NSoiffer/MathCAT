@@ -578,12 +578,11 @@ impl PreferenceManager {
                     return Ok(path);
                 }
             };
-            if looking_for_style_file && alternative_style_file.is_none() {
-                if let Ok(alt_file_path) = find_any_style_file(os_path) {
+            if looking_for_style_file && alternative_style_file.is_none() &&
+               let Ok(alt_file_path) = find_any_style_file(os_path) {
                     // debug!("find_file: found alternative style file '{}'", alt_file_path.display());
                     alternative_style_file = Some(alt_file_path);
                 }
-            }
             if os_path.ends_with("Rules") {
                 // at root of Rules directory
                 break;

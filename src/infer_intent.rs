@@ -95,13 +95,12 @@ fn add_fixity(intent: Element) {
         let intent_name = name(intent);
         crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
-            if let Some(definition) = definitions.get_hashmap("IntentMappings").unwrap().get(intent_name) {
-                if let Some((fixity, _)) = definition.split_once("=") {
+            if let Some(definition) = definitions.get_hashmap("IntentMappings").unwrap().get(intent_name) &&
+                let Some((fixity, _)) = definition.split_once("=") {
                     let new_properties = (if properties.is_empty() {":"} else {properties}).to_string() + fixity + ":";
                     intent.set_attribute_value(INTENT_PROPERTY, &new_properties);
                     // debug!("Added fixity: new value '{}'", intent.attribute_value(INTENT_PROPERTY).unwrap());
-                }
-            };
+                };
         });
     }
 }
@@ -580,8 +579,8 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(
     skip_self: bool,
     no_check_inside: bool) -> Result<Option<Element<'m>>> {
     // debug!("Looking for '{}' in\n{}", name, mml_to_string(mathml));
-    if !skip_self {
-        if let Some(arg_val) = mathml.attribute_value("arg") {
+    if !skip_self &&
+        let Some(arg_val) = mathml.attribute_value("arg") {
             // debug!("looking for '{}', found arg='{}'", name, arg_val);
             if name == arg_val {
                 // check to see if this mathml has an intent value -- if so the value is the value of its intent value
@@ -595,7 +594,6 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(
                 return Ok(None);       // don't look inside 'arg'
             }
         }
-    }
 
     if no_check_inside && mathml.attribute_value(INTENT_ATTR).is_some() {
         return Ok(None);           // don't look inside 'intent'

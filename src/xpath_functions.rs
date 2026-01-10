@@ -34,11 +34,10 @@ use crate::canonicalize::{as_element, name, get_parent, MATHML_FROM_NAME_ATTR};
 
 // @returns {String} -- the text of the (leaf) element otherwise an empty string
 fn get_text_from_element(e: Element) -> String {
-    if e.children().len() == 1 {
-        if let ChildOfElement::Text(t) = e.children()[0] {
+    if e.children().len() == 1 &&
+       let ChildOfElement::Text(t) = e.children()[0] {
             return t.text().to_string();
         }
-    }
     return "".to_string();
 }
 
@@ -206,7 +205,7 @@ impl IsNode {
                 }
                 if children.len() == 5 && 
                    ( (name(first_child) == "minus" && first_child.children().len() == 1 && !is_COE_tag(first_child.children()[0], "mn")) ||
-                     (name(first_child) == "mrow"     && !is_COE_tag(first_child.children()[1], "mn")) ) {
+                     (name(first_child) == "mrow"  && !is_COE_tag(first_child.children()[1], "mn")) ) {
                     return false;      // '-x y z' is too complicated () -- -2 x y is ok
                 }
             }
@@ -410,11 +409,10 @@ impl Function for IsNode {
             let children = e.children();
             if children.is_empty() {
                 return true;
-            } else if children.len() == 1 {
-                if let ChildOfElement::Text(_) = children[0] {
+            } else if children.len() == 1 &&
+                      let ChildOfElement::Text(_) = children[0] {
                     return true;
                 }
-            }
             return false
         }
     }
@@ -482,11 +480,10 @@ impl ToOrdinal {
             }
 
             // first deal with the abnormalities of fractional ordinals (one half, etc). That simplifies what remains
-            if fractional {
-                if let Some(string) = ToOrdinal::compute_irregular_fractional_speech(&number, plural) {
+            if fractional &&
+               let Some(string) = ToOrdinal::compute_irregular_fractional_speech(&number, plural) {
                     return Some(string);
                 }
-            }
 
             // at this point, we only need to worry about singular/plural distinction
 
@@ -1313,14 +1310,13 @@ impl GetNavigationPartName {
     fn navigation_part_name(intent_name: &str, index: usize) -> String {
         crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
-            if let Some(navigation_names) = definitions.get_hashmap("NavigationParts") {
-                if let Some(nav_part_names) = navigation_names.get(intent_name) {
+            if let Some(navigation_names) = definitions.get_hashmap("NavigationParts") &&
+               let Some(nav_part_names) = navigation_names.get(intent_name) {
                     // Split the pattern is: part [; part]*
                     if let Some(part_name) = nav_part_names.trim().split(";").nth(index) {
                         return part_name.trim().to_string();
                     }
                 }
-            }
             return "".to_string();
         })
     }

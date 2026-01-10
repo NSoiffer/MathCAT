@@ -246,20 +246,18 @@ fn convert_last_char_to_number(str: &str) -> usize {
 /// Get the node associated with a `NavigationPosition`.
 /// This can be called on an intent tree 
 fn get_node_by_id<'a>(mathml: Element<'a>, pos: &NavigationPosition) -> Option<Element<'a>> {
-    if let Some(mathml_id) = mathml.attribute_value("id") {
-        if mathml_id == pos.current_node.as_str() &&
-           (crate::xpath_functions::is_leaf(mathml) || 
-            mathml.attribute_value(ID_OFFSET).unwrap_or("0") == pos.current_node_offset.to_string()) {
-            return Some(mathml);
-        }
+    if let Some(mathml_id) = mathml.attribute_value("id") &&
+       mathml_id == pos.current_node.as_str() &&
+        (crate::xpath_functions::is_leaf(mathml) || 
+        mathml.attribute_value(ID_OFFSET).unwrap_or("0") == pos.current_node_offset.to_string()) {
+        return Some(mathml);
     }
 
     for child in mathml.children() {
-        if let Some(child) = child.element() {
-            if let Some(found) = get_node_by_id(child, pos) {
+        if let Some(child) = child.element() &&
+           let Some(found) = get_node_by_id(child, pos) {
                 return Some(found);
             }
-        }
     }
     return None;
 }
@@ -312,11 +310,10 @@ pub fn context_get_variable<'c>(context: &sxd_xpath::Context<'c>, var_name: &str
             Value::Number(f) => Ok(f.to_string()),
             Value::Boolean(b) => Ok(format!("{b}")),    // "true" or "false"
             Value::Nodeset(nodes) => {
-                if nodes.size() == 1 {
-                    if let Some(attr) = nodes.document_order_first().unwrap().attribute() {
+                if nodes.size() == 1 &&
+                   let Some(attr) = nodes.document_order_first().unwrap().attribute() {
                         return Ok(attr.value().to_string());
-                    }
-                };
+                    };
                 let mut error_message = format!("Variable '{var_name}' set somewhere in navigate.yaml is nodeset and not an attribute: ");
                 if nodes.size() == 0 {
                     error_message += &format!("0 nodes (false) -- {} set to non-existent node in\n{}",
