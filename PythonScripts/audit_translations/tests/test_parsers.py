@@ -13,8 +13,10 @@ from ..parsers import (
     extract_match_pattern,
     extract_structure_elements,
     extract_variables,
+    find_untranslated_text_entries,
     find_untranslated_text_values,
     has_audit_ignore,
+    build_line_map,
     parse_rules_file,
     parse_unicode_file,
 )
@@ -96,6 +98,18 @@ class TestFindUntranslatedTextKeys:
         content = {"t": "."}
         assert find_untranslated_text_values(content) == []
 
+    def test_finds_entries_with_lines(self):
+        """Ensure finds entries with line numbers."""
+        yaml = YAML()
+        content = """- name: line-check
+  tag: mo
+  replace:
+    - t: "not translated"
+"""
+        data = yaml.load(content)
+        entries = find_untranslated_text_entries(data[0])
+        assert entries == [("t", "not translated", 4)]
+
 
 class TestParseRulesFile:
     def test_parses_simple_rule(self):
@@ -114,6 +128,7 @@ class TestParseRulesFile:
         assert rules[0].tag == "mo"
         assert rules[0].key == "my-rule|mo"
         assert rules[0].line_number == 1
+        assert rules[0].line_map["match"] == [3]
 
     def test_parses_multiple_rules(self):
         """Ensure parses multiple rules."""
@@ -144,6 +159,7 @@ class TestParseRulesFile:
         rules = parse_rules_file(content, data)
         assert rules[0].has_untranslated_text
         assert "not translated" in rules[0].untranslated_keys
+        assert rules[0].untranslated_entries == [("t", "not translated", 4)]
 
     def test_detects_audit_ignore(self):
         """Ensure detects audit ignore."""
@@ -304,6 +320,30 @@ class TestExtractStructureElements:
         assert "if:" in elements
         assert "then:" in elements
         assert "else:" in elements
+
+
+class TestBuildLineMap:
+    def test_builds_line_map_for_rule_elements(self):
+        """Ensure line map captures nested element lines."""
+        content = """- name: line-map
+  tag: mo
+  match: "."
+  if: cond
+  variables:
+    - foo: bar
+  test:
+    if: cond2
+    then:
+      - t: "x"
+"""
+        yaml = YAML()
+        data = yaml.load(content)
+        line_map = build_line_map(data[0])
+        assert line_map["match"] == [3]
+        assert line_map["condition"] == [4, 8]
+        assert line_map["variables"] == [5]
+        assert line_map["structure:test"] == [7]
+        assert line_map["structure:if"] == [4, 8]
 
 
 def make_rule(name: str, tag: str, data) -> RuleInfo:

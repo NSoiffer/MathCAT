@@ -1,0 +1,9 @@
+
+────────────────────────────────────────────────────────────────────────────────
+✓ structure_diff.yaml
+  English: 1 rules  →  Translated: 1 rules
+────────────────────────────────────────────────────────────────────────────────
+
+  ≠ Rule Differences [1] (structural differences between en and translation)
+      • struct-rule  (line 9 en, 1 tr)
+          Rule structure differs (test/if/then/else blocks)

@@ -1,0 +1,110 @@
+---
+# fixture copied over from Rules
+
+
+- name: overview-default
+  tag: mfrac
+  match: "."
+  replace:
+  - test:
+      if: "IsNode(*[1], 'simple') and IsNode(*[2], 'simple')"
+      then:
+      - x: "*[1]"
+      - T: "partido por"
+      - x: "*[2]"
+      else:
+      - T: "fracción"
+
+- name: overview-default
+  tag: msqrt
+  match: "."
+  replace:
+  - T: "raíz cuadrada"
+  - test:
+      if: "IsNode(*[1], 'simple')"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: [T: de]
+      - x: "*[1]"
+
+- name: overview-default
+  tag: mroot
+  match: "."
+  replace:
+  - test:
+      if: "*[2][self::m:mn]"
+      then_test:
+      - if: "*[2][.='2']"
+        then: [T: raíz cuadrada]
+      - else_if: "*[2][.='3']"
+        then: [T: raíz cúbica]
+      - else_if: "*[2][not(contains(., '.'))]"
+        then: [x: "ToOrdinal(*[2])", T: raíz]
+      else:
+      - test:
+          if: "*[2][self::m:mi][string-length(.)=1]"
+          then:
+          - x: "*[2]"
+          - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
+          else: [x: "*[2]"]
+      - T: raíz
+  - test:
+      if: "IsNode(*[1], 'simple')"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: [T: de]
+      - x: "*[1]"
+
+- name: matrix-override
+  tag: mrow
+  match:
+  - "*[2][self::m:mtable] and"
+  - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
+  replace:
+  - T: la
+  - x: count(*[2]/*)
+  - T: por
+  - x: count(*[2]/*[self::m:mtr][1]/*)
+  - test:
+      if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
+      then: [T: determinante]
+      else: [T: matriz]
+
+- name: overview-default
+  tag: mtable
+  match: "."
+  replace:
+  - T: la
+  - x: count(*[2]/*)
+  - T: por
+  - x: count(*[2]/*[self::m:mtr][1]/*)
+  - T: "tabla"
+
+- name: short-mrow
+  tag: mrow
+  match: "count(*)<6"
+  replace:
+  - insert:
+      nodes: "*"
+      replace: [pause: auto]
+
+- name: long-mrow
+  tag: mrow
+  match: "."
+  replace:
+  - x: "*[1]"
+  - pause: auto
+  - x: "*[2]"
+  - pause: auto
+  - x: "*[3]"
+  - pause: auto
+  - x: "*[4]"
+  - pause: auto
+  - x: "*[5]"
+  - pause: auto
+  - T: "etc."
+
+- include: "SimpleSpeak_Rules.yaml"
+
