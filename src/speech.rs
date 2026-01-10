@@ -26,6 +26,7 @@ use std::rc::Rc;
 use crate::shim_filesystem::{read_to_string_shim, canonicalize_shim};
 use crate::canonicalize::{as_element, create_mathml_element, set_mathml_name, name, MATHML_FROM_NAME_ATTR};
 use regex::Regex;
+use std::sync::LazyLock;
 
 
 pub const NAV_NODE_SPEECH_NOT_FOUND: &str = "NAV_NODE_NOT_FOUND";
@@ -565,13 +566,13 @@ impl InsertChildren {
 }
 
 
-lazy_static! {
-    static ref ATTR_NAME_VALUE: Regex = Regex::new(
+static ATTR_NAME_VALUE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
         // match name='value', where name is sort of an NCNAME (see CONCEPT_OR_LITERAL in infer_intent.rs)
-        // The quotes can be either single or double quotes 
+        // The quotes can be either single or double quotes
         r#"(?P<name>[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*)\s*=\s*('(?P<value>[^']+)'|"(?P<dqvalue>[^"]+)")"#
-    ).unwrap();
-}
+    ).unwrap()
+});
 
 // structure used when "intent:" is encountered in a rule
 // the name is either a string or an xpath that needs evaluation. 99% of the time it is a string

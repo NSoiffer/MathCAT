@@ -13,6 +13,7 @@ use crate::speech::{BRAILLE_RULES, SpeechRulesWithContext, braille_replace_chars
 use crate::canonicalize::get_parent;
 use std::borrow::Cow;
 use std::ops::Range;
+use std::sync::LazyLock;
 
 static UEB_PREFIXES: phf::Set<char> = phf_set! {
     '⠼', '⠈', '⠘', '⠸', '⠐', '⠨', '⠰', '⠠',
@@ -544,106 +545,99 @@ fn nemeth_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
         "↓" => "⠰",     // subscript
     };
 
-    lazy_static! {
-        // Add an English Letter indicator. This involves finding "single letters".
-        // The green book has a complicated set of cases, but the Nemeth UEB Rule book (May 2020), 4.10 has a much shorter explanation:
-        //   punctuation or whitespace on the left and right ignoring open/close chars
-        //   https://nfb.org/sites/www.nfb.org/files/files-pdf/braille-certification/lesson-4--provisional-5-9-20.pdf
-        static ref ADD_ENGLISH_LETTER_INDICATOR: Regex = 
-            Regex::new(r"(?P<start>^|W|P.[\u2800-\u28FF]?|,)(?P<open>[\u2800-\u28FF]?⠷)?(?P<letter>C?L.)(?P<close>[\u2800-\u28FF]?⠾)?(?P<end>W|P|,|$)").unwrap();
+    // Add an English Letter indicator. This involves finding "single letters".
+    // The green book has a complicated set of cases, but the Nemeth UEB Rule book (May 2020), 4.10 has a much shorter explanation:
+    //   punctuation or whitespace on the left and right ignoring open/close chars
+    //   https://nfb.org/sites/www.nfb.org/files/files-pdf/braille-certification/lesson-4--provisional-5-9-20.pdf
+    static ADD_ENGLISH_LETTER_INDICATOR: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r"(?P<start>^|W|P.[\u2800-\u28FF]?|,)(?P<open>[\u2800-\u28FF]?⠷)?(?P<letter>C?L.)(?P<close>[\u2800-\u28FF]?⠾)?(?P<end>W|P|,|$)").unwrap()
+    });
         
-        // Trim braille spaces before and after braille indicators
-        // In order: fraction, /, cancellation, letter, baseline
-        // Note: fraction over is not listed due to example 42(4) which shows a space before the "/"
-        static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
-            Regex::new(r"(⠄⠄⠄|⠤⠤⠤⠤)[Ww]+([⠼⠸⠪])").unwrap();
-        static ref REMOVE_SPACE_AFTER_BRAILLE_INDICATORS: Regex = 
-            Regex::new(r"([⠹⠻Llb])[Ww]+(⠄⠄⠄|⠤⠤⠤⠤)").unwrap();
+    // Trim braille spaces before and after braille indicators
+    // In order: fraction, /, cancellation, letter, baseline
+    // Note: fraction over is not listed due to example 42(4) which shows a space before the "/"
+    static REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: LazyLock<Regex> = 
+        LazyLock::new(|| Regex::new(r"(⠄⠄⠄|⠤⠤⠤⠤)[Ww]+([⠼⠸⠪])").unwrap());
+    static REMOVE_SPACE_AFTER_BRAILLE_INDICATORS: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"([⠹⠻Llb])[Ww]+(⠄⠄⠄|⠤⠤⠤⠤)").unwrap());
 
-        // Hack to convert non-numeric '.' to numeric '.'
-        // The problem is that the numbers are hidden inside of mover -- this might be more general than rule 99_2.
-        static ref DOTS_99_A_2: Regex = Regex::new(r"𝑁⠨mN").unwrap();
+    // Hack to convert non-numeric '.' to numeric '.'
+    // The problem is that the numbers are hidden inside of mover -- this might be more general than rule 99_2.
+    static DOTS_99_A_2: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"𝑁⠨mN").unwrap());
 
-        // Punctuation is one or two chars. There are (currently) only 3 2-char punct chars (—‘’) -- we explicitly list them below
-        static ref REMOVE_SPACE_BEFORE_PUNCTUATION_151: Regex = 
-            Regex::new(r"w(P.[⠤⠦⠠]?|[\u2800-\u28FF]?⠾)").unwrap();
-        static ref REMOVE_SPACE_AFTER_PUNCTUATION_151: Regex = 
-            Regex::new(r"(P.[⠤⠦⠠]?|[\u2800-\u28FF]?⠷)w").unwrap();
+    // Punctuation is one or two chars. There are (currently) only 3 2-char punct chars (—‘’) -- we explicitly list them below
+    static REMOVE_SPACE_BEFORE_PUNCTUATION_151: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"w(P.[⠤⠦⠠]?|[\u2800-\u28FF]?⠾)").unwrap());
+    static REMOVE_SPACE_AFTER_PUNCTUATION_151: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"(P.[⠤⠦⠠]?|[\u2800-\u28FF]?⠷)w").unwrap());
 
-        // Multipurpose indicator insertion
-        // 149 -- consecutive comparison operators have no space -- instead a multipurpose indicator is used (doesn't require a regex)
+    // Multipurpose indicator insertion
+    // 149 -- consecutive comparison operators have no space -- instead a multipurpose indicator is used (doesn't require a regex)
 
-        // 177.2 -- add after a letter and before a digit (or decimal pt) -- digits will start with N
-        static ref MULTI_177_2: Regex = 
-            Regex::new(r"([Ll].)[N𝑁]").unwrap();
+    // 177.2 -- add after a letter and before a digit (or decimal pt) -- digits will start with N
+    static MULTI_177_2: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"([Ll].)[N𝑁]").unwrap());
 
-        // keep between numeric subscript and digit ('M' added by subscript rule)
-        static ref MULTI_177_3: Regex = 
-            Regex::new(r"([N𝑁].)M([N𝑁].)").unwrap();
+    // keep between numeric subscript and digit ('M' added by subscript rule)
+    static MULTI_177_3: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"([N𝑁].)M([N𝑁].)").unwrap());
 
-        // Add after decimal pt for non-digits except for comma and punctuation
-        // Note: since "." can be in the middle of a number, there is not necessarily a "N"
-        // Although not mentioned in 177_5, don't add an 'M' before an 'm'
-        static ref MULTI_177_5: Regex = 
-            Regex::new(r"([N𝑁]⠨)([^⠂⠆⠒⠲⠢⠖⠶⠦⠔N𝑁,Pm])").unwrap();
+    // Add after decimal pt for non-digits except for comma and punctuation
+    // Note: since "." can be in the middle of a number, there is not necessarily a "N"
+    // Although not mentioned in 177_5, don't add an 'M' before an 'm'
+    static MULTI_177_5: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"([N𝑁]⠨)([^⠂⠆⠒⠲⠢⠖⠶⠦⠔N𝑁,Pm])").unwrap());
 
+    // Pattern for rule II.9a (add numeric indicator at start of line or after a space)
+    // 1. start of line
+    // 2. optional minus sign (⠤)
+    // 3. optional typeface indicator
+    // 4. number (N)
+    static NUM_IND_9A: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?P<start>^|[,Ww])(?P<minus>⠤?)N").unwrap());
 
-        // Pattern for rule II.9a (add numeric indicator at start of line or after a space)
-        // 1. start of line
-        // 2. optional minus sign (⠤)
-        // 3. optional typeface indicator
-        // 4. number (N)
-        static ref NUM_IND_9A: Regex = 
-            Regex::new(r"(?P<start>^|[,Ww])(?P<minus>⠤?)N").unwrap();
+    // Needed after section mark(§), paragraph mark(¶), #, or *
+    static NUM_IND_9C: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(⠤?)(⠠⠷|⠠⠳|⠠⠈⠷)N").unwrap());
 
-        // Needed after section mark(§), paragraph mark(¶), #, or *
-        static ref NUM_IND_9C: Regex = 
-            Regex::new(r"(⠤?)(⠠⠷|⠠⠳|⠠⠈⠷)N").unwrap();
+    // Needed after section mark(§), paragraph mark(¶), #, or *
+    static NUM_IND_9D: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(⠈⠠⠎|⠈⠠⠏|⠨⠼|⠈⠼)N").unwrap());
 
-        // Needed after section mark(§), paragraph mark(¶), #, or *
-        static ref NUM_IND_9D: Regex = 
-            Regex::new(r"(⠈⠠⠎|⠈⠠⠏|⠨⠼|⠈⠼)N").unwrap();
+    // Needed after a typeface change or interior shape modifier indicator
+    static NUM_IND_9E: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?P<face>[SB𝔹TIR]+?)N").unwrap());
+    static NUM_IND_9E_SHAPE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?P<mod>⠸⠫)N").unwrap());
 
-        // Needed after a typeface change or interior shape modifier indicator
-        static ref NUM_IND_9E: Regex = Regex::new(r"(?P<face>[SB𝔹TIR]+?)N").unwrap();
-        static ref NUM_IND_9E_SHAPE: Regex = Regex::new(r"(?P<mod>⠸⠫)N").unwrap();
+    // Needed after hyphen that follows a word, abbreviation, or punctuation (caution about rule 11d)
+    // Note -- hyphen might encode as either "P⠤" or "⠤" depending on the tag used
+    static NUM_IND_9F: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"([Ll].[Ll].|P.)(P?⠤)N").unwrap());
 
-        // Needed after hyphen that follows a word, abbreviation, or punctuation (caution about rule 11d)
-        // Note -- hyphen might encode as either "P⠤" or "⠤" depending on the tag used
-        static ref NUM_IND_9F: Regex = Regex::new(r"([Ll].[Ll].|P.)(P?⠤)N").unwrap();
+    // Enclosed list exception
+    // Normally we don't add numeric indicators in enclosed lists (done in get_braille_nemeth_chars).
+    // The green book says "at the start" of an item, don't add the numeric indicator.
+    // The NFB list exceptions after function abbreviations and angles, but what this really means is "after a space"
+    static NUM_IND_ENCLOSED_LIST: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"w([⠂⠆⠒⠲⠢⠖⠶⠦⠔⠴])").unwrap());
 
-        // Enclosed list exception
-        // Normally we don't add numeric indicators in enclosed lists (done in get_braille_nemeth_chars).
-        // The green book says "at the start" of an item, don't add the numeric indicator.
-        // The NFB list exceptions after function abbreviations and angles, but what this really means is "after a space"
-        static ref NUM_IND_ENCLOSED_LIST: Regex = Regex::new(r"w([⠂⠆⠒⠲⠢⠖⠶⠦⠔⠴])").unwrap();
+    // Punctuation chars (Rule 38.6 says don't use before ",", "hyphen", "-", "…")
+    // Never use punctuation indicator before these (38-6)
+    //      "…": "⠀⠄⠄⠄"
+    //      "-": "⠸⠤" (hyphen and dash)
+    //      ",": "⠠⠀"     -- spacing already added
+    // Rule II.9b (add numeric indicator after punctuation [optional minus[optional .][digit]
+    //  because this is run after the above rule, some cases are already caught, so don't
+    //  match if there is already a numeric indicator
+    static NUM_IND_9B: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?P<punct>P..?)(?P<minus>⠤?)N").unwrap());
 
-        // Punctuation chars (Rule 38.6 says don't use before ",", "hyphen", "-", "…")
-        // Never use punctuation indicator before these (38-6)
-        //      "…": "⠀⠄⠄⠄"
-        //      "-": "⠸⠤" (hyphen and dash)
-        //      ",": "⠠⠀"     -- spacing already added
-        // Rule II.9b (add numeric indicator after punctuation [optional minus[optional .][digit]
-        //  because this is run after the above rule, some cases are already caught, so don't
-        //  match if there is already a numeric indicator
-        static ref NUM_IND_9B: Regex = Regex::new(r"(?P<punct>P..?)(?P<minus>⠤?)N").unwrap();
+    // Before 79b (punctuation)
+    static REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?:[↑↓]+[b𝑏]?|[b𝑏])([Ww,P]|$)").unwrap());
 
-        // Before 79b (punctuation)
-        static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[↑↓]+[b𝑏]?|[b𝑏])([Ww,P]|$)").unwrap();
+    // Most commas have a space after them, but not when followed by a close quote (others?)
+    static NO_SPACE_AFTER_COMMA: LazyLock<Regex> = LazyLock::new(|| Regex::new(r",P⠴").unwrap()); // captures both single and double close quote
+    static REMOVE_LEVEL_IND_BEFORE_BASELINE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?:[↑↓mb𝑏]+)([b𝑏])").unwrap());
 
-        // Most commas have a space after them, but not when followed by a close quote (others?)
-        static ref NO_SPACE_AFTER_COMMA: Regex = Regex::new(r",P⠴").unwrap();      // captures both single and double close quote
-        static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[↑↓mb𝑏]+)([b𝑏])").unwrap();
-
-        // Except for the four chars above, the unicode rules always include a punctuation indicator.
-        // The cases to remove them (that seem relevant to MathML) are:
-        //   Beginning of line or after a space (V 38.1)
-        //   After a word (38.4)
-        //   2nd or subsequent punctuation (includes, "-", etc) (38.7)
-        static ref REMOVE_AFTER_PUNCT_IND: Regex = Regex::new(r"(^|[Ww]|[Ll].[Ll].)P(.)").unwrap();
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏CLlMmb𝑏↑↓Nn𝑁Ww,])").unwrap();
-        static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
-    }
+    // Except for the four chars above, the unicode rules always include a punctuation indicator.
+    // The cases to remove them (that seem relevant to MathML) are:
+    //   Beginning of line or after a space (V 38.1)
+    //   After a word (38.4)
+    //   2nd or subsequent punctuation (includes, "-", etc) (38.7)
+    static REMOVE_AFTER_PUNCT_IND: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(^|[Ww]|[Ll].[Ll].)P(.)").unwrap());
+    static REPLACE_INDICATORS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"([SB𝔹TIREDGVHUP𝐏CLlMmb𝑏↑↓Nn𝑁Ww,])").unwrap());
+    static COLLAPSE_SPACES: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"⠀⠀+").unwrap());
 
 //   debug!("Before:  \"{}\"", raw_braille);
     // replacements might overlap at boundaries (e.g., whitespace) -- need to repeat
@@ -849,15 +843,13 @@ static LETTER_PREFIXES: phf::Set<char> = phf_set! {
     'B', 'I', '𝔹', 'S', 'T', 'D', 'C', '𝐶', '𝑐',
 };
 
-lazy_static! {
-    // Trim braille spaces before and after braille indicators
-    // In order: fraction, /, cancellation, letter, baseline
-    // Note: fraction over is not listed due to example 42(4) which shows a space before the "/"
-    // static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
-    //     Regex::new(r"(⠄⠄⠄|⠤⠤⠤)W+([⠼⠸⠪])").unwrap();
-    static ref REPLACE_INDICATORS: Regex =Regex::new(r"([1𝟙SB𝔹TIREDGVHP𝐶𝑐CLMNW𝐖swe,.-—―#ocb])").unwrap();
-    static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
-}
+// Trim braille spaces before and after braille indicators
+// In order: fraction, /, cancellation, letter, baseline
+// Note: fraction over is not listed due to example 42(4) which shows a space before the "/"
+// static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex =
+//     Regex::new(r"(⠄⠄⠄|⠤⠤⠤)W+([⠼⠸⠪])").unwrap();
+static REPLACE_INDICATORS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"([1𝟙SB𝔹TIREDGVHP𝐶𝑐CLMNW𝐖swe,.-—―#ocb])").unwrap());
+static COLLAPSE_SPACES: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"⠀⠀+").unwrap());
 
 fn is_short_form(chars: &[char]) -> bool {
     let chars_as_string = chars.iter().map(|ch| ch.to_string()).collect::<String>();
@@ -1115,9 +1107,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
 }
 
 fn typeface_to_word_mode(braille: &str) -> String {
-    lazy_static! {
-        static ref HAS_TYPEFACE: Regex = Regex::new("[BI𝔹STD]").unwrap();
-    }
+    static HAS_TYPEFACE: LazyLock<Regex> = LazyLock::new(|| Regex::new("[BI𝔹STD]").unwrap());
     // debug!("before typeface fix:  '{}'", braille);
 
     let mut result = "".to_string();
@@ -1717,8 +1707,7 @@ fn handle_contractions(chars: &[char], mut result: String) -> String {
     }
 
     // It would be much better from an extensibility point of view to read the table in from a file
-    lazy_static! {
-        static ref CONTRACTIONS: Vec<Replacement> = vec![
+    static CONTRACTIONS: LazyLock<Vec<Replacement>> = LazyLock::new(|| { vec![
             // 10.3: Strong contractions
             Replacement{ pattern: to_unicode_braille("and"), replacement: "L⠯"},
             Replacement{ pattern: to_unicode_braille("for"), replacement: "L⠿"},
@@ -1759,11 +1748,11 @@ fn handle_contractions(chars: &[char], mut result: String) -> String {
             Replacement{ pattern: to_unicode_braille("en"), replacement: "⠢"},
             Replacement{ pattern: to_unicode_braille("in"), replacement: "⠔"},
            
-        ];
+        ]
+    });
 
-        static ref CONTRACTION_PATTERNS: RegexSet = init_patterns(&CONTRACTIONS);
-        static ref CONTRACTION_REGEX: Vec<Regex> = init_regex(&CONTRACTIONS);
-    }
+    static CONTRACTION_PATTERNS: LazyLock<RegexSet> = LazyLock::new(|| init_patterns(&CONTRACTIONS));
+    static CONTRACTION_REGEX: LazyLock<Vec<Regex>> = LazyLock::new(|| init_regex(&CONTRACTIONS));
 
     let mut chars_as_str = chars.iter().collect::<String>();
     // debug!("  handle_contractions: examine '{}'", &chars_as_str);
@@ -1838,20 +1827,17 @@ static VIETNAM_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 };
 
 fn vietnam_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
-    lazy_static! {
-        // Deal with Vietnamese "rhymes" -- moving accents around
-        // See "Vietnamese Uncontracted Braille Update in MathCAT" or maybe https://icanreadvietnamese.com/blog/14-rule-of-tone-mark-placement
-        // Note: I don't know how to write (for example) I_E_RULE so that it excludes "qu" and "gi", so I use two rules
-        // The first rule rewrites the patterns with "qu" and "gi" to add "!" to prevent a match of the second rule -- "!" is dropped later
-        static ref QU_GI_RULE_EXCEPTION: Regex = Regex::new(r"(L⠟L⠥|L⠛L⠊)").unwrap();
-        static ref IUOY_E_RULE: Regex = Regex::new(r"L(⠊|⠥|⠕|⠽)(L[⠔⠰⠢⠤⠠])L(⠑|⠣)").unwrap();     // ie, ue, oe, and ye rule
-        static ref UO_A_RULE: Regex = Regex::new(r"L(⠥|⠕)(L[⠔⠰⠢⠤⠠])L(⠁|⠡|⠜)").unwrap();     // ua, oa rule
-        static ref UU_O_RULE: Regex = Regex::new(r"L(⠥|⠳)(L[⠔⠰⠢⠤⠠])L(⠪|⠹)").unwrap();     // uo, ưo rule
-        static ref UYE_RULE: Regex = Regex::new(r"L⠥L([⠔⠰⠢⠤⠠])L⠽L⠣").unwrap();     // uo, ưo rule
-        static ref UY_RULE: Regex = Regex::new(r"L⠥L([⠔⠰⠢⠤⠠])L⠽").unwrap();     // uo, ưo rule
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([1𝟙SB𝔹TIREDGVHP𝐶𝑐CLMNW𝐖swe,.-—―#ocb!])").unwrap();
-
-    }
+    // Deal with Vietnamese "rhymes" -- moving accents around
+    // See "Vietnamese Uncontracted Braille Update in MathCAT" or maybe https://icanreadvietnamese.com/blog/14-rule-of-tone-mark-placement
+    // Note: I don't know how to write (for example) I_E_RULE so that it excludes "qu" and "gi", so I use two rules
+    // The first rule rewrites the patterns with "qu" and "gi" to add "!" to prevent a match of the second rule -- "!" is dropped later
+    static QU_GI_RULE_EXCEPTION: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(L⠟L⠥|L⠛L⠊)").unwrap());
+    static IUOY_E_RULE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"L(⠊|⠥|⠕|⠽)(L[⠔⠰⠢⠤⠠])L(⠑|⠣)").unwrap()); // ie, ue, oe, and ye rule
+    static UO_A_RULE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"L(⠥|⠕)(L[⠔⠰⠢⠤⠠])L(⠁|⠡|⠜)").unwrap()); // ua, oa rule
+    static UU_O_RULE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"L(⠥|⠳)(L[⠔⠰⠢⠤⠠])L(⠪|⠹)").unwrap()); // uo, ưo rule
+    static UYE_RULE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"L⠥L([⠔⠰⠢⠤⠠])L⠽L⠣").unwrap()); // uo, ưo rule
+    static UY_RULE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"L⠥L([⠔⠰⠢⠤⠠])L⠽").unwrap()); // uo, ưo rule
+    static REPLACE_INDICATORS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"([1𝟙SB𝔹TIREDGVHP𝐶𝑐CLMNW𝐖swe,.-—―#ocb!])").unwrap());
     // debug!("vietnam_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
@@ -1946,9 +1932,7 @@ static CMU_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 
 
 fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
-    lazy_static! {
-        static ref ADD_WHITE_SPACE: Regex = Regex::new(r"𝘄(.)|𝘄$").unwrap();
-    }
+    static ADD_WHITE_SPACE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"𝘄(.)|𝘄$").unwrap());
 
     // debug!("cmu_cleanup: start={}", raw_braille);
     // let result = typeface_to_word_mode(&raw_braille);
@@ -2082,12 +2066,10 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 };
 
 fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
-    lazy_static! {
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓Nn𝑁WwZ,()])").unwrap();
-        // Numbers need to end with a space, but sometimes there is one there for other reasons
-        static ref DROP_NUMBER_SEPARATOR: Regex = Regex::new(r"(n.)\)").unwrap();
-        static ref NUMBER_MATCH: Regex = Regex::new(r"((N.)+[^WN𝐶#↑↓Z])").unwrap();
-    }
+    static REPLACE_INDICATORS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓Nn𝑁WwZ,()])").unwrap());
+    // Numbers need to end with a space, but sometimes there is one there for other reasons
+    static DROP_NUMBER_SEPARATOR: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(n.)\)").unwrap());
+    static NUMBER_MATCH: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"((N.)+[^WN𝐶#↑↓Z])").unwrap());
 
     // debug!("finnish_cleanup: start={}", raw_braille);
     let result = DROP_NUMBER_SEPARATOR.replace_all(&raw_braille, |cap: &Captures| {
@@ -2146,10 +2128,8 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
 fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     // FIX: need to implement this -- this is just a copy of the Vietnam code
-    lazy_static! {
-        // Empty bases are ok if they follow whitespace
-        static ref EMPTY_BASE: Regex = Regex::new(r"(^|[W𝐖w])E").unwrap();
-    }
+    // Empty bases are ok if they follow whitespace
+    static EMPTY_BASE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(^|[W𝐖w])E").unwrap());
     // debug!("swedish_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
@@ -2195,10 +2175,8 @@ fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
 #[allow(non_snake_case)]
 fn LaTeX_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
-    lazy_static! {
-        static ref REMOVE_SPACE: Regex =Regex::new(r" ([\^_,;)\]}])").unwrap();          // '^', '_', ',', ';', ')', ']', '}'
-        static ref COLLAPSE_SPACES: Regex = Regex::new(r" +").unwrap();
-    }
+    static REMOVE_SPACE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r" ([\^_,;)\]}])").unwrap()); // '^', '_', ',', ';', ')', ']', '}'
+    static COLLAPSE_SPACES: LazyLock<Regex> = LazyLock::new(|| Regex::new(r" +").unwrap());
     // debug!("LaTeX_cleanup: start={}", raw_braille);
     let result = raw_braille.replace('𝐖', " ");
     // let result = COLLAPSE_SPACES.replace_all(&raw_braille, "⠀");
@@ -2214,11 +2192,9 @@ fn LaTeX_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
 
 #[allow(non_snake_case)]
 fn ASCIIMath_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
-    lazy_static! {
-        static ref REMOVE_SPACE_BEFORE_OP: Regex = Regex::new(r#"([\w\d]) +([^\w\d"]|[\^_,;)\]}])"#).unwrap();
-        static ref REMOVE_SPACE_AFTER_OP: Regex =  Regex::new(r#"([^\^_,;)\]}\w\d"]) +([\w\d])"#).unwrap();
-        static ref COLLAPSE_SPACES: Regex = Regex::new(r" +").unwrap();
-    }
+    static REMOVE_SPACE_BEFORE_OP: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"([\w\d]) +([^\w\d"]|[\^_,;)\]}])"#).unwrap());
+    static REMOVE_SPACE_AFTER_OP: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"([^\^_,;)\]}\w\d"]) +([\w\d])"#).unwrap());
+    static COLLAPSE_SPACES: LazyLock<Regex> = LazyLock::new(|| Regex::new(r" +").unwrap());
     // debug!("ASCIIMath_cleanup: start={}", raw_braille);
     let result  = raw_braille.replace("|𝐖__|", "|𝐰__|");    // protect the whitespace to prevent misinterpretation as lfloor
     let result = result.replace('𝐖', " ");
@@ -2369,14 +2345,13 @@ impl BrailleChars {
     }
 
     fn get_braille_nemeth_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {
-        lazy_static! {
-            // To greatly simplify typeface/language generation, the chars have unique ASCII chars for them:
-            // Typeface: S: sans-serif, B: bold, 𝔹: blackboard, T: script, I: italic, R: Roman
-            // Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
-            // Indicators: C: capital, L: letter, N: number, P: punctuation, M: multipurpose
-            static ref PICK_APART_CHAR: Regex = 
-                Regex::new(r"(?P<face>[SB𝔹TIR]*)(?P<lang>[EDGVHU]?)(?P<cap>C?)(?P<letter>L?)(?P<num>[N]?)(?P<char>.)").unwrap();
-        }
+        // To greatly simplify typeface/language generation, the chars have unique ASCII chars for them:
+        // Typeface: S: sans-serif, B: bold, 𝔹: blackboard, T: script, I: italic, R: Roman
+        // Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
+        // Indicators: C: capital, L: letter, N: number, P: punctuation, M: multipurpose
+        static PICK_APART_CHAR: LazyLock<Regex> = LazyLock::new(|| {
+            Regex::new(r"(?P<face>[SB𝔹TIR]*)(?P<lang>[EDGVHU]?)(?P<cap>C?)(?P<letter>L?)(?P<num>[N]?)(?P<char>.)").unwrap()
+        });
         let math_variant = node.attribute_value("mathvariant");
         // FIX: cover all the options -- use phf::Map
         let  attr_typeface = match math_variant {
@@ -2448,11 +2423,10 @@ impl BrailleChars {
         //   this routine merely deals with the mathvariant attr.
         // Canonicalize has already transformed all chars it can to math alphanumerics, but not all have bold/italic 
         // The typeform/caps transforms to (potentially) word mode are handled later.
-        lazy_static! {
-            static ref HAS_TYPEFACE: Regex = Regex::new(".*?(double-struck|script|fraktur|sans-serif).*").unwrap();
-            static ref PICK_APART_CHAR: Regex = 
-                 Regex::new(r"(?P<bold>B??)(?P<italic>I??)(?P<face>[S𝔹TD]??)s??(?P<cap>C??)(?P<greek>G??)(?P<char>[NL].)").unwrap();
-        }
+        static HAS_TYPEFACE: LazyLock<Regex> = LazyLock::new(|| Regex::new(".*?(double-struck|script|fraktur|sans-serif).*").unwrap());
+        static PICK_APART_CHAR: LazyLock<Regex> = LazyLock::new(|| {
+            Regex::new(r"(?P<bold>B??)(?P<italic>I??)(?P<face>[S𝔹TD]??)s??(?P<cap>C??)(?P<greek>G??)(?P<char>[NL].)").unwrap()
+        });
     
         let math_variant = node.attribute_value("mathvariant");
         let text = BrailleChars::substring(as_text(node), &text_range);
@@ -2502,11 +2476,10 @@ impl BrailleChars {
         // In CMU, we need to replace spaces used for number blocks with "."
         // For other numbers, we need to add "." to create digit blocks
 
-        lazy_static! {
-            static ref HAS_TYPEFACE: Regex = Regex::new(".*?(double-struck|script|fraktur|sans-serif).*").unwrap();
-            static ref PICK_APART_CHAR: Regex = 
-                 Regex::new(r"(?P<bold>B??)(?P<italic>I??)(?P<face>[S𝔹TD]??)s??(?P<cap>C??)(?P<greek>G??)(?P<char>[NL].)").unwrap();
-        }
+        static HAS_TYPEFACE: LazyLock<Regex> = LazyLock::new(|| Regex::new(".*?(double-struck|script|fraktur|sans-serif).*").unwrap());
+        static PICK_APART_CHAR: LazyLock<Regex> = LazyLock::new(|| {
+            Regex::new(r"(?P<bold>B??)(?P<italic>I??)(?P<face>[S𝔹TD]??)s??(?P<cap>C??)(?P<greek>G??)(?P<char>[NL].)").unwrap()
+        });
     
         let math_variant = node.attribute_value("mathvariant");
         let text = BrailleChars::substring(as_text(node), &text_range);
