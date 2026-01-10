@@ -3,6 +3,7 @@
 #![allow(non_snake_case)]
 #![allow(clippy::needless_return)]
 use std::cell::RefCell;
+use std::sync::LazyLock;
 
 use crate::canonicalize::{as_text, create_mathml_element};
 use crate::errors::*;
@@ -91,14 +92,12 @@ pub fn get_version() -> String {
 /// The ids can be used for sync highlighting if the `Bookmark` API preference is true.
 pub fn set_mathml(mathml_str: impl AsRef<str>) -> Result<String> {
     enable_logs();
-    lazy_static! {
-        // if these are present when resent to MathJaX, MathJaX crashes (https://github.com/mathjax/MathJax/issues/2822)
-        static ref MATHJAX_V2: Regex = Regex::new(r#"class *= *['"]MJX-.*?['"]"#).unwrap();
-        static ref MATHJAX_V3: Regex = Regex::new(r#"class *= *['"]data-mjx-.*?['"]"#).unwrap();
-        static ref NAMESPACE_DECL: Regex = Regex::new(r#"xmlns:[[:alpha:]]+"#).unwrap();     // very limited namespace prefix match
-        static ref PREFIX: Regex = Regex::new(r#"(</?)[[:alpha:]]+:"#).unwrap();     // very limited namespace prefix match
-        static ref HTML_ENTITIES: Regex = Regex::new(r#"&([a-zA-Z]+?);"#).unwrap();
-    }
+    // if these are present when resent to MathJaX, MathJaX crashes (https://github.com/mathjax/MathJax/issues/2822)
+    static MATHJAX_V2: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"class *= *['"]MJX-.*?['"]"#).unwrap());
+    static MATHJAX_V3: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"class *= *['"]data-mjx-.*?['"]"#).unwrap());
+    static NAMESPACE_DECL: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"xmlns:[[:alpha:]]+"#).unwrap()); // very limited namespace prefix match
+    static PREFIX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"(</?)[[:alpha:]]+:"#).unwrap()); // very limited namespace prefix match
+    static HTML_ENTITIES: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"&([a-zA-Z]+?);"#).unwrap());
 
     NAVIGATION_STATE.with(|nav_stack| {
         nav_stack.borrow_mut().reset();
@@ -667,9 +666,7 @@ pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
 
     // space, tab, newline, carriage return all get collapsed to a single space
     const WHITESPACE: &[char] = &[' ', '\u{0009}', '\u{000A}','\u{000C}', '\u{000D}'];
-    lazy_static! {
-        static ref WHITESPACE_MATCH: Regex = Regex::new(r#"[ \u{0009}\u{000A}\u{00C}\u{000D}]+"#).unwrap();
-    }
+    static WHITESPACE_MATCH: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"[ \u{0009}\u{000A}\u{00C}\u{000D}]+"#).unwrap());
 
     if is_leaf(e) && (!allow_structure_in_leaves || IsNode::is_mathml(e)) {
         // Assume it is HTML inside of the leaf -- turn the HTML into a string
@@ -1103,9 +1100,7 @@ mod tests {
             set_mathml("<math><mrow><mo>&#x02212;</mo><mi>&#x1D55E;</mi></mrow></math>").unwrap();
 
         // need to remove unique ids
-        lazy_static! {
-            static ref ID_MATCH: Regex = Regex::new(r#"id='.+?' "#).unwrap();
-        }
+        static ID_MATCH: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"id='.+?' "#).unwrap());
         let entity_str = ID_MATCH.replace_all(&entity_str, "");
         let converted_str = ID_MATCH.replace_all(&converted_str, "");
         assert_eq!(entity_str, converted_str, "normal entity test failed");

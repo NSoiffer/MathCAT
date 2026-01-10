@@ -11,6 +11,7 @@ use crate::speech::SpeechRulesWithContext;
 use crate::canonicalize::{as_element, as_text, name, create_mathml_element, set_mathml_name, INTENT_ATTR, MATHML_FROM_NAME_ATTR};
 use crate::errors::*;
 use std::fmt;
+use std::sync::LazyLock;
 use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::is_leaf;
 use regex::Regex;
@@ -242,23 +243,24 @@ pub fn intent_speech_for_name(intent_name: &str, verbosity: &str, fixity: &str) 
 // property           := S ':' NCName
 // S                  := [ \t\n\r]*
 
-lazy_static! {
-    // The practical restrictions of NCName are that it cannot contain several symbol characters like
-    //  !, ", #, $, %, &, ', (, ), *, +, ,, /, :, ;, <, =, >, ?, @, [, \, ], ^, `, {, |, }, ~, and whitespace characters
-    //  Furthermore an NCName cannot begin with a number, dot or minus character although they can appear later in an NCName.
-    // NC_NAME defined in www.w3.org/TR/REC-xml/#sec-common-syn, but is complicated
-    //   We follow NC_NAME for the basic latin block, but then allow everything
-    static ref CONCEPT_OR_LITERAL: Regex = Regex::new(
-        r#"^[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#     // NC_NAME but simpler
-    ).unwrap();
-    static ref PROPERTY: Regex = Regex::new(
-        r#"^:[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#    // : NC_NAME
-    ).unwrap();
-    static ref ARG_REF: Regex = Regex::new(
-        r#"^\$[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#   // $ NC_NAME
-    ).unwrap();
-    static ref NUMBER: Regex = Regex::new(r#"^-?[0-9]+(\.[0-9]+)?"#).unwrap();
-}
+// The practical restrictions of NCName are that it cannot contain several symbol characters like
+//  !, ", #, $, %, &, ', (, ), *, +, ,, /, :, ;, <, =, >, ?, @, [, \, ], ^, `, {, |, }, ~, and whitespace characters
+//  Furthermore an NCName cannot begin with a number, dot or minus character although they can appear later in an NCName.
+// NC_NAME defined in www.w3.org/TR/REC-xml/#sec-common-syn, but is complicated
+//   We follow NC_NAME for the basic latin block, but then allow everything
+static CONCEPT_OR_LITERAL: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"^[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#     // NC_NAME but simpler
+    ).unwrap()
+});
+static PROPERTY: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"^:[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#    // : NC_NAME
+    ).unwrap()
+});
+static ARG_REF: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"^\$[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#   // $ NC_NAME
+    ).unwrap()
+});
+static NUMBER: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"^-?[0-9]+(\.[0-9]+)?"#).unwrap());
 
 static TERMINALS_AS_U8: [u8; 3] = [b'(', b',', b')'];
 // static TERMINALS: [char; 3] = ['(', ',',')'];
