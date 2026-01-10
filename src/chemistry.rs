@@ -45,8 +45,8 @@ use phf::{phf_map, phf_set};
 use std::convert::TryInto;
 use std::collections::HashSet;
 use std::cmp::Ordering;
-use std::sync::LazyLock;
 use crate::errors::*;
+use std::sync::LazyLock;
 
 
 pub static NOT_CHEMISTRY: isize = -10000;  // should overwhelm any positive signal
