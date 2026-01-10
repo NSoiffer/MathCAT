@@ -313,10 +313,10 @@ cfg_if! {
                     let path = entry.path();
                     if path.is_dir() {
                         // skip "SharedRules" directory
-                        if let Some(dir_name) = path.file_name()
-                            && dir_name.to_str().unwrap_or_default() != "SharedRules" {
-                                find_all_dirs_shim(&path, found_dirs);
-                            }
+                        if let Some(dir_name) = path.file_name() &&
+                           dir_name.to_str().unwrap_or_default() != "SharedRules" {
+                            find_all_dirs_shim(&path, found_dirs);
+                        }
                     } else {
                         let file_name = path.file_name().unwrap_or_default().to_str().unwrap_or_default();
                         if !found_rules_file &&
