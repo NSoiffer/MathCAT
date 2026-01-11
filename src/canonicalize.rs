@@ -6546,13 +6546,13 @@ mod canonicalize_tests {
 
 		assert!(UPPER_ROMAN_NUMERAL.is_match("XII"));
 		assert!(UPPER_ROMAN_NUMERAL.is_match("V  "));
-		assert!(UPPER_ROMAN_NUMERAL.is_match("  XII"));
-		assert!(UPPER_ROMAN_NUMERAL.is_match(" MCMXCIX "));
+		assert!(UPPER_ROMAN_NUMERAL.is_match("  XII")); // fails
+		assert!(UPPER_ROMAN_NUMERAL.is_match(" MCMXCIX ")); // fails
 
 		assert!(LOWER_ROMAN_NUMERAL.is_match("xii"));
 		assert!(LOWER_ROMAN_NUMERAL.is_match("v  "));
-		assert!(LOWER_ROMAN_NUMERAL.is_match("  xii"));
-		assert!(LOWER_ROMAN_NUMERAL.is_match(" mcmxcix "));
+		assert!(LOWER_ROMAN_NUMERAL.is_match("  xii")); // fails
+		assert!(LOWER_ROMAN_NUMERAL.is_match(" mcmxcix ")); // fails
 	}
 
 
