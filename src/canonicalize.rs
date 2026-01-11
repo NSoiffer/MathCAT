@@ -6540,6 +6540,21 @@ mod canonicalize_tests {
         assert!(are_strs_canonically_equal(test_str, target_str, &[]));
 	}
 
+	#[test]
+	fn test_roman_numeral_regex() {
+		// has a duplicate ^ anchor: ^\s*^ which causes the bug
+
+		assert!(UPPER_ROMAN_NUMERAL.is_match("XII"));
+		assert!(UPPER_ROMAN_NUMERAL.is_match("V  "));
+		assert!(UPPER_ROMAN_NUMERAL.is_match("  XII"));
+		assert!(UPPER_ROMAN_NUMERAL.is_match(" MCMXCIX "));
+
+		assert!(LOWER_ROMAN_NUMERAL.is_match("xii"));
+		assert!(LOWER_ROMAN_NUMERAL.is_match("v  "));
+		assert!(LOWER_ROMAN_NUMERAL.is_match("  xii"));
+		assert!(LOWER_ROMAN_NUMERAL.is_match(" mcmxcix "));
+	}
+
 
 }
 
