@@ -1374,11 +1374,11 @@ impl CanonicalizeContext {
 
 		/// looks for pairs of (letter, pseudoscript) such as x' or p'q' all inside of a single token element
 		fn split_apart_pseudo_scripts<'a>(mi: Element<'a>) -> Option<Element<'a>> {
-			static IS_DEGREES_C_or_F: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"[°º][CF]").unwrap());
+			static IS_DEGREES_C_OR_F: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"[°º][CF]").unwrap());
 
 			let text = as_text(mi);
 			// debug!("split_apart_pseudo_scripts: start text=\"{text}\"");
-			if !text.chars().any(|c| PSEUDO_SCRIPTS.contains(&c)) || IS_DEGREES_C_or_F.is_match(text) {
+			if !text.chars().any(|c| PSEUDO_SCRIPTS.contains(&c)) || IS_DEGREES_C_OR_F.is_match(text) {
 				return None;
 			}
 
@@ -2167,7 +2167,6 @@ impl CanonicalizeContext {
 
 		// Check if start..end is a number
 		fn is_likely_a_number(context: &CanonicalizeContext, mrow: Element, children: &[ChildOfElement]) -> bool {
-			static IS_HEX_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new("[a-eh-z]").unwrap());
 			// Note: the children of math_or_mrow aren't valid ('children' represents the current state)
 			let end = children.len();
 			// {
