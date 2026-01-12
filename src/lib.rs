@@ -23,14 +23,6 @@ pub mod errors {
     pub use anyhow::{anyhow, bail, Error, Result, Context};
 }
 
-// Import macros for use throughout the crate
-#[allow(unused_imports)]
-use log::{debug, error, info, trace, warn};
-#[allow(unused_imports)]
-use cfg_if::cfg_if;
-#[allow(unused_imports)]
-use bitflags::bitflags;
-
 pub mod interface;
 #[cfg(feature = "include-zip")]
 pub use shim_filesystem::ZIPPED_RULE_FILES;
