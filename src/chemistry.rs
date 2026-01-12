@@ -43,6 +43,7 @@ use regex::Regex;
 use crate::xpath_functions::IsBracketed;
 use phf::{phf_map, phf_set};
 use std::convert::TryInto;
+use log::{error};
 use std::collections::HashSet;
 use std::cmp::Ordering;
 use crate::errors::*;

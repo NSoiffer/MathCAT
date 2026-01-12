@@ -14,6 +14,7 @@ use crate::canonicalize::get_parent;
 use std::borrow::Cow;
 use std::ops::Range;
 use std::sync::LazyLock;
+use log::{error, debug};
 
 static UEB_PREFIXES: phf::Set<char> = phf_set! {
     '⠼', '⠈', '⠘', '⠸', '⠐', '⠨', '⠰', '⠠',

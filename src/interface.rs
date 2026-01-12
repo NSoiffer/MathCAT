@@ -15,6 +15,7 @@ use sxd_document::Package;
 
 use crate::canonicalize::{as_element, name};
 use crate::shim_filesystem::{find_all_dirs_shim, find_files_in_dir_that_ends_with_shim};
+use log::{debug, error};
 
 use crate::navigate::*;
 use crate::pretty_print::mml_to_string;
@@ -30,9 +31,6 @@ fn enable_logs() {
     INIT.call_once(||{
         #[cfg(target_os = "android")]
         {
-            extern crate log;
-            extern crate android_logger;
-            
             use log::*;
             use android_logger::*;
         

@@ -18,6 +18,7 @@ use crate::interface::copy_mathml;
 use std::time::Instant;
 use crate::errors::*;
 use phf::phf_set;
+use log::{debug};
 
 pub const ID_OFFSET: &str = "data-id-offset";
 

@@ -27,6 +27,7 @@ use std::rc::Rc;
 use crate::shim_filesystem::{read_to_string_shim, canonicalize_shim};
 use crate::canonicalize::{as_element, create_mathml_element, set_mathml_name, name, MATHML_FROM_NAME_ATTR};
 use regex::Regex;
+use log::{debug, error, info};
 
 
 pub const NAV_NODE_SPEECH_NOT_FOUND: &str = "NAV_NODE_NOT_FOUND";

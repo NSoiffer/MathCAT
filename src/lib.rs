@@ -23,15 +23,13 @@ pub mod errors {
     pub use anyhow::{anyhow, bail, Error, Result, Context};
 }
 
-#[macro_use]
-extern crate bitflags;
-
-#[macro_use]
-extern crate log;
-
-#[macro_use]
-extern crate cfg_if;
-
+// Import macros for use throughout the crate
+#[allow(unused_imports)]
+use log::{debug, error, info, trace, warn};
+#[allow(unused_imports)]
+use cfg_if::cfg_if;
+#[allow(unused_imports)]
+use bitflags::bitflags;
 
 pub mod interface;
 #[cfg(feature = "include-zip")]

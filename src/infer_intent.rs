@@ -16,6 +16,7 @@ use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::is_leaf;
 use regex::Regex;
 use phf::phf_set;
+use log::{debug, error, warn};
 
 const IMPLICIT_FUNCTION_NAME: &str = "apply-function";
 

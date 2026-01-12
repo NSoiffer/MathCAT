@@ -21,6 +21,8 @@ use crate::chemistry::*;
 use unicode_script::Script;
 use roman_numerals_rs::RomanNumeral;
 use std::sync::LazyLock;
+use log::{debug};
+use bitflags::bitflags;
 
 // FIX: DECIMAL_SEPARATOR should be set by env, or maybe language
 const DECIMAL_SEPARATOR: &str = ".";

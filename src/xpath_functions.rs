@@ -23,6 +23,7 @@ use crate::definitions::{Definitions, SPEECH_DEFINITIONS, BRAILLE_DEFINITIONS};
 use regex::Regex;
 use crate::pretty_print::mml_to_string;
 use std::cell::{Ref, RefCell};
+use log::{debug, error, warn};
 use std::sync::LazyLock;
 use std::thread::LocalKey;
 use phf::phf_set;
