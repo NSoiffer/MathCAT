@@ -620,6 +620,7 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(
 mod tests {
     #[allow(unused_imports)]
     use crate::init_logger;
+    use log::debug;
     use sxd_document::parser;
 
 
