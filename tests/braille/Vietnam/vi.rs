@@ -351,13 +351,13 @@ fn rnumber_1_1 () {
 #[test]
 fn mtable_1_1 () {
     let expr = "<math><mrow><mfenced close='' open='{'><mrow><mtable columnalign='left' equalrows='true' equalcolumns='true'><mtr columnalign='left'><mtd columnalign='left'><mrow><mi>x</mi><mo>+</mo><mi>y</mi><mo>=</mo><mn>5</mn></mrow></mtd></mtr><mtr columnalign='left'><mtd columnalign='left'><mrow><mn>2</mn><mi>x</mi><mo>&#x2212;</mo><mi>y</mi><mo>=</mo><mn>1</mn></mrow></mtd></mtr></mtable></mrow></mfenced></mrow></math>";
-    test_braille("Vietnam", expr, "⠸⠣⠭⠐⠖⠽⠐⠶⠼⠑⣍⠸⠣⠼⠃⠭⠐⠤⠽⠐⠶⠼⠁");
+    test_braille("Vietnam", expr, "⠠⠸⠣⠭⠐⠖⠽⠐⠶⠼⠑⠠⣍⠠⠸⠣⠼⠃⠭⠐⠤⠽⠐⠶⠼⠁⠠");
 }
 
 #[test]
 fn mtable_1_2 () {
     let expr = r#"<math><mrow><mfenced close='' open='['><mrow><mtable equalrows='true' equalcolumns='true'><mtr><mtd><mrow><mi>x</mi><mo>=</mo><mn>5</mn></mrow></mtd></mtr><mtr><mtd><mrow><mi>x</mi><mo>=</mo><mo>&#x2212;</mo><mn>7</mn></mrow></mtd></mtr></mtable></mrow></mfenced></mrow></math>"#;
-    test_braille("Vietnam", expr, "⠨⠣⠭⠐⠶⠼⠑⣍⠨⠣⠭⠐⠶⠐⠤⠼⠛");
+    test_braille("Vietnam", expr, "⠠⠨⠣⠭⠐⠶⠼⠑⠠⣍⠠⠨⠣⠭⠐⠶⠐⠤⠼⠛⠠");
 }
 
 #[test]

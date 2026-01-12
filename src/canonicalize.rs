@@ -20,6 +20,7 @@ use std::fmt;
 use crate::chemistry::*;
 use unicode_script::Script;
 use roman_numerals_rs::RomanNumeral;
+use std::sync::LazyLock;
 
 // FIX: DECIMAL_SEPARATOR should be set by env, or maybe language
 const DECIMAL_SEPARATOR: &str = ".";
@@ -48,60 +49,58 @@ static AMBIGUOUS_OPERATORS: phf::Set<&str> = phf_set! {
 };
 
 // static vars used when canonicalizing
-lazy_static!{
-	// lowest priority operator so it is never popped off the stack
-	static ref LEFT_FENCEPOST: OperatorInfo = OperatorInfo{ op_type: OperatorTypes::LEFT_FENCE, priority: 0, next: &None };
+// lowest priority operator so it is never popped off the stack
+static LEFT_FENCEPOST: OperatorInfo = OperatorInfo{ op_type: OperatorTypes::LEFT_FENCE, priority: 0, next: &None };
 
-	static ref INVISIBLE_FUNCTION_APPLICATION: &'static OperatorInfo = OPERATORS.get("\u{2061}").unwrap();
-	static ref IMPLIED_TIMES: &'static OperatorInfo = OPERATORS.get("\u{2062}").unwrap();
-	static ref IMPLIED_INVISIBLE_COMMA: &'static OperatorInfo = OPERATORS.get("\u{2063}").unwrap();
-	static ref IMPLIED_INVISIBLE_PLUS: &'static OperatorInfo = OPERATORS.get("\u{2064}").unwrap();
+static INVISIBLE_FUNCTION_APPLICATION: LazyLock<&'static OperatorInfo> = LazyLock::new(|| OPERATORS.get("\u{2061}").unwrap());
+static IMPLIED_TIMES: LazyLock<&'static OperatorInfo> = LazyLock::new(|| OPERATORS.get("\u{2062}").unwrap());
+static IMPLIED_INVISIBLE_COMMA: LazyLock<&'static OperatorInfo> = LazyLock::new(|| OPERATORS.get("\u{2063}").unwrap());
+static IMPLIED_INVISIBLE_PLUS: LazyLock<&'static OperatorInfo> = LazyLock::new(|| OPERATORS.get("\u{2064}").unwrap());
 
-	// FIX: any other operators that should act the same (e.g, plus-minus and minus-plus)?
-	static ref PLUS: &'static OperatorInfo = OPERATORS.get("+").unwrap();
-	static ref MINUS: &'static OperatorInfo = OPERATORS.get("-").unwrap();
-	static ref PREFIX_MINUS: &'static OperatorInfo = MINUS.next.as_ref().unwrap();
+// FIX: any other operators that should act the same (e.g, plus-minus and minus-plus)?
+static PLUS: LazyLock<&'static OperatorInfo> = LazyLock::new(|| OPERATORS.get("+").unwrap());
+static MINUS: LazyLock<&'static OperatorInfo> = LazyLock::new(|| OPERATORS.get("-").unwrap());
+static PREFIX_MINUS: LazyLock<&'static OperatorInfo> = LazyLock::new(|| MINUS.next.as_ref().unwrap());
 
-	static ref TIMES_SIGN: &'static OperatorInfo = OPERATORS.get("×").unwrap();
+static TIMES_SIGN: LazyLock<&'static OperatorInfo> = LazyLock::new(|| OPERATORS.get("×").unwrap());
 
-	// IMPLIED_TIMES_HIGH_PRIORITY -- used in trig functions for things like sin 2x cos 2x where want > function app priority
-	static ref IMPLIED_TIMES_HIGH_PRIORITY: OperatorInfo = OperatorInfo{
-		op_type: OperatorTypes::INFIX, priority: 851, next: &None
-	};
-	// IMPLIED_SEPARATOR_HIGH_PRIORITY -- used for Geometry points like ABC
-	static ref IMPLIED_SEPARATOR_HIGH_PRIORITY: OperatorInfo = OperatorInfo{
-		op_type: OperatorTypes::INFIX, priority: 901, next: &None
-	};
-	// IMPLIED_CHEMICAL_BOND -- used for implicit and explicit bonds
-	static ref IMPLIED_CHEMICAL_BOND: OperatorInfo = OperatorInfo{
-		op_type: OperatorTypes::INFIX, priority: 905, next: &None
-	};
-	static ref IMPLIED_PLUS_SLASH_HIGH_PRIORITY: OperatorInfo = OperatorInfo{	// (linear) mixed fraction 2 3/4
-		op_type: OperatorTypes::INFIX, priority: 881, next: &None
-	};
+// IMPLIED_TIMES_HIGH_PRIORITY -- used in trig functions for things like sin 2x cos 2x where want > function app priority
+static IMPLIED_TIMES_HIGH_PRIORITY: OperatorInfo = OperatorInfo{
+	op_type: OperatorTypes::INFIX, priority: 851, next: &None
+};
+// IMPLIED_SEPARATOR_HIGH_PRIORITY -- used for Geometry points like ABC
+static IMPLIED_SEPARATOR_HIGH_PRIORITY: OperatorInfo = OperatorInfo{
+	op_type: OperatorTypes::INFIX, priority: 901, next: &None
+};
+// IMPLIED_CHEMICAL_BOND -- used for implicit and explicit bonds
+static IMPLIED_CHEMICAL_BOND: OperatorInfo = OperatorInfo{
+	op_type: OperatorTypes::INFIX, priority: 905, next: &None
+};
+static IMPLIED_PLUS_SLASH_HIGH_PRIORITY: OperatorInfo = OperatorInfo{	// (linear) mixed fraction 2 3/4
+	op_type: OperatorTypes::INFIX, priority: 881, next: &None
+};
 
-	// Useful static defaults to have available if there is no character match
-	static ref DEFAULT_OPERATOR_INFO_PREFIX: &'static OperatorInfo = &OperatorInfo{
-		op_type: OperatorTypes::PREFIX, priority: 260, next: &None
-	};
-	static ref DEFAULT_OPERATOR_INFO_INFIX: &'static OperatorInfo = &OperatorInfo{
-		op_type: OperatorTypes::INFIX, priority: 260, next:& None
-	};
-	static ref DEFAULT_OPERATOR_INFO_POSTFIX: &'static OperatorInfo = &OperatorInfo{
-		op_type: OperatorTypes::POSTFIX, priority: 260, next: &None
-	};
+// Useful static defaults to have available if there is no character match
+static DEFAULT_OPERATOR_INFO_PREFIX: OperatorInfo = OperatorInfo{
+	op_type: OperatorTypes::PREFIX, priority: 260, next: &None
+};
+static DEFAULT_OPERATOR_INFO_INFIX: OperatorInfo = OperatorInfo{
+	op_type: OperatorTypes::INFIX, priority: 260, next:& None
+};
+static DEFAULT_OPERATOR_INFO_POSTFIX: OperatorInfo = OperatorInfo{
+	op_type: OperatorTypes::POSTFIX, priority: 260, next: &None
+};
 
-	// avoids having to use Option<OperatorInfo> in some cases
-	static ref ILLEGAL_OPERATOR_INFO: &'static OperatorInfo = &OperatorInfo{
-		op_type: OperatorTypes::INFIX, priority: 999, next: &None
-	};
+// avoids having to use Option<OperatorInfo> in some cases
+static ILLEGAL_OPERATOR_INFO: OperatorInfo = OperatorInfo{
+	op_type: OperatorTypes::INFIX, priority: 999, next: &None
+};
 
-	// used to tell if an operator is a relational operator
-	static ref EQUAL_PRIORITY: usize = OPERATORS.get("=").unwrap().priority;
+// used to tell if an operator is a relational operator
+static EQUAL_PRIORITY: LazyLock<usize> = LazyLock::new(|| OPERATORS.get("=").unwrap().priority);
 
-	// useful for detecting whitespace
-	static ref IS_WHITESPACE: Regex = Regex::new(r"^\s+$").unwrap();    // only Unicode whitespace
-}
+// useful for detecting whitespace
+static IS_WHITESPACE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\s+$").unwrap());    // only Unicode whitespace
 
 // Operators are either PREFIX, INFIX, or POSTFIX, but can also have other properties such as LEFT_FENCE
 bitflags! {
@@ -295,7 +294,7 @@ impl<'a, 'op:'a> StackInfo<'a, 'op> {
 		// debug!("  adding '{}' to mrow[{}], operator '{}/{}'",
 		// 		element_summary(child), self.mrow.children().len(), show_invisible_op_char(child_op.ch), child_op.op.priority);
 		self.mrow.append_child(child);
-		if ptr_eq(child_op.op, *ILLEGAL_OPERATOR_INFO) {
+		if ptr_eq(child_op.op, &ILLEGAL_OPERATOR_INFO) {
 			assert!(!self.is_operand); 	// should not have two operands in a row (ok to add whitespace)
 			self.is_operand = true;
 		} else {
@@ -444,12 +443,10 @@ static EMPTY_ELEMENTS: phf::Set<&str> = phf_set! {
 	"mspace", "none", "mprescripts", "mglyph", "malignmark", "maligngroup", "msline",
 };
 
-lazy_static! {
-	// turns out Roman Numerals tests aren't needed, but we do want to block VII from being a chemical match
-	// two cases because we don't want to have a match for 'Cl', etc.
-	static ref UPPER_ROMAN_NUMERAL: Regex = Regex::new(r"^\s*^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\s*$").unwrap();
-	static ref LOWER_ROMAN_NUMERAL: Regex = Regex::new(r"^\s*^m{0,3}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})\s*$").unwrap();
-}
+// turns out Roman Numerals tests aren't needed, but we do want to block VII from being a chemical match
+// two cases because we don't want to have a match for 'Cl', etc.
+static UPPER_ROMAN_NUMERAL: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\s*^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\s*$").unwrap());
+static LOWER_ROMAN_NUMERAL: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\s*^m{0,3}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})\s*$").unwrap());
 
 
 struct CanonicalizeContextPatterns {
@@ -740,12 +737,10 @@ impl CanonicalizeContext {
 	/// Returns 'None' if the element should not be in the tree.
 	fn clean_mathml<'a>(&self, mathml: Element<'a>) -> Option<Element<'a>> {
 		// Note: this works bottom-up (clean the children first, then this element)
-		lazy_static! {
-			static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap();
+		static IS_PRIME: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"['′″‴⁗]").unwrap());
 
-			// Note: including intervening spaces in what is likely a symbol of omission preserves any notion of separate digits (e.g., "_ _ _")
-			static ref IS_UNDERSCORE: Regex = Regex::new(r"^[_\u{00A0}]+$").unwrap();
-        }
+		// Note: including intervening spaces in what is likely a symbol of omission preserves any notion of separate digits (e.g., "_ _ _")
+		static IS_UNDERSCORE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^[_\u{00A0}]+$").unwrap());
 
 			
 		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
@@ -1262,9 +1257,7 @@ impl CanonicalizeContext {
 
 			fn is_proportional_before_colon<'a>(siblings: impl Iterator<Item = &'a ChildOfElement<'a>>) -> Option<bool> {
 				// unparsed, so we look at relative priorities to make sure the proportional operator is really the next operator
-				lazy_static!{
-					static ref PROPORTIONAL_PRIORITY: usize = OPERATORS.get("∷").unwrap().priority;
-				}
+				static PROPORTIONAL_PRIORITY: LazyLock<usize> = LazyLock::new(|| OPERATORS.get("∷").unwrap().priority);
 				for sibling in siblings {
 					let child = as_element(*sibling);
 					if name(child) == "mo" {
@@ -1381,13 +1374,11 @@ impl CanonicalizeContext {
 
 		/// looks for pairs of (letter, pseudoscript) such as x' or p'q' all inside of a single token element
 		fn split_apart_pseudo_scripts<'a>(mi: Element<'a>) -> Option<Element<'a>> {
-			lazy_static!{
-				static ref IS_DEGREES_C_or_F: Regex = Regex::new(r"[°º][CF]").unwrap();
-			}
+			static IS_DEGREES_C_OR_F: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"[°º][CF]").unwrap());
 
 			let text = as_text(mi);
 			// debug!("split_apart_pseudo_scripts: start text=\"{text}\"");
-			if !text.chars().any(|c| PSEUDO_SCRIPTS.contains(&c)) || IS_DEGREES_C_or_F.is_match(text) {
+			if !text.chars().any(|c| PSEUDO_SCRIPTS.contains(&c)) || IS_DEGREES_C_OR_F.is_match(text) {
 				return None;
 			}
 
@@ -1974,9 +1965,7 @@ impl CanonicalizeContext {
 		/// under some specific conditions (trying to be a little cautious).
 		/// The returned (mrow) element reuses the arg so tree siblings links remain correct.
 		fn split_points(leaf: Element) -> Option<Element> {
-			lazy_static!{
-				static ref IS_UPPERCASE: Regex = Regex::new(r"^[A-Z]+$").unwrap();
-			}
+			static IS_UPPERCASE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^[A-Z]+$").unwrap());
 
 			if !IS_UPPERCASE.is_match(as_text(leaf)) {
 				return None;
@@ -2178,9 +2167,6 @@ impl CanonicalizeContext {
 
 		// Check if start..end is a number
 		fn is_likely_a_number(context: &CanonicalizeContext, mrow: Element, children: &[ChildOfElement]) -> bool {
-			lazy_static! {
-				static ref IS_HEX_BLOCK: Regex = Regex::new("[a-eh-z]").unwrap();
-			}
 			// Note: the children of math_or_mrow aren't valid ('children' represents the current state)
 			let end = children.len();
 			// {
@@ -3260,7 +3246,7 @@ impl CanonicalizeContext {
 	}
 
 	fn canonicalize_mo_text(&self, mo: Element) {
-		// lazy_static! {
+		// lazy_static! {    (NOTE: std::sync::LazyLock is now used instead)
 		// 	static ref IS_LIKELY_SCALAR_VARIABLE: Regex = Regex::new("[a-eh-z]").unwrap();
 		// }
 		
@@ -3353,7 +3339,7 @@ impl CanonicalizeContext {
 		};	
 	
 		let found_op_info = if mo_node.attribute_value(CHEMICAL_BOND).is_some() {
-			Some(&*IMPLIED_CHEMICAL_BOND)
+			Some(&IMPLIED_CHEMICAL_BOND)
 		} else {
 			OPERATORS.get(as_text(mo_node))
 		};
@@ -3364,7 +3350,7 @@ impl CanonicalizeContext {
 	
 		let found_op_info = found_op_info.unwrap();
 		let matching_op_info = find_operator_info(found_op_info, op_type, form.is_some());
-		if ptr_eq(matching_op_info, *ILLEGAL_OPERATOR_INFO) {
+		if ptr_eq(matching_op_info, &ILLEGAL_OPERATOR_INFO) {
 			return op_not_in_operator_dictionary(op_type);
 		} else {
 			return matching_op_info;
@@ -4113,7 +4099,7 @@ impl CanonicalizeContext {
 			}
 			return false;
 		}
-		return ptr_eq(op_on_top.op, &*IMPLIED_TIMES_HIGH_PRIORITY);
+		return ptr_eq(op_on_top.op, &IMPLIED_TIMES_HIGH_PRIORITY);
 
 		fn is_trig(node: Element) -> bool {
 			let base_of_name = get_possible_embellished_node(node);
@@ -4223,17 +4209,17 @@ impl CanonicalizeContext {
 							base_of_child.remove_attribute("data-was-mo");
 							set_mathml_name(base_of_child, "mo");
 							let mut top_of_stack = parse_stack.pop().unwrap();
-							top_of_stack.add_child_to_mrow(current_child, OperatorPair{ ch: "\u{00A0}", op: &INVISIBLE_FUNCTION_APPLICATION});		// whitespace -- make part of mrow to keep out of parse
+							top_of_stack.add_child_to_mrow(current_child, OperatorPair{ ch: "\u{00A0}", op: *INVISIBLE_FUNCTION_APPLICATION});		// whitespace -- make part of mrow to keep out of parse
 							parse_stack.push(top_of_stack);
 							continue;
 						}
 						// consecutive operands -- add an invisible operator as appropriate
 						current_op = if likely_function_name == FunctionNameCertainty::True {
-									OperatorPair{ ch: "\u{2061}", op: &INVISIBLE_FUNCTION_APPLICATION }
+									OperatorPair{ ch: "\u{2061}", op: *INVISIBLE_FUNCTION_APPLICATION }
 								} else if self.is_mixed_fraction(previous_child, &children[i_child..])? {
-									OperatorPair{ ch: "\u{2064}", op: &IMPLIED_INVISIBLE_PLUS }
+									OperatorPair{ ch: "\u{2064}", op: *IMPLIED_INVISIBLE_PLUS }
 								} else if self.is_implied_comma(previous_child, current_child, mrow) {
-									OperatorPair{ch: "\u{2063}", op: &IMPLIED_INVISIBLE_COMMA }				  
+									OperatorPair{ch: "\u{2063}", op: *IMPLIED_INVISIBLE_COMMA }				  
 								} else if self.is_implied_chemical_bond(previous_child, current_child) {
 									OperatorPair{ch: "\u{2063}", op: &IMPLIED_CHEMICAL_BOND }				  
 								} else if self.is_implied_separator(previous_child, current_child) {
@@ -4241,7 +4227,7 @@ impl CanonicalizeContext {
 								} else if self.is_trig_arg(base_of_previous_child, base_of_child, &mut parse_stack) {
 									OperatorPair{ch: "\u{2062}", op: &IMPLIED_TIMES_HIGH_PRIORITY }				  
 								} else {
-									OperatorPair{ ch: "\u{2062}", op: &IMPLIED_TIMES }
+									OperatorPair{ ch: "\u{2062}", op: *IMPLIED_TIMES }
 								};
 						if let Some(attr_val) = base_of_child.attribute_value(CHANGED_ATTR)
 							&& attr_val == "data-was-mo" {
@@ -4272,16 +4258,16 @@ impl CanonicalizeContext {
 				}
 			}
 	
-			if !ptr_eq(current_op.op, *ILLEGAL_OPERATOR_INFO) {
+			if !ptr_eq(current_op.op, &ILLEGAL_OPERATOR_INFO) {
 				if current_op.op.is_left_fence() || current_op.op.is_prefix() {
 					if top(&parse_stack).is_operand {
 						// will end up with operand operand -- need to choose operator associated with prev child
 						// we use the original input here because in this case, we need to look to the right of the ()s to deal with chemical states
 						let likely_function_name = self.is_function_name(as_element(children[i_child-1]), Some(&children[i_child..]));
 						let implied_operator = if likely_function_name== FunctionNameCertainty::True {
-								OperatorPair{ ch: "\u{2061}", op: &INVISIBLE_FUNCTION_APPLICATION }
+								OperatorPair{ ch: "\u{2061}", op: *INVISIBLE_FUNCTION_APPLICATION }
 							} else {
-								OperatorPair{ ch: "\u{2062}", op: &IMPLIED_TIMES }
+								OperatorPair{ ch: "\u{2062}", op: *IMPLIED_TIMES }
 							};
 						// debug!("  adding implied {}", if ptr_eq(implied_operator.op,*IMPLIED_TIMES) {"times"} else {"function apply"});
 	
