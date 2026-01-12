@@ -4,6 +4,8 @@
 
 use std::path::{Path, PathBuf};
 use crate::errors::*;
+use cfg_if::cfg_if;
+use log::{debug};
 
 
 // The zipped files are needed by WASM builds.

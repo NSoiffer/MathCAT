@@ -24,7 +24,6 @@
 //! See the struct [`Definitions`] for the variables that are read in.
 #![allow(clippy::needless_return)]
 
-extern crate yaml_rust;
 use yaml_rust::yaml::Hash;
 use yaml_rust::Yaml;
 use crate::errors::*;

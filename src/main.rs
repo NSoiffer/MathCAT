@@ -3,7 +3,7 @@
 #![allow(clippy::needless_return)]
 
 use libmathcat::interface::*;
-use log::*;
+use log::{debug, info};
 use std::time::Instant;
 
 

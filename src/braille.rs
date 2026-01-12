@@ -14,6 +14,7 @@ use crate::canonicalize::get_parent;
 use std::borrow::Cow;
 use std::ops::Range;
 use std::sync::LazyLock;
+use log::error;
 
 static UEB_PREFIXES: phf::Set<char> = phf_set! {
     '⠼', '⠈', '⠘', '⠸', '⠐', '⠨', '⠰', '⠠',
@@ -3033,6 +3034,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate::init_logger;
     use crate::interface::*;
+    use log::debug;
 
     #[test]
     fn ueb_highlight_24() -> Result<()> {       // issue 24

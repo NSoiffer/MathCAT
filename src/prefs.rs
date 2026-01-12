@@ -22,9 +22,9 @@
 use yaml_rust::{Yaml, YamlLoader};
 use crate::pretty_print::yaml_to_string;
 use crate::tts::TTS;
-extern crate dirs;
 use std::cell::RefCell;
 use std::rc::Rc;
+use log::{debug, error, warn};
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use crate::speech::{as_str_checked, RulesFor, FileAndTime};
