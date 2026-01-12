@@ -6530,12 +6530,12 @@ mod canonicalize_tests {
 	fn test_roman_numeral_regex() {
 		assert!(UPPER_ROMAN_NUMERAL.is_match("XII"));
 		assert!(UPPER_ROMAN_NUMERAL.is_match("V  "));
-		assert!(!UPPER_ROMAN_NUMERAL.is_match("  XII"));
+		assert!(!UPPER_ROMAN_NUMERAL.is_match("  II"));
 		assert!(!UPPER_ROMAN_NUMERAL.is_match(" MCMXCIX "));
 
 		assert!(LOWER_ROMAN_NUMERAL.is_match("xii"));
 		assert!(LOWER_ROMAN_NUMERAL.is_match("v  "));
-		assert!(!LOWER_ROMAN_NUMERAL.is_match("  xii"));
+		assert!(!LOWER_ROMAN_NUMERAL.is_match("  ii"));
 		assert!(!LOWER_ROMAN_NUMERAL.is_match(" mcmxcix "));
 	}
 
