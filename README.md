@@ -23,8 +23,8 @@ For more information, see the [full documentation](https://nsoiffer.github.io/Ma
 
 This section explains test coverage with `llvm-cov` and `grcov` on _MacOS_.
 
-Using other operating systems should also work with [grcov](https://github.com/mozilla/grcov), but may require some tweaks
-regarding LLVM, paths, etc.
+Using other operating systems should also work with [grcov](https://github.com/mozilla/grcov), 
+but may require some tweaks regarding LLVM, paths, etc.
 
 ```bash
 # One-time setup
