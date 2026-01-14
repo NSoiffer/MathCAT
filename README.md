@@ -18,3 +18,33 @@ There are four related projects that make use of MathCAT:
 MathCAT is used in many assistive technologies including NVDA and JAWS.
 
 For more information, see the [full documentation](https://nsoiffer.github.io/MathCAT/).
+
+## Test Coverage
+
+This section explains test coverage with `llvm-cov` and `grcov` on _MacOS_.
+
+Using other operating systems should also work with [grcov](https://github.com/mozilla/grcov), but may require some tweaks
+regarding LLVM, paths, etc.
+
+```bash
+# One-time setup
+rustup component add llvm-tools-preview
+cargo install grcov
+
+export LLVM_PROFILE_FILE="target/coverage/%p-%m.profraw"
+RUSTFLAGS="-Cinstrument-coverage" cargo test
+# Example with a single test:
+# RUSTFLAGS="-Cinstrument-coverage" cargo test Languages::zh::tw::units::without_prefix_powers_of_2
+
+# Generate report
+grcov . \
+  --source-dir . \
+  --binary-path ./target/debug/deps \
+  -t html \
+  --branch \
+  --ignore-not-existing \
+  --ignore "target/*" \
+  -o target/coverage/html
+
+open target/coverage/html/index.html
+```
