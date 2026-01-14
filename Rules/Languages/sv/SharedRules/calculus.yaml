@@ -1,30 +1,14 @@
 ---
 
-- name: laplacian
-  tag: laplacian
-  match: "count(*) <= 1"   # can be on ∇^2 or on enclosing mrow
-  replace:
-  - T: "Laplaceoperatorn"      # phrase('laplacian' of x)
-  - test:
-      if: "count(*) = 1"
-      then:
-      - test:
-          if: "$Verbosity!='Terse'"
-          then: [T: "av"]             # phrase(function 'of' one variable)
-      - test:
-          if: "not(IsNode(*[1], 'leaf'))"
-          then: [pause: short]
-      - x: "*[1]"
-
 - name: divergence
   tag: divergence
   match: "."
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-      then: [T: "divergens"]      # phrase('divergence' from the mean)
-      else: [T: "div"]      # phrase('divergence' from the mean)
-  - T: "av"      # phrase(systems 'of' linear equations)
+      then: [t: "divergence"]      # phrase('divergence' from the mean)
+      else: [t: "div"]      # phrase('divergence' from the mean)
+  - t: "of"      # phrase(systems 'of' linear equations)
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]
@@ -34,7 +18,7 @@
   tag: curl
   match: "."
   replace:
-  - T: "rotationen av"      # phrase(the 'curl of' a field)
+  - t: "curl of"      # phrase(the 'curl of' a field)
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]
@@ -46,8 +30,8 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [T: "gradienten av"]      # phrase('divergence' from the mean)
-      else: [T: "grad"]      # phrase('divergence' from the mean)
+      then: [t: "gradient of"]      # phrase('divergence' from the mean)
+      else: [t: "del"]      # phrase('divergence' from the mean)
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]
