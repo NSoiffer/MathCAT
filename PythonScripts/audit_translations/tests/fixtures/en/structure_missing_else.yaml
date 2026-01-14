@@ -1,0 +1,8 @@
+- name: missing-else-block
+  tag: root
+  match: "."
+  replace:
+  - test:
+      if: "@intent='foo'"
+      then: [t: "has foo"]
+      else: [t: "no foo"]

@@ -219,3 +219,136 @@ def test_print_warnings_includes_snippets_when_verbose() -> None:
     output = capture.get()
 
     assert output == golden_path.read_text(encoding="utf-8")
+
+
+def test_misaligned_structure_differences_are_skipped() -> None:
+    """
+    Test that structure differences with misaligned tokens are skipped.
+
+    When English has a "test" block that Norwegian doesn't have (and vice versa),
+    the structural tokens become misaligned. The fix skips reporting these
+    to avoid showing confusing line numbers.
+    """
+    base_dir = Path(__file__).parent
+    fixtures_dir = base_dir / "fixtures"
+
+    result = compare_files(
+        str(fixtures_dir / "en" / "structure_misaligned.yaml"),
+        str(fixtures_dir / "de" / "structure_misaligned.yaml"),
+    )
+
+    # The result should detect that structures differ
+    assert len(result.rule_differences) > 0
+    assert any(diff.diff_type == "structure" for diff in result.rule_differences)
+
+    # But when collecting issues, misaligned structure diffs should be filtered out
+    issues = collect_issues(result, "structure_misaligned.yaml", "de")
+    structure_issues = [i for i in issues if i["diff_type"] == "structure"]
+
+    # CRITICAL: Before the fix, this would have structure issues with misleading line numbers
+    # After the fix, misaligned structures are skipped, so we should have 0 structure issues
+    assert len(structure_issues) == 0, (
+        "Expected misaligned structure differences to be filtered out, "
+        f"but found {len(structure_issues)} structure issues"
+    )
+
+    # Other differences (like conditions) should still be reported
+    condition_issues = [i for i in issues if i["diff_type"] == "condition"]
+    assert len(condition_issues) > 0, "Expected condition differences to still be reported"
+
+
+def test_missing_else_block_is_still_reported() -> None:
+    """
+    Test that legitimate missing structural elements are still reported.
+
+    When one file has an 'else' block and the other doesn't, this is a clear
+    structural difference that should be reported with accurate line numbers.
+    """
+    base_dir = Path(__file__).parent
+    fixtures_dir = base_dir / "fixtures"
+
+    result = compare_files(
+        str(fixtures_dir / "en" / "structure_missing_else.yaml"),
+        str(fixtures_dir / "de" / "structure_missing_else.yaml"),
+    )
+
+    # Should detect structure difference
+    assert len(result.rule_differences) > 0
+    structure_diffs = [diff for diff in result.rule_differences if diff.diff_type == "structure"]
+    assert len(structure_diffs) == 1
+
+    # This case has one token None (missing else), so it should still be reported
+    issues = collect_issues(result, "structure_missing_else.yaml", "de")
+    structure_issues = [i for i in issues if i["diff_type"] == "structure"]
+
+    # CRITICAL: This legitimate difference should still be reported
+    # One file has else:, the other doesn't - a clear missing element
+    assert len(structure_issues) == 1, (
+        "Expected missing else block to be reported, "
+        f"but found {len(structure_issues)} structure issues"
+    )
+
+    # Verify the issue has proper line numbers
+    issue = structure_issues[0]
+    assert issue["issue_line_en"] is not None
+    # When else: doesn't exist in translation, we fall back to the rule line number
+    assert issue["issue_line_tr"] == 1  # start of the rule
+
+
+def test_print_warnings_skips_misaligned_structures() -> None:
+    """
+    Test that print_warnings doesn't display misaligned structure differences.
+    """
+    base_dir = Path(__file__).parent
+    fixtures_dir = base_dir / "fixtures"
+
+    result = compare_files(
+        str(fixtures_dir / "en" / "structure_misaligned.yaml"),
+        str(fixtures_dir / "de" / "structure_misaligned.yaml"),
+    )
+
+    # Raw result should have structure differences detected
+    structure_diffs = [diff for diff in result.rule_differences if diff.diff_type == "structure"]
+    assert len(structure_diffs) > 0
+
+    with console.capture() as capture:
+        issues_count = print_warnings(result, "structure_misaligned.yaml", verbose=False)
+    output = capture.get()
+
+    # CRITICAL: The output should not contain "Rule structure differs"
+    # because misaligned structures are filtered during display
+    assert "Rule structure differs" not in output, (
+        "Expected misaligned structure differences to be filtered from display"
+    )
+
+    # The issues count should not include filtered structure differences
+    # It should only count the condition differences
+    condition_diffs = [diff for diff in result.rule_differences if diff.diff_type == "condition"]
+    assert issues_count == len(condition_diffs), (
+        f"Expected issues_count ({issues_count}) to equal condition_diffs ({len(condition_diffs)})"
+    )
+
+
+def test_print_warnings_still_shows_missing_else() -> None:
+    """
+    Test that print_warnings still displays legitimate missing elements.
+    """
+    base_dir = Path(__file__).parent
+    fixtures_dir = base_dir / "fixtures"
+
+    result = compare_files(
+        str(fixtures_dir / "en" / "structure_missing_else.yaml"),
+        str(fixtures_dir / "de" / "structure_missing_else.yaml"),
+    )
+
+    with console.capture() as capture:
+        issues_count = print_warnings(result, "structure_missing_else.yaml", verbose=False)
+    output = capture.get()
+
+    # CRITICAL: This legitimate difference should appear in output
+    assert "Rule structure differs" in output, (
+        "Expected missing else block to be shown in output"
+    )
+
+    # Should report exactly 1 issue (the structure difference)
+    assert issues_count == 1, f"Expected 1 issue but got {issues_count}"

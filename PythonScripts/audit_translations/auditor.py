@@ -191,19 +191,42 @@ def issue_base(rule: RuleInfo, file_name: str, language: str) -> dict:
 def first_structure_mismatch(
     english_tokens: List[str],
     translated_tokens: List[str],
-) -> Tuple[Optional[str], Optional[str]]:
+) -> Tuple[Optional[str], Optional[str], int]:
+    """
+    Find the first structural mismatch between two token lists.
+
+    Returns (en_token, tr_token, mismatch_position).
+    Position is the index in the token list where they first differ.
+    """
     min_len = min(len(english_tokens), len(translated_tokens))
     for idx in range(min_len):
         if english_tokens[idx] != translated_tokens[idx]:
-            return english_tokens[idx], translated_tokens[idx]
+            return english_tokens[idx], translated_tokens[idx], idx
     if len(english_tokens) > min_len:
-        return english_tokens[min_len], None
+        return english_tokens[min_len], None, min_len
     if len(translated_tokens) > min_len:
-        return None, translated_tokens[min_len]
-    return None, None
+        return None, translated_tokens[min_len], min_len
+    return None, None, -1
 
 
-def resolve_issue_line(rule: RuleInfo, kind: str, token: Optional[str] = None) -> int:
+def resolve_issue_line_at_position(
+    rule: RuleInfo,
+    kind: str,
+    token: Optional[str] = None,
+    position: int = 0
+) -> Optional[int]:
+    """
+    Resolve the line number for a specific occurrence of an element within a rule.
+
+    Args:
+        rule: The rule to search in
+        kind: The kind of element ('match', 'condition', 'variables', 'structure')
+        token: For structure kind, the specific token to find
+        position: The occurrence index (0 for first, 1 for second, etc.)
+
+    Returns:
+        The line number if found, None if the element doesn't exist at that position.
+    """
     if kind == "match":
         lines = rule.line_map.get("match", [])
     elif kind == "condition":
@@ -213,6 +236,34 @@ def resolve_issue_line(rule: RuleInfo, kind: str, token: Optional[str] = None) -
     elif kind == "structure" and token:
         token_key = f"structure:{token.rstrip(':')}"
         lines = rule.line_map.get(token_key, [])
+    else:
+        lines = []
+
+    if position < len(lines):
+        return lines[position]
+    return None
+
+
+def resolve_issue_line(rule: RuleInfo, kind: str, token: Optional[str] = None) -> Optional[int]:
+    """
+    Resolve the line number for an issue within a rule.
+
+    Returns the line number if found, None if the element doesn't exist in the rule.
+    For 'structure' kind with a missing token, returns None instead of falling back
+    to rule.line_number to avoid misleading line numbers when elements are missing.
+    """
+    if kind == "match":
+        lines = rule.line_map.get("match", [])
+    elif kind == "condition":
+        lines = rule.line_map.get("condition", [])
+    elif kind == "variables":
+        lines = rule.line_map.get("variables", [])
+    elif kind == "structure" and token:
+        token_key = f"structure:{token.rstrip(':')}"
+        lines = rule.line_map.get(token_key, [])
+        # For structure differences, if the token doesn't exist, return None
+        # rather than falling back to rule.line_number which is misleading
+        return lines[0] if lines else None
     else:
         lines = []
     return lines[0] if lines else rule.line_number
@@ -274,9 +325,21 @@ def collect_issues(
         if diff.diff_type == "structure":
             en_tokens = extract_structure_elements(diff.english_rule.data)
             tr_tokens = extract_structure_elements(diff.translated_rule.data)
-            en_token, tr_token = first_structure_mismatch(en_tokens, tr_tokens)
+            en_token, tr_token, mismatch_pos = first_structure_mismatch(en_tokens, tr_tokens)
+
+            # Skip reporting when tokens are misaligned (both exist but differ)
+            # This avoids misleading line numbers when entire blocks are missing/added
+            # We only report when one is None (clear case of missing element)
+            if en_token is not None and tr_token is not None and en_token != tr_token:
+                continue
+
             issue_line_en = resolve_issue_line(diff.english_rule, "structure", en_token)
             issue_line_tr = resolve_issue_line(diff.translated_rule, "structure", tr_token)
+
+            # Skip reporting structure differences where we can't find both tokens
+            # This avoids misleading line numbers when blocks are missing
+            if issue_line_en is None or issue_line_tr is None:
+                continue
         else:
             issue_line_en = resolve_issue_line(diff.english_rule, diff.diff_type)
             issue_line_tr = resolve_issue_line(diff.translated_rule, diff.diff_type)
@@ -340,23 +403,37 @@ def print_warnings(result: ComparisonResult, file_name: str, verbose: bool = Fal
                 issues += 1
 
     if result.rule_differences:
-        total_diffs = len(result.rule_differences)
-        console.print(
-            f"\n  [magenta]≠[/] [bold]Rule Differences[/] "
-            f"[[magenta]{total_diffs}[/]] [dim](structural differences between en and translation)[/]"
-        )
+        # Count only diffs that will actually be displayed
+        displayable_diffs = []
         for diff in result.rule_differences:
             if diff.diff_type == "structure":
                 en_tokens = extract_structure_elements(diff.english_rule.data)
                 tr_tokens = extract_structure_elements(diff.translated_rule.data)
-                en_token, tr_token = first_structure_mismatch(en_tokens, tr_tokens)
+                en_token, tr_token, mismatch_pos = first_structure_mismatch(en_tokens, tr_tokens)
+
+                # Skip reporting when tokens are misaligned (both exist but differ)
+                # This avoids misleading line numbers when entire blocks are missing/added
+                if en_token is not None and tr_token is not None and en_token != tr_token:
+                    continue
+
                 line_en = resolve_issue_line(diff.english_rule, "structure", en_token)
                 line_tr = resolve_issue_line(diff.translated_rule, "structure", tr_token)
+                # Skip structure diffs where we can't find both tokens
+                if line_en is None or line_tr is None:
+                    continue
             else:
                 line_en = resolve_issue_line(diff.english_rule, diff.diff_type)
                 line_tr = resolve_issue_line(diff.translated_rule, diff.diff_type)
-            print_diff_item(diff, line_en=line_en, line_tr=line_tr, verbose=verbose)
-            issues += 1
+            displayable_diffs.append((diff, line_en, line_tr))
+
+        if displayable_diffs:
+            console.print(
+                f"\n  [magenta]≠[/] [bold]Rule Differences[/] "
+                f"[[magenta]{len(displayable_diffs)}[/]] [dim](structural differences between en and translation)[/]"
+            )
+            for diff, line_en, line_tr in displayable_diffs:
+                print_diff_item(diff, line_en=line_en, line_tr=line_tr, verbose=verbose)
+                issues += 1
 
     if result.extra_rules:
         console.print(f"\n  [blue]ℹ[/] [bold]Extra Rules[/] [[blue]{len(result.extra_rules)}[/]] [dim](may be intentional)[/]")

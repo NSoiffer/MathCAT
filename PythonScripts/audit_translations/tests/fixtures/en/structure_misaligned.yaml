@@ -1,0 +1,18 @@
+- name: misaligned-structure
+  tag: root
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [t: "the"]
+  - test:
+      if: "$Setting = 'Value'"
+      then:
+      - test:
+          if: "parent::m:minus"
+          then: [t: "negative"]
+          else: [t: "positive"]
+  - test:
+      if: "*[2][.='2']"
+      then: [t: "square"]
+      else: [t: "other"]

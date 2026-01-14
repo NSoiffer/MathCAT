@@ -1,0 +1,15 @@
+- name: misaligned-structure
+  tag: root
+  match: "."
+  replace:
+  - test:
+      if: $Setting = 'Value'
+      then:
+      - test:
+          if: parent::m:minus
+          then: [T: "negativ"]
+          else: [T: "positiv"]
+  - test:
+      if: "*[2][.='2']"
+      then: [T: "quadrat"]
+      else: [T: "andere"]
