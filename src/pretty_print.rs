@@ -643,4 +643,70 @@ mod tests {
             _ => panic!("Expected string value from xpath"),
         }
     }
+
+    #[test]
+    /// Evaluates non-BMP literal text with a MathML namespace-qualified XPath.
+    fn xpath_non_bmp_namespace_literal() {
+        use sxd_xpath::{Factory, Value};
+
+        let xml = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>𝞪</mi></math>";
+        let package = parser::parse(xml).unwrap();
+        let xpath = Factory::new()
+            .build("string(/m:math/m:mi)")
+            .unwrap()
+            .unwrap();
+        let mut context = sxd_xpath::Context::new();
+        context.set_namespace("m", "http://www.w3.org/1998/Math/MathML");
+
+        let value = xpath.evaluate(&context, first_element(&package)).unwrap();
+        match value {
+            Value::String(s) => assert_eq!(s, "𝞪"),
+            _ => panic!("Expected string value from xpath"),
+        }
+    }
+
+    #[test]
+    /// Evaluates non-BMP numeric text with a MathML namespace-qualified XPath.
+    fn xpath_non_bmp_namespace_numeric() {
+        use sxd_xpath::{Factory, Value};
+
+        let xml = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>&#120746;</mi></math>";
+        let package = parser::parse(xml).unwrap();
+        let xpath = Factory::new()
+            .build("string(/m:math/m:mi)")
+            .unwrap()
+            .unwrap();
+        let mut context = sxd_xpath::Context::new();
+        context.set_namespace("m", "http://www.w3.org/1998/Math/MathML");
+
+        let value = xpath.evaluate(&context, first_element(&package)).unwrap();
+        match value {
+            Value::String(s) => assert_eq!(s, "𝞪"),
+            _ => panic!("Expected string value from xpath"),
+        }
+    }
+
+    #[test]
+    /// Extracts a text node via XPath (nodeset result) and verifies the non-BMP character survives.
+    fn xpath_non_bmp_text_nodeset() {
+        use sxd_xpath::{Factory, Value};
+
+        let xml = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>𝞪</mi></math>";
+        let package = parser::parse(xml).unwrap();
+        let xpath = Factory::new().build("/m:math/m:mi/text()").unwrap().unwrap();
+        let mut context = sxd_xpath::Context::new();
+        context.set_namespace("m", "http://www.w3.org/1998/Math/MathML");
+
+        let value = xpath.evaluate(&context, first_element(&package)).unwrap();
+        match value {
+            Value::Nodeset(nodes) => {
+                let ordered = nodes.document_order();
+                let node = ordered.first().expect("Expected one text node");
+                let text = node.text().expect("Expected text node");
+                assert_eq!(text.text(), "𝞪");
+                assert_eq!(ordered.len(), 1);
+            }
+            _ => panic!("Expected nodeset value from xpath"),
+        }
+    }
 }
