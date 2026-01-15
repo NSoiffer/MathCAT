@@ -577,4 +577,70 @@ mod tests {
         assert!(rendered.contains(" a='&amp;'"));
         assert!(rendered.contains(" b='&lt;'"));
     }
+
+    #[test]
+    /// Preserves non-BMP characters from a literal XML form.
+    fn format_element_non_bmp_character_literal() {
+        let package = parser::parse("<math><mi>𝞪</mi></math>").unwrap();
+        let math = first_element(&package);
+        let mi = math
+            .children()
+            .iter()
+            .find_map(|c| match c {
+                ChildOfElement::Element(e) => Some(*e),
+                _ => None,
+            })
+            .unwrap();
+        let rendered = format_element(mi, 0);
+        assert!(rendered.contains("𝞪"));
+    }
+
+    #[test]
+    /// Preserves non-BMP characters from a numeric XML form.
+    fn format_element_non_bmp_character_numeric() {
+        let package = parser::parse("<math><mi>&#x1d7aa;</mi></math>").unwrap();
+        let math = first_element(&package);
+        let mi = math
+            .children()
+            .iter()
+            .find_map(|c| match c {
+                ChildOfElement::Element(e) => Some(*e),
+                _ => None,
+            })
+            .unwrap();
+        let rendered = format_element(mi, 0);
+        assert!(rendered.contains("𝞪"));
+    }
+
+    #[test]
+    /// Evaluates non-BMP literal text through sxd_xpath.
+    fn xpath_non_bmp_literal() {
+        use sxd_xpath::{Factory, Value};
+
+        let package = parser::parse("<math><mi>𝞪</mi></math>").unwrap();
+        let xpath = Factory::new().build("string(/math/mi)").unwrap().unwrap();
+        let context = sxd_xpath::Context::new();
+
+        let value = xpath.evaluate(&context, first_element(&package)).unwrap();
+        match value {
+            Value::String(s) => assert_eq!(s, "𝞪"),
+            _ => panic!("Expected string value from xpath"),
+        }
+    }
+
+    #[test]
+    /// Evaluates non-BMP numeric text through sxd_xpath.
+    fn xpath_non_bmp_numeric() {
+        use sxd_xpath::{Factory, Value};
+
+        let package = parser::parse("<math><mi>&#x1d7aa;</mi></math>").unwrap();
+        let xpath = Factory::new().build("string(/math/mi)").unwrap().unwrap();
+        let context = sxd_xpath::Context::new();
+
+        let value = xpath.evaluate(&context, first_element(&package)).unwrap();
+        match value {
+            Value::String(s) => assert_eq!(s, "𝞪"),
+            _ => panic!("Expected string value from xpath"),
+        }
+    }
 }
