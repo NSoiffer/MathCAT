@@ -513,3 +513,68 @@ fn need_quotes(string: &str) -> bool {
         || string.parse::<i64>().is_ok()
         || string.parse::<f64>().is_ok()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sxd_document::dom::{ChildOfElement, ChildOfRoot};
+    use sxd_document::parser;
+
+    /// helper function
+    fn first_element(package: &sxd_document::Package) -> Element<'_> {
+        let doc = package.as_document();
+        for child in doc.root().children() {
+            if let ChildOfRoot::Element(e) = child {
+                return e;
+            }
+        }
+        panic!("No root element found");
+    }
+
+    #[test]
+    /// Escapes XML entities and invisible characters for safe display.
+    /// Tests the method on a few hardcoded characters.
+    fn handle_special_chars_escapes() {
+        let input = "& < > \" ' \u{2061} \u{2062} \u{2063} \u{2064} x";
+        let expected = "&amp; &lt; &gt; &quot; &apos; &#x2061; &#x2062; &#x2063; &#x2064; x";
+        assert_eq!(handle_special_chars(input), expected);
+    }
+
+    #[test]
+    /// Formats a leaf element as a single line with escaped text.
+    fn format_element_leaf_text() {
+        let package = parser::parse("<math><mi>&amp;</mi></math>").unwrap();
+        let math = first_element(&package);
+        let mi = math
+            .children()
+            .iter()
+            .find_map(|c| match c {
+                ChildOfElement::Element(e) => Some(*e),
+                _ => None,
+            })
+            .unwrap();
+        assert_eq!(format_element(mi, 0), " <mi>&amp;</mi>\n");
+    }
+
+    #[test]
+    /// Formats a nested element with indentation and newlines.
+    fn format_element_nested() {
+        let package = parser::parse("<math><mi>x</mi><mo>+</mo></math>").unwrap();
+        let math = first_element(&package);
+        let rendered = format_element(math, 0);
+        assert!(rendered.starts_with(" <math>\n"));
+        assert!(rendered.contains("\n  <mi>x</mi>\n"));
+        assert!(rendered.contains("\n  <mo>+</mo>\n"));
+        assert!(rendered.ends_with("</math>\n"));
+    }
+
+    #[test]
+    /// Escapes special characters in attribute values.
+    fn format_attrs_escapes() {
+        let package = parser::parse("<math a=\"&amp;\" b=\"&lt;\"></math>").unwrap();
+        let math = first_element(&package);
+        let rendered = format_attrs(&math.attributes());
+        assert!(rendered.contains(" a='&amp;'"));
+        assert!(rendered.contains(" b='&lt;'"));
+    }
+}
