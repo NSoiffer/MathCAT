@@ -688,3 +688,72 @@ impl TTS {
         return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use yaml_rust::YamlLoader;
+
+    #[test]
+    /// Verifies pronounce YAML builds and renders all supported fields.
+    fn pronounce_build_and_display() {
+        let yaml = YamlLoader::load_from_str(
+            r#"
+- text: "alpha"
+- ipa: "a"
+- sapi5: "b"
+- eloquence: "c"
+"#,
+        )
+        .unwrap();
+        let values = &yaml[0];
+        let rule = TTS::build("pronounce", values).unwrap();
+        let rendered = format!("{rule}");
+
+        assert!(rendered.contains("text: 'alpha'"));
+        assert!(rendered.contains("ipa: 'a'"));
+        assert!(rendered.contains("sapi5: 'b'"));
+        assert!(rendered.contains("eloquence: 'c'"));
+    }
+
+    #[test]
+    /// Ensures pronounce requires a text entry and rejects missing text.
+    fn pronounce_requires_text() {
+        let yaml = YamlLoader::load_from_str(
+            r#"
+- ipa: "a"
+"#,
+        )
+        .unwrap();
+        let values = &yaml[0];
+        let err = TTS::build("pronounce", values).unwrap_err();
+        assert!(err.to_string().contains("'text' key/value is required"));
+    }
+
+    #[test]
+    /// Coalesces adjacent punctuation pauses for the None engine.
+    fn merge_pauses_none_coalesces() {
+        let input = "a,,;b";
+        let output = TTS::None.merge_pauses(input);
+        assert!(!output.contains(",,"));
+        assert!(output.contains(";"));
+    }
+
+    #[test]
+    /// Uses the maximum pause when merging consecutive SSML breaks.
+    fn merge_pauses_ssml_keeps_max() {
+        let input = "<break time='100ms'/><break time='300ms'/>";
+        let output = TTS::SSML.merge_pauses(input);
+        assert!(!output.contains("100ms"));
+        assert!(output.contains("300ms"));
+    }
+
+    #[test]
+    /// Uses the maximum pause when merging consecutive SAPI5 breaks.
+    fn merge_pauses_sapi5_keeps_max() {
+        let input = "<silence msec=='100ms'/><silence msec=='300ms'/>";
+        let output = TTS::SAPI5.merge_pauses(input);
+        assert!(!output.contains("100ms"));
+        assert!(output.contains("300ms"));
+    }
+}
