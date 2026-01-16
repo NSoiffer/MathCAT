@@ -794,8 +794,7 @@ impl CanonicalizeContext {
 				if !text.trim().is_empty() && is_roman_number_match(text) {
 					// people tend to set them in a non-italic font and software makes that 'mtext'
 					CanonicalizeContext::make_roman_numeral(mathml);
-				}
-				if first_char == '-' || first_char == '\u{2212}' {
+				} else if matches!(first_char, '-' | '\u{2212}') {
 					let doc = mathml.document();
 					let mo = create_mathml_element(&doc, "mo");
 					let mn = create_mathml_element(&doc, "mn");
@@ -804,6 +803,19 @@ impl CanonicalizeContext {
 					set_mathml_name(mathml, "mrow");
 					mathml.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
 					mathml.replace_children([mo,mn]);
+				}
+				if let Some((idx, last_char)) = text.char_indices().next_back() {
+					// look for something like 12°
+					if PSEUDO_SCRIPTS.contains(&last_char) {
+						let doc = mathml.document();
+						let mn = create_mathml_element(&doc, "mn");
+						let mo = create_mathml_element(&doc, "mo");
+						mn.set_text(&text[..idx]);
+						mo.set_text(last_char.to_string().as_str());
+						set_mathml_name(mathml, "msup");
+						mathml.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
+						mathml.replace_children([mn, mo]);
+					}
 				}
 				return Some(mathml);
 			},
@@ -4799,6 +4811,22 @@ mod canonicalize_tests {
 			<mrow data-changed='added'><mo>-</mo><mn>1</mn></mrow>
 			<mrow data-changed='added'><mo>-</mo><mn>987</mn></mrow>
 			</mfrac></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str, &[]));
+    }
+
+    #[test]
+    fn mn_with_degree_sign() {
+        let test_str = "<math> <mrow> <mi>cos</mi> <mo>⁡</mo> <mrow> <mo>(</mo> <mn>150°</mn> <mo>)</mo> </mrow> </mrow> </math>";
+        let target_str = "<math>
+			<mrow>
+				<mi>cos</mi> <mo>&#x2061;</mo>
+				<mrow>
+					<mo>(</mo>
+					<msup data-changed='added'> <mn>150</mn> <mo>°</mo> </msup>
+					<mo>)</mo>
+				</mrow>
+			</mrow>
+		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str, &[]));
     }
 
