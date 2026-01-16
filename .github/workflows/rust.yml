@@ -58,6 +58,8 @@ jobs:
     continue-on-error: false
     needs: [zip-rules]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     # download the previous build artifacts and put them in their proper places
     - name: download Rules.zip
