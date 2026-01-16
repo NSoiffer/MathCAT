@@ -888,6 +888,19 @@ impl CanonicalizeContext {
 					CanonicalizeContext::make_roman_numeral(mathml);
 					return Some(mathml);
 				}
+				// common bug: trig functions, lim, etc., should be mi
+				if ["…", "⋯", "∞"].contains(&text) ||
+				   crate::definitions::SPEECH_DEFINITIONS.with(|definitions| 
+					if let Some(hashset) = definitions.borrow().get_hashset("FunctionNames") {
+						hashset.contains(text)
+					} else {
+						false
+					}
+				) {
+					set_mathml_name(mathml, "mi");
+					return Some(mathml);
+				}
+
 				// allow non-breaking whitespace to stay -- needed by braille
 				if IS_WHITESPACE.is_match(text) {
 					// normalize to just a single non-breaking space
@@ -5241,6 +5254,39 @@ mod canonicalize_tests {
         let test_str = "<math><mo>sin</mo><mi>x</mi>
 				<mo>+</mo><mo>cos</mo><mi>y</mi>
 				<mo>+</mo><munder><mo>lim</mo><mi>D</mi></munder><mi>y</mi>
+			</math>";
+        let target_str = "<math>
+		<mrow data-changed='added'>
+		  <mrow data-changed='added'>
+			<mi>sin</mi>
+			<mo data-changed='added'>&#x2061;</mo>
+			<mi>x</mi>
+		  </mrow>
+		  <mo>+</mo>
+		  <mrow data-changed='added'>
+			<mi>cos</mi>
+			<mo data-changed='added'>&#x2061;</mo>
+			<mi>y</mi>
+		  </mrow>
+		  <mo>+</mo>
+		  <mrow data-changed='added'>
+			<munder>
+			  <mi>lim</mi>
+			  <mi>D</mi>
+			</munder>
+			<mo data-changed='added'>&#x2061;</mo>
+			<mi>y</mi>
+		  </mrow>
+		</mrow>
+	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str, &[]));
+    }
+
+    #[test]
+    fn trig_mtext() {
+        let test_str = "<math><mtext>sin</mtext><mi>x</mi>
+				<mo>+</mo><mtext>cos</mtext><mi>y</mi>
+				<mo>+</mo><munder><mtext>lim</mtext><mi>D</mi></munder><mi>y</mi>
 			</math>";
         let target_str = "<math>
 		<mrow data-changed='added'>
