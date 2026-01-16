@@ -5,6 +5,8 @@
 use std::path::{Path, PathBuf};
 use crate::errors::*;
 use cfg_if::cfg_if;
+
+#[allow(unused_imports)]
 use log::{debug};
 
 
