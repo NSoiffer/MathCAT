@@ -252,38 +252,7 @@ Whether you are developing code or writing rules, writing and running the tests 
 
 The `tests` directory is similar to the `Rules` directory. If you are a translator, see the section above that describes what you should do.
 
-Rust provides testing support with the command `cargo test`.
-
-### Test Coverage
-
-This section explains test coverage with `llvm-cov` and `grcov` on _MacOS_.
-Another option is using built-in coverage-support of your IDE, for example _RustRover_ by _JetBrains_.
-
-Using other operating systems should also work with [grcov](https://github.com/mozilla/grcov),
-but may require some tweaks regarding LLVM, paths, etc.
-
-```bash
-# One-time setup
-rustup component add llvm-tools-preview
-cargo install grcov
-
-export LLVM_PROFILE_FILE="target/coverage/%p-%m.profraw"
-RUSTFLAGS="-Cinstrument-coverage" cargo test
-# Example with a single test:
-# RUSTFLAGS="-Cinstrument-coverage" cargo test Languages::zh::tw::units::without_prefix_powers_of_2
-
-# Generate report
-grcov . \
-  --source-dir . \
-  --binary-path ./target/debug/deps \
-  -t html \
-  --branch \
-  --ignore-not-existing \
-  --ignore "target/*" \
-  -o target/coverage/html
-
-open target/coverage/html/index.html
-```
+Rust provides testing support with the command `cargo test`. For more information about testing and test coverage, see the [Developer Guide](developers.md).
 
 
 ## Files
