@@ -146,7 +146,6 @@
     "_explanation": "rule_difference structure_empty.yaml struct-empty|mi"
   },
   {
-    "_explanation": "structure_misaligned.yaml: English has extra test block causing misalignment. Fix filters out misleading structure differences but reports condition difference.",
     "language": "de",
     "file": "structure_misaligned.yaml",
     "rule_name": "misaligned-structure",
@@ -161,10 +160,10 @@
     "description": "Conditions differ",
     "english_snippet": "$Setting = 'Value', $Verbosity!='Terse', *[2][.='2'], parent::m:minus",
     "translated_snippet": "$Setting = 'Value', *[2][.='2'], parent::m:minus",
-    "untranslated_texts": []
+    "untranslated_texts": [],
+    "_explanation": "structure_misaligned.yaml: English has extra test block causing misalignment. Fix filters out misleading structure differences but reports condition difference."
   },
   {
-    "_explanation": "structure_missing_else.yaml: Verifies fix still reports legitimate missing else blocks. Unlike misaligned case, this has clear missing element.",
     "language": "de",
     "file": "structure_missing_else.yaml",
     "rule_name": "missing-else-block",
@@ -179,7 +178,8 @@
     "description": "Rule structure differs (test/if/then/else blocks)",
     "english_snippet": "replace: test: if: then: else:",
     "translated_snippet": "replace: test: if: then:",
-    "untranslated_texts": []
+    "untranslated_texts": [],
+    "_explanation": "structure_missing_else.yaml: Verifies fix still reports legitimate missing else blocks. Unlike misaligned case, this has clear missing element."
   },
   {
     "language": "de",
