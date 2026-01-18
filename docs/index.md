@@ -17,7 +17,7 @@ There are many different audiences for MathCAT and each audience has different i
 * AT users: [information about preferences you can set](users.md)
 * AT developers/library users: [information about the API that MathCAT exposes](callers.md)
 * Translators/Rule writers: [information about the files that need to be translated](helpers.md)
-* MathCAT developers: information about MathCAT's design
+* MathCAT developers: [information about development workflow and testing](developers.md)
 
 # Some Technical Details
 MathCAT is written in Rust and can be built to interface with many languages. To date there are interfaces for:
