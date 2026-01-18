@@ -3764,3 +3764,21 @@
  - "🣑": [t: "is in equilibrium with"]                      # 0x1F8D1
  - "🣒": [t: "is in equilibrium biased to the right with"]  # 0x1F8D2
  - "🣓": [t: "is in equilibrium biased to the left with"]   # 0x1F8D3
+
+# MathJax v4 has adopted these PUA values for some partial chem bonds that aren't in Unicode
+ - "\uE410": [t: "partial bond "]                          # 0xe410 
+ - "\uE411": [t: "double partial bond "]                          # 0xe411 
+ - "\uE412": [t: "triple partial bond "]                          # 0xe412 
+
+# MathJax v4 also adopted these PUA values for some arrows thar are in Unicode
+# Hopefully these will be exported properly in future versions of MathJax
+ - "\uE428": [spell: "'⟵'"]                      # 0xe428  defer to def of arrow
+ - "\uE429": [spell: "'⟶'"]                      # 0xe429  defer to def of arrow 
+ - "\uE42A": [spell: "'⟷'"]                      # 0xe42a  defer to def of arrow 
+ - "\uE408": [spell: "'🣑'"]                       # 0xe408  defer to def of arrow 
+ - "\uE409": [spell: "'🣒'"]                       # 0xe409  defer to def of arrow 
+ - "\uE40A": [spell: "'🣓'"]                       # 0xe40a  defer to def of arrow 
+ - "\uE42B": [spell: "'⇄'"]                       # 0xe42b  defer to def of arrow 
+ - "\uE42C": [spell: "'←'"]                       # 0xe42c  defer to def of arrow 
+ - "\uE42D": [spell: "'→'"]                       # 0xe42d  defer to def of arrow 
+ - "\uE42E": [spell: "'⇄'"]                       # 0xe42e  defer to def of arrow 
