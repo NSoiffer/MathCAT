@@ -213,6 +213,14 @@
   - T: "av"      # phrase(the square root 'of' 25 equals 5)
   - x: "*[2]"
 
+- name: repeating-decimal
+  tag: repeating-decimal
+  match: "."
+  replace:
+  - x: "*[1]"
+  - T: "med repeterande siffror"      # phrase('with repeating digits')
+  - spell: "*[2]"
+
 - name: msubsup-skip-super
   # handles single, double, etc., prime
   tag: [skip-super, say-super]
@@ -274,6 +282,14 @@
                                   ) ]"  
   replace:
   - x: "IfThenElse($NeuterUnitFollows, 'ett', 1)"
+
+# in terse mode, we just say "m" or "s", etc., not meters or seconds
+- name: unit-terse
+  tag: unit
+  match: "$Verbosity = 'Terse' and string-length(.)=1"
+  replace:
+  - bookmark: "@id"
+  - spell: "text()"
 
 # the order of matching is
 # 1. does it match the base of an SI unit
@@ -498,6 +514,26 @@
       then: [T: "cotan hype"]                  # phrase('cotanch' is shorthand for hyperbolic cotangent)
       else: [T: "cotangens hyperbolicus"]      # phrase(the 'hyperbolic cotangent' is a mathematical function)
 
+- name: exponential
+  tag: mi
+  match: ".='exp'"
+  replace:
+  - bookmark: "@id"
+  - test:
+      if: "$Verbosity='Terse'"
+      then: [T: "exp"]      # phrase('exp' means exponential function)
+      else: [T: "exponentialfunktionen"]      # phrase('exponential' function)
+
+- name: covariance
+  tag: mi
+  match: ".='Cov'"
+  replace:
+  - bookmark: "@id"
+  - test:
+      if: "$Verbosity='Terse'"
+      then: [T: "Cov"]      # phrase('Cov' is shorthand for the covariance function)
+      else: [T: "kovarians"]      # phrase('covariance' function)
+
 - # handle both log and ln
   name: log
   tag: mi
@@ -630,6 +666,57 @@
       
   - T: "med element"      # phrase(the 2 by 2 matrix 'with entry' x)
   - x: "*[1]/*"
+
+# enklare uppläsning för specialfall av matriser
+- name: zero-matrix
+  tag: matrix
+  # select all the non-zero entries -- if there are none of them, then it is a zero matrix
+  match: "not( */*/*[not(self::m:mn and .= 0)] )"
+  replace:
+  - x: count(*)
+  - T: "gånger"       # phrase(the 1 'by' 2 matrix)
+  - x: count(*[self::m:mtr][1]/*)
+  - T: "nollmatris"   # phrase(the 2 by 2 'zero matrix')
+  - pause: long
+
+- name: identity-matrix
+  tag: matrix
+  # select all the non-zero entries...if they are not on the diagonal, or are != 1
+  #   if there are any of them, then this isn't an identity matrix
+  match:
+  - "count(*) = count(*[1]/*) and "
+  - "not( */*/*[not(self::m:mn and .= 0)]"
+  - "          [count(../preceding-sibling::*)!=count(../../preceding-sibling::*) or .!= 1]"
+  - "    )"
+  replace:
+  - x: count(*)
+  - T: "gånger"       # phrase(the 1 'by' 2 matrix)
+  - x: count(*[self::m:mtr][1]/*)
+  - T: "identitetsmatris"   # phrase(the 2 by 2 'identity matrix')
+  - pause: long
+
+- name: diagonal-matrix
+  tag: matrix
+  # select all the non-zero entries...if they are not on the diagonal
+  #   if there are any of them, then this isn't an identity matrix
+  match:
+  - "count(*) = count(*[1]/*) and "
+  - "not( */*/*[not(self::m:mn and .= 0)]"
+  - "          [count(../preceding-sibling::*)!=count(../../preceding-sibling::*)]"
+  - "    )"
+  replace:
+  - x: count(*)
+  - T: "gånger"       # phrase(the 1 'by' 2 matrix)
+  - x: count(*[self::m:mtr][1]/*)
+  - T: "diagonalmatris"   # phrase(the 2 by 2 'diagonal matrix')
+  - pause: long
+  - insert:
+      # this lists the diagonal 'mtd's to be read, and they say "column nnn" before reading the contents
+      # there seems to be an xpath bug -- without the parens, the match fails for the
+      #   test Languages::en::mtable::diagonal_matrix due to match failure (the third matching element seems to be missing)
+      nodes: "(*/*/*[not(self::m:mn and .= 0)]/..)"
+      replace: [pause: auto]
+  - pause: long
 
 # simpler reading methods for smaller matrices if the entries are simple
 - name: 2-or-3x1-matrix
@@ -790,6 +877,14 @@
         if: "$Verbosity='Medium'"
         then: [T: "nedsänkt"]      # phrase(H 'sub' 2)
   - x: "*[3]"
+
+- name: dimension-by
+  tag: mrow
+  match: dimension-product
+  replace:
+  - insert:
+      nodes: "*"
+      replace: [T: "gånger", pause: auto]      # phrase(3 'by' 5 matrix)
 
 - name: chemistry-msup
   tag: [chemical-formula]
