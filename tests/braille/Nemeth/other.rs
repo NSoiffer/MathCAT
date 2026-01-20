@@ -93,3 +93,63 @@ fn find_baseline_indicator_bug_364() {
     };
 }
 
+#[test]
+fn no_omission_for_spaces_at_start_or_end_single() {
+    // http://github.com/TalkingCatSW/MathCAT/issues/468
+    let expr = r#" <math><mtext> </mtext><mtext> </mtext><mi>x</mi><mtext> </mtext><mtext> </mtext></math>"#;
+    test_braille("Nemeth", expr, "⠰⠭");
+}
+
+#[test]
+fn no_omission_for_spaces_at_start() {
+    // http://github.com/TalkingCatSW/MathCAT/issues/468
+    let expr = r#"<math><mtext> </mtext><mtext> </mtext><mn>2</mn><mo>+</mo><mi>x</mi></math>"#;
+    test_braille("Nemeth", expr, "⠼⠆⠬⠭");
+}
+
+#[test]
+fn no_omission_for_spaces_at_end() {
+    // http://github.com/TalkingCatSW/MathCAT/issues/468
+    let expr = r#"<math><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>9</mn>
+                        <mtext> </mtext><mtext> </mtext><mtext> </mtext><mtext> </mtext><mtext> </mtext></math>"#;
+    test_braille("Nemeth", expr, "⠭⠘⠆⠐⠬⠔");
+}
+
+#[test]
+fn no_omission_for_spaces_in_middle() {
+    // http://github.com/TalkingCatSW/MathCAT/issues/468
+    let expr = r#"<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+        <mstyle displaystyle="true" scriptlevel="0">
+            <mfrac>
+            <mn>1</mn>
+            <mn>2</mn>
+            </mfrac>
+        </mstyle>
+        <mo stretchy="false">(</mo>
+        <mi>p</mi>
+        <mo>+</mo>
+        <mi>q</mi>
+        <mo stretchy="false">)</mo>
+        <mtext>&#xA0;</mtext>
+        <mtext>&#xA0;</mtext>
+        <mtext>&#xA0;</mtext>
+        <mtext>&#xA0;</mtext>
+        <mtext>or</mtext>
+        <mtext>&#xA0;</mtext>
+        <mtext>&#xA0;</mtext>
+        <mtext>&#xA0;</mtext>
+        <mtext>&#xA0;</mtext>
+        <mstyle displaystyle="true" scriptlevel="0">
+            <mfrac>
+            <mrow>
+                <mi>p</mi>
+                <mo>+</mo>
+                <mi>q</mi>
+            </mrow>
+            <mn>2</mn>
+            </mfrac>
+        </mstyle>
+    </math>"#;
+    test_braille("Nemeth", expr, "⠹⠂⠌⠆⠼⠷⠏⠬⠟⠾⠀⠕⠗⠀⠹⠏⠬⠟⠌⠆⠼");
+}
+

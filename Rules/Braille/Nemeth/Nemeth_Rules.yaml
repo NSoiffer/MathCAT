@@ -8,7 +8,8 @@
       variables: [MatchingWhitespace: "true()"]
       replace:
       - test:
-        - if: "@data-previous-space-width > 1.1"
+          # people sometimes use mtext for spaces around text -- see no_omission_for_spaces_in_middle()
+        - if: "@data-previous-space-width > 1.1 and not(self::m:mtext)"
           then: [t: "⠿"]
           # non-breaking space width; also avoid spaces added after commas in scripts (78_1)
         - else_if: "@data-previous-space-width >= 0.7 and
@@ -16,7 +17,7 @@
           then: [t: "W"]
       - x: "."
       - test:
-        - if: "@data-following-space-width > 1.1"
+        - if: "@data-following-space-width > 1.1 and not(self::m:mtext)"
           then: [t: "⠿"]
           # non-breaking space width; also avoid spaces added after commas in scripts (78_1)
         - else_if: "@data-following-space-width >= 0.7 and

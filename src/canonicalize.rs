@@ -1840,40 +1840,61 @@ impl CanonicalizeContext {
 				return;
 			}
 
-			let mut i = 1;	// we look back at previous child if we detect appropriate mtext -- prev child will always exist
-			let mut previous_child = as_element(children[0]);
-			let mut is_previous_child_whitespace = name(previous_child) == "mtext" && as_text(previous_child) == "\u{00A0}";
+			let mut i = 0;
+			let mut previous_mtext_with_width: Option<Element<'_>> = None;  // prefer to spacing on previous mtext
+			let mut whitespace: Option<f64> = None;
 			while i < children.len() {
 				let child = as_element(children[i]);
 				let is_child_whitespace = name(child) == "mtext" && as_text(child) == "\u{00A0}";
-				// debug!("merge_whitespace: {}", mml_to_string(child));
-				if is_child_whitespace && is_previous_child_whitespace {
-					// grab the width of the previous and current child, add them together
-					let previous_width = previous_child.attribute_value("data-width").unwrap_or("0");
-					let child_width = child.attribute_value("data-width").unwrap_or("0");
-					let width = previous_width.parse::<f64>().unwrap_or(0.0)
-								   + child_width.parse::<f64>().unwrap_or(0.0);
-					// set the combined width on the previous child and remove the current child (don't inc 'i')
-					previous_child.set_attribute_value("data-width", &width.to_string());
-					children.remove(i);
-					// previous child is unchanged
-				} else if is_previous_child_whitespace {
+				debug!("merge_whitespace: i={}, whitespace={:?}, mtext set={} {}",
+						i, whitespace, previous_mtext_with_width.is_some(), mml_to_string(child));
+				if is_child_whitespace {
+					// update the running total of whitespace
+					let child_width = child.attribute_value("data-width").unwrap_or("0")
+																					.parse::<f64>().unwrap_or(0.0)	;
+					whitespace = match whitespace {
+						None => Some(child_width),
+						Some(w) => Some(w + child_width),
+					};
+					if children.len() == 1 {
+						i += 1;							// don't remove only child
+					} else {
+						children.remove(i);		// remove the current child (don't inc 'i')
+					}
+				} else if let Some(ws) = whitespace {
 					// done with sequence of whitespaces
-					child.set_attribute_value("data-previous-space-width", previous_child.attribute_value("data-width").unwrap());
-					children.remove(i-1);
-					previous_child = child;
-					is_previous_child_whitespace = false;
+					if let Some(prev_mtext) = previous_mtext_with_width {
+						// prefer to set on previous mtext
+						prev_mtext.set_attribute_value("data-following-space-width", (ws).to_string().as_str());
+						previous_mtext_with_width = None;
+					} else {
+						child.set_attribute_value("data-previous-space-width", ws.to_string().as_str());
+						if name(child) == "mtext" {
+							previous_mtext_with_width = Some(child);
+						}
+					}
+					whitespace = None;
+					i += 1;
 				} else {
 					i += 1;
-					previous_child = child;
-					is_previous_child_whitespace = is_child_whitespace;
+					previous_mtext_with_width = None;
 				}
 			}
-			if children.len() > 1 && is_previous_child_whitespace {
-				// last child in mrow (= previous_child) is white space -- mark space *after*
-				let non_space_child = as_element(children[children.len()-2]);
-				non_space_child.set_attribute_value("data-following-space-width", previous_child.attribute_value("data-width").unwrap());
-				children.remove(children.len()-1);
+			debug!("  after loop: whitespace={:?}, {}", whitespace, mml_to_string(as_element(children[children.len()-1])));
+			if let Some(mut ws) = whitespace {
+				// last child in mrow is white space -- mark with space *after*
+				if children.len() == 1 {
+					// only child -- check to see if we need to set the space-width
+					let child = as_element(children[0]);
+					let child_width = child.attribute_value("data-width").unwrap_or("0").parse::<f64>().unwrap_or(0.0);
+					if (child_width - ws).abs() > 0.001 {
+						ws += child_width;
+						child.set_attribute_value("data-following-space-width", ws.to_string().as_str());
+					}
+				} else {
+					let non_space_child = as_element(children[children.len()-1]);
+					non_space_child.set_attribute_value("data-following-space-width", ws.to_string().as_str());
+				}
 			}
 		}
 
@@ -5572,7 +5593,7 @@ mod canonicalize_tests {
 				<mrow data-changed='added'>
 					<mi>cos</mi>
 					<mo data-changed='added'>&#x2061;</mo>
-					<mi data-previous-space-width='0.700'>x</mi>
+					<mi data-previous-space-width='0.7'>x</mi>
 				</mrow>
 	  		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str, &[]));
