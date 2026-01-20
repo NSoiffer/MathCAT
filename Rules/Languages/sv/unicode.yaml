@@ -436,7 +436,7 @@
  - "∶":                                          #  0x2236
      - T: "till"                            #  (en: 'to')
  - "∷": [T: "som"]                        #  0x2237 (en: 'as', MathPlayer: 'proportion', google: 'som')
- - "∼": [T: "tilde"]                      #  0x223c (en: 'varies with')
+ - "∼": [T: "är proportionell mot"]                      #  0x223c (en: 'varies with')
  - "∽": [T: "spegelvänd tilde"]                     #  0x223d (en: 'reversed tilde')
  - "∾":                                          #  0x223e
      # SWEDISH: Could not find any examples of how this character is used and what specific meaning it has. In ClearSpeak rules, it is
