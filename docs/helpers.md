@@ -252,6 +252,8 @@ Whether you are developing code or writing rules, writing and running the tests 
 
 The `tests` directory is similar to the `Rules` directory. If you are a translator, see the section above that describes what you should do.
 
+Rust provides testing support with the command `cargo test`. For more information about testing and test coverage, see the [Developer Guide](developers.md).
+
 
 ## Files
 MathCAT reads the following files for critical information:
