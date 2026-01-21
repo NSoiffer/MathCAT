@@ -164,9 +164,6 @@
    - test:
       if: "preceding-sibling::*"
       then: [t: "⣍"]
-   - test: 
-      if: "../*[2]"   # more than one row
-      then: [t: "⠠"]
    - t: ""
    - x: $RowStart
    - test:
@@ -178,9 +175,6 @@
       if: .[self::m:mlabeledtr]
       then: [x: "*[position()>1]"]
       else: [x: "*"]
-   - test: 
-      if: "../*[2]"   # more than one row
-      then: [t: "⠠"]
    - x: $RowEnd
 -
   name: default
