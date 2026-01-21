@@ -8,21 +8,29 @@
       variables: [MatchingWhitespace: "true()"]
       replace:
       - test:
-          # people sometimes use mtext for spaces around text -- see no_omission_for_spaces_in_middle()
-        - if: "@data-previous-space-width > 1.1 and not(self::m:mtext)"
-          then: [t: "⠿"]
-          # non-breaking space width; also avoid spaces added after commas in scripts (78_1)
-        - else_if: "@data-previous-space-width >= 0.7 and
-                    ($NewScriptContext='' or not(preceding-sibling::*[1][self::m:mo and .=',']))"
-          then: [t: "W"]
+          # ignore spaces at the beginning or end of math
+        - if: "not(parent::m:math) or preceding-sibling::*"
+          then:
+          - test:
+              # people sometimes use mtext for spaces around text -- see no_omission_for_spaces_in_middle()
+            - if: "@data-previous-space-width > 1.1 and not(self::m:mtext)"
+              then: [t: "⠿"]
+              # non-breaking space width; also avoid spaces added after commas in scripts (78_1)
+            - else_if: "@data-previous-space-width >= 0.7 and
+                        ($NewScriptContext='' or not(preceding-sibling::*[1][self::m:mo and .=',']))"
+              then: [t: "W"]
       - x: "."
       - test:
-        - if: "@data-following-space-width > 1.1 and not(self::m:mtext)"
-          then: [t: "⠿"]
-          # non-breaking space width; also avoid spaces added after commas in scripts (78_1)
-        - else_if: "@data-following-space-width >= 0.7 and
-                    ($NewScriptContext='' or not(self::m:mo and .=','))"
-          then: [t: "W"]
+          # ignore spaces at the beginning or end of math
+        - if: "not(parent::m:math) or following-sibling::*"
+          then:
+          - test:
+            - if: "@data-following-space-width > 1.1 and not(self::m:mtext)"
+              then: [t: "⠿"]
+              # non-breaking space width; also avoid spaces added after commas in scripts (78_1)
+            - else_if: "@data-following-space-width >= 0.7 and
+                        ($NewScriptContext='' or not(self::m:mo and .=','))"
+              then: [t: "W"]
 
 -
    name: omission-intent
