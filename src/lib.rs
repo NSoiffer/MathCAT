@@ -30,6 +30,8 @@ pub use shim_filesystem::ZIPPED_RULE_FILES;
 mod canonicalize;
 mod infer_intent;
 pub mod speech;
+#[cfg(feature = "rule-coverage")]
+pub mod rule_coverage;
 mod braille;
 mod navigate;
 mod prefs;

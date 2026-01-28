@@ -28,6 +28,8 @@ use crate::shim_filesystem::{read_to_string_shim, canonicalize_shim};
 use crate::canonicalize::{as_element, create_mathml_element, set_mathml_name, name, MATHML_FROM_NAME_ATTR};
 use regex::Regex;
 use log::{debug, error, info};
+#[cfg(feature = "rule-coverage")]
+use crate::rule_coverage;
 
 
 pub const NAV_NODE_SPEECH_NOT_FOUND: &str = "NAV_NODE_NOT_FOUND";
@@ -1259,6 +1261,8 @@ struct SpeechPattern {
     pattern_name: String,
     tag_name: String,
     file_name: String,
+    #[cfg(feature = "rule-coverage")]
+    coverage_id: usize,
     pattern: MyXPath,                     // the xpath expr to attempt to match
     match_uses_var_defs: bool,            // include var_defs in context for matching
     var_defs: VariableDefinitions,        // any variable definitions [can be and probably is an empty vector most of the time]
@@ -1341,11 +1345,14 @@ impl SpeechPattern  {
                         format!("value for 'match' in rule ({}: {}):\n{}",
                                 tag_name, pattern_name, yaml_to_string(dict, 1))
                     })?;
+            let file_name_string = file.to_str().unwrap().to_string();
             let speech_pattern =
                 Box::new( SpeechPattern{
                     pattern_name: pattern_name.clone(),
                     tag_name: tag_name.clone(),
-                    file_name: file.to_str().unwrap().to_string(),
+                    file_name: file_name_string.clone(),
+                    #[cfg(feature = "rule-coverage")]
+                    coverage_id: rule_coverage::register_rule(&file_name_string, &pattern_name, &tag_name),
                     match_uses_var_defs: dict["variables"].is_array() && pattern_xpath.rc.string.contains('$'),    // FIX: should look at var_defs for actual name
                     pattern: pattern_xpath,
                     var_defs: VariableDefinitions::build(&dict["variables"])
@@ -2429,6 +2436,8 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 if !pattern.match_uses_var_defs && pattern.var_defs.len() > 0 { // don't push them on twice
                     self.context_stack.push(pattern.var_defs.clone(), mathml)?;
                 }
+                #[cfg(feature = "rule-coverage")]
+                rule_coverage::record_rule_hit(pattern.coverage_id);
                 let result = if self.nav_node_offset > 0 &&
                             self.nav_node_id == mathml.attribute_value("id").unwrap_or_default() && is_leaf(mathml) {
                     let ch = crate::canonicalize::as_text(mathml).chars().nth(self.nav_node_offset-1).unwrap_or_default();
