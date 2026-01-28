@@ -56,8 +56,13 @@ The tool automatically adjusts its matching logic based on the file type:
 
 **Syntax:**
 ```bash
-uv run python -m audit_translations <language> [--file <specific_file>]
-uv run python -m audit_translations --list
+# Preferred: console script (no -m needed)
+uv run audit-translations <language> [--file <specific_file>]
+uv run audit-translations --list
+
+# If running from the repo root, point uv at the project:
+uv run --project PythonScripts audit-translations <language>
+uv run --project PythonScripts audit-translations --list
 ```
 
 **Convenience Features:**
@@ -74,25 +79,34 @@ uv run python -m audit_translations --list
 
 ```bash
 # List available languages
-uv run python -m audit_translations --list
+uv run audit-translations --list
+
+# Same from repo root
+uv run --project PythonScripts audit-translations --list
 
 # Audit all Spanish translation files
-uv run python -m audit_translations es
+uv run audit-translations es
 
 # Audit German translations
-uv run python -m audit_translations de
+uv run audit-translations de
 
 # Audit only a specific file
-uv run python -m audit_translations es --file SharedRules/default.yaml
+uv run audit-translations es --file SharedRules/default.yaml
 
 # Produce JSONL output for automation or AI workflows
-uv run python -m audit_translations es --format jsonl --output es-issues.jsonl
+uv run audit-translations es --format jsonl --output es-issues.jsonl
 
 # Audit a regional variant (merges Rules/Languages/de and Rules/Languages/de/CH)
-uv run python -m audit_translations de-CH
+uv run audit-translations de-CH
 
 # Show detailed output with English/translated snippets for rule differences
-uv run python -m audit_translations es --verbose
+uv run audit-translations es --verbose
+```
+
+**Running from the repo root (without `cd PythonScripts`):**
+```bash
+uv run --project PythonScripts audit-translations es
+uv run --project PythonScripts audit-translations --list
 ```
 
 ### Testing

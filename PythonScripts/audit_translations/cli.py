@@ -18,9 +18,9 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    python -m audit_translations es
-    python -m audit_translations de --file SharedRules/default.yaml
-    python -m audit_translations --list
+    uv run audit-translations es
+    uv run audit-translations de --file SharedRules/default.yaml
+    uv run audit-translations --list
         """
     )
 

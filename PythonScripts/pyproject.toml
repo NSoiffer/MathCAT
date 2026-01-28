@@ -6,5 +6,16 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = ["rich", "ruamel.yaml"]
 
+[project.scripts]
+audit-translations = "audit_translations.cli:main"
+
 [dependency-groups]
 dev = ["pytest"]
+
+[build-system]
+requires = ["uv_build>=0.9.25,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "audit_translations"
+module-root = ""
