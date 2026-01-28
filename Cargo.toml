@@ -14,6 +14,7 @@ exclude = ["src/main.rs", "docs", "PythonScripts"]    # should have "Rules/", bu
 [features]
 "include-zip" = []
 "enable-logs" = ["android_logger"]
+"rule-coverage" = []
 
 [dependencies]
 sxd-document = "0.3"
