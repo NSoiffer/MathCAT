@@ -1,5 +1,15 @@
 //! Rule-level coverage tracking for YAML speech/braille/intent rules.
 //! Enabled only when the `rule-coverage` Cargo feature is active.
+//! 
+//! - When rules are loaded, each rule registers and gets a small integer id.
+//! - When a rule matches, we record a hit for that id.
+//! - A thread-local guard triggers a one-time LCOV export on program/test shutdown,
+//!   so callers don’t need to remember to “flush” coverage.
+//! All state is behind a Mutex for safety; exports land in `target/rule-coverage/*.info`.
+//!
+//! To view everything on one page, regenerate HTML with:
+//!   genhtml --flat target/rule-coverage/lcov.info -o target/rule-coverage/html-flat
+//! then open `target/rule-coverage/html-flat/index.html`.
 #![cfg(feature = "rule-coverage")]
 
 use std::io::{self, Write};
@@ -9,6 +19,9 @@ use std::sync::{LazyLock, Mutex};
 
 const MANIFEST_DIR: &str = env!("CARGO_MANIFEST_DIR");
 thread_local! {
+    // One guard per thread. When the thread ends, its Drop runs; only the first guard
+    // across all threads performs the export (see DID_EXPORT below). This avoids needing
+    // an explicit "finish" call and still works when tests spawn threads.
     static EXPORT_GUARD: ExportGuard = ExportGuard;
 }
 
@@ -76,6 +89,12 @@ pub fn record_rule_hit(id: usize) {
 
 pub fn reset_rule_coverage() { COVERAGE.lock().unwrap().clear(); }
 
+/// Emit LCOV records:
+///   FN/FNDA for rule declarations and hit counts
+///   DA for per-rule line hits (one line per rule here)
+///   LF/LH for lines found/hit; FNF/FNH for functions (rules) found/hit
+///
+/// See: https://manpages.debian.org/trixie/lcov/geninfo.1.en.html
 pub fn export_rule_coverage_lcov<W: Write>(mut w: W) -> io::Result<()> {
     let cov = COVERAGE.lock().unwrap();
     for file in &cov.files {
@@ -112,6 +131,9 @@ fn ensure_guard() {
     }
 }
 
+// RAII helper: when an ExportGuard is dropped, it attempts to export coverage.
+// A global AtomicBool ensures only the first drop across all threads writes the LCOV,
+// so multiple threads shutting down won't duplicate the file.
 struct ExportGuard;
 static DID_EXPORT: AtomicBool = AtomicBool::new(false);
 
