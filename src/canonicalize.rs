@@ -3498,10 +3498,10 @@ impl CanonicalizeContext {
 		};
 	
 		let operator_versions = OperatorVersions::new(op);
-		if operator_versions.prefix.is_some() &&
+		if let Some(prefix) = operator_versions.prefix &&
 		   (top(parse_stack).last_child_in_mrow().is_none() || !top(parse_stack).is_operand) {
 			// debug!("   is prefix");
-			return operator_versions.prefix.unwrap();
+			return prefix;
 		}
 		
 		// We have either a right fence or an infix operand at the top of the stack
@@ -3529,19 +3529,19 @@ impl CanonicalizeContext {
 		} else {
 			false
 		};
-		if operator_versions.postfix.is_some() && (next_child.is_none() || has_left_match) {
+		if let Some(postfix) =operator_versions.postfix && (next_child.is_none() || has_left_match) {
 			// last child in row (must be a close) or we have a left match
 			// debug!("   is postfix");
-			return operator_versions.postfix.unwrap();
+			return postfix;
 		} else if next_child.is_none() {
 			// operand on left, so prefer infix version
-			return if operator_versions.infix.is_none() {op} else {operator_versions.infix.unwrap()};
+			return if let Some(infix) = operator_versions.infix {infix} else {op};
 		}
 	
 		let next_child = next_child.unwrap();
-		if operator_versions.prefix.is_some() && (n_vertical_bars_on_right & 0x1 != 0) {
+		if let Some(prefix) = operator_versions.prefix && (n_vertical_bars_on_right & 0x1 != 0) {
 			// 	("   is prefix");
-			return operator_versions.prefix.unwrap();		// odd number of vertical bars remain, so consider this the start of a pair
+			return prefix;		// odd number of vertical bars remain, so consider this the start of a pair
 		}
 	
 		let next_child = get_possible_embellished_node(next_child);
@@ -3556,13 +3556,13 @@ impl CanonicalizeContext {
 												  
 		// If the next child is a prefix op or a left fence, it will reduce to an operand, so don't consider it an operator
 		if next_child_op.is_some() && !next_child_op.unwrap().is_left_fence() && !next_child_op.unwrap().is_prefix() {
-			if operator_versions.postfix.is_some() {
+			if let Some(postfix) =operator_versions.postfix {
 				// debug!("   is postfix");
-				return operator_versions.postfix.unwrap();	
+				return postfix;	
 			}
-		} else if operator_versions.infix.is_some() {
+		} else if let Some(infix) = operator_versions.infix {
 			// debug!("   is infix");
-			return operator_versions.infix.unwrap();	
+			return infix;	
 		}
 	
 		// nothing good to match
