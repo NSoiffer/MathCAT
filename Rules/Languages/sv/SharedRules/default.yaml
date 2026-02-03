@@ -274,12 +274,15 @@
           - PreSubscript: "IFTHENELSE($Verbosity='Verbose', 'nedsänkt', 'nedsänkt')"
           - PreSuperscript: "IFTHENELSE($Verbosity='Verbose', 'upphöjt', 'upphöjt')"
           replace:
-          - test: # only bother announcing if there is more than one prescript
+          - test: # SWEDISH: announce prescripts regardless of how many
               if: "count($Prescripts) > 2"
               then:
               - T: "med"      # phrase(substitute x 'with' y)
               - x: "count($Prescripts) div 2"
               - T: "vänster index"      # phrase(in this equation certain 'prescripts' apply)
+              - pause: short
+              else:
+              - T: "vänster index"
               - pause: short
           - test:
               if: "not($Prescripts[1][self::m:none])"
@@ -334,6 +337,12 @@
               - T: "med"      # phrase(substitute x 'with' y)
               - x: "count($Postscripts) div 2"
               - T: "höger index"      # phrase(this material includes several 'postscripts')
+              - pause: short
+              else:
+              - test:
+                  if: "$Prescripts"
+                  then: [T: "och"]
+              - T: "höger index"
               - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none])"
