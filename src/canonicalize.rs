@@ -760,7 +760,7 @@ impl CanonicalizeContext {
 			name(parent).to_string()
 		};
 		let parent_requires_child = ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(&parent_name) ||
-										  parent_name == "mtd" || parent_name == "mtr" || parent_name == "mlabeledtr";
+										  matches!(parent_name.as_ref(), "mtd" | "mtr" | "mlabeledtr" | "mtable");
 
 		// handle empty leaves -- leaving it empty causes problems with the speech rules
 		if is_leaf(mathml) && !EMPTY_ELEMENTS.contains(element_name) && as_text(mathml).is_empty() {
@@ -4777,9 +4777,9 @@ mod canonicalize_tests {
     }
 
     #[test]
-    fn canonical_mtext_in_mrow() {
+    fn canonical_mtext_in_mtr() {
 		// make sure mtext doesn't go away
-        let test_str = "<math>  <mtable> <mtr> <mtext> </mtext> </mtr> <mtr> <mtext> </mtext> </mtr> </mtable> </math>";
+        let test_str = "<math> <mtable> <mtr> <mtext> </mtext> </mtr> <mtr> <mtext> </mtext> </mtr> </mtable> </math>";
         let target_str = "   <math>
 			<mtable>
 				<mtr>
@@ -4788,6 +4788,36 @@ mod canonicalize_tests {
 				<mtr>
 					<mtext data-changed='empty_content' data-width='0' data-empty-in-2D='true'> </mtext>
 				</mtr>
+			</mtable>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str, &[]));
+    }
+
+    #[test]
+    fn canonical_mtext_in_mtable() {
+		// make sure mtext doesn't go away
+        let test_str = r"<math> <mtable> <mtr> <mtd> <mi>L</mi> </mtd> <mtd> <mrow> <mi>&lt;mi/&gt;</mi> <mo>=</mo> 
+		        <mrow> <mo>[</mo> <mtable> <mtext> </mtext> </mtable> <mo>]</mo> </mrow> </mrow> </mtd> </mtr> </mtable> </math>";
+        let target_str = r"<math>
+			<mtable>
+			<mtr>
+				<mtd>
+				<mi>L</mi>
+				</mtd>
+				<mtd>
+				<mrow>
+					<mi>&lt;mi/&gt;</mi>
+					<mo>=</mo>
+					<mrow>
+					<mo>[</mo>
+					<mtable>
+						<mtext data-changed='empty_content' data-width='0' data-empty-in-2D='true'> </mtext>
+					</mtable>
+					<mo>]</mo>
+					</mrow>
+				</mrow>
+				</mtd>
+			</mtr>
 			</mtable>
 		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str, &[]));
