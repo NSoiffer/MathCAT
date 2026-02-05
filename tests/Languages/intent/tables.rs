@@ -146,44 +146,44 @@ fn system_of_equations() {
                 </mtr>
             </mtable>
             </math>"#;
-    let intent = "<math data-from-mathml='math'>
-                <system-of-equations data-from-mathml='mtable' columnalign='right left' columnspacing='0em' rowspacing='3pt' data-intent-property=':system-of-equations:'>
-                    <mtr data-from-mathml='mtr'>
-                    <mtd data-from-mathml='mtr'>
-                        <mrow data-from-mathml='mtr'>
+    let intent = " <math data-from-mathml='math'>
+        <system-of-equations data-from-mathml='mtable' columnalign='right left' columnspacing='0em' rowspacing='3pt' data-intent-property=':system-of-equations:'>
+            <mtr data-from-mathml='mtr'>
+                <mtd data-from-mathml='mtr'>
+                    <mrow data-from-mathml='mtr'>
+                    <mrow data-from-mathml='mrow' data-changed='added'>
+                        <mi data-from-mathml='mi'>x</mi>
+                        <mo data-from-mathml='mo'>+</mo>
+                        <mi data-from-mathml='mi'>y</mi>
+                    </mrow>
+                    <mrow data-from-mathml='mrow' data-changed='added'>
+                        <mo data-from-mathml='mo' data-previous-space-width='0'>is equal to</mo>
                         <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mi data-from-mathml='mi'>x</mi>
-                            <mo data-from-mathml='mo'>+</mo>
-                            <mi data-from-mathml='mi'>y</mi>
+                        <mi data-from-mathml='mi'>y</mi>
+                        <mo data-from-mathml='mo'>+</mo>
+                        <mn data-from-mathml='mn'>1</mn>
                         </mrow>
-                        <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mo data-from-mathml='mo'>is equal to</mo>
-                            <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mi data-from-mathml='mi'>y</mi>
-                            <mo data-from-mathml='mo'>+</mo>
-                            <mn data-from-mathml='mn'>1</mn>
-                            </mrow>
-                        </mrow>
-                        </mrow>
-                    </mtd>
-                    </mtr>
-                    <mtr data-from-mathml='mtr'>
-                    <mtd data-from-mathml='mtr'>
-                        <mrow data-from-mathml='mtr'>
-                        <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mi data-from-mathml='mi'>x</mi>
-                            <mo data-from-mathml='mo'>-</mo>
-                            <mi data-from-mathml='mi'>y</mi>
-                        </mrow>
-                        <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mo data-from-mathml='mo'>is equal to</mo>
-                            <mn data-from-mathml='mn'>4</mn>
-                        </mrow>
-                        </mrow>
-                    </mtd>
-                    </mtr>
-                </system-of-equations>
-            </math>";
+                    </mrow>
+                    </mrow>
+                </mtd>
+                </mtr>
+                <mtr data-from-mathml='mtr'>
+                <mtd data-from-mathml='mtr'>
+                    <mrow data-from-mathml='mtr'>
+                    <mrow data-from-mathml='mrow' data-changed='added'>
+                        <mi data-from-mathml='mi'>x</mi>
+                        <mo data-from-mathml='mo'>-</mo>
+                        <mi data-from-mathml='mi'>y</mi>
+                    </mrow>
+                    <mrow data-from-mathml='mrow' data-changed='added'>
+                        <mo data-from-mathml='mo' data-previous-space-width='0'>is equal to</mo>
+                        <mn data-from-mathml='mn'>4</mn>
+                    </mrow>
+                    </mrow>
+                </mtd>
+            </mtr>
+        </system-of-equations>
+        </math>";
     test_intent(mathml, intent, vec![]);
 }
 
@@ -202,43 +202,43 @@ fn system_of_equations_infer_intent() {
             </mtable>
             </math>"#;
     let intent = "<math data-from-mathml='math'>
-                <system-of-equations data-from-mathml='mtable' columnalign='right left' columnspacing='0em' rowspacing='3pt' data-intent-property=':system-of-equations:'>
-                    <mtr data-from-mathml='mtr'>
-                    <mtd data-from-mathml='mtr'>
-                        <mrow data-from-mathml='mtr'>
+        <system-of-equations data-from-mathml='mtable' columnalign='right left' columnspacing='0em' rowspacing='3pt' data-intent-property=':system-of-equations:'>
+            <mtr data-from-mathml='mtr'>
+                <mtd data-from-mathml='mtr'>
+                    <mrow data-from-mathml='mtr'>
+                    <mrow data-from-mathml='mrow' data-changed='added'>
+                        <mi data-from-mathml='mi'>x</mi>
+                        <mo data-from-mathml='mo'>+</mo>
+                        <mi data-from-mathml='mi'>y</mi>
+                    </mrow>
+                    <mrow data-from-mathml='mrow' data-changed='added'>
+                        <mo data-from-mathml='mo' data-previous-space-width='0'>=</mo>
                         <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mi data-from-mathml='mi'>x</mi>
-                            <mo data-from-mathml='mo'>+</mo>
-                            <mi data-from-mathml='mi'>y</mi>
+                        <mi data-from-mathml='mi'>y</mi>
+                        <mo data-from-mathml='mo'>+</mo>
+                        <mn data-from-mathml='mn'>1</mn>
                         </mrow>
-                        <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mo data-from-mathml='mo'>=</mo>
-                            <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mi data-from-mathml='mi'>y</mi>
-                            <mo data-from-mathml='mo'>+</mo>
-                            <mn data-from-mathml='mn'>1</mn>
-                            </mrow>
-                        </mrow>
-                        </mrow>
-                    </mtd>
-                    </mtr>
-                    <mtr data-from-mathml='mtr'>
-                    <mtd data-from-mathml='mtr'>
-                        <mrow data-from-mathml='mtr'>
-                        <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mi data-from-mathml='mi'>x</mi>
-                            <mo data-from-mathml='mo'>-</mo>
-                            <mi data-from-mathml='mi'>y</mi>
-                        </mrow>
-                        <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mo data-from-mathml='mo'>=</mo>
-                            <mn data-from-mathml='mn'>4</mn>
-                        </mrow>
-                        </mrow>
-                    </mtd>
-                    </mtr>
-                </system-of-equations>
-            </math>";
+                    </mrow>
+                    </mrow>
+                </mtd>
+                </mtr>
+                <mtr data-from-mathml='mtr'>
+                <mtd data-from-mathml='mtr'>
+                    <mrow data-from-mathml='mtr'>
+                    <mrow data-from-mathml='mrow' data-changed='added'>
+                        <mi data-from-mathml='mi'>x</mi>
+                        <mo data-from-mathml='mo'>-</mo>
+                        <mi data-from-mathml='mi'>y</mi>
+                    </mrow>
+                    <mrow data-from-mathml='mrow' data-changed='added'>
+                        <mo data-from-mathml='mo' data-previous-space-width='0'>=</mo>
+                        <mn data-from-mathml='mn'>4</mn>
+                    </mrow>
+                </mrow>
+            </mtd>
+            </mtr>
+        </system-of-equations>
+        </math>";
     test_intent(mathml, intent, vec![]);
 }
 
@@ -256,43 +256,43 @@ fn lines() {
                 </mtr>
             </mtable>
             </math>"#;
-    let intent = "<math data-from-mathml='math'>
-                <lines data-from-mathml='mtable' data-intent-property=':lines:'>
-                    <mtr data-from-mathml='mtr'>
-                    <mtd data-from-mathml='mtr'>
-                        <mrow data-from-mathml='mtr'>
-                        <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mi data-from-mathml='mi'>x</mi>
-                            <mo data-from-mathml='mo'>+</mo>
-                            <mi data-from-mathml='mi'>y</mi>
-                        </mrow>
-                        <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mo data-from-mathml='mo'>=</mo>
-                            <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mi data-from-mathml='mi'>y</mi>
-                            <mo data-from-mathml='mo'>+</mo>
-                            <mn data-from-mathml='mn'>1</mn>
-                            </mrow>
-                        </mrow>
-                        </mrow>
-                    </mtd>
-                    </mtr>
-                    <mtr data-from-mathml='mtr'>
-                    <mtd data-from-mathml='mtr'>
-                        <mrow data-from-mathml='mtr'>
-                        <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mi data-from-mathml='mi'>x</mi>
-                            <mo data-from-mathml='mo'>-</mo>
-                            <mi data-from-mathml='mi'>y</mi>
-                        </mrow>
-                        <mrow data-from-mathml='mrow' data-changed='added'>
-                            <mo data-from-mathml='mo'>=</mo>
-                            <mn data-from-mathml='mn'>4</mn>
-                        </mrow>
-                        </mrow>
-                    </mtd>
-                    </mtr>
-                </lines>
-            </math>";
+    let intent = " <math data-from-mathml='math'>
+        <lines data-from-mathml='mtable' data-intent-property=':lines:'>
+            <mtr data-from-mathml='mtr'>
+            <mtd data-from-mathml='mtr'>
+                <mrow data-from-mathml='mtr'>
+                <mrow data-from-mathml='mrow' data-changed='added'>
+                    <mi data-from-mathml='mi'>x</mi>
+                    <mo data-from-mathml='mo'>+</mo>
+                    <mi data-from-mathml='mi'>y</mi>
+                </mrow>
+                <mrow data-from-mathml='mrow' data-changed='added'>
+                    <mo data-from-mathml='mo' data-previous-space-width='0'>=</mo>
+                    <mrow data-from-mathml='mrow' data-changed='added'>
+                    <mi data-from-mathml='mi'>y</mi>
+                    <mo data-from-mathml='mo'>+</mo>
+                    <mn data-from-mathml='mn'>1</mn>
+                    </mrow>
+                </mrow>
+                </mrow>
+            </mtd>
+            </mtr>
+            <mtr data-from-mathml='mtr'>
+            <mtd data-from-mathml='mtr'>
+                <mrow data-from-mathml='mtr'>
+                <mrow data-from-mathml='mrow' data-changed='added'>
+                    <mi data-from-mathml='mi'>x</mi>
+                    <mo data-from-mathml='mo'>-</mo>
+                    <mi data-from-mathml='mi'>y</mi>
+                </mrow>
+                <mrow data-from-mathml='mrow' data-changed='added'>
+                    <mo data-from-mathml='mo' data-previous-space-width='0'>=</mo>
+                    <mn data-from-mathml='mn'>4</mn>
+                </mrow>
+                </mrow>
+            </mtd>
+            </mtr>
+        </lines>
+        </math>";
     test_intent(mathml, intent, vec![]);
 }

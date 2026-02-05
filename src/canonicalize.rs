@@ -759,7 +759,8 @@ impl CanonicalizeContext {
 			let parent = get_parent(mathml);
 			name(parent).to_string()
 		};
-		let parent_requires_child = ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(&parent_name);
+		let parent_requires_child = ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(&parent_name) ||
+										  parent_name == "mtd" || parent_name == "mtr" || parent_name == "mlabeledtr";
 
 		// handle empty leaves -- leaving it empty causes problems with the speech rules
 		if is_leaf(mathml) && !EMPTY_ELEMENTS.contains(element_name) && as_text(mathml).is_empty() {
@@ -1846,8 +1847,8 @@ impl CanonicalizeContext {
 			while i < children.len() {
 				let child = as_element(children[i]);
 				let is_child_whitespace = name(child) == "mtext" && as_text(child) == "\u{00A0}";
-				debug!("merge_whitespace: i={}, whitespace={:?}, mtext set={} {}",
-						i, whitespace, previous_mtext_with_width.is_some(), mml_to_string(child));
+				// debug!("merge_whitespace: i={}, whitespace={:?}, mtext set={} {}",
+				// 		i, whitespace, previous_mtext_with_width.is_some(), mml_to_string(child));
 				if is_child_whitespace {
 					// update the running total of whitespace
 					let child_width = child.attribute_value("data-width").unwrap_or("0")
@@ -1880,7 +1881,7 @@ impl CanonicalizeContext {
 					previous_mtext_with_width = None;
 				}
 			}
-			debug!("  after loop: whitespace={:?}, {}", whitespace, mml_to_string(as_element(children[children.len()-1])));
+			// debug!("  after loop: whitespace={:?}, {}", whitespace, mml_to_string(as_element(children[children.len()-1])));
 			if let Some(mut ws) = whitespace {
 				// last child in mrow is white space -- mark with space *after*
 				if children.len() == 1 {
@@ -4772,6 +4773,23 @@ mod canonicalize_tests {
     fn canonical_one_element_mrow_around_mrow() {
         let test_str = "<math><mrow><mrow><mo>-</mo><mi>a</mi></mrow></mrow></math>";
         let target_str = "<math><mrow><mo>-</mo><mi>a</mi></mrow></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str, &[]));
+    }
+
+    #[test]
+    fn canonical_mtext_in_mrow() {
+		// make sure mtext doesn't go away
+        let test_str = "<math>  <mtable> <mtr> <mtext> </mtext> </mtr> <mtr> <mtext> </mtext> </mtr> </mtable> </math>";
+        let target_str = "   <math>
+			<mtable>
+				<mtr>
+					<mtext data-changed='empty_content' data-width='0' data-empty-in-2D='true'> </mtext>
+				</mtr>
+				<mtr>
+					<mtext data-changed='empty_content' data-width='0' data-empty-in-2D='true'> </mtext>
+				</mtr>
+			</mtable>
+		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str, &[]));
     }
 
