@@ -1161,7 +1161,7 @@
       then_test:
         if: "$Verbosity='Terse'"
         then: [{T: "bildar"}]      # phrase(hydrogen and oxygen 'forms' water )
-        else: [{T: "reaktion bildar"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
+        else: [{T: "reagerar och bildar"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
     - else_if: ".='⇌' or .='\u1f8d2'"
       then: [{T: "är i jämvikt med"}]      # phrase(a reactant 'is in equilibrium with' a product)
     - else_if: ".='\u1f8d4'"
