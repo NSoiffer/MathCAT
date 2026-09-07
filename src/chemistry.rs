@@ -1384,17 +1384,14 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> i32 {
         // prescripts are normally positive integers, chem 2.5.1 allows for a superscript for a Lewis dot
         // postscript should be a charge
 
-        let prescripts;
-        let postscripts;
-        if children.len() == 4 && name(as_element(children[1]))=="mprescripts" { // just prescripts
-            prescripts = &children[2..4];
-            postscripts = &children[0..0]; // empty
+        
+        
+        let (prescripts, postscripts) = if children.len() == 4 && name(as_element(children[1]))=="mprescripts" { // just prescripts
+            (&children[2..4], &children[0..0]) // empty
         } else if children.len() == 6 && name(as_element(children[3]))=="mprescripts" {  // pre and postscripts
-            prescripts = &children[4..6];
-            postscripts = &children[1..3]; // empty
+            (&children[4..6], &children[1..3]) // empty
         } else if children.len() == 3 || children.len() == 5 {   // just postscripts (simultaneous or offset)
-            prescripts = &children[0..0]; // empty
-            postscripts = &children[1..];
+            (&children[0..0], &children[1..])
         } else {
             return NOT_CHEMISTRY;
         };

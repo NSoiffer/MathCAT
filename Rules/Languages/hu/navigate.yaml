@@ -56,30 +56,30 @@
             then: [T: "teljesen ráközelített"]       # phrase('zoomed in all of the way')
           - else_if: "$NavNodeOffset = 0"
             then: [T: "ráközelített az első karakterre"]   # phrase('zoomed in to first character')
-            else: [T: "karakterre nagyítva"]          # phrase('zoomed in to character')
+            else: [T: "ráközelített a karakterre"]          # phrase('zoomed in to character')
         - pause: "medium"
         else:
         - test:
           # CommandOffset is 1 + length of the English NavCommand stem (Zoom/Move/Read/Describe),
           # not the spoken Prefix length — so translations can use a different Prefix word.
           - if: "starts-with($NavCommand, 'Zoom')"
-            then: [set_variables: [Prefix: "'zoom'", CommandOffset: "5"]]          # phrase('zoom' in to see more details)     
+            then: [set_variables: [Prefix: "'nagyítás'", CommandOffset: "5"]]          # phrase('zoom' in to see more details)     
           - else_if: "starts-with($NavCommand, 'Move')"
-            then: [set_variables: [Prefix: "'move'", CommandOffset: "5"]]          # phrase('move' to next entry in table)     
+            then: [set_variables: [Prefix: "'ugrás'", CommandOffset: "5"]]          # phrase('move' to next entry in table)     
           - else_if: "starts-with($NavCommand, 'Read')"
-            then: [set_variables: [Prefix: "'read'", CommandOffset: "5"]]          # phrase('read' to next entry in table)     
+            then: [set_variables: [Prefix: "'olvasás'", CommandOffset: "5"]]          # phrase('read' to next entry in table)     
           - else_if: "starts-with($NavCommand, 'Describe')"
-            then: [set_variables: [Prefix: "'describe'", CommandOffset: "9"]]      # phrase('describe' to next entry in table)
+            then: [set_variables: [Prefix: "'leírás'", CommandOffset: "9"]]      # phrase('describe' to next entry in table)
         - test:
             if: "$Prefix != ''"
             then:
             - x: "$Prefix"
             - test:
               - if: "substring($NavCommand, $CommandOffset) = 'In'"
-                then: [T: "ban"]                                  # phrase(zoom 'in' to see more details)
+                then: [T: ""]                                  # phrase(zoom 'in' to see more details)
               - else_if: "substring($NavCommand, $CommandOffset) = 'InAll'"
                 # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets "ed" concatenated to "zoom"
-                then: [T: "Teljesen kinagyítva"]                     # phrase(zoom 'out all of the way' to see more details)
+                then: [T: "Teljesen nagyítsa ki"]                     # phrase(zoom 'out all of the way' to see more details)
               - else_if: "substring($NavCommand, $CommandOffset) = 'Out'"
                 then: [T: "ki"]                                 # phrase(zoom 'out' to see more details)
               - else_if: "substring($NavCommand, $CommandOffset) = 'OutAll'"
@@ -1322,12 +1322,12 @@
       if: "preceding-sibling::* and following-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'out of'", Child2D: "."]
+          variables: [Move2D: "'ki'", Child2D: "."]
           replace: [x: ".."]
       - x: "following-sibling::*[1]"
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]       # phrase('in' the denominator)
+          variables: [Move2D: "'ban/ben'", Child2D: "following-sibling::*[1]"]       # phrase('in' the denominator)
           replace: [x: ".."]
       - with:
           variables: [NavCommand: "'MoveNextZoom'"]

@@ -2412,23 +2412,21 @@ impl CanonicalizeContext {
 			// This is not yet in canonical form, so the fences may be siblings or siblings of the parent 
 			let preceding_siblings = as_element(children[0]).preceding_siblings();
 			let following_siblings = as_element(children[end-1]).following_siblings();
-			let first_child;
-			let last_child;
-			if preceding_siblings.is_empty() && following_siblings.is_empty() {
+			
+			
+			let (first_child, last_child) = if preceding_siblings.is_empty() && following_siblings.is_empty() {
 				// number spans all children, look to parent for fences
 				let preceding_children = mrow.preceding_siblings();
 				let following_children = mrow.following_siblings();
 				if preceding_children.is_empty() || following_children.is_empty() {
 					return true;	// doesn't have left or right fence
 				}
-				first_child = preceding_children[preceding_children.len()-1];
-				last_child = following_children[0];
+				(preceding_children[preceding_children.len()-1], following_children[0])
 			} else if preceding_siblings.is_empty() || following_siblings.is_empty() {
 				return true; // can't be fences around it
 			} else {
-				first_child = preceding_siblings[preceding_siblings.len()-1];
-				last_child = following_siblings[0];
-			}
+				(preceding_siblings[preceding_siblings.len()-1], following_siblings[0])
+			};
 			let first_child = as_element(first_child);
 			let last_child = as_element(last_child);
 			return !(name(first_child) == "mo" && is_fence(first_child) &&

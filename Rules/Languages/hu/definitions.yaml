@@ -347,30 +347,30 @@
 
 - NavigationParts: {
     # These are the parts of a formula that can be navigated to
-    "large-op": "base; lower limit; upper limit",
-    "mfrac": "numerator; denominator",
+    "large-op": "alap; alsó határ; felső határ",
+    "mfrac": "számláló; nevező",
     "fraction": "számláló; nevező",
     "msqrt": "gyök",
     "square-root": "gyök",
-    "mroot": "root; root index",
+    "mroot": "gyök; gyök index",
     "root": "gyök; gyök index",
-    "msub": "base; subscript",
-    "sub": "base; subscript",
-    "logarithm-with-base": "base",
-    "indexed-by": "base; subscript",
-    "msup": "base; superscript",
-    "say-super": "base; superscript",
-    "skip-super": "base; superscript",
-    "power": "base; exponent",
-    "msubsup": "base; subscript; superscript",
-    "munder": "base; under limit",
-    "mover": "base; upper limit",
-    "munderover": "base; under limit; upper limit",
+    "msub": "alap; alsó index",
+    "sub": "alap; alsó index",
+    "logarithm-with-base": "alap",
+    "indexed-by": "alap; alsó index",
+    "msup": "alap; felső index",
+    "say-super": "alap; felső index",
+    "skip-super": "alap; felső index",
+    "power": "alap; kitevő",
+    "msubsup": "alap; alsó index; felső index",
+    "munder": "alap; határérték alatt",
+    "mover": "alap; határérték felett",
+    "munderover": "alap; határérték alatt; határérték felett",
 
     # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
     # it's a hack to put them here, but at least they are grouped with the other navigation parts
-    "in": "in",
-    "out": "out of",
+    "in": "ban/ben",
+    "out": "ki",
   }
 
 - KnownWords: {
