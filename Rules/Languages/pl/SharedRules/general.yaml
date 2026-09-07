@@ -286,6 +286,23 @@
                          IfThenElse(parent::m:power[parent::m:fraction and not(preceding-sibling::*)], ancestor::*[3][self::m:mrow], false()) ) ) )"
   - IsSingular: "(not($MRowForCoefficient) and parent::*[name(.)!='skip-super' or *[1][.=1]]) or
                  ($MRowForCoefficient and $MRowForCoefficient[(count(*) = 3 and *[1][self::m:mn and .=1] and *[2]='\u2062')])"
+    # Polish plural depends on the numeral, not only on "is it one":
+    #   1 metr | 2, 3, 4 metry (nominative plural) | 5 metrów (genitive plural)
+    # and the teens break the naive rule: 12, 13, 14 metrów (genitive, despite
+    # ending in 2, 3, 4), likewise 112-114. $Coefficient is 0 when the numeral
+    # cannot be determined, which falls through to the genitive - the form
+    # Polish uses with unknown or large quantities.
+  - Coefficient: "IfThenElse($MRowForCoefficient, number($MRowForCoefficient/*[1][self::m:mn]), 0)"
+    # The 'per-fraction' rule speaks the denominator after the preposition "na",
+    # which governs the accusative: "na godzinę", not "na godzina". Only feminine
+    # nouns change form, so AccusativeCase holds just those; a missing entry
+    # means the accusative equals the nominative (as for "na litr", "na mol").
+    # The second test covers a denominator raised to a power, as in m/s^2, where
+    # the unit's parent is the 'power' element rather than the fraction itself.
+  - IsFractionDenominator: "(parent::m:fraction and preceding-sibling::*) or
+                            (parent::m:power and parent::*[parent::m:fraction and preceding-sibling::*])"
+  - IsNominativePlural: "$Coefficient mod 10 >= 2 and $Coefficient mod 10 <= 4 and
+                         not($Coefficient mod 100 >= 12 and $Coefficient mod 100 <= 14)"
   - Prefix: "''"
   - Word: "''"  
   replace:
@@ -330,22 +347,32 @@
       if: "$Prefix = ''"
       then:
       - test:
-        - if: "$IsSingular"
+        - if: "$IsSingular and $IsFractionDenominator and DefinitionValue($Word, 'Speech', 'AccusativeCase') != ''"
+          then: [x: "DefinitionValue($Word, 'Speech', 'AccusativeCase')"]
+        - else_if: "$IsSingular"
           # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets the prefix concatenated to the base
           then: [x: "$Word"]
-        - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
+        - else_if: "$IsNominativePlural and DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
           then: [x: "DefinitionValue($Word, 'Speech', 'PluralForms')"]
-          else: [x: "$Word", ct: "s"]
+        - else_if: "DefinitionValue($Word, 'Speech', 'PluralGenitive') != ''"
+          then: [x: "DefinitionValue($Word, 'Speech', 'PluralGenitive')"]
+          # No inflected form is known: speak the singular, because a wrong
+          # ending is worse for a screen reader user than a missing one.
+          else: [x: "$Word"]
       else:
       - x: "$Prefix"
       - ct: "-"
       - test:
-        - if: "$IsSingular"
+        - if: "$IsSingular and $IsFractionDenominator and DefinitionValue($Word, 'Speech', 'AccusativeCase') != ''"
+          then: [x: "concat('\uF8FE', DefinitionValue($Word, 'Speech', 'AccusativeCase'))"]
+        - else_if: "$IsSingular"
           # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets the prefix concatenated to the base
           then: [x: "concat('\uF8FE', $Word)"]
-        - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
+        - else_if: "$IsNominativePlural and DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
           then: [x: "concat('\uF8FE', DefinitionValue($Word, 'Speech', 'PluralForms'))"]
-          else: [x: "concat('\uF8FE', $Word)", ct: "s"]
+        - else_if: "DefinitionValue($Word, 'Speech', 'PluralGenitive') != ''"
+          then: [x: "concat('\uF8FE', DefinitionValue($Word, 'Speech', 'PluralGenitive'))"]
+          else: [x: "concat('\uF8FE', $Word)"]
 
 # need to reverse the order of speech: $ 3 -> 3 dollars
 - name: currency
@@ -355,15 +382,21 @@
     # If the amount is singular, we don't add the plural ending.
   - IsSingular: "*[3][self::m:mn and .=1] and *[2]='\u2062'"
   - CurrencyWord: "DefinitionValue(*[1], 'Speech', 'CurrencySymbols')"
+    # Same numeral-dependent choice as in the 'unit' rule above.
+  - Coefficient: "IfThenElse(*[3][self::m:mn], number(*[3]), 0)"
+  - IsNominativePlural: "$Coefficient mod 10 >= 2 and $Coefficient mod 10 <= 4 and
+                         not($Coefficient mod 100 >= 12 and $Coefficient mod 100 <= 14)"
   replace:
   - bookmark: "*[3]/@id"
   - x: "*[3]"
   - test:
     - if: "$IsSingular"
       then: [x: "$CurrencyWord"]
-    - else_if: "DefinitionValue($CurrencyWord, 'Speech', 'PluralForms') != ''"
+    - else_if: "$IsNominativePlural and DefinitionValue($CurrencyWord, 'Speech', 'PluralForms') != ''"
       then: [x: "DefinitionValue($CurrencyWord, 'Speech', 'PluralForms')"]
-      else: [x: "DefinitionValue(*[1], 'Speech', 'CurrencySymbols')", ct: "s"]
+    - else_if: "DefinitionValue($CurrencyWord, 'Speech', 'PluralGenitive') != ''"
+      then: [x: "DefinitionValue($CurrencyWord, 'Speech', 'PluralGenitive')"]
+      else: [x: "$CurrencyWord"]
 
 - name: sin
   tag: mi

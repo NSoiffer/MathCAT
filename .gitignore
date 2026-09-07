@@ -3,7 +3,6 @@
 target
 build.rs.orig
 Python/libmathcat.pyd
-Cargo.lock
 src-pest.7z
 src.7z
 mp2.7z

@@ -86,7 +86,7 @@ fn frac_with_units() -> Result<()> {
         </mfrac>
         </mrow>
     </math>";
-    test("pl", "ClearSpeak", expr, "62 milas na godzina")?;
+    test("pl", "ClearSpeak", expr, "62 mile na godzinę")?;
     return Ok(());
 
 }
