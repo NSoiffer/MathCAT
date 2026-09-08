@@ -1408,9 +1408,10 @@ pub struct FontSizeGuess;
 ///    ""
 // 		   returns original node match isn't found
 impl FontSizeGuess {
+    /// Returns an estimated width in em units, using an assumed 12-point font for conversions.
     pub fn em_from_value(value_with_unit: &str) -> f64 {
         // match one or more digits followed by a unit -- there are many more units, but they tend to be large and rarer(?)
-        static FONT_VALUE: LazyLock<Regex> = LazyLock::new(|| { Regex::new(r"(-?[0-9]*\.?[0-9]*)(px|cm|mm|Q|in|ppc|pt|ex|em|rem)").unwrap() });
+        static FONT_VALUE: LazyLock<Regex> = LazyLock::new(|| { Regex::new(r"(-?[0-9]*\.?[0-9]*)(px|cm|mm|Q|in|pc|pt|ex|em|rem)").unwrap() });
         let cap = FONT_VALUE.captures(value_with_unit);
         if let Some(cap) = cap {
             if cap.len() == 3 {
@@ -1782,6 +1783,16 @@ mod tests {
         crate::interface::set_preference("Language", "en")?;
         crate::definitions::read_definitions_file(true)?;
         return Ok( () );
+    }
+
+    // Pica widths must use the existing 12pt font estimate: 1pc, 12pt, and 1em are equivalent.
+    #[test]
+    fn font_size_guess_pica_widths() {
+        assert_eq!(FontSizeGuess::em_from_value("1pc"), 1.0);
+        assert_eq!(FontSizeGuess::em_from_value("0.5pc"), 0.5);
+        assert_eq!(FontSizeGuess::em_from_value("-1pc"), -1.0);
+        assert_eq!(FontSizeGuess::em_from_value("12pt"), 1.0);
+        assert_eq!(FontSizeGuess::em_from_value("1em"), 1.0);
     }
 
     #[test]
