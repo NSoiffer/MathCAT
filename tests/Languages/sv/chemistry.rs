@@ -160,9 +160,9 @@ fn beta_decay() -> Result<()> {
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
     "14, 6, versal c; bildar, 14, 7, versal n; plus 0, minus 1, e")?;
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-    "upphöjt 14, nedsänkt 6, versal c; reaktion bildar; upphöjt 14, nedsänkt 7, versal n; plus, upphöjt 0, nedsänkt minus 1, e")?;
+    "upphöjt 14, nedsänkt 6, versal c; reagerar och bildar; upphöjt 14, nedsänkt 7, versal n; plus, upphöjt 0, nedsänkt minus 1, e")?;
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-    "övre index 14, nedre index 6, versal c; reaktion bildar; övre index 14, nedre index 7, versal n; plus, övre index 0, nedre index minus 1, e")?;
+    "övre index 14, nedre index 6, versal c; reagerar och bildar; övre index 14, nedre index 7, versal n; plus, övre index 0, nedre index minus 1, e")?;
     return Ok(());
 
 }
@@ -426,9 +426,9 @@ fn mhchem_beta_decay() -> Result<()> {
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
     "14, 6, versal c; bildar, 14, 7, versal n; plus 0, minus 1, e")?;
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-    "upphöjt 14, nedsänkt 6, versal c; reaktion bildar; upphöjt 14, nedsänkt 7, versal n; plus, upphöjt 0, nedsänkt minus 1, e")?;
+    "upphöjt 14, nedsänkt 6, versal c; reagerar och bildar; upphöjt 14, nedsänkt 7, versal n; plus, upphöjt 0, nedsänkt minus 1, e")?;
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-    "övre index 14, nedre index 6, versal c; reaktion bildar; övre index 14, nedre index 7, versal n; plus, övre index 0, nedre index minus 1, e")?;
+    "övre index 14, nedre index 6, versal c; reagerar och bildar; övre index 14, nedre index 7, versal n; plus, övre index 0, nedre index minus 1, e")?;
     return Ok(());
 
 }
@@ -443,7 +443,7 @@ fn hcl_na_yields() -> Result<()> {
       </mrow>
     </math>";
     test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-    "2, versal h, versal c l; plus 2 versal n a; reaktion bildar; 2, versal n a, versal c l; plus versal h, nedre index 2")?;
+    "2, versal h, versal c l; plus 2 versal n a; reagerar och bildar; 2, versal n a, versal c l; plus versal h, nedre index 2")?;
     return Ok(());
 
 }
