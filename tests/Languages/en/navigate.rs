@@ -8,23 +8,10 @@ use crate::common::*;
 use anyhow::Result;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
-fn init_nav(mathml: &str) -> Result<()> {
-    set_rules_dir(abs_rules_dir_path())?;
-    set_preference("Language", "en")?;
-    set_preference("SpeechStyle", "SimpleSpeak")?;
-    set_preference("Verbosity", "Medium")?;
-    set_preference("NavMode", "Enhanced")?;
-    set_preference("NavVerbosity", "Verbose")?;
-    set_preference("AutoZoomOut", "False")?;
-    set_preference("Overview", "False")?;
-    set_mathml(mathml)?;
-    Ok(())
-}
-
 fn assert_zoom_in(command: &str, mathml: &str, expected: &str) -> Result<()> {
     init_panic_handler();
     let result = catch_unwind(AssertUnwindSafe(|| {
-        init_nav(mathml)?;
+        init_nav("en", mathml)?;
         let speech = do_navigate_command(command)?;
         let trimmed_speech = speech.trim_end_matches([' ', ',', ';']).to_string();
         assert_eq!(expected, trimmed_speech);

@@ -1030,13 +1030,7 @@ mod tests {
         init_panic_handler();
         let result = catch_unwind(AssertUnwindSafe(|| {
             set_rules_dir(super::super::abs_rules_dir_path())?;
-            set_preference("NavMode", nav_mode_default)?;
-            set_preference("NavVerbosity", "Verbose")?;
-            set_preference("AutoZoomOut", "True")?;
-            set_preference("Language", language)?;
-            set_preference("SpeechStyle", "SimpleSpeak")?;
-            set_preference("Verbosity", "Medium")?;
-            set_preference("Overview", "False")?;
+            set_navigation_test_preferences(language, nav_mode_default, true)?;
             set_mathml(mathml)?;
             return Ok( () );
         }));

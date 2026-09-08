@@ -540,6 +540,28 @@ pub fn do_navigate_command(command: impl AsRef<str>) -> Result<String> {
     return report_any_panic(result);
 }
 
+/// Preferences shared by navigation unit and integration tests.
+///
+/// Sets `PauseFactor` to 100 so local user prefs (e.g. AppData) cannot change
+/// TTS:None pause punctuation (`,` vs `;`) in goldens.
+/// `auto_zoom_out` is true for most `src/navigate.rs` tests and false for
+/// `tests/Languages/*/navigate.rs`.
+pub fn set_navigation_test_preferences(
+    language: impl AsRef<str>,
+    nav_mode: impl AsRef<str>,
+    auto_zoom_out: bool,
+) -> Result<()> {
+    set_preference("NavMode", nav_mode)?;
+    set_preference("NavVerbosity", "Verbose")?;
+    set_preference("AutoZoomOut", if auto_zoom_out { "True" } else { "False" })?;
+    set_preference("Language", language)?;
+    set_preference("SpeechStyle", "SimpleSpeak")?;
+    set_preference("Verbosity", "Medium")?;
+    set_preference("PauseFactor", "100")?;
+    set_preference("Overview", "False")?;
+    return Ok(());
+}
+
 /// Given an 'id' and an offset (for tokens), set the navigation node to that id.
 /// An error is returned if the 'id' doesn't exist
 pub fn set_navigation_node(id: impl AsRef<str>, offset: usize) -> Result<()> {
