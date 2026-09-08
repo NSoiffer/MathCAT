@@ -138,7 +138,7 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "は"]
-     - t: "小なり"
+     - T: "小なり"
  - "=":                                           # 0x3d
     - test: 
         if: "$Verbosity!='Terse'"
@@ -149,7 +149,7 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "は"]
-     - t: "より大きい"
+     - T: "大なり"
  - "?": [t: "疑問符"]                       # 0x3f
  - "@": [t: "アットマーク"]                             # 0x40
  - "[":                                          # 0x5b
@@ -345,23 +345,23 @@
         - test:
             if: "$Verbosity!='Terse' and not(ancestor::*[self::m:set])"    # "the set x is an element of ..." sounds bad"
             then: [t: "は"]
-        - t: "属する"
+        - T: "要素オブ"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "中へ"]
+                then: [T: "イン"]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
                 then: [t: "元"]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "要素の"]
+                then: [T: "要素オブ"]
               - else: [t: "に属する"]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
                 then: [t: "元"]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "要素"]
+                then: [t: "要素オブ"]
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [t: "に含まれる"]
               - else: [t: "属する"]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
@@ -383,12 +383,12 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "は"]
-     - t: "より小さいか等しい"
+     - T: "小なり オア イコール"
  - "≥":                                          # 0x2265
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "は"]
-     - t: "より大きいか等しい"
+     - T: "大なり オア イコール"
 
  # --- restored complex short definitions (prefer over unicode-full) ---
  - "…":                                          # 0x2026
@@ -448,23 +448,23 @@
         - test: 
             if: "$Verbosity!='Terse' and not(ancestor::*[self::m:set])"    # "the set x is an element of ..." sounds bad"
             then: [t: "は"]
-        - t: "要素の"
+        - T: "要素オブ"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "中へ"]
+                then: [T: "イン"]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
                 then: [t: "元"]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "要素の"]
+                then: [T: "要素オブ"]
               - else: [t: "に属する"]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
                 then: [t: "元"]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "要素"]
+                then: [t: "要素オブ"]
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [t: "に含まれる"]
               - else: [t: "属する"]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
@@ -487,12 +487,12 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "は"]
-     - t: "最も肯定的な"
+     - T: "最も正の"
  - "≠":                                          # 0x2260
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "は"]
-     - t: "等しくない"
+     - T: "ノット イコール"
  - "≡":                                          # 0x2261
      - test: 
          if: "$Verbosity!='Terse'"
