@@ -1,0 +1,268 @@
+name: Alert Translators on English File Changes
+
+permissions:
+  contents: read
+  discussions: write
+
+on:
+  schedule:
+    - cron: '3 14 1,15 * *' # 14:03 UTC on day 1 and 15 of the month
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Load alert config
+        id: config
+        run: |
+          CONFIG_FILE=".github/translator-alert.config"
+          
+          PATHS=$(grep '^paths=' "$CONFIG_FILE"   | cut -d '=' -f2-)
+          EXCLUDE=$(grep '^exclude=' "$CONFIG_FILE" | cut -d '=' -f2-)
+          NOTIFY=$(grep '^notify=' "$CONFIG_FILE" | cut -d '=' -f2-)
+          
+          echo "paths=$PATHS"    >> $GITHUB_OUTPUT
+          echo "exclude=$EXCLUDE" >> $GITHUB_OUTPUT
+          echo "notify=$NOTIFY"  >> $GITHUB_OUTPUT
+
+      - name: Determine changed files
+        id: changes
+        run: |
+          LAST_WORKFLOW_RUN_DATE=$([ "$(date "+%d")" -eq 1 ] && echo "$(date --date "-1 month" "+%Y-%m")-15 14:03:00 +0000" || echo "$(date "+%Y-%m")-01 14:03:00 +0000")
+          LOG=$(git log --since="$LAST_WORKFLOW_RUN_DATE" --name-only --pretty=format:'COMMIT:%H')
+
+          FILES=$(printf "%s\n" "$LOG" | awk '/^COMMIT:/{next} NF' | sort -u)
+
+          {
+            echo "log<<EOF"
+            printf "%s\n" "$LOG"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "files<<EOF"
+            printf "%s\n" "$FILES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check if monitored paths has changes
+        id: check
+        env:
+          FILES: ${{ steps.changes.outputs.files }}
+          INCLUDES: ${{ steps.config.outputs.paths }}
+          EXCLUDES: ${{ steps.config.outputs.exclude }}
+        run: |
+
+          ALERT=false
+          MATCHED_FILES=""
+
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+
+            INCLUDED=false
+            for p in $INCLUDES; do
+              case "$f" in
+                $p*) INCLUDED=true; break ;;
+              esac
+            done
+            [ "$INCLUDED" = false ] && continue
+
+            EXCLUDED=false
+            for x in $EXCLUDES; do
+              [ -z "$x" ] && continue
+              case "$f" in
+                $x*) EXCLUDED=true; break ;;
+              esac
+            done
+            [ "$EXCLUDED" = true ] && continue
+
+            ALERT=true
+            MATCHED_FILES="${MATCHED_FILES}${f}\n"
+          done <<< "${FILES}"
+          
+          echo "alert=$ALERT" >> "$GITHUB_OUTPUT"
+
+          echo "matched<<EOF" >> "$GITHUB_OUTPUT"
+          printf "%b" "$MATCHED_FILES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Craft alert message
+        id: message
+        if: steps.check.outputs.alert == 'true'
+        uses: actions/github-script@v9
+        env:
+          NOTIFY: ${{ steps.config.outputs.notify }}
+          PATHS: ${{ steps.config.outputs.paths }}
+          EXCLUDES: ${{ steps.config.outputs.exclude }}
+          MATCHED: ${{ steps.check.outputs.matched }}
+          LOG: ${{ steps.changes.outputs.log }}
+        with:
+          script: |
+            const notify = process.env.NOTIFY;
+            const paths = process.env.PATHS;
+            const excludes = process.env.EXCLUDES;
+
+            const matchedList = process.env.MATCHED
+              .split("\n")
+              .map(s => s.trim())
+              .filter(Boolean);
+            
+            const rawLog = process.env.LOG;
+            const lines  = rawLog.split("\n");
+
+            const shaSet = new Set();
+            let currentSha = null;
+
+            for (const line of lines) {
+              if (line.startsWith("COMMIT:")) {
+                currentSha = line.substring("COMMIT:".length).trim();
+              } else {
+                const file = line.trim();
+                if (!file || !currentSha) continue;
+            
+                if (matchedList.includes(file)) {
+                  shaSet.add(currentSha);
+                }
+              }
+            }
+
+            const commitUrls = shaSet.size
+              ? Array.from(shaSet).map(sha => `- https://github.com/${context.repo.owner}/${context.repo.repo}/commit/${sha}`).join("\n")
+              : "(No commits specifically touched monitored files)";
+
+            const body = `
+            Changes detected in english files.
+            
+            Changed files:
+            ${JSON.stringify(matchedList, null, 2)}
+            
+            See changes in the commits affecting monitored files:
+            ${commitUrls}
+            
+            Notifying: ${notify}
+            `;
+            
+            core.setOutput('body', body);  
+
+      - name: Resolve discussion category
+        id: discussion_meta
+        if: steps.check.outputs.alert == 'true'
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const QUERY = `query ($owner: String!, $name: String!) {
+              repository(owner: $owner, name: $name) {
+                id
+                discussionCategories(first: 50) {
+                  nodes { id slug }
+                }
+              }
+            }`;
+            
+            const data = await github.graphql(QUERY, {
+              owner: context.repo.owner,
+              name: context.repo.repo
+            });
+            
+            const category = data.repository.discussionCategories.nodes
+              .find(c => c.slug === "announcements");
+            
+            if (!category) {
+              core.setFailed("Discussion category not found.");
+              return;
+            }
+            
+            core.setOutput("repository_id", data.repository.id);
+            core.setOutput("category_id", category.id);
+
+      - name: Determine release title
+        id: release
+        if: steps.check.outputs.alert == 'true'
+        run: |
+          RELEASE_TAG=$(git describe --tags --abbrev=0)
+          RELEASE_TITLE="Translation alerts for release ${RELEASE_TAG}"
+          echo "title=$RELEASE_TITLE" >> $GITHUB_OUTPUT
+
+      - name: Find or create release discussion
+        id: discussion
+        if: steps.check.outputs.alert == 'true'
+        uses: actions/github-script@v9
+        env:
+          REPOSITORY_ID: ${{ steps.discussion_meta.outputs.repository_id }}
+          CATEGORY_ID: ${{ steps.discussion_meta.outputs.category_id }}
+          TITLE: ${{ steps.release.outputs.title }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const repoId = process.env.REPOSITORY_ID;
+            const categoryId = process.env.CATEGORY_ID;
+            const title = process.env.TITLE;
+            
+            const FIND = `query ($owner: String!, $name: String!) {
+              repository(owner: $owner, name: $name) {
+                discussions(first: 50) {
+                  nodes { id title category { id } }
+                }
+              }
+            }`;
+            
+            const result = await github.graphql(FIND, {
+              owner: context.repo.owner,
+              name: context.repo.repo
+            });
+            
+            let discussion = result.repository.discussions.nodes
+              .find(d => d.title === title && d.category?.id === categoryId);
+            
+            if (!discussion) {
+              const CREATE = `mutation ($input: CreateDiscussionInput!) {
+                createDiscussion(input: $input) {
+                  discussion { id }
+                }
+              }`;
+            
+              const created = await github.graphql(CREATE, {
+                input: {
+                  repositoryId: repoId,
+                  categoryId,
+                  title,
+                  body: "Translation updates for this release."
+                }
+              });
+            
+              discussion = created.createDiscussion.discussion;
+            }
+            
+            core.setOutput("discussion_id", discussion.id);
+
+      - name: Post alert comment
+        if: steps.check.outputs.alert == 'true'
+        uses: actions/github-script@v9
+        env:
+          DISCUSSION_ID: ${{ steps.discussion.outputs.discussion_id }}
+          BODY: ${{ steps.message.outputs.body }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const discussionId = process.env.DISCUSSION_ID;
+            const body = process.env.BODY;
+            
+            const ADD = `mutation ($input: AddDiscussionCommentInput!) {
+              addDiscussionComment(input: $input) {
+                comment { id }
+              }
+            }`;
+            
+            await github.graphql(ADD, {
+              input: {
+                discussionId: discussionId,
+                body: body
+              }
+            });
