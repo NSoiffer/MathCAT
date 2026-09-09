@@ -6,7 +6,7 @@ permissions:
 
 on:
   schedule:
-    - cron: '3 14 1,15 * *'
+    - cron: '3 14 1,15 * *' # 14:03 UTC on day 1 and 15 of the month
 
 jobs:
   alert:
