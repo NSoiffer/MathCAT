@@ -261,17 +261,9 @@ impl PreferenceManager {
         // Note: if current_dir() also fails, unwrap_or_default yields an empty PathBuf,
         //       and the result may remain relative.
         #[cfg(not(feature = "include-zip"))]
-        let rules_dir = match rules_dir.canonicalize() {
-            Err(_e) => {
-                if rules_dir.is_absolute() {
-                    rules_dir
-                } else {
-                    std::env::current_dir()
-                        .unwrap_or_default()
-                        .join(&rules_dir)
-                }
-            },
-            Ok(rules_dir) =>  rules_dir,
+        let rules_dir = match canonicalize_shim(&rules_dir) {
+            Err(e) => bail!("set_rules_dir: could not canonicalize path {}: {}", rules_dir.display(), e.to_string()),
+            Ok(rules_dir) => rules_dir,
         };
 
         self.set_rules_dir(&rules_dir)?;

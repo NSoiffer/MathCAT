@@ -281,15 +281,81 @@ cfg_if! {
             crate::interface::set_rules_dir("Rules").unwrap();       // force reinitialization after the change
         }
     } else {
+        use std::collections::{HashMap, HashSet};
+        use std::sync::RwLock;
+
+        static IN_MEMORY_FILES: RwLock<Option<HashMap<String, String>>> = RwLock::new(None);
+        static IN_MEMORY_DIRS: RwLock<Option<HashSet<String>>> = RwLock::new(None);
+
+        pub fn add_in_memory_file(path: &str, content: &str) {
+            {
+                let mut files = IN_MEMORY_FILES.write().unwrap();
+                files.get_or_insert_with(HashMap::new).insert(path.to_string(), content.to_string());
+            }
+
+            let path_obj = Path::new(path);
+            {
+                let mut dirs = IN_MEMORY_DIRS.write().unwrap();
+                let dirs = dirs.get_or_insert_with(HashSet::new);
+                for parent in path_obj.ancestors().skip(1) {
+                    let parent_str = parent.to_str().unwrap_or_default();
+                    if !parent_str.is_empty() {
+                        dirs.insert(parent_str.to_string());
+                    }
+                }
+            }
+        }
+
+        pub fn canonicalize_shim(path: &Path) -> std::io::Result<PathBuf> {
+            use std::ffi::OsStr;
+            let dot = OsStr::new(".");
+            let dot_dot = OsStr::new("..");
+            let mut result = PathBuf::new();
+            for part in path.iter() {
+                if dot == part {
+                    continue;
+                } else if dot_dot == part {
+                    result.pop();
+                } else {
+                    result.push(part);
+                }
+            }
+            return Ok(result);
+        }
+
+        fn get_in_memory_key(path: &Path) -> String {
+            canonicalize_shim(path).unwrap_or_else(|_| path.to_path_buf()).to_str().unwrap_or_default().to_string()
+        }
+
         pub fn is_file_shim(path: &Path) -> bool {
+            if IN_MEMORY_FILES.read().unwrap().as_ref().map_or(false, |f| f.contains_key(&get_in_memory_key(path))) {
+                return true;
+            }
             return path.is_file();
         }
         
         pub fn is_dir_shim(path: &Path) -> bool {
+            if IN_MEMORY_DIRS.read().unwrap().as_ref().map_or(false, |d| d.contains(&get_in_memory_key(path))) {
+                return true;
+            }
             return path.is_dir();
         }
         
         pub fn find_files_in_dir_that_ends_with_shim(dir: &Path, ending: &str) ->  Vec<String> {
+            let dir_name = get_in_memory_key(dir);
+            let mut answer = Vec::new();
+            if let Some(files) = IN_MEMORY_FILES.read().unwrap().as_ref() {
+                for file_name in files.keys() {
+                    if file_name.starts_with(&dir_name) && file_name.ends_with(ending) {
+                        let name = Path::new(file_name).file_name().unwrap_or_default().to_str().unwrap_or_default();
+                        answer.push(name.to_string());
+                    }
+                }
+            }
+            if !answer.is_empty() {
+                return answer;
+            }
+
             match dir.read_dir() {
                 Err(_) => return vec![],    // empty
                 Ok(read_dir) => {
@@ -340,27 +406,6 @@ cfg_if! {
             }
         }
         
-        /// Resolves the path to an absolute, canonical form using the OS.
-        /// If `canonicalize()` fails (e.g., ACCESS_DENIED in containers), falls back to:
-        ///   - returning the path as-is if it is already absolute,
-        ///   - prepending the current working directory if it is relative.
-        /// Note: the fallback does not resolve symlinks or normalize `..`/`.` segments.
-        pub fn canonicalize_shim(path: &Path) -> std::io::Result<PathBuf> {
-            match path.canonicalize() {
-                Ok(p) => Ok(p),
-                Err(_) => {
-                    if path.is_absolute() {
-                        Ok(path.to_path_buf())
-                    } else {
-                        // Prepend cwd to make the relative path absolute.
-                        // unwrap_or_default yields an empty PathBuf if cwd is unavailable,
-                        // in which case the returned path will still be relative.
-                        Ok(std::env::current_dir().unwrap_or_default().join(path))
-                    }
-                }
-            }
-        }
-        
         // Tests extract language/braille zips in parallel. During extraction, individual YAML
         // files can briefly exist in a partially-written state (created/truncated before the
         // full contents are flushed). Guard both extraction and YAML reads with the same lock
@@ -379,6 +424,10 @@ cfg_if! {
         }
 
         pub fn read_to_string_shim(path: &Path) -> Result<String> {
+            if let Some(content) = IN_MEMORY_FILES.read().unwrap().as_ref().and_then(|f| f.get(&get_in_memory_key(path)).cloned()) {
+                return Ok(content);
+            }
+
             let path = match path.canonicalize() {
                 Ok(path) => path,
                 Err(_) => path.to_path_buf(),
@@ -489,5 +538,19 @@ mod tests {
 
         assert_eq!("test-value", read_to_string_shim(&existing_file).unwrap());
         assert!(read_to_string_shim(&test_dir.path().join("does-not-exist.yaml")).is_err());
+    }
+
+    #[test]
+    fn in_memory_filesystem_shim() {
+        add_in_memory_file("virtual/rules/Languages/en/test_Rules.yaml", "key: value");
+        let file_path = Path::new("virtual/rules/Languages/en/test_Rules.yaml");
+        let dir_path = Path::new("virtual/rules/Languages/en");
+
+        assert!(is_file_shim(file_path));
+        assert!(is_dir_shim(dir_path));
+        assert_eq!(read_to_string_shim(file_path).unwrap(), "key: value");
+
+        let found = find_files_in_dir_that_ends_with_shim(dir_path, "_Rules.yaml");
+        assert_eq!(found, vec!["test_Rules.yaml".to_string()]);
     }
 }
