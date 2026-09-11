@@ -1390,3 +1390,47 @@ fn single_line_with_label() -> Result<()> {
       expr, "1 equation, with label 2; b equals 2")?;
     return Ok(());
   }
+
+#[test]
+fn matrix_raised_to_power() -> Result<()> {
+  // A parenthesized matrix as the base of msup must speak as "the matrix ... squared".
+  // Regression for #762: the mrow 'matrix' intent rule returns a bare `x:`, so the intent tree
+  // carried a nested TEMP_NAME wrapper into `power` and NVDA read "TEMP NAME of the 2 by 2 matrix ...".
+  let expr = "<math><msup>
+      <mrow><mo>(</mo>
+        <mtable>
+          <mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr>
+          <mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr>
+        </mtable>
+      <mo>)</mo></mrow>
+      <mn>2</mn>
+    </msup></math>";
+  test("en", "ClearSpeak", expr, "the 2 by 2 matrix; row 1; 1, 2; row 2; 3, 4; squared")
+}
+
+#[test]
+fn matrix_raised_to_power_lualatex_spacing() -> Result<()> {
+  // The exact MathML from #762 (LuaLaTeX pmatrix output): negative-width mspace around the
+  // table and fence attributes on the parens. Canonicalization must fold the spacing away so
+  // the matrix is still recognized as the base of the power.
+  let expr = "<math display='block'>
+    <msup>
+      <mrow>
+        <mo fence='true' lspace='0' rspace='0' symmetric='true'>(</mo>
+        <mspace width='-4.981pt'/>
+        <mrow>
+          <mspace width='4.981pt'/>
+          <mtable>
+            <mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr>
+            <mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr>
+          </mtable>
+          <mspace width='4.981pt'/>
+        </mrow>
+        <mspace width='-4.981pt'/>
+        <mo fence='true' lspace='0' rspace='0' symmetric='true'>)</mo>
+      </mrow>
+      <mn>2</mn>
+    </msup>
+  </math>";
+  test("en", "ClearSpeak", expr, "the 2 by 2 matrix; row 1; 1, 2; row 2; 3, 4; squared")
+}
