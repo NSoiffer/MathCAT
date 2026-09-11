@@ -709,24 +709,38 @@ impl Intent {
 
 
         /// "lift" up the children any "TEMP_NAME" child -- could short circuit when only one child
+        ///
+        /// TEMP_NAME is only ever a transport wrapper created by `replace_nodes_tree`, so wrappers can nest:
+        /// a rule whose replacement is a bare `x:` (e.g., the mrow 'matrix' rule returns `x: "*[2]"`) yields
+        /// TEMP_NAME(matrix), and the parent intent's `x: "*[1]"` wraps that again. Lifting only one level left
+        /// `power(TEMP_NAME(matrix), 2)`, spoken as "TEMP NAME of the 2 by 2 matrix ... squared" (issue #762).
+        /// Nested wrappers whose children are all elements are flattened; a leaf wrapper (text from a Text or
+        /// Attribute node) is only unwrapped when it is a direct child, matching the previous behavior.
         fn lift_children(result: Element) -> Element {
             // debug!("lift_children:\n{}", mml_to_string(result));
             // most likely there will be the same number of new children as result has, but there could be more
             let mut new_children = Vec::with_capacity(2*result.children().len());
             for child_of_element in result.children() {
-                match child_of_element {
-                    ChildOfElement::Element(child) => {
-                        if name(child) == "TEMP_NAME" {
-                            new_children.append(&mut child.children());  // almost always just one
-                        } else {
-                            new_children.push(child_of_element);
-                        }
-                    },
-                    _ => new_children.push(child_of_element),      // text()
-                }
+                push_lifted(child_of_element, &mut new_children, true);
             }
             result.replace_children(new_children);
             return result;
+
+            fn push_lifted<'a>(child_of_element: ChildOfElement<'a>, new_children: &mut Vec<ChildOfElement<'a>>, is_direct_child: bool) {
+                if let ChildOfElement::Element(child) = child_of_element {
+                    if name(child) == "TEMP_NAME" {
+                        let grandchildren = child.children();
+                        let is_leaf_wrapper = grandchildren.iter().any(|gc| matches!(gc, ChildOfElement::Text(_)));
+                        if is_direct_child || !is_leaf_wrapper {
+                            for grandchild in grandchildren {
+                                push_lifted(grandchild, new_children, false);
+                            }
+                            return;
+                        }
+                    }
+                }
+                new_children.push(child_of_element);
+            }
         }
     }    
 }
