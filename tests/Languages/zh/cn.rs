@@ -946,7 +946,7 @@ fn menclose_names_the_mark_instead_of_the_result() -> Result<()> {
 
 #[test]
 fn tau_and_dotted_minus_symbols_are_distinguishable() -> Result<()> {
-    test("zh", "SimpleSpeak", "<math><mi>&#x03c4;</mi></math>", "陶")?;
+    test("zh", "SimpleSpeak", "<math><mi>&#x03c4;</mi></math>", "tau")?;
     test(
         "zh",
         "SimpleSpeak",
@@ -973,14 +973,14 @@ fn unicode_letter_currency_and_operator_names_match_character_identity() -> Resu
         ("2114", "磅符号"),
         ("2116", "序号符号"),
         ("2127", "姆欧"),
-        ("2129", "倒置希腊小写字母约塔"),
+        ("2129", "倒置希腊小写字母 iota"),
         ("223c", "波浪运算符"),
         ("223d", "反转波浪号"),
         ("2240", "圈积"),
         ("2244", "不渐近等于"),
         ("2246", "近似但不等于"),
         ("2257", "圆圈等于"),
-        ("225c", "德尔塔等于"),
+        ("225c", "delta 等于"),
         ("226d", "不等价于"),
         ("22a3", "左断言符"),
         ("22a6", "断言符"),
@@ -2783,7 +2783,7 @@ fn remaining_ea00_mathtype_private_use_symbols_match_verified_sources() -> Resul
         (0xeca3, "向上的圆括号右部"),
         (0xeca4, "向下的花括号延伸段"),
         (0xed02, "无点 j"),
-        (0xed03, "双伽马"),
+        (0xed03, "digamma"),
         (0xed10, "d"),
         (0xed11, "e"),
         (0xed12, "i"),
@@ -2840,15 +2840,15 @@ fn remaining_ea00_mathtype_private_use_symbols_match_verified_sources() -> Resul
 fn mathtype_double_struck_greek_matches_the_original_character_table() -> Result<()> {
     // Check every MathType PUA slot because the source order is non-alphabetic in both ranges.
     let capitals = [
-        ("f201", "德尔塔"),
-        ("f202", "克西"),
-        ("f203", "拉姆达"),
-        ("f204", "派"),
-        ("f205", "西格马"),
-        ("f206", "西塔"),
-        ("f207", "伽马"),
-        ("f208", "欧米伽"),
-        ("f209", "宇普西隆"),
+        ("f201", "delta"),
+        ("f202", "zai"),
+        ("f203", "lambda"),
+        ("f204", "pi"),
+        ("f205", "sigma"),
+        ("f206", "theta"),
+        ("f207", "gamma"),
+        ("f208", "omega"),
+        ("f209", "upsilon"),
     ];
     for (codepoint, name) in capitals {
         let expr = format!("<math><mi>&#x{codepoint};</mi></math>");
@@ -2858,29 +2858,29 @@ fn mathtype_double_struck_greek_matches_the_original_character_table() -> Result
     }
 
     let lowercase = [
-        ("f220", "阿尔法"),
-        ("f221", "贝塔"),
-        ("f222", "斐"),
-        ("f223", "泽塔"),
-        ("f224", "普西"),
-        ("f225", "德尔塔"),
-        ("f226", "艾普西隆"),
-        ("f227", "伽马"),
-        ("f228", "伊塔"),
-        ("f229", "约塔"),
-        ("f22a", "克西"),
-        ("f22b", "卡帕"),
-        ("f22c", "拉姆达"),
-        ("f22d", "缪"),
-        ("f22e", "纽"),
-        ("f22f", "艾普西隆"),
-        ("f230", "派"),
-        ("f231", "西塔"),
-        ("f232", "柔"),
-        ("f233", "西格马"),
-        ("f234", "陶"),
-        ("f235", "西塔"),
-        ("f236", "欧米伽"),
+        ("f220", "alpha"),
+        ("f221", "beta"),
+        ("f222", "phi"),
+        ("f223", "zeta"),
+        ("f224", "psi"),
+        ("f225", "delta"),
+        ("f226", "epsilon"),
+        ("f227", "gamma"),
+        ("f228", "eta"),
+        ("f229", "iota"),
+        ("f22a", "zai"),
+        ("f22b", "kappa"),
+        ("f22c", "lambda"),
+        ("f22d", "mu"),
+        ("f22e", "nu"),
+        ("f22f", "epsilon"),
+        ("f230", "pi"),
+        ("f231", "theta"),
+        ("f232", "rho"),
+        ("f233", "sigma"),
+        ("f234", "tau"),
+        ("f235", "theta"),
+        ("f236", "omega"),
     ];
     for (codepoint, name) in lowercase {
         let expr = format!("<math><mi>&#x{codepoint};</mi></math>");
@@ -2890,9 +2890,9 @@ fn mathtype_double_struck_greek_matches_the_original_character_table() -> Result
     }
 
     let special = [
-        ("f237", "双线体词尾西格马"),
-        ("f250", "双线体柔"),
-        ("f251", "双线体斐"),
+        ("f237", "双线体 final sigma"),
+        ("f250", "双线体 rho"),
+        ("f251", "双线体 phi"),
     ];
     for (codepoint, expected) in special {
         let expr = format!("<math><mi>&#x{codepoint};</mi></math>");
@@ -2906,16 +2906,16 @@ fn mathtype_double_struck_greek_matches_the_original_character_table() -> Result
 fn mathematical_capital_theta_symbols_remain_speakable_in_every_variant() -> Result<()> {
     // Each 25-character range has an extra theta-symbol slot where U+03A2 must not be used.
     let cases = [
-        ("1d6b9", "粗体 大写 西塔"),
-        ("f419", "粗体 大写 西塔"),
-        ("1d6f3", "大写 西塔"),
-        ("f453", "大写 西塔"),
-        ("1d72d", "粗体 大写 西塔"),
-        ("f48d", "粗体 大写 西塔"),
-        ("1d767", "粗体 大写 西塔"),
-        ("f4c7", "粗体 大写 西塔"),
-        ("1d7a1", "粗体 大写 西塔"),
-        ("f501", "粗体 大写 西塔"),
+        ("1d6b9", "粗体 大写 theta"),
+        ("f419", "粗体 大写 theta"),
+        ("1d6f3", "大写 theta"),
+        ("f453", "大写 theta"),
+        ("1d72d", "粗体 大写 theta"),
+        ("f48d", "粗体 大写 theta"),
+        ("1d767", "粗体 大写 theta"),
+        ("f4c7", "粗体 大写 theta"),
+        ("1d7a1", "粗体 大写 theta"),
+        ("f501", "粗体 大写 theta"),
     ];
 
     for (codepoint, expected) in cases {
@@ -2930,9 +2930,9 @@ fn mathematical_capital_theta_symbols_remain_speakable_in_every_variant() -> Res
 fn audited_unicode_ranges_keep_their_boundaries() -> Result<()> {
     // The first and last characters catch off-by-one and shifted translate mappings.
     let cases = [
-        ("03aa", "大写 约塔 带分音符"),
-        ("03ab", "大写 宇普西隆 带分音符"),
-        ("03cf", "大写 凯"),
+        ("03aa", "大写 iota 带分音符"),
+        ("03ab", "大写 upsilon 带分音符"),
+        ("03cf", "大写 kai"),
         ("24b6", "带圈 大写 a"),
         ("24cf", "带圈 大写 z"),
         ("24d0", "带圈 a"),
@@ -3011,63 +3011,95 @@ fn audited_unicode_ranges_keep_their_boundaries() -> Result<()> {
 }
 
 #[test]
+fn confirmed_greek_unicode_variants_keep_chinese_modifiers_and_english_cores() -> Result<()> {
+    let cases = [
+        ("02e0", "修饰用小写 gamma"),
+        ("03ca", "带分音符的 iota"),
+        ("03cb", "带分音符的 upsilon"),
+        ("03cc", "带重音符的 omicron"),
+        ("03cd", "带重音符的 upsilon"),
+        ("03ce", "带重音符的 omega"),
+        ("03d0", "beta"),
+        ("03d1", "theta"),
+        ("03d2", "带钩的 upsilon"),
+        ("03d3", "带锐音与钩的 upsilon"),
+        ("03d4", "带分音与钩的 upsilon"),
+        ("03d7", "kai"),
+        ("03d8", "大写 archaic koppa"),
+        ("03d9", "archaic koppa"),
+        ("03dd", "digamma"),
+        ("213c", "双线体 pi"),
+        ("213d", "双线体 gamma"),
+        ("f250", "双线体 rho"),
+        ("f251", "双线体 phi"),
+    ];
+
+    for (codepoint, expected) in cases {
+        let expr = format!("<math><mi>&#x{codepoint};</mi></math>");
+        test("zh", "SimpleSpeak", &expr, expected)
+            .map_err(|error| anyhow::anyhow!("U+{codepoint}: {error}"))?;
+    }
+    Ok(())
+}
+
+#[test]
 fn mathtype_greek_and_digit_ranges_keep_verified_character_order() -> Result<()> {
     // Check every mapped MathType slot in U+F404-U+F555, including easily shifted variants.
     let capitals = [
-        "阿尔法",
-        "贝塔",
-        "伽马",
-        "德尔塔",
-        "艾普西隆",
-        "泽塔",
-        "伊塔",
-        "西塔",
-        "约塔",
-        "卡帕",
-        "拉姆达",
-        "缪",
-        "纽",
-        "克西",
-        "奥密克戎",
-        "派",
-        "柔",
-        "西塔",
-        "西格马",
-        "陶",
-        "宇普西隆",
-        "斐",
-        "希",
-        "普西",
-        "欧米伽",
+        "alpha",
+        "beta",
+        "gamma",
+        "delta",
+        "epsilon",
+        "zeta",
+        "eta",
+        "theta",
+        "iota",
+        "kappa",
+        "lambda",
+        "mu",
+        "nu",
+        "zai",
+        "omicron",
+        "pi",
+        "rho",
+        "theta",
+        "sigma",
+        "tau",
+        "upsilon",
+        "phi",
+        "chi",
+        "psi",
+        "omega",
     ];
     let lowercase = [
-        "阿尔法",
-        "贝塔",
-        "伽马",
-        "德尔塔",
-        "艾普西隆",
-        "泽塔",
-        "伊塔",
-        "西塔",
-        "约塔",
-        "卡帕",
-        "拉姆达",
-        "缪",
-        "纽",
-        "克西",
-        "奥密克戎",
-        "派",
-        "柔",
-        "词尾西格马",
-        "西格马",
-        "陶",
-        "宇普西隆",
-        "斐",
-        "希",
-        "普西",
-        "欧米伽",
+        "alpha",
+        "beta",
+        "gamma",
+        "delta",
+        "epsilon",
+        "zeta",
+        "eta",
+        "theta",
+        "iota",
+        "kappa",
+        "lambda",
+        "mu",
+        "nu",
+        "zai",
+        "omicron",
+        "pi",
+        "rho",
+        "final sigma",
+        "sigma",
+        "tau",
+        "upsilon",
+        "phi",
+        "chi",
+        "psi",
+        "omega",
     ];
-    let variants = ["偏导数", "艾普西隆", "西塔", "卡帕", "斐", "柔", "派"];
+    let variants = ["偏导数", "epsilon", "theta", "kappa", "phi", "rho", "pi"];
     let families = [
         (0xf408, 0xf421, 0xf422, 0xf43b, "粗体 ", "粗体纳布拉"),
         (0xf442, 0xf45b, 0xf45c, 0xf475, "", "斜体纳布拉"),
@@ -3983,8 +4015,8 @@ fn additional_cn_formula_cases_cover_common_notation() -> Result<()> {
         (
             "eigen-equation",
             "<math><mi>A</mi><mi>v</mi><mo>=</mo><mi>λ</mi><mi>v</mi></math>",
-            "大写 a v, 等于 拉姆达 v",
-            "大写 a v, 等于 拉姆达 v",
+            "大写 a v, 等于 lambda v",
+            "大写 a v, 等于 lambda v",
         ),
         (
             "distance-formula",
@@ -4043,8 +4075,8 @@ fn additional_cn_formula_cases_cover_common_notation() -> Result<()> {
         (
             "euler-identity",
             "<math><msup><mi>e</mi><mrow><mi>i</mi><mi>π</mi></mrow></msup><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></math>",
-            "e 的 i 派 次方, 加 1; 等于 0",
-            "e 的 i 派 次方, 加 1; 等于 0",
+            "e 的 i pi 次方, 加 1; 等于 0",
+            "e 的 i pi 次方, 加 1; 等于 0",
         ),
         (
             "speed-unit",
@@ -4194,14 +4226,14 @@ fn additional_cn_edge_formulas_cover_uncommon_structure() -> Result<()> {
         (
             "polar-coordinate",
             "<math><mrow intent='polar-coordinate($x,$y)'><mi arg='x'>r</mi><mi arg='y'>θ</mi></mrow></math>",
-            "极坐标 r 逗号, 西塔",
-            "极坐标 r 逗号, 西塔",
+            "极坐标 r 逗号, theta",
+            "极坐标 r 逗号, theta",
         ),
         (
             "spherical-coordinate",
             "<math><mrow intent='spherical-coordinate($x,$y,$z)'><mi arg='x'>r</mi><mi arg='y'>θ</mi><mi arg='z'>φ</mi></mrow></math>",
-            "球坐标 r 逗号, 西塔 逗号, 斐",
-            "球坐标 r 逗号, 西塔 逗号, 斐",
+            "球坐标 r 逗号, theta 逗号, phi",
+            "球坐标 r 逗号, theta 逗号, phi",
         ),
         (
             "coordinate",
@@ -4470,8 +4502,8 @@ fn additional_cn_semantic_formulas_cover_probability_chemistry_and_algebra() -> 
         (
             "approximately",
             "<math><mrow intent='approximately($a,$b)'><mi arg='a'>π</mi><mi arg='b'>3.14</mi></mrow></math>",
-            "派 约等于 3.14",
-            "派 约等于 3.14",
+            "pi 约等于 3.14",
+            "pi 约等于 3.14",
         ),
         (
             "identically-equals",
@@ -4599,13 +4631,13 @@ fn additional_cn_semantic_formulas_cover_probability_chemistry_and_algebra() -> 
         "zh",
         "SimpleSpeak",
         variance,
-        "西格马 上标 二; 等于; 分数, n 分之, 求和 从 i 等于 1 到 n; 左括号, x 减 x 上横线; 右括号 平方, 结束分数",
+        "sigma 上标 二; 等于; 分数, n 分之, 求和 从 i 等于 1 到 n; 左括号, x 减 x 上横线; 右括号 平方, 结束分数",
     )?;
     test(
         "zh",
         "ClearSpeak",
         variance,
-        "西格马 上标 二; 等于; 分数，分子为; 求和 从 i 等于 1 到 n; 左括号, x 减 x 上横线; 右括号 平方; 分母为 n",
+        "sigma 上标 二; 等于; 分数，分子为; 求和 从 i 等于 1 到 n; 左括号, x 减 x 上横线; 右括号 平方; 分母为 n",
     )?;
 
     let reaction = "<math><mmultiscripts><mtext>C</mtext><mprescripts/><mn>6</mn><mn>14</mn></mmultiscripts><mo>→</mo><mmultiscripts><mtext>N</mtext><mprescripts/><mn>7</mn><mn>14</mn></mmultiscripts><mo>+</mo><mmultiscripts><mtext>e</mtext><mprescripts/><mrow><mo>−</mo><mn>1</mn></mrow><mn>0</mn></mmultiscripts></math>";
@@ -4739,14 +4771,14 @@ fn additional_cn_probability_linear_algebra_and_geometry_cases() -> Result<()> {
         (
             "correlation-coefficient",
             "<math><mi>ρ</mi><mo>=</mo><mfrac><mrow><mi>Cov</mi><mo>⁡</mo><mrow><mo>(</mo><mi>X</mi><mo>,</mo><mi>Y</mi><mo>)</mo></mrow></mrow><mrow><msub><mi>σ</mi><mi>X</mi></msub><msub><mi>σ</mi><mi>Y</mi></msub></mrow></mfrac></math>",
-            "柔 等于; 分数, 西格马 下标 大写 x; 西格马 下标 大写 y; 分之, 协方差, 左括号, 大写 x 逗号, 大写 y; 右括号, 结束分数",
-            "柔 等于; 分数，分子为; 协方差, 左括号, 大写 x 逗号, 大写 y; 右括号; 分母为 西格马 下标 大写 x; 西格马 下标 大写 y",
+            "rho 等于; 分数, sigma 下标 大写 x; sigma 下标 大写 y; 分之, 协方差, 左括号, 大写 x 逗号, 大写 y; 右括号, 结束分数",
+            "rho 等于; 分数，分子为; 协方差, 左括号, 大写 x 逗号, 大写 y; 右括号; 分母为 sigma 下标 大写 x; sigma 下标 大写 y",
         ),
         (
             "normal-density",
             "<math><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mi>σ</mi><msqrt><mn>2</mn><mi>π</mi></msqrt></mrow></mfrac><msup><mi>e</mi><mrow><mo>−</mo><mfrac><mrow><mo>(</mo><mi>x</mi><mo>−</mo><mi>μ</mi><mo>)</mo></mrow><mn>2</mn></mfrac></mrow></msup></math>",
-            "f x 等于; 分数, 西格马 乘, 根号 2 派 结束根号; 分之 1, 结束分数; 乘; e 的 负 分数, 2 分之, 左括号 x 减 缪, 右括号, 结束分数; 次方",
-            "f x 等于; 分数，分子为 1; 分母为 根号 2 派; 乘; e 的 分数，分子为; 左括号 x 减 缪, 右括号; 分母为 2; 次方",
+            "f x 等于; 分数, sigma 乘 根号 2 pi 结束根号; 分之 1, 结束分数; 乘; e 的 负 分数, 2 分之, 左括号 x 减 mu 右括号, 结束分数; 次方",
+            "f x 等于; 分数，分子为 1; 分母为 根号 2 pi; 乘; e 的 分数，分子为; 左括号 x 减 mu 右括号; 分母为 2; 次方",
         ),
         (
             "binomial-probability",
@@ -4763,8 +4795,8 @@ fn additional_cn_probability_linear_algebra_and_geometry_cases() -> Result<()> {
         (
             "polar-complex-form",
             "<math><mi>z</mi><mo>=</mo><mi>r</mi><mrow><mo>(</mo><mi>cos</mi><mo>⁡</mo><mi>θ</mi><mo>+</mo><mi>i</mi><mi>sin</mi><mo>⁡</mo><mi>θ</mi><mo>)</mo></mrow></math>",
-            "z 等于; r; 左括号; 余弦 西塔, 加, i 正弦 西塔; 右括号",
-            "z 等于; r; 左括号; 余弦 西塔, 加, i 正弦 西塔; 右括号",
+            "z 等于; r; 左括号; 余弦 theta, 加, i 正弦 theta; 右括号",
+            "z 等于; r; 左括号; 余弦 theta, 加, i 正弦 theta; 右括号",
         ),
         (
             "slope-formula",
@@ -4874,8 +4906,8 @@ fn additional_cn_units_chemistry_and_adornment_cases() -> Result<()> {
         (
             "radian-unit",
             "<math><mfrac><mi>π</mi><mn>2</mn></mfrac><mi intent=':unit'>rad</mi></math>",
-            "2 分之 派, 弧度",
-            "2 分之 派 弧度",
+            "2 分之 pi, 弧度",
+            "2 分之 pi 弧度",
         ),
         (
             "si-prefix",
@@ -4922,8 +4954,8 @@ fn additional_cn_units_chemistry_and_adornment_cases() -> Result<()> {
         (
             "reaction-condition",
             "<math><mrow><mi mathvariant='normal'>A</mi><mover><mo>→</mo><mi>Δ</mi></mover><mi mathvariant='normal'>B</mi></mrow></math>",
-            "大写 a, 向右箭头 上方有 大写 德尔塔, 大写 b",
-            "大写 a, 向右箭头 上方有 大写 德尔塔, 大写 b",
+            "大写 a, 向右箭头 上方有 大写 delta, 大写 b",
+            "大写 a, 向右箭头 上方有 大写 delta, 大写 b",
         ),
         (
             "hydrate-dot",
