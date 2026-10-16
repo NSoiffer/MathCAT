@@ -1744,6 +1744,66 @@ fn p42_matrix() -> Result<()> {
     return Ok(());
 }
 
+// Empty cells are marked up with dots (25).
+#[test]
+fn matrix_with_empty_cells() -> Result<()> {
+    let expr = "<math>
+<mrow>
+<mo>(</mo>
+<mtable>
+	<mtr>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    <mtd>
+    </mtd>
+    <mtd>
+    </mtd>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    </mtr>
+	<mtr>
+    <mtd>
+    </mtd>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    <mtd>
+    </mtd>
+    <mtd>
+    </mtd>
+    </mtr>
+	<mtr>
+    <mtd>
+    </mtd>
+    <mtd>
+    </mtd>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    <mtd>
+    </mtd>
+    </mtr>
+	<mtr>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    <mtd>
+    </mtd>
+    <mtd>
+    </mtd>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    </mtr>
+</mtable>
+<mo>)</mo>
+</mrow>
+</math>";
+    test_braille("Finnish", expr, "⠦⠼⠁⠀⠒⠀⠒⠀⠼⠁⠴⠀⠐⠐⠀⠦⠒⠀⠼⠁⠀⠒⠀⠒⠴⠀⠐⠐⠀⠦⠒⠀⠒⠀⠼⠁⠀⠒⠴⠀⠐⠐⠀⠦⠼⠁⠀⠒⠀⠒⠀⠼⠁⠴")?;
+    return Ok(());
+}
 
 // Two 5-dots separate the rows in the 2D math. Format: [whitespace][dot 5][dot 5][whitespace]. This is not an operator.
 // In the determinant the vertical bar is repeated for every row.
