@@ -678,7 +678,7 @@ fn p22_equation_solving_notation() -> Result<()> {
     return Ok(());
 }
 
-// This is Finnish notation. The bar | is used to denote that an operation is done on both sides of the equation. This is not a real life example, but a string of mark up that should produce the output in the test.
+// This is Finnish notation. The bar | is used to denote that an operation is done on both sides of the equation. This is not a real life example, but a string of mark up that should produce the output in the test: [space][vertical bar][operation done on both sides].
 #[test]
 fn operate_by_on_both_sides() -> Result<()> {
     let expr = "<math>
