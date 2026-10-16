@@ -230,6 +230,20 @@ fn p15_greater_than() -> Result<()> {
     return Ok(());
 }
 
+// No space required between variables.
+#[test]
+fn greater_than_with_more_variables() -> Result<()> {
+    let expr = "<math>
+    <mn>2</mn>
+    <mi>x</mi>
+    <mi>y</mi>
+    <mo>&gt;</mo>
+    <mn>6</mn>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠀⠭⠽⠀⠱⠀⠼⠋")?;
+    return Ok(());
+}
+
 #[test]
 fn p15_greater_than_or_equal_to() -> Result<()> {
     let expr = "<math>
