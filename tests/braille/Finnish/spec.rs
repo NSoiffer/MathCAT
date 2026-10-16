@@ -317,7 +317,7 @@ fn p16_division() -> Result<()> {
     <mo>:</mo>
     <mn>3</mn>
 </math>";
-    test_braille("Finnish", expr, "⠦⠼⠋⠀⠭⠀⠖⠼⠉⠀⠭⠴⠀⠌⠼⠉")?;
+    test_braille("Finnish", expr, "⠦⠼⠋⠀⠭⠀⠖⠼⠉⠀⠭⠴⠀⠒⠼⠉")?;
     return Ok(());
 }
 
@@ -653,7 +653,7 @@ fn p22_equation_solving_notation() -> Result<()> {
     <mo>:</mo>
     <mn>5</mn>
 </math>";
-    test_braille("Finnish", expr, "⠼⠑⠀⠭⠀⠶⠤⠼⠁⠚⠀⠀⠸⠀⠌⠼⠑")?;
+    test_braille("Finnish", expr, "⠼⠑⠀⠭⠀⠶⠤⠼⠁⠚⠀⠀⠸⠀⠒⠼⠑")?;
     
     return Ok(());
 }
@@ -1334,7 +1334,7 @@ fn p40_p_or_q() -> Result<()> {
     return Ok(());
 }
 
-// The colon : should be written directly after the function f (and similar). This is unlike when it is used as a division sign and for ratio.
+// The colon : should be written directly after the function f (and similar). This is different compared to it being used as a division sign and as a ratio.
 #[test]
 fn p41_function_definition() -> Result<()> {
     let expr = "<math>
