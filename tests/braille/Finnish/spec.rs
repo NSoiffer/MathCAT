@@ -2,23 +2,16 @@
 //
 // Changes to the specifications in the rules and tests in MathCAT
 // Some changes have been made to the rules and these tests test against the modified rules. The changes have been made, because the specification is for printed braille and intended for people authoring mathematics braille. Some things have been changed to be consistent in all situations and to work in the braille display context.
-
-// UEB tests for the basic mathml tags
-// Initial tests are from BANA guidelines, mostly about initial chars for code switching
-//   http://www.brailleauthority.org/ueb/ueb_math_guidance/final_for_posting_ueb_math_guidance_may_2019_102419.pdf
-// These tests start with "bana_"
-//
-// Many come from (refer to) https://iceb.org/guidelines_for_technical_material_2014.pdf
-// For example, "fraction_6_1_1" is a fraction example from section 6.1, and is the first example there.
 use crate::common::*;
 use anyhow::Result;
 
 // Finnish spec tests
-
 // Page and some other identification has been added to the function name, so you can figure out which expression the test in based on. Some tests are variations of the "official" test.
 
-// Grouping numbers
+// In general numbers and variables are separated from each other with a space, so the variables (most often letters) are not interpreted as numbers.
+// Variables can be written with no space between them, since there is not similar misinterpretation risk. 
 
+// Grouping numbers
 // No example in the specs
 #[test]
 fn p7_no_grouping_in_four_digit_numbers() -> Result<()> {
@@ -237,6 +230,20 @@ fn p15_greater_than() -> Result<()> {
     return Ok(());
 }
 
+// No space required between variables.
+#[test]
+fn greater_than_with_more_variables() -> Result<()> {
+    let expr = "<math>
+    <mn>2</mn>
+    <mi>x</mi>
+    <mi>y</mi>
+    <mo>&gt;</mo>
+    <mn>6</mn>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠀⠭⠽⠀⠱⠀⠼⠋")?;
+    return Ok(());
+}
+
 #[test]
 fn p15_greater_than_or_equal_to() -> Result<()> {
     let expr = "<math>
@@ -261,6 +268,7 @@ fn p15_less_than_or_equal_to() -> Result<()> {
 }
 
 // Fractions with 'dropped dots'.
+// When the fraction ends in a parenthesis (dots 356), the dot 6 is used to end the 'dropped dots' zone, so it is not confused with 'dropped dots' for number 0 (dots 356). 
 #[test]
 fn p15_fractions_minus() -> Result<()> {
     let expr = "<math>
@@ -309,7 +317,7 @@ fn p16_division() -> Result<()> {
     <mo>:</mo>
     <mn>3</mn>
 </math>";
-    test_braille("Finnish", expr, "⠦⠼⠋⠀⠭⠀⠖⠼⠉⠀⠭⠴⠀⠌⠼⠉")?;
+    test_braille("Finnish", expr, "⠦⠼⠋⠀⠭⠀⠖⠼⠉⠀⠭⠴⠀⠒⠼⠉")?;
     return Ok(());
 }
 
@@ -333,7 +341,7 @@ fn p16_fractional() -> Result<()> {
 
 #[test]
 fn p16_absolute_value() -> Result<()> {
-    let expr = " <math>
+    let expr = "<math>
       <mrow>
         <mrow>
           <mo>|</mo>
@@ -423,8 +431,7 @@ fn p17_multiple_operations() -> Result<()> {
       <mn>2</mn>
     </msup>
 </math>";
-    test_braille("Finnish", expr, "⠼⠑⠀⠄⠼⠉⠬⠀⠖⠦⠼⠓⠁⠀⠤⠼⠋⠚⠴⠀⠌⠼⠉⠀⠤⠦⠼⠃⠀⠖⠼⠙⠴⠬")?;
-    // : as a division sign
+    test_braille("Finnish", expr, "⠼⠑⠀⠄⠼⠉⠬⠀⠖⠦⠼⠓⠁⠀⠤⠼⠋⠚⠴⠀⠒⠼⠉⠀⠤⠦⠼⠃⠀⠖⠼⠙⠴⠬")?;
     return Ok(());
 }
 
@@ -516,6 +523,7 @@ fn p19_fraction_multiplication_Finnish_notation_multiscripts() -> Result<()> {
     return Ok(());
 }
 
+// This is Finnish notation where the numerator and denomator is multiplied by the same expression that is in the pre-supercript. Structure is always: [multiplicator][parenthesis]
 #[test]
 fn p19_fraction_multiplication_Finnish_notation_multiscripts_2() -> Result<()> {
     let expr = "<math>
@@ -574,6 +582,7 @@ fn p22_fraction_division_Finnish_notation_msup() -> Result<()> {
     return Ok(());
 }
 
+// This is Finnish notation for dividing the numerator and denominator by the same expression. It is always of the form: [parenthesis][divisor]
 #[test]
 fn p22_fraction_division_Finnish_notation_msup_2() -> Result<()> {
     let expr = "<math>
@@ -587,6 +596,26 @@ fn p22_fraction_division_Finnish_notation_msup_2() -> Result<()> {
       <mn>2</mn>
     </mrow>
   </msup>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠲⠣⠼⠃")?;
+    return Ok(());
+}
+
+// It could possible to have the same structure as a mmultiscript as before, so here is a test for that. Output is the same as before.
+#[test]
+fn p22_fraction_division_Finnish_notation_mmultiscripts() -> Result<()> {
+    let expr = "<math>
+  <mmultiscripts>
+    <mfrac>
+      <mn>2</mn>
+      <mn>4</mn>
+    </mfrac>
+    <mrow></mrow>
+    <mrow>
+      <mo>(</mo>
+      <mn>2</mn>
+    </mrow>
+  </mmultiscripts>
 </math>";
     test_braille("Finnish", expr, "⠼⠃⠲⠣⠼⠃")?;
     return Ok(());
@@ -630,6 +659,8 @@ fn p23_equation_1_with_invisible_multiplication() -> Result<()> {
     return Ok(());
 }
 
+// This is Finnish notation. The bar | is used to denote that an operation is done on both sides of the equation.
+// Here the equation is divided by five on both sides.
 #[test]
 fn p22_equation_solving_notation() -> Result<()> {
     let expr = "<math>
@@ -642,11 +673,12 @@ fn p22_equation_solving_notation() -> Result<()> {
     <mo>:</mo>
     <mn>5</mn>
 </math>";
-    test_braille("Finnish", expr, "⠼⠑⠀⠭⠀⠶⠤⠼⠁⠚⠀⠀⠸⠀⠌⠼⠑")?;
-    // Context: the equation is divided by five on both sides.
+    test_braille("Finnish", expr, "⠼⠑⠀⠭⠀⠶⠤⠼⠁⠚⠀⠀⠸⠀⠒⠼⠑")?;
+    
     return Ok(());
 }
 
+// This is Finnish notation. The bar | is used to denote that an operation is done on both sides of the equation. This is not a real life example, but a string of mark up that should produce the output in the test: [space][vertical bar][operation done on both sides].
 #[test]
 fn operate_by_on_both_sides() -> Result<()> {
     let expr = "<math>
@@ -678,7 +710,67 @@ fn operate_by_on_both_sides() -> Result<()> {
     <mn>5</mn>
 </math>";
     test_braille("Finnish", expr, "⠀⠀⠸⠀⠖⠼⠑⠀⠀⠸⠀⠤⠼⠑⠀⠀⠸⠀⠄⠼⠑⠀⠀⠸⠀⠄⠼⠑⠀⠀⠸⠀⠒⠼⠑⠀⠀⠸ ⠦⠴⠬⠀⠀⠸⠀⠌⠼⠑")?;
-  // Context: When marking up operation on both sides on an equation, this is the correct result.
+    return Ok(());
+  }
+
+// Sometimes also two bars || are used.
+#[test]
+fn p22_equation_solving_notation_double_bars() -> Result<()> {
+    let expr = "<math>
+    <mn>5</mn>
+    <mi>x</mi>
+    <mo>=</mo>
+    <mo>−</mo>
+    <mn>10</mn>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>:</mo>
+    <mn>5</mn>
+</math>";
+    test_braille("Finnish", expr, "⠼⠑⠀⠭⠀⠶⠤⠼⠁⠚⠀⠀⠸⠸⠀⠒⠼⠑")?;
+    
+    return Ok(());
+}
+
+// Sometimes also two bars || are used. This is not a real life example, but a string of mark up that should produce the output in the test: [space][vertical bar][vertical bar][operation done on both sides].
+#[test]
+fn operate_by_on_both_sides_double_bars() -> Result<()> {
+    let expr = "<math>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>+</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>-</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>−</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>·</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>×</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>|</mo>
+    <msup>
+    <mrow>
+    <mo>(</mo>
+    <mo>)</mo>
+    </mrow>
+    <mn>2</mn>
+    </msup>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>/</mo>
+    <mn>5</mn>
+</math>";
+    test_braille("Finnish", expr, "⠀⠀⠸⠸⠀⠖⠼⠑⠀⠀⠸⠸⠀⠤⠼⠑⠀⠀⠸⠸⠀⠄⠼⠑⠀⠀⠸⠸⠀⠄⠼⠑⠀⠀⠸⠸⠀⠒⠼⠑⠀⠀⠸⠸ ⠦⠴⠬⠀⠀⠸⠸⠀⠌⠼⠑")?;
     return Ok(());
   }
 
@@ -726,6 +818,7 @@ fn p24_fraction_2() -> Result<()> {
     return Ok(());
 }
 
+// Rule fix: Fractions' division requires double parentheses so that the order of operations is respected.
 #[test]
 fn p25_long_fraction() -> Result<()> {
     let expr = "<math>
@@ -772,7 +865,6 @@ fn p25_long_fraction() -> Result<()> {
   </mrow>
 </math>";
     test_braille("Finnish", expr, "⠦⠦⠭⠬⠀⠤⠼⠛⠀⠭⠀⠖⠼⠁⠃⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠃⠚⠴⠴⠀⠒⠦⠦⠭⠬⠀⠤⠼⠓⠀⠭⠀⠖⠼⠁⠑⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠁⠋⠴⠴")?;
-    // Rule fix: Fractions' division requires double parentheses so that the order of operations is respected.
     return Ok(());
 }
 
@@ -1006,45 +1098,118 @@ fn msub_parentheses() -> Result<()> {
     return Ok(());
 }
 
-// Overline notation comes after the subscript
+// Overline braille notation (dots 156) comes after the (sub)script.
+// For the rule: order should be first subscript and then superscript
 #[test]
 fn msub_with_vector() -> Result<()> {
     let expr = "<math>
-    <mover>
       <msub>
+      <mover>
         <mi>a</mi>
-        <mtext>b</mtext>
+        <mo>¯</mo>
+      </mover>
+        <mi>b</mi>
       </msub>
-      <mo>¯</mo>
-    </mover>
     <mo>+</mo>
     <mn>1</mn>
 </math>";
     test_braille("Finnish", expr, "⠁⠡⠃⠱⠀⠖⠼⠁")?;
-    // For the rule: order should be first subscript and then superscript
     return Ok(());
 }
 
+// Even when the vector is marked with an arrow, it should output the same dots (156).
+#[test]
+fn msub_with_vector_arrow() -> Result<()> {
+    let expr = "<math>
+      <msub>
+      <mover>
+        <mi>a</mi>
+        <mo>→</mo>
+      </mover>
+        <mi>b</mi>
+      </msub>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠁⠡⠃⠱⠀⠖⠼⠁")?;
+    return Ok(());
+}
+
+// Overline braille notation (dots 156) comes after the (sub)script.
 #[test]
 fn msub_with_vector_with_sub_text() -> Result<()> {
     let expr = "<math>
   <mrow data-changed='added'>
-    <mover>
       <msub>
-        <mi>a</mi>
+        <mover>
+          <mi>a</mi>
+          <mo>¯</mo>
+        </mover>
         <mtext>tuki</mtext>
       </msub>
-      <mo>¯</mo>
-    </mover>
     <mo>+</mo>
     <mn>1</mn>
   </mrow>
  </math>";
     test_braille("Finnish", expr, "⠁⠡⠞⠥⠅⠊⠱⠀⠖⠼⠁")?;
-    // For the rule: order should be first subscript and then superscript
     return Ok(());
 }
 
+// First the subscript, then superscript and then overline notation.
+#[test]
+fn msubsup_with_vector() -> Result<()> {
+    let expr = "<math>
+  <mrow>
+      <msubsup>
+        <mover>
+          <mi>a</mi>
+          <mo>¯</mo>
+        </mover>
+        <mn>5</mn>
+        <mn>0</mn>
+      </msubsup>
+    <mo>+</mo>
+    <mn>1</mn>
+  </mrow>
+ </math>";
+    test_braille("Finnish", expr, "⠁⠡⠼⠑⠌⠼⠚⠱⠀⠖⠼⠁")?;
+    return Ok(());
+}
+
+// First the subscript, then superscript and then overline notation.
+#[test]
+fn msubsup_with_vector_complex_with_parentheses() -> Result<()> {
+    let expr = "<math>
+  <mrow>
+      <msubsup>
+        <mover>
+          <mi>a</mi>
+          <mo>¯</mo>
+        </mover>
+        <mrow>
+          <mo>(</mo>
+          <mn>5</mn>
+          <mo>+</mo>
+          <mn>2</mn>
+          <mo>)</mo>
+        </mrow>
+        <mrow>
+          <mo>(</mo>
+          <mn>3</mn>
+          <mo>+</mo>
+          <mi>x</mi>
+          <mo>)</mo>
+        </mrow>
+      </msubsup>
+    <mo>+</mo>
+    <mn>1</mn>
+  </mrow>
+ </math>";
+    test_braille("Finnish", expr, "⠁⠡⠦⠼⠑⠀⠖⠼⠃⠴⠌⠦⠼⠉⠀⠖⠭⠴⠱⠀⠖⠼⠁")?;
+    return Ok(());
+}
+
+// First the subscript and then the superscript.
 #[test]
 fn msubsup() -> Result<()> {
     let expr = "<math>
@@ -1060,6 +1225,7 @@ fn msubsup() -> Result<()> {
     return Ok(());
 }
 
+// The scripts should have parentheses for easier reading.
 #[test]
 fn msubsup_parentheses_in_sub_and_sup() -> Result<()> {
     let expr = "<math>
@@ -1321,6 +1487,7 @@ fn p40_p_or_q() -> Result<()> {
     return Ok(());
 }
 
+// The colon : should be written directly after the function f (and similar). This is different compared to it being used as a division sign and as a ratio.
 #[test]
 fn p41_function_definition() -> Result<()> {
     let expr = "<math>
@@ -1337,6 +1504,7 @@ fn p41_function_definition() -> Result<()> {
     return Ok(());
 }
 
+// Here the bar | should have whitespace on both sides of the character.
 #[test]
 fn p41_inverse_function() -> Result<()> {
     let expr = "<math>
@@ -1439,8 +1607,8 @@ fn p41_function_with_parts_with_arrow() -> Result<()> {
     return Ok(());
 }
 
-#[test]
 // Two 5-dots separate the rows in the 2D math. Format: [whitespace][dot 5][dot 5][whitespace]. This is not an operator.
+#[test]
 fn p40_function_with_parts() -> Result<()> {
   let expr = "<math>
       <mi>f</mi>
@@ -1504,6 +1672,8 @@ fn p40_function_with_parts() -> Result<()> {
     return Ok(());
 }
 
+// Two 5-dots separate the rows in the 2D math. Format: [whitespace][dot 5][dot 5][whitespace]. This is not an operator.
+// In the matrix the parentheses are repeated for every row.
 #[test]
 fn p42_matrix() -> Result<()> {
     let expr = "<math>
@@ -1574,7 +1744,69 @@ fn p42_matrix() -> Result<()> {
     return Ok(());
 }
 
+// Empty cells are marked up with dots (25).
+#[test]
+fn matrix_with_empty_cells() -> Result<()> {
+    let expr = "<math>
+<mrow>
+<mo>(</mo>
+<mtable>
+	<mtr>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    <mtd>
+    </mtd>
+    <mtd>
+    </mtd>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    </mtr>
+	<mtr>
+    <mtd>
+    </mtd>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    <mtd>
+    </mtd>
+    <mtd>
+    </mtd>
+    </mtr>
+	<mtr>
+    <mtd>
+    </mtd>
+    <mtd>
+    </mtd>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    <mtd>
+    </mtd>
+    </mtr>
+	<mtr>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    <mtd>
+    </mtd>
+    <mtd>
+    </mtd>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    </mtr>
+</mtable>
+<mo>)</mo>
+</mrow>
+</math>";
+    test_braille("Finnish", expr, "⠦⠼⠁⠀⠒⠀⠒⠀⠼⠁⠴⠀⠐⠐⠀⠦⠒⠀⠼⠁⠀⠒⠀⠒⠴⠀⠐⠐⠀⠦⠒⠀⠒⠀⠼⠁⠀⠒⠴⠀⠐⠐⠀⠦⠼⠁⠀⠒⠀⠒⠀⠼⠁⠴")?;
+    return Ok(());
+}
 
+// Two 5-dots separate the rows in the 2D math. Format: [whitespace][dot 5][dot 5][whitespace]. This is not an operator.
+// In the determinant the vertical bar is repeated for every row.
 #[test]
 fn p42_determinant() -> Result<()> {
     let expr = "<math>
@@ -1614,12 +1846,101 @@ fn p42_determinant() -> Result<()> {
     <mi>b</mi>
     </math>";
     test_braille("Finnish", expr, "⠸⠁⠀⠖⠃⠀⠁⠀⠤⠃⠸⠀⠐⠐⠀⠸⠁⠀⠤⠃⠀⠁⠀⠖⠃⠸⠀⠶⠼⠙⠀⠁⠃")?;
-    // Two 5-dots separate the rows in the 2D math. Format: [whitespace][dot 5][dot 5][whitespace]. This is not an operator.
-    // Rules fix: There are extra whitespaces between the elements of the matrix.
     return Ok(());
 }
 
+#[test]
+fn open_interval() -> Result<()> {
+    let expr = "<math> 
+  <mo>]</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>[</mo>
+</math>";
+    test_braille("Finnish", expr, "⠾⠉⠂⠀⠙⠷")?;
+    return Ok(());
+}
 
+#[test]
+fn open_interval_alt() -> Result<()> {
+    let expr = "<math> 
+  <mo>(</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>)</mo>
+</math>";
+    test_braille("Finnish", expr, "⠦⠉⠂⠀⠙⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn half_open_interval_left() -> Result<()> {
+    let expr = "<math> 
+  <mo>]</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>]</mo>
+</math>";
+    test_braille("Finnish", expr, "⠾⠉⠂⠀⠙⠾")?;
+    return Ok(());
+}
+
+#[test]
+fn half_open_interval_left_alt() -> Result<()> {
+    let expr = "<math> 
+  <mo>(</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>]</mo>
+</math>";
+    test_braille("Finnish", expr, "⠦⠉⠂⠀⠙⠾")?;
+    return Ok(());
+}
+
+#[test]
+fn half_open_interval_right() -> Result<()> {
+    let expr = "<math> 
+  <mo>[</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>[</mo>
+</math>";
+    test_braille("Finnish", expr, "⠷⠉⠂⠀⠙⠷")?;
+    return Ok(());
+}
+
+#[test]
+fn half_open_interval_right_alt() -> Result<()> {
+    let expr = "<math> 
+  <mo>[</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>)</mo>
+</math>";
+    test_braille("Finnish", expr, "⠷⠉⠂⠀⠙⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn closed_interval() -> Result<()> {
+    let expr = "<math> 
+  <mo>[</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>]</mo>
+</math>";
+    test_braille("Finnish", expr, "⠷⠉⠂⠀⠙⠾")?;
+    return Ok(());
+}
+
+// Dots 156 to signify the bar over "arc".
 #[test]
 fn p45_arcsin_with_bar_over() -> Result<()> {
     let expr = "<math>
@@ -1631,8 +1952,6 @@ fn p45_arcsin_with_bar_over() -> Result<()> {
 <mi>x</mi>
 </math>";
     test_braille("Finnish", expr, "⠁⠗⠉⠱⠀⠎⠊⠝⠀⠭")?;
-    // Dots 156 to signify the bar over "arc".
-    // Rules fix: There should be a whitespace after the bar.
     return Ok(());
 }
 
@@ -1643,6 +1962,48 @@ fn p46_simple_derivative_fraction() -> Result<()> {
         <mrow><mi>d</mi><mi>x</mi></mrow>
       </mfrac></math>";
     test_braille("Finnish", expr, "⠙⠋⠦⠭⠴⠀⠌⠙⠭")?;
+    return Ok(());
+}
+
+#[test]
+fn p46_first_order_derivative() -> Result<()> {
+    let expr = "<math><mi>f</mi><mo>'</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>";
+    test_braille("Finnish", expr, "⠋⠔⠦⠭⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn p46_first_order_derivative_alt() -> Result<()> {
+    let expr = "<math><mi>f</mi><mo>’</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>";
+    test_braille("Finnish", expr, "⠋⠔⠦⠭⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn second_order_derivative() -> Result<()> {
+    let expr = "<math><mi>f</mi><mo>''</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>";
+    test_braille("Finnish", expr, "⠋⠔⠔⠦⠭⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn second_order_derivative_alt_1() -> Result<()> {
+    let expr = "<math><mi>f</mi><mo>’’</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>";
+    test_braille("Finnish", expr, "⠋⠔⠔⠦⠭⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn second_order_derivative_alt_2() -> Result<()> {
+    let expr = "<math><mi>f</mi><mo>”</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>";
+    test_braille("Finnish", expr, "⠋⠔⠔⠦⠭⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn nth_order_derivative() -> Result<()> {
+    let expr = "<math><msup><mi>f</mi><mrow><mo>(</mo><mi>n</mi><mo>)</mo></mrow></msup><mo>(</mo><mi>x</mi><mo>)</mo></math>";
+    test_braille("Finnish", expr, "⠋⠌⠦⠝⠴⠦⠭⠴")?;
     return Ok(());
 }
 
@@ -1673,6 +2034,7 @@ fn line_under_terminated_by_space() -> Result<()> {
     return Ok(());
 }
 
+// Needs parentheses so that grouping is clear.
 #[test]
 fn line_under_parentheses() -> Result<()> {
     let expr = "<math>
@@ -1688,11 +2050,10 @@ fn line_under_parentheses() -> Result<()> {
 <mn>1</mn>
 </math>";
     test_braille("Finnish", expr, "⠦⠎⠀⠌⠼⠃⠴⠤⠀⠖⠼⠁")?;
-    // Needs parentheses so that grouping works.
     return Ok(());
 }
 
-// 'Change of zone' dot 5 is used after the limit subscript notation.
+// 'Change of zone' dot 5 is used after the limit subscript notation. The subscript is in parentheses for easier reading.
 #[test]
 fn p48_limit_right_hand_approaching_Finnish_notation() -> Result<()> {
     let expr = "<math>
@@ -1718,7 +2079,7 @@ fn p48_limit_right_hand_approaching_Finnish_notation() -> Result<()> {
     return Ok(());
 }
 
-// 'Change of zone' dot 5 is used after the limit subscript notation.
+// 'Change of zone' dot 5 is used after the limit subscript notation. The subscript is in parentheses for easier reading.
 #[test]
 fn p48_limit_right_hand_approaching_Finnish_notation_with_msup() -> Result<()> {
     let expr = "<math>
@@ -1746,7 +2107,7 @@ fn p48_limit_right_hand_approaching_Finnish_notation_with_msup() -> Result<()> {
     return Ok(());
 }
 
-// 'Change of zone' dot 5 is used after the limit subscript notation.
+// 'Change of zone' dot 5 is used after the limit subscript notation. The subscript is in parentheses for easier reading.
 #[test]
 fn limit_approaches_from_below() -> Result<()> {
     let expr = "<math>
@@ -1771,7 +2132,7 @@ fn limit_approaches_from_below() -> Result<()> {
     return Ok(());
 }
 
-// This is a hack, so the Finnish substitution notation for integral would work. The intent is might be wrong, but that is what the notation means.
+// Finnish integral substitution notation. The intent might be wrong, but that is what the notation means.
 #[test]
 fn p49_integral_with_Finnish_notation_for_substitution() -> Result<()> {
     let expr = "<math>
@@ -1807,6 +2168,7 @@ fn p49_integral_with_Finnish_notation_for_substitution() -> Result<()> {
 }
 
 // Markup for lower and upper bounds for summation, product, intersection, union and such. "Equal to" character is replaced lower (dots 26) and upper (dots 35) bounds.
+// Parentheses are added for clarity. Dot 5 is used to end the zone of the upper bound.
 #[test]
 fn p49_summation_with_lower_upper_bounds() -> Result<()> {
     let expr = "<math>
@@ -1829,10 +2191,11 @@ fn p49_summation_with_lower_upper_bounds() -> Result<()> {
 </msub>
 </math>";
     test_braille("Finnish", expr, "⠸⠎⠡⠊⠢⠼⠚⠔⠝⠐⠦⠋⠡⠊⠀⠭⠡⠊⠴")?;
-    // Parentheses are added for clarity. Dot 5 is used to end the zone of the upper bound.
     return Ok(());
 }
 
+// Markup for lower and upper bounds for summation, product, intersection, union and such. "Equal to" character is replaced lower (dots 26) and upper (dots 35) bounds.
+// Dot 5 is used to end the zone of the upper bound.
 #[test]
 fn p49_union_with_lower_upper_bounds() -> Result<()> {
     let expr = "<math>
@@ -1851,10 +2214,11 @@ fn p49_union_with_lower_upper_bounds() -> Result<()> {
 </msub>
 </math>";
     test_braille("Finnish", expr, "⠳⠖⠡⠊⠢⠼⠁⠔⠝⠐⠠⠁⠡⠊")?;
-    // Dot 5 is used to end the zone of the upper bound.
     return Ok(());
 }
 
+// The test combines subscript notation and the lower and upper bound notation. "Equal to" character is replaced lower (dots 26) and upper (dots 35) bounds.
+// Dot 5 is used to end the zone of the upper bound.
 #[test]
 fn p49_sequence_with_lower_upper_bounds() -> Result<()> {
     let expr = "<math>
@@ -1875,11 +2239,11 @@ fn p49_sequence_with_lower_upper_bounds() -> Result<()> {
 <mi>∞</mi>
 </msubsup>
 </math>";
-    test_braille("Finnish", expr, "⠦⠭⠡⠝⠴⠡⠝⠢⠼⠁⠬⠿")?;
-    // Dot 5 is used to end the zone of the upper bound.
+    test_braille("Finnish", expr, "⠦⠭⠡⠝⠴⠡⠝⠢⠼⠁⠔⠿")?;
     return Ok(());
 }
 
+// Regular letters are used in the bold lettering.
 #[test]
 fn p50_such_that_y_greater_than_x() -> Result<()> {
     let expr = "<math>
@@ -1898,7 +2262,6 @@ fn p50_such_that_y_greater_than_x() -> Result<()> {
     <mi>x</mi>
 </math>";
     test_braille("Finnish", expr, "⠳⠂⠭⠀⠳⠔⠠⠗⠂⠀⠳⠢⠽⠀⠳⠔⠠⠗⠆⠀⠽⠀⠱⠀⠭")?;
-    // Sami, FI: The comma <mo>,</mo> is not produced by MathCAT. Should be.
     return Ok(());
 }
 
@@ -1919,6 +2282,7 @@ fn p50_cube_root() -> Result<()> {
     return Ok(());
 }
 
+// The ⠯ character is used between the elements in the binomial.
 #[test]
 fn p50_binomial_with_factorial() -> Result<()> {
     let expr = r#"<math>
@@ -1951,7 +2315,6 @@ fn p50_binomial_with_factorial() -> Result<()> {
   </mrow>
 </math>"#;
     test_braille("Finnish", expr, "⠦⠼⠋⠯⠀⠼⠙⠴⠀⠶⠼⠋⠠⠲⠀⠌⠷⠼⠙⠠⠲⠀⠦⠼⠋⠀⠤⠼⠙⠠⠴⠠⠲⠾")?;
-    // The ⠯ character is used between the elements in the binomial.
     return Ok(());
 }
 
@@ -1986,8 +2349,6 @@ fn p50_conditional_probability() -> Result<()> {
     test_braille("Finnish", expr, "⠠⠏⠦⠠⠃⠀⠸⠀⠠⠁⠴⠀⠶⠠⠏⠦⠠⠁⠠⠃⠴⠀⠌⠠⠏⠦⠠⠁⠴")?;
     return Ok(());
 }
-
-
 
 #[test]
 fn p50_alternative_derivative_1() -> Result<()> {
@@ -2162,6 +2523,7 @@ fn p52_quadratic_formula() -> Result<()> {
     return Ok(());
 }
 
+// Sub- and superscripts are used before the atom sign. 
 #[test]
 fn p63_O16() -> Result<()> {
     // From MathType
@@ -2170,6 +2532,7 @@ fn p63_O16() -> Result<()> {
     return Ok(());
 }
 
+// The numbers are written as 'dropped dots' (like in fractions) right after the atom. No whitespace between the atoms.
 #[test]
 fn p64_chemical_equation_1() -> Result<()> {
     // From MathType
@@ -2185,6 +2548,7 @@ fn p64_sodium_ion() -> Result<()> {
     return Ok(());
 }
 
+// Whitespace before the ion's plus or minus sign if there is a number before it. Parentheses for clarity.
 #[test]
 fn p64_copper_ion() -> Result<()> {
     // From MathType
@@ -2200,6 +2564,7 @@ fn p64_chemistry_1() -> Result<()> {
     return Ok(());
 }
 
+// Whitespace before the dash, not after.
 #[test]
 fn p64_chemistry_bond_1() -> Result<()> {
     let expr = "<math intent=':chemical-formula'><mi>H</mi><mo>-</mo><mi>H</mi></math>";
@@ -2207,6 +2572,7 @@ fn p64_chemistry_bond_1() -> Result<()> {
     return Ok(());
 }
 
+// Whitespace before the colon, not after.
 #[test]
 fn p64_chemistry_bond_1_alternative() -> Result<()> {
     let expr = "<math intent=':chemical-formula'><mi>H</mi><mo>:</mo><mi>H</mi></math>";
@@ -2214,6 +2580,7 @@ fn p64_chemistry_bond_1_alternative() -> Result<()> {
     return Ok(());
 }
 
+// Whitespace before the dashes, not after.
 #[test]
 fn p64_chemistry_bond_2() -> Result<()> {
     let expr = "<math intent=':chemical-formula'><mi>O</mi><mo>=</mo><mi>O</mi></math>";
@@ -2221,6 +2588,7 @@ fn p64_chemistry_bond_2() -> Result<()> {
     return Ok(());
 }
 
+// Whitespace before the double colon, not after.
 #[test]
 fn p64_chemistry_bond_2_alternative() -> Result<()> {
     let expr = "<math intent=':chemical-formula'><mi>O</mi><mo>∷</mo><mi>O</mi></math>";
@@ -2228,9 +2596,263 @@ fn p64_chemistry_bond_2_alternative() -> Result<()> {
     return Ok(());
 }
 
+// Whitespace before the dashes, not after.
 #[test]
 fn p64_chemistry_bond_3() -> Result<()> {
     let expr = "<math intent=':chemical-formula'><mi>N</mi><mo>≡</mo><mi>N</mi></math>";
     test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    return Ok(());
+}
+
+// The specs use different parentheses for atomic groups. Dots (126) for left and dots (345) for right parenthesis.
+// For MathCAT these are not used, since making the rule would probably be difficult. The parentheses that are used in the MathML are also output by MathCAT.
+#[test]
+fn chemical_formula_parentheses_1() -> Result<()> {
+    let expr = "<math>
+  <mi>Ca</mi>
+  <msub>
+    <mrow>
+    <mo>(</mo>
+    <mi>O</mi>
+    <mi>H</mi>
+    <mo>)</mo>
+    </mrow>
+  <mn>2</mn>
+  </msub>
+</math>";
+    test_braille("Finnish", expr, "⠠⠉⠁⠦⠠⠕⠠⠓⠴⠆")?;
+    return Ok(());
+}
+
+// Here the zone ending dot (5) is needed, so parenthesis are not confused with the 'dropped dots'.
+#[test]
+fn chemical_formula_parentheses_2() -> Result<()> {
+    let expr = "<math>
+  <msub>
+    <mi>Ca</mi>
+    <mn>3</mn>
+  </msub>
+  <msub>
+    <mrow>
+    <mo>(</mo>
+    <mi>P</mi>
+      <msub>
+      <mi>O</mi>
+      <mn>4</mn>
+      </msub>
+    <mo>)</mo>
+    </mrow>
+  <mn>2</mn>
+  </msub>
+</math>";
+    test_braille("Finnish", expr, "⠠⠉⠁⠒⠦⠠⠏⠠⠕⠲⠐⠴⠆")?;
+    return Ok(());
+}
+
+// New tests start here 11.9.2026
+
+#[test]
+fn approx_1() -> Result<()> {
+    let expr = "<math>
+  <mrow>
+    <mn>230</mn>
+    <mo>≈</mo>
+    <mn>200</mn>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠉⠚⠀⠸⠶⠼⠃⠚⠚")?;
+    return Ok(());
+}
+
+#[test]
+fn approx_2() -> Result<()> {
+    let expr = "<math>
+  <mrow>
+    <mn>80</mn>
+    <mo>+</mo>
+    <mn>60</mn>
+    <mo>≈</mo>
+    <mn>150</mn>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠓⠚⠀⠖⠼⠋⠚⠀⠸⠶⠼⠁⠑⠚")?;
+    return Ok(());
+}
+
+#[test]
+fn large_numbers_1() -> Result<()> {
+    let expr = "<math>
+  <mrow>
+    <mn>20.000</mn>
+    <mo>+</mo>
+    <mn>3000</mn>
+    <mo>=</mo>
+    <mn>23.000</mn>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠚⠄⠚⠚⠚⠀⠖⠼⠉⠚⠚⠚⠀⠶⠼⠃⠉⠄⠚⠚⠚")?;
+    return Ok(());
+}
+
+#[test]
+fn large_numbers_2() -> Result<()> {
+    let expr = "<math>
+  <mrow>
+    <mn>88.888</mn>
+    <mo>−</mo>
+    <mn>8080</mn>
+    <mo>=</mo>
+    <mn>80.808</mn>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠓⠓⠄⠓⠓⠓⠀⠤⠼⠓⠚⠓⠚⠀⠶⠼⠓⠚⠄⠓⠚⠓")?;
+    return Ok(());
+}
+
+#[test]
+fn comparison_multiple_numbers() -> Result<()> {
+    let expr = "<math>
+  <mrow>
+    <mn>1000</mn>
+    <mo>&lt;</mo>
+    <mn>9000</mn>
+    <mo>&lt;</mo>
+    <mn>10.000</mn>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠁⠚⠚⠚⠀⠣⠀⠼⠊⠚⠚⠚⠀⠣⠀⠼⠁⠚⠄⠚⠚⠚")?;
+    return Ok(());
+}
+
+#[test]
+fn division_slash_1() -> Result<()> {
+    let expr = "<math>
+  <mrow>
+    <mn>9</mn>
+    <mo>/</mo>
+    <mn>3</mn>
+    <mo>=</mo>
+    <mn>3</mn>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠊⠀⠌⠼⠉⠀⠶⠼⠉")?;
+    return Ok(());
+}
+
+#[test]
+fn division_slash_2() -> Result<()> {
+    let expr = "<math>
+  <mrow>
+    <mn>100</mn>
+    <mo>/</mo>
+    <mn>2</mn>
+    <mo>=</mo>
+    <mn>50</mn>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠁⠚⠚⠀⠌⠼⠃⠀⠶⠼⠑⠚")?;
+    return Ok(());
+}
+
+#[test]
+fn units_grams() -> Result<()> {
+    let expr = "<math>
+  <mn>380</mn>
+  <mi>g</mi>
+</math>";
+    test_braille("Finnish", expr, "⠼⠉⠓⠚⠀⠛")?;
+    return Ok(());
+}
+
+#[test]
+fn units_kilograms_and_grams() -> Result<()> {
+    let expr = "<math>
+    <mn>4</mn>
+    <mi>kg</mi>
+    <mo>−</mo>
+    <mn>150</mn>
+    <mi>g</mi>
+    <mo>=</mo>
+    <mn>3,850</mn>
+    <mi>kg</mi>
+</math>";
+    test_braille("Finnish", expr, "⠼⠙⠀⠅⠛⠀⠤⠼⠁⠑⠚⠀⠛⠀⠶⠼⠉⠂⠓⠑⠚⠀⠅⠛")?;
+    return Ok(());
+}
+
+// Invisible plus is replaced with the number sign (dots 3456) in a mixed fraction.
+#[test]
+fn invisible_plus_with_mixed_fraction_1() -> Result<()> {
+    let expr = "<math>
+    <mn>1</mn>
+    <mo>&#x2064;</mo>
+    <mfrac>
+      <mn>1</mn>
+      <mn>2</mn>
+    </mfrac>
+</math>";
+    test_braille("Finnish", expr, "⠼⠁⠼⠁⠆")?;
+    return Ok(());
+}
+
+// Invisible plus is replaced with the number sign (dots 3456) in a mixed fraction.
+#[test]
+fn invisible_plus_with_mixed_fraction_2() -> Result<()> {
+    let expr = "<math>
+    <mn>1</mn>
+    <mo>&#x2064;</mo>
+    <mfrac>
+      <mn>1</mn>
+      <mn>2</mn>
+    </mfrac>
+    <mo>−</mo>
+    <mn>2</mn>
+    <mo>&#x2064;</mo>
+    <mfrac>
+      <mn>1</mn>
+      <mn>3</mn>
+    </mfrac>
+</math>";
+    test_braille("Finnish", expr, "⠼⠁⠼⠁⠆⠀⠤⠼⠃⠼⠁⠒")?;
+    return Ok(());
+}
+
+// The same solution is used for counting in steps as is in the matrices. A custom [space][dot 5][dot 5][space] separates rows from each other.
+#[test]
+fn count_with_steps() -> Result<()> {
+    let expr = "<math>
+  <mtable>
+    <mtr>
+      <mtd>
+        <mo>(</mo>
+        <mn>10</mn>
+        <mo>−</mo>
+        <mn>6</mn>
+        <mo>)</mo>
+        <mo>&#x22C5;</mo>
+        <mo>(</mo>
+        <mn>5</mn>
+        <mo>+</mo>
+        <mn>5</mn>
+        <mo>)</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mo>=</mo>
+        <mn>4</mn>
+        <mo>&#x22C5;</mo>
+        <mn>10</mn>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mo>=</mo>
+        <mn>40</mn>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>";
+    test_braille("Finnish", expr, "⠦⠼⠁⠚⠀⠤⠼⠋⠴⠀⠄⠦⠼⠑⠀⠖⠼⠑⠴⠀⠐⠐⠀⠶⠼⠙⠀⠄⠼⠁⠚⠀⠐⠐⠀⠶⠼⠙⠚")?;
     return Ok(());
 }
