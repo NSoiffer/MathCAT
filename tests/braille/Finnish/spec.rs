@@ -601,6 +601,26 @@ fn p22_fraction_division_Finnish_notation_msup_2() -> Result<()> {
     return Ok(());
 }
 
+// It could possible to have the same structure as a mmultiscript as before, so here is a test for that. Output is the same as before.
+#[test]
+fn p22_fraction_division_Finnish_notation_mmultiscripts() -> Result<()> {
+    let expr = "<math>
+  <mmultiscripts>
+    <mfrac>
+      <mn>2</mn>
+      <mn>4</mn>
+    </mfrac>
+    <mrow></mrow>
+    <mrow>
+      <mo>(</mo>
+      <mn>2</mn>
+    </mrow>
+  </mmultiscripts>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠲⠣⠼⠃")?;
+    return Ok(());
+}
+
 #[test]
 fn p23_equation_1_no_invisible_multiplication() -> Result<()> {
     let expr = "<math>
