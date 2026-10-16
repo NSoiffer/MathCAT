@@ -1140,13 +1140,13 @@ fn msub_with_vector_arrow() -> Result<()> {
 fn msub_with_vector_with_sub_text() -> Result<()> {
     let expr = "<math>
   <mrow data-changed='added'>
-    <mover>
       <msub>
-        <mi>a</mi>
+        <mover>
+          <mi>a</mi>
+          <mo>¯</mo>
+        </mover>
         <mtext>tuki</mtext>
       </msub>
-      <mo>¯</mo>
-    </mover>
     <mo>+</mo>
     <mn>1</mn>
   </mrow>
