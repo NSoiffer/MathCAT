@@ -8,8 +8,10 @@ use anyhow::Result;
 // Finnish spec tests
 // Page and some other identification has been added to the function name, so you can figure out which expression the test in based on. Some tests are variations of the "official" test.
 
-// Grouping numbers
+// In general numbers and variables are separated from each other with a space, so the variables (most often letters) are not interpreted as numbers.
+// Variables can be written with no space between them, since there is not similar misinterpretation risk. 
 
+// Grouping numbers
 // No example in the specs
 #[test]
 fn p7_no_grouping_in_four_digit_numbers() -> Result<()> {
