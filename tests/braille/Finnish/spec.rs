@@ -1117,6 +1117,24 @@ fn msub_with_vector() -> Result<()> {
     return Ok(());
 }
 
+// Even when the vector is marked with an arrow, it should output the same dots (156).
+#[test]
+fn msub_with_vector_arrow() -> Result<()> {
+    let expr = "<math>
+      <msub>
+      <mover>
+        <mi>a</mi>
+        <mo>→</mo>
+      </mover>
+        <mi>b</mi>
+      </msub>
+    <mo>+</mo>
+    <mn>1</mn>
+</math>";
+    test_braille("Finnish", expr, "⠁⠡⠃⠱⠀⠖⠼⠁")?;
+    return Ok(());
+}
+
 // Overline braille notation (dots 156) comes after the (sub)script.
 #[test]
 fn msub_with_vector_with_sub_text() -> Result<()> {
