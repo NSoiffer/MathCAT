@@ -713,6 +713,67 @@ fn operate_by_on_both_sides() -> Result<()> {
     return Ok(());
   }
 
+// Sometimes also two bars || are used.
+#[test]
+fn p22_equation_solving_notation_double_bars() -> Result<()> {
+    let expr = "<math>
+    <mn>5</mn>
+    <mi>x</mi>
+    <mo>=</mo>
+    <mo>−</mo>
+    <mn>10</mn>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>:</mo>
+    <mn>5</mn>
+</math>";
+    test_braille("Finnish", expr, "⠼⠑⠀⠭⠀⠶⠤⠼⠁⠚⠀⠀⠸⠸⠀⠒⠼⠑")?;
+    
+    return Ok(());
+}
+
+// Sometimes also two bars || are used. This is not a real life example, but a string of mark up that should produce the output in the test: [space][vertical bar][vertical bar][operation done on both sides].
+#[test]
+fn operate_by_on_both_sides_double_bars() -> Result<()> {
+    let expr = "<math>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>+</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>-</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>−</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>·</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>×</mo>
+    <mn>5</mn>
+    <mo>|</mo>
+    <mo>|</mo>
+    <msup>
+    <mrow>
+    <mo>(</mo>
+    <mo>)</mo>
+    </mrow>
+    <mn>2</mn>
+    </msup>
+    <mo>|</mo>
+    <mo>|</mo>
+    <mo>/</mo>
+    <mn>5</mn>
+</math>";
+    test_braille("Finnish", expr, "⠀⠀⠸⠸⠀⠖⠼⠑⠀⠀⠸⠸⠀⠤⠼⠑⠀⠀⠸⠸⠀⠄⠼⠑⠀⠀⠸⠸⠀⠄⠼⠑⠀⠀⠸⠸⠀⠒⠼⠑⠀⠀⠸⠸ ⠦⠴⠬⠀⠀⠸⠸⠀⠌⠼⠑")?;
+    return Ok(());
+  }
+
 #[test]
 fn p24_fraction() -> Result<()> {
     let expr = "<math>
