@@ -2604,6 +2604,51 @@ fn p64_chemistry_bond_3() -> Result<()> {
     return Ok(());
 }
 
+// The specs use different parentheses for atomic groups. Dots (126) for left and dots (345) for right parenthesis.
+// For MathCAT these are not used, since making the rule would probably be difficult. The parentheses that are used in the MathML are also output by MathCAT.
+#[test]
+fn chemical_formula_parentheses_1() -> Result<()> {
+    let expr = "<math>
+  <mi>Ca</mi>
+  <msub>
+    <mrow>
+    <mo>(</mo>
+    <mi>O</mi>
+    <mi>H</mi>
+    <mo>)</mo>
+    </mrow>
+  <mn>2</mn>
+  </msub>
+</math>";
+    test_braille("Finnish", expr, "⠠⠉⠁⠦⠠⠕⠠⠓⠴⠆")?;
+    return Ok(());
+}
+
+// Here the zone ending dot (5) is needed, so parenthesis are not confused with the 'dropped dots'.
+#[test]
+fn chemical_formula_parentheses_2() -> Result<()> {
+    let expr = "<math>
+  <msub>
+    <mi>Ca</mi>
+    <mn>3</mn>
+  </msub>
+  <msub>
+    <mrow>
+    <mo>(</mo>
+    <mi>P</mi>
+      <msub>
+      <mi>O</mi>
+      <mn>4</mn>
+      </msub>
+    <mo>)</mo>
+    </mrow>
+  <mn>2</mn>
+  </msub>
+</math>";
+    test_braille("Finnish", expr, "⠠⠉⠁⠒⠦⠠⠏⠠⠕⠲⠐⠴⠆")?;
+    return Ok(());
+}
+
 // New tests start here 11.9.2026
 
 #[test]
