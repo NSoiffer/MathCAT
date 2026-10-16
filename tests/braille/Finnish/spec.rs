@@ -1137,6 +1137,60 @@ fn msub_with_vector_with_sub_text() -> Result<()> {
     return Ok(());
 }
 
+// First the subscript, then superscript and then overline notation.
+#[test]
+fn msubsup_with_vector() -> Result<()> {
+    let expr = "<math>
+  <mrow>
+      <msubsup>
+        <mover>
+          <mi>a</mi>
+          <mo>¯</mo>
+        </mover>
+        <mn>5</mn>
+        <mn>0</mn>
+      </msubsup>
+    <mo>+</mo>
+    <mn>1</mn>
+  </mrow>
+ </math>";
+    test_braille("Finnish", expr, "⠁⠡⠼⠑⠌⠼⠚⠱⠀⠖⠼⠁")?;
+    return Ok(());
+}
+
+// First the subscript, then superscript and then overline notation.
+#[test]
+fn msubsup_with_vector_complex_with_parentheses() -> Result<()> {
+    let expr = "<math>
+  <mrow>
+      <msubsup>
+        <mover>
+          <mi>a</mi>
+          <mo>¯</mo>
+        </mover>
+        <mrow>
+          <mo>(</mo>
+          <mn>5</mn>
+          <mo>+</mo>
+          <mn>2</mn>
+          <mo>)</mo>
+        </mrow>
+        <mrow>
+          <mo>(</mo>
+          <mn>3</mn>
+          <mo>+</mo>
+          <mi>x</mi>
+          <mo>)</mo>
+        </mrow>
+      </msubsup>
+    <mo>+</mo>
+    <mn>1</mn>
+  </mrow>
+ </math>";
+    test_braille("Finnish", expr, "⠁⠡⠦⠼⠑⠀⠖⠼⠃⠴⠌⠦⠼⠉⠀⠖⠭⠴⠱⠀⠖⠼⠁")?;
+    return Ok(());
+}
+
 // First the subscript and then the superscript.
 #[test]
 fn msubsup() -> Result<()> {
