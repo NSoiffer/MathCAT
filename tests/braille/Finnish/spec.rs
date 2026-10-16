@@ -1965,6 +1965,48 @@ fn p46_simple_derivative_fraction() -> Result<()> {
     return Ok(());
 }
 
+#[test]
+fn p46_first_order_derivative() -> Result<()> {
+    let expr = "<math><mi>f</mi><mo>'</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>";
+    test_braille("Finnish", expr, "⠋⠔⠦⠭⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn p46_first_order_derivative_alt() -> Result<()> {
+    let expr = "<math><mi>f</mi><mo>’</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>";
+    test_braille("Finnish", expr, "⠋⠔⠦⠭⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn second_order_derivative() -> Result<()> {
+    let expr = "<math><mi>f</mi><mo>''</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>";
+    test_braille("Finnish", expr, "⠋⠔⠔⠦⠭⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn second_order_derivative_alt_1() -> Result<()> {
+    let expr = "<math><mi>f</mi><mo>’’</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>";
+    test_braille("Finnish", expr, "⠋⠔⠔⠦⠭⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn second_order_derivative_alt_2() -> Result<()> {
+    let expr = "<math><mi>f</mi><mo>”</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>";
+    test_braille("Finnish", expr, "⠋⠔⠔⠦⠭⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn nth_order_derivative() -> Result<()> {
+    let expr = "<math><msup><mi>f</mi><mrow><mo>(</mo><mi>n</mi><mo>)</mo></mrow></msup><mo>(</mo><mi>x</mi><mo>)</mo></math>";
+    test_braille("Finnish", expr, "⠋⠌⠦⠝⠴⠦⠭⠴")?;
+    return Ok(());
+}
+
 // Line under a variable
 #[test]
 fn p46_random_variable() -> Result<()> {
