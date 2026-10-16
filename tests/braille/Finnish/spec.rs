@@ -2660,7 +2660,7 @@ fn approx_1() -> Result<()> {
     <mn>200</mn>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    test_braille("Finnish", expr, "⠼⠃⠉⠚⠀⠸⠶⠼⠃⠚⠚")?;
     return Ok(());
 }
 
@@ -2675,7 +2675,7 @@ fn approx_2() -> Result<()> {
     <mn>150</mn>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    test_braille("Finnish", expr, "⠼⠓⠚⠀⠖⠼⠋⠚⠀⠸⠶⠼⠁⠑⠚")?;
     return Ok(());
 }
 
@@ -2690,7 +2690,7 @@ fn large_numbers_1() -> Result<()> {
     <mn>23.000</mn>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    test_braille("Finnish", expr, "⠼⠃⠚⠄⠚⠚⠚⠀⠖⠼⠉⠚⠚⠚⠀⠶⠼⠃⠉⠄⠚⠚⠚")?;
     return Ok(());
 }
 
@@ -2705,7 +2705,7 @@ fn large_numbers_2() -> Result<()> {
     <mn>80.808</mn>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    test_braille("Finnish", expr, "⠼⠓⠓⠄⠓⠓⠓⠀⠤⠼⠓⠚⠓⠚⠀⠶⠼⠓⠚⠄⠓⠚⠓")?;
     return Ok(());
 }
 
@@ -2720,7 +2720,7 @@ fn comparison_multiple_numbers() -> Result<()> {
     <mn>10.000</mn>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    test_braille("Finnish", expr, "⠼⠁⠚⠚⠚⠀⠣⠀⠼⠊⠚⠚⠚⠀⠣⠀⠼⠁⠚⠄⠚⠚⠚")?;
     return Ok(());
 }
 
@@ -2735,7 +2735,7 @@ fn division_slash_1() -> Result<()> {
     <mn>3</mn>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    test_braille("Finnish", expr, "⠼⠊⠀⠌⠼⠉⠀⠶⠼⠉")?;
     return Ok(());
 }
 
@@ -2750,7 +2750,7 @@ fn division_slash_2() -> Result<()> {
     <mn>50</mn>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    test_braille("Finnish", expr, "⠼⠁⠚⠚⠀⠌⠼⠃⠀⠶⠼⠑⠚")?;
     return Ok(());
 }
 
@@ -2760,12 +2760,12 @@ fn units_grams() -> Result<()> {
   <mn>380</mn>
   <mi>g</mi>
 </math>";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    test_braille("Finnish", expr, "⠼⠉⠓⠚⠀⠛")?;
     return Ok(());
 }
 
 #[test]
-fn test_default() -> Result<()> {
+fn units_kilograms_and_grams() -> Result<()> {
     let expr = "<math>
     <mn>4</mn>
     <mi>kg</mi>
@@ -2776,10 +2776,11 @@ fn test_default() -> Result<()> {
     <mn>3,850</mn>
     <mi>kg</mi>
 </math>";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    test_braille("Finnish", expr, "⠼⠙⠀⠅⠛⠀⠤⠼⠁⠑⠚⠀⠛⠀⠶⠼⠉⠂⠓⠑⠚⠀⠅⠛")?;
     return Ok(());
 }
 
+// Invisible plus is replaced with the number sign (dots 3456) in a mixed fraction.
 #[test]
 fn invisible_plus_with_mixed_fraction_1() -> Result<()> {
     let expr = "<math>
@@ -2790,10 +2791,11 @@ fn invisible_plus_with_mixed_fraction_1() -> Result<()> {
       <mn>2</mn>
     </mfrac>
 </math>";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    test_braille("Finnish", expr, "⠼⠁⠼⠁⠆")?;
     return Ok(());
 }
 
+// Invisible plus is replaced with the number sign (dots 3456) in a mixed fraction.
 #[test]
 fn invisible_plus_with_mixed_fraction_2() -> Result<()> {
     let expr = "<math>
@@ -2811,10 +2813,11 @@ fn invisible_plus_with_mixed_fraction_2() -> Result<()> {
       <mn>3</mn>
     </mfrac>
 </math>";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    test_braille("Finnish", expr, "⠼⠁⠼⠁⠆⠀⠤⠼⠃⠼⠁⠒")?;
     return Ok(());
 }
 
+// The same solution is used for counting in steps as is in the matrices. A custom [space][dot 5][dot 5][space] separates rows from each other.
 #[test]
 fn count_with_steps() -> Result<()> {
     let expr = "<math>
@@ -2850,14 +2853,6 @@ fn count_with_steps() -> Result<()> {
     </mtr>
   </mtable>
 </math>";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
-    return Ok(());
-}
-
-
-#[test]
-fn test_default() -> Result<()> {
-    let expr = "";
-    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝")?;
+    test_braille("Finnish", expr, "⠦⠼⠁⠚⠀⠤⠼⠋⠴⠀⠄⠦⠼⠑⠀⠖⠼⠑⠴⠀⠐⠐⠀⠶⠼⠙⠀⠄⠼⠁⠚⠀⠐⠐⠀⠶⠼⠙⠚")?;
     return Ok(());
 }
