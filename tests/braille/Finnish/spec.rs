@@ -1849,6 +1849,97 @@ fn p42_determinant() -> Result<()> {
     return Ok(());
 }
 
+#[test]
+fn open_interval() -> Result<()> {
+    let expr = "<math> 
+  <mo>]</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>[</mo>
+</math>";
+    test_braille("Finnish", expr, "⠾⠉⠂⠀⠙⠷")?;
+    return Ok(());
+}
+
+#[test]
+fn open_interval_alt() -> Result<()> {
+    let expr = "<math> 
+  <mo>(</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>)</mo>
+</math>";
+    test_braille("Finnish", expr, "⠦⠉⠂⠀⠙⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn half_open_interval_left() -> Result<()> {
+    let expr = "<math> 
+  <mo>]</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>]</mo>
+</math>";
+    test_braille("Finnish", expr, "⠾⠉⠂⠀⠙⠾")?;
+    return Ok(());
+}
+
+#[test]
+fn half_open_interval_left_alt() -> Result<()> {
+    let expr = "<math> 
+  <mo>(</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>]</mo>
+</math>";
+    test_braille("Finnish", expr, "⠦⠉⠂⠀⠙⠾")?;
+    return Ok(());
+}
+
+#[test]
+fn half_open_interval_right() -> Result<()> {
+    let expr = "<math> 
+  <mo>[</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>[</mo>
+</math>";
+    test_braille("Finnish", expr, "⠷⠉⠂⠀⠙⠷")?;
+    return Ok(());
+}
+
+#[test]
+fn half_open_interval_right_alt() -> Result<()> {
+    let expr = "<math> 
+  <mo>[</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>)</mo>
+</math>";
+    test_braille("Finnish", expr, "⠷⠉⠂⠀⠙⠴")?;
+    return Ok(());
+}
+
+#[test]
+fn closed_interval() -> Result<()> {
+    let expr = "<math> 
+  <mo>[</mo>
+    <mi>c</mi>
+    <mo>,</mo>
+    <mi>d</mi>
+    <mo>]</mo>
+</math>";
+    test_braille("Finnish", expr, "⠷⠉⠂⠀⠙⠾")?;
+    return Ok(());
+}
+
 // Dots 156 to signify the bar over "arc".
 #[test]
 fn p45_arcsin_with_bar_over() -> Result<()> {
