@@ -177,7 +177,7 @@
    - test:
       if: .[self::m:mlabeledtr]
       then:
-         - t: "⠗⠊⠧⠊⠝⠀⠕⠞⠎⠊⠅⠅⠕⠱"  # "row label:" ("rivin otsikko:")
+         - t: "⠗⠊⠧⠊"  # "row label" ("rivi")
          - x: "*[1]/*"           # contents of row label
    - test:
       if: .[self::m:mlabeledtr]
@@ -838,7 +838,7 @@
    tag: "*"
    match: "*"    # make sure there are children
    replace: 
-   - t: "unknown math m l element"
+   - T: "tuntematon mathML-elementti"
    - x: "name(.)"
    - x: "*"
 
@@ -848,7 +848,7 @@
    tag: "*"
    match: "text()"
    replace: 
-   - t: unknown math m l element
+   - T: "tuntematon mathML-elementti"
    - x: "name(.)"
    - x: "text()"
 
@@ -857,5 +857,5 @@
    tag: "*"
    match: "."
    replace: 
-    - t: "empty unknown math m l element"
+    - T: "tuntematon mathML-elementti"
     - x: "name(.)"
