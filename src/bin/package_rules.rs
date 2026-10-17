@@ -87,7 +87,7 @@ mod tests {
     fn outer_names(bytes: &[u8]) -> Vec<String> {
         let mut archive = ZipArchive::new(Cursor::new(bytes)).unwrap();
         let mut names: Vec<String> = (0..archive.len())
-            .map(|i| archive.by_index(i).unwrap().name().replace('\\', "/"))
+            .map(|i| archive.by_index(i).unwrap().name().unwrap().replace('\\', "/"))
             .collect();
         names.sort();
         return names;

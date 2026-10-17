@@ -7,7 +7,7 @@
 //
 // Inner language/braille zips always use BZIP2. Downloadable `Rules.zip` uses DEFLATE for the
 // outer archive so Windows Explorer / `unzip` can open it. The include-zip embed uses BZIP2
-// for both layers (MathCAT's `zip` crate reads it; zip 8.x bzip2 is pure Rust and works on wasm).
+// for both layers (MathCAT's `zip` crate reads it; zip 9.x bzip2 is pure Rust and works on wasm).
 
 use std::fs::{self, File, read_dir};
 use std::io::{self, Cursor, Read, Seek, Write};

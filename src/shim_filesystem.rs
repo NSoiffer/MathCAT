@@ -108,7 +108,7 @@ cfg_if! {
                         let path = match file.enclosed_name() {
                             Some(path) => PathBuf::from(containing_dir).join(path),
                             None => {
-                                bail!("Entry {} has a suspicious path (outside of archive)", file.name());
+                                bail!("Entry {} has a suspicious path (outside of archive)", String::from_utf8_lossy(file.name_raw()));
                             }
                         };
                         // debug!("read_zip_file: file path='{}'", path.display());
