@@ -38,6 +38,8 @@ mod prefs;
 mod tts;
 mod xpath_functions;
 mod definitions;
+#[cfg(feature = "rule-coverage")]
+mod rule_coverage;
 pub mod pretty_print;
 mod chemistry;
 

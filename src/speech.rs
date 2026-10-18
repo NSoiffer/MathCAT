@@ -2291,6 +2291,14 @@ impl SpeechRules {
         if self.rules.is_empty() || !self.rule_files.is_file_up_to_date(&rule_file, should_ignore_file_time) {
             self.rules.clear();
             let files_read = self.read_patterns(&rule_file)?;
+            #[cfg(feature = "rule-coverage")]
+            for patterns in self.rules.values() {
+                for pattern in patterns {
+                    crate::rule_coverage::defined_rule(
+                        Path::new(&pattern.file_name), &pattern.pattern_name, &pattern.tag_name
+                    );
+                }
+            }
             self.rule_files.set_files_and_times(files_read);
         }
 
@@ -2511,6 +2519,10 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 }
                 return match result {
                     Ok(s) => {
+                        #[cfg(feature = "rule-coverage")]
+                        crate::rule_coverage::matched_rule(
+                            Path::new(&pattern.file_name), &pattern.pattern_name, &pattern.tag_name
+                        );
                         // for all except braille and navigation, nav_node_id will be an empty string and will not match
                         if self.nav_node_id.is_empty() {
                             Ok( Some(s) )

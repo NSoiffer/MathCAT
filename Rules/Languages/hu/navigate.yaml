@@ -39,7 +39,7 @@
 #   as they would likely be much more efficient and also cleaner.
 
 # Rules for announcing the command
-- name: say-command
+- name: say-command #audit-ignore
   tag: "!*"
   match: "$SayCommand != ''"   # value should be '', 'true', or 'false'
   variables: [Prefix: "''"]
@@ -48,7 +48,7 @@
     - if: "$MatchCounter = 0 and $SayCommand = 'true'"
       then_test:
       - if: "self::m:math and starts-with($NavCommand, 'ZoomOut')"
-        then: [T: "teljesen kinagyítva", pause: "medium"]
+        then: [T: "teljesen kicsinyítve", pause: "medium"]      # phrase('zoomed out all of the way')
       - else_if: "IsNode(., 'leaf') and starts-with($NavCommand, 'ZoomIn')"
         then:
         - test:
@@ -56,41 +56,51 @@
             then: [T: "teljesen ráközelített"]       # phrase('zoomed in all of the way')
           - else_if: "$NavNodeOffset = 0"
             then: [T: "ráközelített az első karakterre"]   # phrase('zoomed in to first character')
-            else: [T: "karakterre nagyítva"]          # phrase('zoomed in to character')
+            else: [T: "ráközelített a karakterre"]          # phrase('zoomed in to character')
         - pause: "medium"
         else:
         - test:
           # CommandOffset is 1 + length of the English NavCommand stem (Zoom/Move/Read/Describe),
           # not the spoken Prefix length — so translations can use a different Prefix word.
           - if: "starts-with($NavCommand, 'Zoom')"
-            then: [set_variables: [Prefix: "'zoom'", CommandOffset: "5"]]          # phrase('zoom' in to see more details)     
+            then:
+            # the whole phrase is chosen here ("kicsinyítés" is the Hungarian for "zoom out"), so no suffix word is needed below
+            - test:
+              - if: "$NavCommand = 'ZoomOut'"
+                then: [set_variables: [Prefix: "'kicsinyítés'", CommandOffset: "5"]]          # phrase('zoom out')
+              - else_if: "$NavCommand = 'ZoomOutAll'"
+                then: [set_variables: [Prefix: "'teljes kicsinyítés'", CommandOffset: "5"]]   # phrase('zoom out all of the way')
+              - else_if: "$NavCommand = 'ZoomInAll'"
+                then: [set_variables: [Prefix: "'teljes nagyítás'", CommandOffset: "5"]]      # phrase('zoom in all of the way')
+              - else: [set_variables: [Prefix: "'nagyítás'", CommandOffset: "5"]]             # phrase('zoom' in to see more details)
           - else_if: "starts-with($NavCommand, 'Move')"
-            then: [set_variables: [Prefix: "'move'", CommandOffset: "5"]]          # phrase('move' to next entry in table)     
+            then: [set_variables: [Prefix: "'ugrás'", CommandOffset: "5"]]          # phrase('move' to next entry in table)     
           - else_if: "starts-with($NavCommand, 'Read')"
-            then: [set_variables: [Prefix: "'read'", CommandOffset: "5"]]          # phrase('read' to next entry in table)     
+            then:
+            # "olvasás jelenlegi" is not Hungarian; the whole phrase is chosen here (no suffix word needed for 'Current')
+            - test:
+              - if: "$NavCommand = 'ReadCurrent'"
+                then: [set_variables: [Prefix: "'az aktuális elem felolvasása'", CommandOffset: "5"]]   # phrase('read current')
+              - else: [set_variables: [Prefix: "'olvasás'", CommandOffset: "5"]]          # phrase('read' to next entry in table)     
           - else_if: "starts-with($NavCommand, 'Describe')"
-            then: [set_variables: [Prefix: "'describe'", CommandOffset: "9"]]      # phrase('describe' to next entry in table)
+            then:
+            - test:
+              - if: "$NavCommand = 'DescribeCurrent'"
+                then: [set_variables: [Prefix: "'az aktuális elem leírása'", CommandOffset: "9"]]      # phrase('describe current')
+              - else: [set_variables: [Prefix: "'leírás'", CommandOffset: "9"]]      # phrase('describe' to next entry in table)
         - test:
             if: "$Prefix != ''"
             then:
             - x: "$Prefix"
             - test:
               - if: "substring($NavCommand, $CommandOffset) = 'In'"
-                then: [T: "ban"]                                  # phrase(zoom 'in' to see more details)
-              - else_if: "substring($NavCommand, $CommandOffset) = 'InAll'"
-                # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets "ed" concatenated to "zoom"
-                then: [T: "Teljesen kinagyítva"]                     # phrase(zoom 'out all of the way' to see more details)
-              - else_if: "substring($NavCommand, $CommandOffset) = 'Out'"
-                then: [T: "ki"]                                 # phrase(zoom 'out' to see more details)
-              - else_if: "substring($NavCommand, $CommandOffset) = 'OutAll'"
-                # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets "ed" concatenated to "zoom"
-                then: [T: "teljes táblázat kinagyítása"]                     # phrase(zoom 'out all of the way' to see more details)
+                then: [T: ""]                                  # phrase(zoom 'in' to see more details)
+              # 'InAll', 'Out' and 'OutAll' are covered by the Prefix chosen above (nothing more to say)
               - else_if: "substring($NavCommand, $CommandOffset) = 'Next'"
                 then: [T: "jobbra"]                               # phrase(move to the 'right')
               - else_if: "substring($NavCommand, $CommandOffset) = 'Previous'"
                 then: [T: "balra"]                                # phrase(move to the 'left')
-              - else_if: "substring($NavCommand, $CommandOffset) = 'Current'"
-                then: [T: "jelenlegi"]                                 # phrase(who is the 'current' president)
+              # 'Current' is covered by the Prefix chosen above (ReadCurrent / DescribeCurrent)
               - else_if: "substring($NavCommand, $CommandOffset) = 'LineStart'"
                 then: [T: "a sor elejére"]                                 # phrase(move 'to start of line')
               - else_if: "substring($NavCommand, $CommandOffset) = 'LineEnd'"
@@ -122,7 +132,7 @@
   - x: "count($Child2D/preceding-sibling::*)+1"
   - pause: "medium"
 
-- name: into-or-out-of-mmultiscripts
+- name: into-or-out-of-mmultiscripts #audit-ignore
   tag: "*"
   match: "$Move2D != '' and (@data-from-mathml='mmultiscripts' or self::m:mmultiscripts)"
   replace:
@@ -133,25 +143,34 @@
           variables:
           - NumPrecedingSiblings: "count($Child2D/preceding-sibling::*)"
           replace:
-          - x: "$Move2D"
           - test:
             - if: "$NumPrecedingSiblings=0"
-              then: [T: "alapja"]                 # phrase(the 'base' of the power)
+              then: [T: "alap"]                   # phrase(the 'base' of the power)
             - else_if: "$Child2D/preceding-sibling::*[self::m:mprescripts]" # are we before mprescripts and hence are postscripts
               then:
               - test:   # in postscripts -- base shifts by one
                   if: "$NumPrecedingSiblings mod 2 = 0" 
-                  then: [T: "alsó index kezdete"]       # phrase(x with 'subscript' 2)
-                  else: [T: "Felső index kezdete"]     # phrase(x with 'superscript' 2)
+                  then: [T: "bal alsó index"]           # phrase(x with 'pre-subscript' 2)
+                  else: [T: "bal felső index"]          # phrase(x with 'pre-superscript' 2)
               else:
               - test:
                   if: "$NumPrecedingSiblings mod 2 = 0"
-                  then: [T: "felső index"]    # phrase(x with 'pre-superscript' 2)
-                  else: [T: "alsó index"]      # phrase(x with 'pre-subscript' 2)
+                  then: [T: "felső index"]        # phrase(x with 'superscript' 2)
+                  else: [T: "alsó index"]          # phrase(x with 'subscript' 2)
+          # Hungarian puts the case suffix on the part name ("a számlálóban"), which cannot be built for arbitrary part names.
+          # So "in" is silent (the command word already says it) and the other words follow the part name as a
+          # possessive/genitive noun phrase that works for any name: "számláló elhagyása", "nevező eleje", "alsó index vége".
+          - test:
+            - if: "$Move2D = 'out of'"
+              then: [T: "elhagyása"]                    # phrase('out of' the denominator)
+            - else_if: "$Move2D = 'start of'"
+              then: [T: "eleje"]                        # phrase('start of' the denominator)
+            - else_if: "$Move2D = 'end of'"
+              then: [T: "vége"]                         # phrase('end of' the denominator)
           - pause: "medium"
 
 # Rules for speaking what happens when moving into or out of a notation
-- name: into-or-out-of-default
+- name: into-or-out-of-default #audit-ignore
   tag: "*"
   # saying "out of row n" is not very useful, so skip it
   # match: "$Move2D != '' and @data-from-mathml and @data-from-mathml != name(.) and count(*)>1 and @data-from-mathml != 'mtable'"
@@ -162,7 +181,6 @@
       - PartNumber: "count($Child2D/preceding-sibling::*)"
       - PartName: "GetNavigationPartName(name(.), $PartNumber)"
       replace:
-      - x: "$Move2D"
       - test:
         - if: "$PartName != ''"
           then: [x: "$PartName"]
@@ -185,8 +203,18 @@
                 then: [x: "SpeakIntentName(name(.), $Verbosity, 'silent')"]
               - else: [x: "SpeakIntentName(name(.), $Verbosity, 'other')"]
           else:
-          - T: "része"         # phrase(the 'part' of the expression)
+          - T: "rész"          # phrase(the 'part' of the expression)
           - x: "count($Child2D/preceding-sibling::*) + 1"
+      # Hungarian puts the case suffix on the part name ("a számlálóban"), which cannot be built for arbitrary part names.
+      # So "in" is silent (the command word already says it) and the other words follow the part name as a
+      # possessive/genitive noun phrase that works for any name: "számláló elhagyása", "nevező eleje", "alsó index vége".
+      - test:
+        - if: "$Move2D = 'out of'"
+          then: [T: "elhagyása"]                    # phrase('out of' the denominator)
+        - else_if: "$Move2D = 'start of'"
+          then: [T: "eleje"]                        # phrase('start of' the denominator)
+        - else_if: "$Move2D = 'end of'"
+          then: [T: "vége"]                         # phrase('end of' the denominator)
       - pause: "medium"
 
 - name: default-move
@@ -1205,16 +1233,15 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then:
-      - T: "nem tud"                                          # phrase('cannot' move right in expression)
+      - T: "nem tud jobbra"                                   # phrase('cannot' move 'right' in expression)
       - test:
         - if: "$NavCommand = 'MoveNext'"
           then: [T: "mozogni"]                                  # phrase('move' to next entry in table)     
         - else_if: "$NavCommand = 'ReadNext'"
           then: [T: "olvasni"]                                  # phrase('read' next entry in table)     
           else: [T: "leírni"]                              # phrase('describe' next entry in table)     
-      - T: "jobbra"                              # phrase(move 'right')
       - pause: short
-  - T: "matematematikai blokk vége"                              # phrase(move 'end of math')
+  - T: "matematikai blokk vége"                              # phrase(move 'end of math')
   - pause: long
   - set_variables: [SpeakExpression: "'false'"]
 
@@ -1406,7 +1433,7 @@
       - pause: medium
   - with:
       variables:
-      - Move2D: "'end of'"
+      - Move2D: "'start of'"
       - Child2D: "$EdgeNode/*[1]"
       - MatchCounter: $MatchCounter + 1
       replace: [x: "$EdgeNode"]
@@ -1680,9 +1707,8 @@
       then:
       - test:
         - if: "$NavCommand = 'ReadCurrent'"
-          then: [T: "olvassa"]                                  # phrase('read' next entry in table) 
-          else: [T: "írja le"]                              # phrase('describe' next entry in table)     
-      - T: "jelenlegi"                                         # phrase('current' entry in table)
+          then: [T: "az aktuális elem felolvasása"]             # phrase('read current' entry in table)
+          else: [T: "az aktuális elem leírása"]                 # phrase('describe current' entry in table)
       - pause: long
   - set_variables: [NavNode: "@id"]
 

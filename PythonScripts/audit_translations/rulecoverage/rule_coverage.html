@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rule YAML coverage</title>
+<style>
+body { max-width: 75rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; color: #17212b; }
+h1, h2 { line-height: 1.2; }
+.summary { display: flex; flex-wrap: wrap; gap: .5rem 2rem; }
+.problems { padding: .5rem 1rem; background: #fff0ed; border-left: .25rem solid #b42318; }
+.controls { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.5rem 0; }
+input, select { font: inherit; padding: .35rem .5rem; }
+input { flex: 1 1 20rem; }
+.file { border: 1px solid #cad4dc; border-radius: .4rem; margin: .5rem 0; padding: .6rem 1rem; }
+summary { cursor: pointer; }
+.count { float: right; color: #52616d; }
+.badge { display: inline-block; border-radius: .3rem; padding: .05rem .4rem; font-size: .85rem; font-weight: 600; }
+.badge.matched { color: #155c36; background: #dcf5e5; }
+.badge.unmatched { color: #8b3d00; background: #fff0cf; }
+.rules { list-style: none; padding-left: 1rem; }
+.rules li { position: relative; padding: .2rem 0; }
+.rule-tooltip { display: none; position: absolute; z-index: 1; top: 100%; left: 0;
+  max-width: min(35rem, 90vw); max-height: 60vh; overflow: auto; padding: .5rem .7rem;
+  border: 1px solid #8396a5; border-radius: .3rem; background: #fff; color: #17212b;
+  box-shadow: 0 .2rem .6rem #0003; white-space: pre-line; overflow-wrap: anywhere; }
+.rules li:hover .rule-tooltip, .rules li:focus .rule-tooltip { display: block; }
+.rule-name { font-weight: 600; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<h1>Rule YAML coverage</h1>
+<p>Status: <strong>{{ status }}</strong></p>
+<div class="summary"><span>{{ rule_file_count }} files with active rules</span><span>{{ file_coverage }} rule files matched</span>
+<span>{{ rule_coverage }} active rules matched</span></div>
+<p>Paths are relative to <code>Rules/</code>. Files with active rules are coverage targets;
+a file is matched when a rule from it completes its replacement successfully.</p>
+{% if errors %}
+<section class="problems"><h2>Problems</h2><ul>
+{% for error in errors %}<li>{{ error }}</li>{% endfor %}
+</ul></section>
+{% endif %}
+<div class="controls"><input id="search" type="search" aria-label="Search files and rules"
+placeholder="Search paths, rule names, or tags">
+<select id="status" aria-label="Filter by coverage"><option value="all">All</option>
+<option value="matched">Matched</option><option value="unmatched">No match</option></select></div>
+<div id="files">
+{% for file in files %}
+<details class="file" data-file-search="{{ file.path }}" data-status="{{ 'matched' if file.matched else 'unmatched' }}">
+<summary><span class="badge {{ 'matched' if file.matched else 'unmatched' }}">{{ 'Matched' if file.matched else 'No match' }}</span>
+<code>{{ file.path }}</code> <span class="count">{{ file.coverage }} rules</span></summary>
+<p>{{ file.coverage }} active rules matched</p><ul class="rules">
+{% set file_index = loop.index0 %}
+{% for rule in file.rules %}
+<li data-rule-search="{{ rule.name }} {{ rule.tag }}" data-status="{{ 'matched' if rule.matched else 'unmatched' }}" tabindex="0" aria-describedby="rule-tooltip-{{ file_index }}-{{ loop.index0 }}">
+<span class="badge {{ 'matched' if rule.matched else 'unmatched' }}">{{ 'Matched' if rule.matched else 'No match' }}</span>
+<span class="rule-name">{{ rule.name }}</span> <code>{{ rule.tag }}</code> <span class="count">{{ rule.hits }} {{ 'hit' if rule.hits == 1 else 'hits' }}</span>
+<span class="rule-tooltip" id="rule-tooltip-{{ file_index }}-{{ loop.index0 }}" role="tooltip">{{ rule.tooltip }}</span></li>
+{% endfor %}
+</ul>
+</details>
+{% endfor %}
+</div>
+<p id="no-results" hidden>No matching files or rules</p>
+<script>
+const search = document.getElementById('search');
+const status = document.getElementById('status');
+const files = [...document.querySelectorAll('.file')];
+function filter() {
+  const query = search.value.trim().toLocaleLowerCase();
+  let visible = 0;
+  for (const file of files) {
+    const pathMatches = file.dataset.fileSearch.toLocaleLowerCase().includes(query);
+    let visibleRules = 0;
+    for (const rule of file.querySelectorAll('[data-rule-search]')) {
+      const show = (status.value === 'all' || rule.dataset.status === status.value)
+        && (pathMatches || rule.dataset.ruleSearch.toLocaleLowerCase().includes(query));
+      rule.hidden = !show;
+      if (show) visibleRules++;
+    }
+    const fileStatusMatches = status.value === 'all' || file.dataset.status === status.value;
+    const showFile = (pathMatches && fileStatusMatches) || visibleRules > 0;
+    file.hidden = !showFile;
+    if (showFile) visible++;
+  }
+  document.getElementById('no-results').hidden = visible > 0;
+}
+search.addEventListener('input', filter);
+status.addEventListener('change', filter);
+</script>
+</body>
+</html>

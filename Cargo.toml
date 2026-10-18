@@ -13,6 +13,7 @@ exclude = ["src/main.rs", "docs", "BrailleDocs", "PythonScripts"]    # should ha
 
 [features]
 default = ["rules-all"]
+"rule-coverage" = ["dep:serde_json"]
 "include-zip" = []
 "enable-logs" = ["android_logger"]
 "tts" = [ "natural-tts" ]
@@ -75,12 +76,13 @@ cfg-if = "1.0.1"
 fastrand = { version = "2.3.0" }
 clap = { version = "4.5.60", features = ["derive"] }
 html-escape = "0.2.13"
+serde_json = { version = "1.0", optional = true }
 elements_rs = { version = "0.2.8", default-features = false }
 
 # Runtime extracts inner language/braille zips (BZIP2). The package-rules binary also
 # writes DEFLATE outer archives for Windows/unzip-compatible Rules.zip downloads.
-# wasm uses the same features: zip 8.x bzip2 is pure Rust (libbz2-rs-sys), not clang C.
-zip = { version = "8.2", default-features = false, features = ["deflate", "bzip2"] }
+# wasm uses the same features: zip 9.x bzip2 is pure Rust (libbz2-rs-sys), not clang C.
+zip = { version = "9.0", default-features = false, features = ["deflate", "bzip2"] }
 
 android_logger = {version = "0.15.1", optional = true}
 natural-tts = { version = "0.3.1", optional = true }
@@ -88,7 +90,7 @@ natural-tts = { version = "0.3.1", optional = true }
 [build-dependencies]
 bitflags = "2.6"
 yaml-rust = "0.4"
-zip = { version = "8.2", default-features = false, features = ["deflate", "bzip2"] }
+zip = { version = "9.0", default-features = false, features = ["deflate", "bzip2"] }
 
 [dev-dependencies]
 tempfile = "3.23"

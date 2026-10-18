@@ -32,4 +32,4 @@ mod alphabets;
 mod definitions;
 mod intent;
 mod mtable;
-
+mod navigate;
