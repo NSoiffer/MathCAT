@@ -1,0 +1,70 @@
+---
+
+- name: line-segment
+  tag: line-segment
+  match: "count(*)=2"
+  replace:
+  - T: "线段"
+  - x: "*[1]"
+  - x: "*[2]"
+
+- name: geometry-ray
+  tag: ray
+  match: "count(*)=2"
+  replace:
+  - T: "射线"
+  - x: "*[1]"
+  - x: "*[2]"
+
+- name: geometry-arc
+  tag: arc
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [T: ""]            # phrase('the' arc A B C)
+  - T: "弧"                        # phrase(the 'arc' A B C)
+  - x: "*[1]"
+  - x: "*[2]"
+
+- name: measure-of-angle
+  tag: measure-of-angle
+  match: "count(*)=3"
+  replace:
+  - T: "角"
+  - x: "*[1]"
+  - x: "*[2]"
+  - x: "*[3]"
+  - T: "的度数"
+
+- name: geometry-quantity
+  tag: [length, area]
+  match: "count(*)=1"
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "self::m:length"
+      then: [T: "的长度"]
+      else: [T: "的面积"]
+
+
+- name: coordinate
+  tag: coordinate
+  # Intent forms coordinate($x,...) use @arg and fall through to function-intent / IntentMappings.
+  match: "not(*[@arg])"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [OT: ""]      # phrase('the' point at 1, 2)
+  - T: "点"      # phrase(the 'point' at 1, 2)
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [T: ""]      # Chinese does not need an equivalent of "at" here.
+  - pause: short
+  - insert:
+      nodes: "*"
+      replace: [T: "逗号", pause: auto]      # phrase(f of x 'comma' y)
+  - pause: short
+  - test:
+      if: "($SpeechStyle='ClearSpeak' and $Verbosity='Verbose') or not(IsNode(*[last()],'leaf'))"
+      then: [T: "结束点"]      # phrase(start point, 'end point')

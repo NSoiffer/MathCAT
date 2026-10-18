@@ -1,0 +1,687 @@
+---
+- include: "../../definitions.yaml"
+
+# IntentMappings Syntax:
+#
+# This section defines how each "intent" is spoken for various grammatical forms (fixities such as "prefix", "infix", "postfix", and "function"),
+#  along with supporting different verbosity levels.
+# The syntax is a little bit complicated, but allows a declarative syntax so you don't have to write as many rules.
+#
+# For each intent, you specify spoken forms for one or more fixities using the syntax below.
+#
+# - Each mapping has the form:
+#     "<intent>": "<fixity1>=<speech1> || <fixity2>=<speech2> || ...",
+#   or just
+#     "<intent>": "<speech>",
+#   where <speech> is used for all forms if fixity and '=' are omitted.
+#
+# - If an intent has multiple fixities, separate them with "||". Spaces are allowed around delimiters for readability.
+# - If only one ":" is present in *<speech>*, it provides the 'terse' form, and the following string is used for both 'medium' and 'verbose'.
+# - If more than one ":" is present, the string is split into 'terse', 'medium', and 'verbose' forms, in that order (each separated by ":").
+# - If no ":" is present, the same spoken form is used for all styles.
+#
+# - Use semicolons ";" to divide opening, main, and closing bracketing words within a speech string, where such words make sense.
+# - If an intent has multiple fixities but a definition does not specify one, the first fixity listed is chosen by default.
+#
+# Functions and argument glue:
+# - The "|" character delimits options describing how to glue arguments together when speaking function arguments.
+# - Arity templates (multiple "|" options, or one option with ','-separated glue words): glue-word count
+#   implies arity; the final argument is preceded by "of". Example: "sum | over | from,to"
+#      - 1 arg:  "sum of x"
+#      - 2 args: "sum over i of x"
+#      - 3 args: "sum from i to n of x"
+#   If no option matches the argument count, separators fall back to "comma".
+# - Binary separator (exactly one "|" option, no commas in it): after "of", that word joins the two args.
+#   Example: "quotient": "function=integer part | divided by" → "integer part of x divided by y"
+#   If there are not exactly two args, separators fall back to "comma" (no real n-ary use of these words).
+#
+# BNF-like description:
+#
+#   IntentMappingsEntry ::= <intent> ":" <intent_speech>
+#
+#   <intent_speech> ::= <fixity_speech> ( "||" <fixity_speech> )*
+#                    | <simple_speech>
+#
+#   <fixity_speech> ::= <fixity> "=" <speech_options>
+#
+#   <fixity> ::= "prefix" | "infix" | "postfix" | "function" | "nofix" | "silent"
+#
+#   <speech_options> ::= <speech_string>
+#                     | <speech_string> "|" <arg_glue> ( "|" <arg_glue> )*
+#
+#   <speech_string> ::= text
+#       # May use ":" to separate terse:medium:verbose forms.
+#       # May use ";" for bracketing (opening; main; closing).
+#
+#   <arg_glue> ::= text
+#       # One option, no commas: binary separator after "of" (e.g. "divided by").
+#       # One option with "," or several "|" options: arity templates
+#       # (glue-word count = arg_count - 1; last arg preceded by "of").
+#       # Unmatched arity (or binary glue with ≠2 args): fall back to "comma".
+#
+#   <simple_speech> ::= <speech_string> (applies to all fixities)
+#
+# Example:
+#   "absolute-value": "function= ; absolute value: the absolute value: the absolute value; end absolute value"
+#   "sum": "function=sum | over | from,to"
+#   "quotient": "function=integer part | divided by"
+#
+- IntentMappings: {
+    "binomial": "infix=二项式系数; 取; 结束二项式系数",
+
+    ### Functions and Inverses
+    # Interval intents (open-/closed-interval, etc.) are handled by rules due to special cases involving ∞.
+    "inverse": "function=逆 || postfix=的逆", 
+
+    "domain": "function= ; 定义域",
+    "codomain": "function= ; 陪域",
+
+    "image": "function=像", 
+    #"fraction":"function=fraction; over; end fraction", # NOTE: Fails
+    "mixed-fraction": "infix=又", # NOTE: in website says function, but follow infix speech pattern.
+    # Binary quotient/remainder intents use dedicated rules in SharedRules/general.yaml
+    # so that the result noun can follow both operands in natural Chinese word order.
+    "quotient": "function=商",
+    "evaluated-at": "infix=取值于",
+    "remainder": "function=余数",
+
+    "max": "function=最大值",
+    "min": "function=最小值",
+
+    "power": "infix=的指数为",
+    "root": "function=根",
+
+    "greatest-common-divisor": "function=最大公约数",
+    "least-common-multiple": "function=最小公倍数", # In webpage typo "lest common"
+
+    "absolute-value": "function= ; 绝对值: 绝对值: 绝对值; 结束绝对值",
+    "complex-conjugate": "function=共轭复数",
+    "complex-arg": "function=辐角",
+    "real-part": "function=实部",
+    "imaginary-part": "function=虚部",
+
+    "polar-coordinate": "function=极坐标",
+    "spherical-coordinate": "function=球坐标",
+    "cartesian-coordinate": "function=直角坐标",
+    "coordinate": "function=坐标",
+    "floor": "function=向下取整",
+    "ceiling": "function=向上取整",
+    "round": "function=四舍五入后的值",
+    "fractional-part": "function=小数部分",
+
+
+    ### Calculus
+    # "definite-integral":"function=integral over || function=integral from; to", # Property ???
+    # "derivative":"function=the derivative; with respect to", # Property ???
+    # "partial-derivative": "prefix=偏导数", ## Note, included with infix, but separately under calculus tab has ??? for functionality
+
+    "limit": "prefix=极限，当",
+    "tends-to": "infix=趋于",
+    "tends-to-from-above": "infix=从上方趋于",
+    "tends-to-from-below": "infix=从下方趋于",
+
+
+    ### Sets
+    "set": "function= ; 集合: 集合",
+    "set-difference": "function=差集 | 与 || infix=差集",
+    "complement": "function=补集",
+    "empty-set": "nofix=空集",
+    "cardinality": "function=基数", # NOTE: does not have a defined speech template in website
+    "list": "function=列表",
+    "tuple": "function= ; 元组: 元组",
+
+
+    ### Sequence and Series
+    "sum": "function=求和 | 遍历 | 从,到",
+    "product": "function=乘积 | 遍历 | 从,到",
+
+
+    ### Elementary classical functions
+    "sine": "function=正弦",
+    "cosine": "function=余弦",
+    "tangent": "function=正切",
+    "secant": "function=正割",
+    "cosecant": "function=余割",
+    "cotangent": "function=余切",
+
+    "arcsine": "function=反正弦",
+    "arccosine": "function=反余弦",
+    "arctangent": "function=反正切",
+    "arcsecant": "function=反正割",
+    "arccosecant": "function=反余割",
+    "arccotangent": "function=反余切",
+
+    "hyperbolic-sine": "function=双曲正弦",
+    "hyperbolic-cosine": "function=双曲余弦",
+    "hyperbolic-tangent": "function=双曲正切",
+    "hyperbolic-secant": "function=双曲正割",
+    "hyperbolic-cosecant": "function=双曲余割",
+    "hyperbolic-cotangent": "function=双曲余切",
+
+    "arc-hyperbolic-sine": "function=反双曲正弦",
+    "arc-hyperbolic-cosine": "function=反双曲余弦",
+    "arc-hyperbolic-tangent": "function=反双曲正切",
+    "arc-hyperbolic-secant": "function=反双曲正割",
+    "arc-hyperbolic-cosecant": "function=反双曲余割",
+    "arc-hyperbolic-cotangent": "function=反双曲余切",
+
+    "exponential": "function=指数函数",
+    "natural-logarithm": "function=自然对数",
+    "logarithm": "function=对数", ##Check arity 2 
+
+
+    ### Statistics and Probability
+    "mean": "function=平均值", 
+    "standard-deviation": "function=标准差",
+    "variance": "function=方差",
+    "median": "function=中位数",
+    "mode": "function=众数",
+
+    "conditional-probability": "function=条件概率 | 条件为", 
+
+
+    ### Linear Algebra
+    "vector": "function= ; 向量 || prefix=向量", # prefix not tested, also prefix not on webpage
+    "matrix": "function=矩阵", # NOTE: Failing test, recheck
+    "determinant": "function=行列式",
+    "adjugate": "function=伴随矩阵",
+    "magnitude": "function=模",
+    "norm": "function=; 范数: 范数: 范数; 结束范数",
+    "span": "function=张成空间",
+
+    "unit-vector": "prefix=单位向量",
+
+    "identity-matrix": "nofix=单位矩阵", # NOTE: no function specified
+    "transpose": "postfix=转置 || function=转置",
+    "dimensional-product": "infix=乘", # INFIX
+
+
+    ### Constants and Sets
+    "set-of-integers": "nofix=整数集: 全体整数的集合",
+    "set-of-reals": "nofix=实数集: 全体实数的集合",
+    "set-of-rationals": "nofix=有理数集: 全体有理数的集合",
+    "set-of-natural-numbers": "nofix=自然数集: 全体自然数的集合",
+    "set-of-complex-numbers": "nofix=复数集: 全体复数的集合",
+    "set-of-primes": "nofix=素数集: 全体素数的集合",
+
+    
+    ### Geometry
+    "line-segment": "prefix=线段",
+    "directed-line-segment": "prefix=有向线段", 
+    "line": "prefix=直线",
+    "ray": "prefix=射线",
+    "arc": "prefix=弧",
+
+    "length": "function=长度",
+    "area": "function=面积",
+
+    "point": "prefix=点",  ## NOTE: Has ??? for property in site. Should it be prefix? Or something else.
+
+    ### Separators
+    "time-separator": "infix=",
+
+    ### General Concepts 
+    "fenced-group": "function=括号组", # appears both under general concepts and grouping
+     # NOTE: in site mentions "the pair x and y", due to being defined as function, needs the "of" keyword
+    "ordered-pair": "function=有序对 | 和", # Needs to be tested
+    # Simple last arg: "x sub k". Complex: "… end sub" (terse/medium) / "end subscript" (verbose) via infix-intent.
+    "indexed-by": "infix= ; 下标; 结束下标: 结束下标: 结束下标",
+    
+    "highlight": "postfix=已突出显示",
+    "least-common-denominator": "function=最小公分母",
+    "rate": "infix=每",
+    "translation": "function=平移",
+    "constraint": "infix= ; 条件为; ", 
+    
+    "binomial-coefficient": "infix=取",
+    "pochhammer": "function=升阶乘",
+    "permutation-cycle": "function=轮换",
+    "embellished-name": "infix=带修饰",
+
+    ### Grouping
+    "annotation": "infix= ; 即; ",              # NOTE: Follows the same order as indexed-by, in site listed as function. Should it be infix?
+    "braced-group": "function=分组; 结束分组",  # NOTE: not tested, site is missing "of" keyword function introduces
+    #"repeating-decimal":"function=repeating decimal", # NOTE: BREAKS TEST. Check again. Site is missing "of" keyword function introduces.
+
+
+    ### Other
+    ## Default fixity function
+    "curl": "function=旋度",
+    "divergence": "function=散度",
+    "gradient": "function=梯度",
+    "laplacian": "function=拉普拉斯算子",
+
+    ## Default fixity prefix
+    "angle": "prefix=角",
+    "angle-measure": "prefix=角的度数",
+    "change": "prefix=变化量",
+    "for-all": "prefix=任意",
+    "measured-angle": "prefix=角的度数",
+    "not": "prefix=非",
+    "number-of": "prefix=数量",
+    "partial-derivative": "prefix=偏导数",
+    "right-angle": "prefix=直角",
+    "square-root-of": "prefix=平方根",
+    "there-does-not-exist": "prefix=不存在",
+    "there-exists": "prefix=存在",
+
+
+    ## Default fixity infix
+    "and": "infix=且",
+    "applied-to": "infix=作用于",
+    "approximately": "infix=约等于",
+    "congruent": "infix=全等于",
+    "cartesian-product": "infix=笛卡尔积",
+    "composed-with": "infix=复合",
+    "cross-product": "infix=叉乘", # Operator form; complete binary expressions use the textbook noun phrase below.
+    "defined-as": "infix=定义为",
+    "divided-by": "infix=除以",
+    "divides": "infix=整除",
+    "does-not-belong-to": "infix=不属于",
+    "does-not-divide": "infix=不整除",
+    "dot-product": "infix=点乘", # Operator form; complete binary expressions use the textbook noun phrase below.
+    "downwards-diagonal-ellipsis": "infix=右下对角线省略号",
+    "direct-product": "infix=直积",
+    "element-of": "infix=属于",
+    "ellipsis": "infix=省略号",
+    "equals": "infix=等于",
+    "equivalent-to": "infix=等价于",
+    "evaluates-to": "infix=结果为",
+    "given": "infix=已知",
+    "greater-than": "infix=大于",
+    "greater-than-or-equal-to": "infix=大于等于",
+    "identically-equals": "infix=恒等于",
+    "if-and-only-if": "infix=当且仅当",
+    "implies": "infix=推出",
+    "inner-product": "infix=内积",
+    "intersection": "infix=交",
+    "less-than": "infix=小于",
+    "less-than-or-equal-to": "infix=小于等于",
+    "list-separator": "infix=逗号",
+    "maps-to": "infix=映射到",
+    "member-of": "infix=属于",
+    "minus-or-plus": "infix=减或加",
+    "not-subset": "infix=非子集",
+    "not-superset": "infix=非超集",
+    "not-equal-to": "infix=不等于",
+    "not-member-of": "infix=不属于",
+    "not-parallel-to": "infix=不平行于",
+    "obtained-from": "infix=由此得到",
+    "or": "infix=或",
+    "outer-product": "infix=外积",
+    "parallel-to": "infix=平行于",
+    "perpendicular": "infix=垂直于",
+    "plus": "infix=加 || prefix=正", # Prefix not tested
+    "minus": "infix=减 || prefix=负", # Prefix not tested
+    "plus-or-minus": "infix=加或减",
+    "precedes": "infix=先于",
+    "proportional": "infix=正比于",
+    "range-separator": "infix=到",
+    "ratio": "infix=比",
+    "similar": "infix=相似于",
+    "subset": "infix=子集",
+    "subset-or-equal": "infix=子集或等于",
+    "succeeds": "infix=后于",
+    "such-that": "infix=满足",
+    "superset": "infix=超集",
+    "superset-or-equal": "infix=超集或等于",
+    "tilde": "infix=波浪号",
+    "times": "infix=乘",
+    "union": "infix=并",
+    "upwards-diagonal-ellipsis": "infix=右上对角线省略号",
+    "vertical-ellipsis": "infix=垂直省略号",
+    "xor": "infix=异或",
+
+    ## Default fixity postfix
+    "factorial": "postfix=阶乘",
+    "percent": "postfix=百分号",
+
+    ## Default fixity nofix
+    "diameter": "nofix=d: 直径",
+    "distance": "nofix=d; D: 距离",
+    "probability": "nofix=P: 概率 || function=概率",
+    "radius": "nofix=r: 半径",
+    "volume": "nofix=V: 体积 || function=体积",
+    "exponential-e": "nofix=e",
+    "imaginary-i": "nofix=i",
+    "differential-d": "nofix=d",
+    "golden-ratio": "nofix=黄金分割比",
+    
+
+    ## Other : Not tested, don't appear in https://w3c.github.io/mathml-docs/intent-core-concepts/
+    "modified-variable": "silent= ",
+    "say-super": "infix=上标",   # used with 'mo' for superscripts (e.g, "<")
+    "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
+    # "large-op": "infix=over || other=from,to",
+    "lim-sup": "prefix=上极限，当",
+    "lim-inf": "prefix=下极限，当",
+    "logarithm-with-base": "prefix=对数，底数为",
+    # "pochhammer": "function=升阶乘",  # arguments are in reverse order, so can't work here
+    "trace": "function= ; 迹: 迹: 迹; 结束迹",
+    "dimension": "function=; 维数: 维数: 维数; 结束维数",
+    "homomorphism": "function= ; 同态: 同态: 同态; 结束同态",
+    "kernel": "function= ; 核: 核: 核; 结束核",
+    
+    "chemistry-concentration": "function= ; 浓度: 浓度: 浓度; 结束浓度",
+  }
+
+  # Names of functions that in terse mode don't say "of" (or it's equivalent in other languages)
+- TerseFunctionNames: {
+    "divergence", "del:gradient", "curl"
+  }
+
+- NavigationParts: {
+    # These are the parts of a formula that can be navigated to
+    "large-op": "主体; 下限; 上限",
+    "mfrac": "分子; 分母",
+    "fraction": "分子; 分母",
+    "msqrt": "根号内",
+    "square-root": "根号内",
+    "mroot": "根号内; 根指数",
+    "root": "根号内; 根指数",
+    "msub": "底数; 下标",
+    "sub": "底数; 下标",
+    "logarithm-with-base": "底数",
+    "indexed-by": "底数; 下标",
+    "msup": "底数; 上标",
+    "say-super": "底数; 上标",
+    "skip-super": "底数; 上标",
+    "power": "底数; 指数",
+    "msubsup": "底数; 下标; 上标",
+    "munder": "主体; 下限",
+    "mover": "主体; 上限",
+    "munderover": "主体; 下限; 上限",
+
+    # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
+    # it's a hack to put them here, but at least they are grouped with the other navigation parts
+    "in": "进入",
+    "out": "离开",
+  }
+
+- KnownWords: {
+    # MathCAT will put together some runs of three or more mi's (a common mistake), but skips those in alphabetical order.
+    # This is a list of exceptions so that they do get put together. Don't list words with repeated letters.
+
+    # I asked bard and chatgpt for formula words that are alphabetical, and they failed.
+    # Here are the words I managed to find, but it almost certainly not complete. Change the list for other languages.
+    "Abel", "aery", "ails", "airy", "amps", "ceil", "cents", "chop", "flux", "flow", "knot", "most"
+  }
+
+- SIPrefixes: {
+    "Q": "昆", "R": "容", "Y": "尧", "Z": "泽", "E": "艾", "P": "拍", "T": "太", "G": "吉", "M": "兆", "k": "千", "h": "百", "da": "十",
+    "d": "分", "c": "厘", "m": "毫", "µ": "微", "n": "纳", "p": "皮", "f": "飞", "a": "阿", "z": "仄", "y": "幺", "r": "柔", "q": "亏"
+  }
+
+# this is a list of all units that accept SIPrefixes
+# from www.bipm.org/documents/20126/41483022/SI-Brochure-9-EN.pdf
+#   Prefixes may be used with any of the 29 SI units with special names
+#   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
+- SIUnits: {
+    # base units
+    "A": "安培",
+    "cd": "坎德拉",
+    "K": "开尔文", "K": "开尔文", # U+212A
+    "g": "克",
+    "m": "米",     # British spelling works for US also
+    "mol": "摩尔",
+    "s": "秒", "sec": "秒",  # "sec" not actually legal
+
+    # derived units
+    "Bq": "贝可勒尔",
+    "C": "库仑",
+    "°C": "摄氏度", "℃": "摄氏度", # should only take negative powers
+    "F": "法拉",
+    "Gy": "戈瑞",
+    "H": "亨利",
+    "Hz": "赫兹",
+    "J": "焦耳",
+    "kat": "开特",
+    "lm": "流明",
+    "lx": "勒克斯",
+    "N": "牛顿",
+    "Ω": "欧姆", "Ω": "欧姆",       # Greek Cap letter, U+2126 OHM SIGN
+    "Pa": "帕",
+    "S": "西门子",
+    "Sv": "希沃特",
+    "T": "特斯拉",
+    "V": "伏特",
+    "W": "瓦特",
+    "Wb": "韦伯",
+
+    # accepted (plus a few variants) that take SI prefixes
+    "l": "升", "L": "升", "ℓ": "升",  # Should only take negative powers; British spelling works for US also
+    "t": "吨",           # should only take positive powers
+    "Da": "道尔顿",
+    "Np": "奈培",               # should only take negative powers
+    "u": "统一原子质量单位",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
+    "eV": "电子伏特",
+    "rad": "弧度",             # should only take negative powers
+    "sr": "球面度",           # should only take negative powers
+  
+    # others that take a prefix
+    "a": "年",               # should only take positive powers
+    "as": "角秒",          # see en.wikipedia.org/wiki/Minute_and_second_of_arc
+
+    # technically wrong, but used in practice with SI Units
+    "b": "比特",               # should only take positive powers
+    "B": "字节",              # should only take positive powers
+    "Bd": "波特",             # should only take positive powers
+  }
+
+
+- UnitsWithoutPrefixes: {
+    # time
+    "″": "秒", "\"": "秒",
+    "′": "分", "'": "分","min": "分",
+    "h": "小时", "hr": "小时", "Hr": "小时",
+    "d": "天", "dy": "天",
+    "w": "周", "wk": "周",
+    "y": "年", "yr": "年",    
+
+    # angles
+    "°": "度", "deg": "度", # should only take negative powers
+    "arcmin": "角分",
+    "amin": "角分",
+    "am": "角分",
+    "MOA": "角分",
+    "arcsec": "角秒",
+    "asec": "角秒",
+
+    # distance
+    "au": "天文单位", "AU": "天文单位",
+    "ltyr": "光年", "ly": "光年",
+    "pc": "秒差距",
+    "Å": "埃", "Å": "埃",           # U+00C5 and U+212B
+    "fm": "费米",
+
+    # others
+    "ha": "公顷",
+    # "B": "bel",    # "B" more commonly means bytes
+    "dB": "分贝", # already logarithmic, so not used with SI prefixes
+
+    "amu": "原子质量单位",
+    "atm": "标准大气压",
+    "bar": "巴",
+    "cal": "卡路里",
+    "Ci": "居里",
+    "grad": "百分度",
+    "M": "摩尔浓度",
+    "R": "伦琴",
+    "rpm": "转每分",
+    "℧": "姆欧",
+    "dyn": "达因",
+    "erg": "尔格",
+
+    # powers of 2 used with bits and bytes
+    "Kib": "基比比特", "Mib": "梅比比特", "Gib": "吉比比特", "Tib": "太比比特", "Pib": "拍比比特", "Eib": "艾比比特", "Zib": "泽比比特", "Yib": "尧比比特",
+    "KiB": "基比字节", "MiB": "梅比字节", "GiB": "吉比字节", "TiB": "太比字节", "PiB": "拍比字节", "EiB": "艾比字节", "ZiB": "泽比字节", "YiB": "尧比字节",
+  }
+
+  # this will only be used if the language is English, so it can be empty for other countries
+- EnglishUnits: {
+    # length
+    "in": "英寸",
+    "ft": "英尺",
+    "mi": "英里",
+    "rd": "杆",
+    "li": "链节",
+    "ch": "链",
+
+    # area
+    "sq in": "平方英寸", "sq. in": "平方英寸", "sq. in.": "平方英寸",
+    "sq ft": "平方英尺", "sq. ft": "平方英尺", "sq. ft.": "平方英尺",
+    "sq yd": "平方码", "sq. yd": "平方码", "sq. yd.": "平方码",
+    "sq mi": "平方英里", "sq. mi": "平方英里", "sq. mi.": "平方英里",
+    "ac": "英亩",
+    "FBM": "板英尺",
+
+    # volume
+    "cu in": "立方英寸", "cu. in": "立方英寸", "cu. in.": "立方英寸",
+    "cu ft": "立方英尺", "cu. ft": "立方英尺", "cu. ft.": "立方英尺",
+    "cu yd": "立方码", "cu. yd": "立方码", "cu. yd.": "立方码",
+    "bbl": "桶", "BBL": "桶",
+    "pk": "配克",
+    "bu": "蒲式耳",
+    "tsp": "茶匙",
+    "tbl": "汤匙",
+
+    # liquid
+    "fl dr": "液量打兰",
+    "fl oz": "液量盎司",
+    "gi": "及耳",
+    "cp": "杯", "cup": "杯",
+    "pt": "品脱",
+    "qt": "夸脱",
+    "gal": "加仑",
+
+    # weight
+    "gr": "格令",
+    "dr": "打兰",
+    "oz": "盎司", "℥": "盎司",
+    "lb": "磅",
+    "cwt": "英担",
+    "dwt": "本尼威特",
+    "oz t": "金衡盎司",
+    "lb t": "金衡磅",
+
+    # energy
+    "hp": "马力",
+    "BTU": "英热单位",
+    "°F": "华氏度", "℉": "华氏度",
+
+    # other
+    "mph": "英里每小时",
+    "mpg": "英里每加仑",
+  }
+
+- CurrencySymbols: {
+    "$": "美元", "¢": "美分", "€": "欧元", "£": "英镑", "₡": "科朗", "₤": "里拉", "₨": "卢比",
+    "₩": "韩元", "₪": "新谢克尔", "₱": "比索", "₹": "卢比", "₺": "里拉", "₿": "比特币",
+    # could add more currencies...
+  }
+
+- PluralForms: {
+  # FIX: this needs to be flushed out
+    "inch": "英寸", "square inch": "平方英寸", "cubic inch": "立方英寸",
+    "foot": "英尺", "square foot": "平方英尺", "cubic foot": "立方英尺",
+    "board foot": "板英尺",
+    "degree celsius": "摄氏度",
+    "degree fahrenheit": "华氏度",
+    "henry": "亨利",
+    "hertz": "赫兹",
+    "lux": "勒克斯",
+    "siemens": "西门子",
+    "revolution per minute": "转每分",
+    "mile per hour": "英里每小时",
+    "mile per gallon": "英里每加仑",
+    "colón": "科朗", "lira": "里拉", "won": "韩元", "bitcoin": "比特币"
+  }
+
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+# - name: { "...", "..." "..." }
+# For numbers, 
+# - name: [] "...", "..." "..." ]
+
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+# For English, a regular pattern starts at twenty
+- NumbersOnes: [
+        "零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九"
+    ]
+
+- NumbersOrdinalOnes: [
+        "第零", "第一", "第二", "第三", "第四", "第五", "第六", "第七", "第八", "第九", "第十", "第十一", "第十二", "第十三", "第十四", "第十五", "第十六", "第十七", "第十八", "第十九"
+    ]
+
+- NumbersOrdinalPluralOnes: [
+        "第零", "第一", "第二", "第三", "第四", "第五", "第六", "第七", "第八", "第九", "第十", "第十一", "第十二", "第十三", "第十四", "第十五", "第十六", "第十七", "第十八", "第十九"
+    ]
+
+    # stop when regularity begins
+- NumbersOrdinalFractionalOnes: [
+        "零", "一", "二分之一"
+    ]
+
+    # stop when regularity begins
+- NumbersOrdinalFractionalPluralOnes: [
+        "零", "一", "二分之一"
+    ]
+
+
+    # What to use for multiples of 10
+- NumbersTens: [
+        "", "十", "二十", "三十", "四十", "五十", "六十", "七十", "八十", "九十"
+    ]
+
+- NumbersOrdinalTens: [
+        "", "第十", "第二十", "第三十", "第四十", "第五十", "第六十", "第七十", "第八十", "第九十"
+    ]
+
+- NumbersOrdinalPluralTens: [
+        "", "第十", "第二十", "第三十", "第四十", "第五十", "第六十", "第七十", "第八十", "第九十"
+    ]
+
+
+- NumbersHundreds: [
+        "", "一百", "二百", "三百", "四百", "五百", "六百", "七百", "八百", "九百"
+    ]
+
+- NumbersOrdinalHundreds: [
+        "", "第一百", "第二百", "第三百", "第四百", "第五百", "第六百", "第七百", "第八百", "第九百"
+    ]
+
+- NumbersOrdinalPluralHundreds: [
+        "", "第一百", "第二百", "第三百", "第四百", "第五百", "第六百", "第七百", "第八百", "第九百"
+    ]
+      
+
+    # At this point, hopefully the language is regular. If not, code needs to be written
+- NumbersLarge: [
+        "", "千", "百万", "十亿", "兆", "千兆", "百京", "十垓", "秭", "千秭", "百穰"
+    ]
+      
+- NumbersOrdinalLarge: [
+        "", "第一千", "第一百万", "第十亿", "第一兆", "第一千兆", "第一百京", "第十垓", "第一秭", "第一千秭", "第一百穰"
+    ]
+      
+- NumbersOrdinalPluralLarge: [
+        "", "第一千", "第一百万", "第十亿", "第一兆", "第一千兆", "第一百京", "第十垓", "第一秭", "第一千秭", "第一百穰"
+    ]

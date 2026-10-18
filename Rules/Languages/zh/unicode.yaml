@@ -1,0 +1,538 @@
+---
+ # Note to translators:
+ #   most languages don't have two ways to pronounce 'a' -- if not need, remove the rules and change "B-Z" to "A-Z"
+ #   some languages say the word for "uppercase" after the letter. Make sure to change that where appropriate by moving some code around
+ - "a": 
+    - test: 
+        if: "$TTS='none'"
+        then: [T: "a"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
+        else: [SPELL: "'a'"]                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
+ - "b-z": 
+    - test: 
+        if: "$TTS='none'"
+        then: [T: "."]                          
+        else: [SPELL: "'.'"]                       
+
+ # Capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
+ # screen readers have options to use pitch changes or beeps instead of or in addition to say "cap"
+ # Also, if a user can see the screen, they probably don't need to hear "cap", but if they specified an override, they must want to hear the override.
+
+ - "A":
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [T: "大写"]
+          else: [x: "$SpeechOverrides_CapitalLetters"]
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        replace:
+        - test:
+            if: "$TTS='none'"
+            then: [T: "a"]
+            else: [SPELL: "'a'"]
+            
+ - "B-Z":
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [T: "大写"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
+        replace: [SPELL: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]
+
+ - "0-9": [T: "."]
+
+ - " ": [T: " "]                     # 0x20
+
+ - "!":                                            # 0x21
+    - test:
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+        then_test:
+            if: "$Verbosity = 'Terse'"
+            then: [T: "感叹号"]                      # 0x21
+            else: [T: "感叹号"]          # 0x21
+        else: [T: "阶乘"]                     # 0x21
+          
+ - "\"": [T: "双引号"]                     # 0x22
+ - "#": [T: "井号"]                              # 0x23
+ - "$": [T: "美元"]                             # 0x24
+ - "%": [T: "百分号"]                             # 0x25
+ - "&": [T: "与号"]                           # 0x26
+ - "'": [T: "单引号"]                          # 0x27
+ - "(":                                            # 0x28
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then_test:
+            if: "$Verbosity='Terse'"
+            then: [T: "左括号"]                     # 0x28
+            else: [T: "左括号"]               # 0x28
+        else: [T: "左括号"]                   # 0x28                         
+ - ")":                                          # 0x29
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then_test:
+            if: "$Verbosity='Terse'"
+            then: [T: "右括号"]                   # 0x29
+            else: [T: "右括号"]             # 0x29
+        else: [T: "右括号"]                 # 0x29                 
+
+ - "*":                                          # 0x2a
+    test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='skip-super']"
+        then: [T: "星号"]                        # 0x2a
+        else: [T: "乘"]                       # 0x2a
+ - "+": [T: "加"]                              # 0x2b
+ - ",":                                          # 0x2c
+    # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
+    # that this test is here and not with "…" is not ideal, but seems simplest
+     test:
+        if:
+            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or "
+               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+               # speak "comma" when not adjacent to '…'
+            - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
+               # except if expression starts with '…'
+            - "../*[1][.='…'] "
+        then:
+        - T: "逗号"                         #     (en: 'comma')
+        - test:
+            if: "$Verbosity != Terse"
+            then: [pause: short]
+        # else silent
+
+ - "-":
+    - test:
+        if: "ancestor::*[@data-chem-formula] and not(following-sibling::*)"
+        then: [T: "负"]
+        else: [T: "减"]                               # 0x2d
+ - ".":                                          # 0x2e
+    - test:
+        if: "parent::*[1][self::m:mn]"
+        then: [T: "点"]
+        else: [T: "点"]
+ - "/":                                           # 0x2f
+    - test:
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+        then: [T: "斜杠"]                        # 0x2f
+        else: [T: "除以"]                   # 0x2f
+
+ - ":": [T: "冒号"]                               # 0x3a
+ - ";": [T: "分号"]                           # 0x3b
+ - "<":                                          # 0x3c
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "小于"
+ - "=":                                           # 0x3d
+    - test: 
+        if: "$Verbosity!='Terse'"
+        then: [T: "等于"]
+        else: [T: "等于"]
+
+ - ">":                                          # 0x3e
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "大于"
+ - "?": [T: "问号"]                       # 0x3f
+ - "@": [T: "艾特号"]                             # 0x40
+ - "[":                                          # 0x5b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: "左方括号"]
+        else: [T: "左方括号"]                            
+ - "\\": [T: "反斜杠"]                         # 0x5c
+ - "]":                                          # 0x5d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: "右方括号"]
+        else: [T: "右方括号"]
+ - "^":                                           # 0x5e
+    - test:
+        if: "parent::m:modified-variable or parent::m:mover"
+        then: [T: "帽符"]
+        else: [T: "脱字符"]
+ - "_": [T: "下划线"]                          # 0x5f
+ - "`": [T: "钝音符"]                              # 0x60
+ - "{":                                         # 0x7b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: "左花括号"]
+        else: [T: "左花括号"]                            
+ - "|":                                          # 0x7c
+    # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
+     - with:
+        variables: [DefaultToGiven: "count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and ../../../*[1][.='P']"] # P(A|B)
+        replace:
+        - test:
+            - if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+              then: [T: "竖线"]
+            - else_if: "$SpeechStyle != 'ClearSpeak'"
+              then_test:
+                - if: "$DefaultToGiven"
+                  then: [T: "条件为"]
+                - else_if: "preceding-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))] and 
+                            following-sibling::*[1][self::m:mn and not(contains(., $DecimalSeparators))]"
+                  then: [T: "整除"]
+                  else: [T: "竖线"]
+            - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
+              then: [T: "竖线"]
+            - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+              then: [T: "使得"]
+            - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
+              then: [T: "条件为"] 
+            - else: [T: "整除"]                   
+
+ - "}":                                          # 0x7d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: "右花括号"]
+        else: [T: "右花括号"]                            
+
+ - "~": [T: "波浪号"]                               # 0x7e
+ - " ":                                            # 0xa0
+    - test:
+        # could be mtext in mtd or mtext in an mrow that is a concatenation of mtd's. Is there a better solution?
+        if: "@data-empty-in-2D and not(ancestor::*[self::m:piecewise or self::m:system-of-equations or self::m:lines])"
+        then: [T: "空格"]                         # want to say something for fraction (etc) with empty child
+        else: [T: ""]                            
+
+ - "¬": [T: "非"]                                 # 0xac
+ - "°": [T: "度"]                           # 0xb0
+ - "±":                                           # 0xb1
+    - test:
+        if: "preceding-sibling::* and following-sibling::*"
+        then: [T: "加或减"]
+        else: [T: "正或负"]
+ - "´": [T: "锐音符"]                            # 0xb4
+ - "·":                                            # 0xB7
+    - test:
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')] or not($SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultSymbolDot = 'Auto')"
+        then: [T: "点"]
+        else: [T: "乘"]
+ - "×":                                          # 0xd7
+    - test:
+        if: "$SpeechStyle = 'ClearSpeak'"
+        then_test:
+        - if: "$ClearSpeak_MultSymbolX = 'Auto'"
+          then: [T: "乘"]
+        - else_if: "$ClearSpeak_MultSymbolX = 'By'"
+          then: [T: "乘"]
+          else: [T: "叉乘"]
+        else_test:
+            if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+            then: [T: "叉乘"]
+            else: [T: "乘"]
+
+ - "÷": [T: "除以"]                          # 0xf7
+ - "̀": [T: "上加钝音符"]          # 0x300
+ - "́": [T: "上加锐音符"]          # 0x301
+ - "̂": [T: "上加抑扬符"]     # 0x302
+ - "̃": [T: "上加波浪号"]                 # 0x303
+ - "̄": [T: "上加长音符"]                # 0x304
+ - "̅": [T: "上加横线"]               # 0x305
+ - "̆": [T: "上加短音符"]                           # 0x306
+ - "̇": [T: "上加点"]             # 0x307
+
+   # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
+ - "Α-Ω": 
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [T: "大写"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
+        replace: [SPELL: "translate('.', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+
+ - "α": [T: "alpha"]                               # 0x3b1
+ - "β": [T: "beta"]                                # 0x3b2
+ - "γ": [T: "gamma"]                               # 0x3b3
+ - "δ": [T: "delta"]                               # 0x3b4
+ - "ε": [T: "epsilon"]                             # 0x3b5
+ - "ζ": [T: "zeta"]                                # 0x3b6
+ - "η": [T: "eta"]                                 # 0x3b7
+ - "θ": [T: "theta"]                               # 0x3b8
+ - "ι": [T: "iota"]                                # 0x3b9
+ - "κ": [T: "kappa"]                               # 0x3ba
+ - "λ": [T: "lambda"]                              # 0x3bb
+ - "μ": [T: "mu"]                                  # 0x3bc
+ - "ν": [T: "nu"]                                  # 0x3bd
+ - "ξ": [T: "zai"]                                 # 0x3be
+ - "ο": [T: "omicron"]                             # 0x3bf
+ - "π": [T: "pi"]                                  # 0x3c0
+ - "ρ": [T: "rho"]                                 # 0x3c1
+ - "ς": [T: "final sigma"]                         # 0x3c2
+ - "σ": [T: "sigma"]                               # 0x3c3
+ - "τ": [T: "tau"]                                 # 0x3c4
+ - "υ": [T: "upsilon"]                             # 0x3c5
+ - "φ": [T: "phi"]                                 # 0x3c6
+ - "χ": [T: "chi"]                                 # 0x3c7
+ - "ψ": [T: "psi"]                                 # 0x3c8
+ - "ω": [T: "omega"]                               # 0x3c9
+ - "ϕ": [T: "phi"]                                 # 0x3d5
+ - "ϖ": [T: "pi"]                                  # 0x3d6
+ - "ϵ": [T: "epsilon"]                             # 0x3f5
+ - "϶": [T: "反向 epsilon"]                         # 0x3f6
+
+ - "⁡":                                          # 0x2061
+    - test:
+        # skip saying "of" when Terse and a trig function, when it is a shape (does this happen?), or we are in :literal mode
+        if: "not(
+              ( $Verbosity='Terse' or ($SpeechStyle = 'ClearSpeak' and IsNode(following-sibling::*[1],'simple')) and
+                preceding-sibling::*[1][IfThenElse($SpeechStyle='ClearSpeak',
+                                                   IsInDefinition(., 'ClearSpeakTrigFunctionNames'),
+                                                   IsInDefinition(., 'TrigFunctionNames') )]
+              ) or
+              preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')] or
+              (@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])
+            )"
+        then: [T: ""]
+ - "⁢": [T: ""]                                   # 0x2062
+ - "⁣": [T: ""]                                   # 0x2063
+ - "⁤": [T: "又"]                                # 0x2064
+ - "ℂℕℚℝℤ":     # here we rely on this running through the table again to speak "cap xxx"
+    - T: "双线体"
+    - SPELL: "translate('.', 'ℂℕℚℝℤ', 'CNQRZ')"
+
+ - "℃": [T: "摄氏度"]                     # 0x2103
+ - "ℋℛℓ":                                          # 0x210b
+    - T: "花体"
+    - SPELL: "translate('.', 'ℋℛℓ', 'HRl')"
+ - "ℜ":                                          # 0x211c
+    - T: "哥特体"
+    - SPELL: "'R'"
+
+ - "ⅆⅇⅈⅉ":                                          # 0x2146-9
+    - T: "双线斜体"
+    - SPELL: "translate('.', 'ⅆⅇⅈⅉ', 'deij')"
+
+ - "←": [T: "向左箭头"]                     # 0x2190
+ - "↑": [T: "向上箭头"]                       # 0x2191
+ - "→":                                          # 0x2192
+     - test:
+        if: "ancestor::*[2][self::m:limit]"
+        then: [T: "趋于"]
+        else: [T: "向右箭头"]
+
+ - "↓": [T: "向下箭头"]                     # 0x2193
+ - "∈":                                          # 0x2208
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then:
+        - test:
+            if: "$Verbosity!='Terse' and not(ancestor::*[self::m:set])"    # "the set x is an element of ..." sounds bad"
+            then: [T: ""]
+        - T: "属于"
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "属于"]
+              - else: [T: "属于"]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "属于"]
+              - else: [T: "属于"]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+ - "∥":                                           # 0x2225
+     - test:
+         if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+         then: [T: "双竖线"]
+         else:
+         - test:
+              if: "$Verbosity!='Terse'"
+              then: [T: ""]
+         - T: "平行于"
+ - "∦":                                           # 0x2226
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "不平行于"
+ - "≤":                                          # 0x2264
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "小于等于"
+ - "≥":                                          # 0x2265
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "大于等于"
+
+ # --- restored complex short definitions (prefer over unicode-full) ---
+ - "…":                                          # 0x2026
+    test:
+        if:
+            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
+               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+               # speak '…' as 'and so on...' unless expr starts with '…'
+            - "../*[1][.='…']"
+        then: [T: "省略号"]
+        else_test:  # must have $ClearSpeak_Ellipses = 'AndSoOn'
+            if: "count(following-sibling::*) = 0"
+            then: [T: "等等"]
+            else: [T: "依此类推，直到"]
+ - "∂":                                          # 0x2202
+     - test: 
+         if: "$Verbosity='Terse'"
+         then: [T: "偏微分"]
+         else: [T: "偏导数"]
+ - "∆": [T: "增量"]                            # 0x2206
+ - "∉":                                          # 0x2209
+    # rule is identical to 0x2208
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then:
+        - test: 
+            if: "$Verbosity!='Terse'"
+            then: [T: ""]
+        - T: "不属于"
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "不属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "不属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "不属于"]
+              - else: [T: "不属于"]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "不属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "不属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "不属于"]
+              - else: [T: "不属于"]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+ - "∊":                                          # 0x220a
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then:
+        - test: 
+            if: "$Verbosity!='Terse' and not(ancestor::*[self::m:set])"    # "the set x is an element of ..." sounds bad"
+            then: [T: ""]
+        - T: "属于"
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "属于"]
+              - else: [T: "属于"]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "属于"]
+              - else: [T: "属于"]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+ - "√":                                          # 0x221a
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [OT: ""]
+     - T: "平方根"
+ - "∝":                                          # 0x221d
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "正比于"
+ - "∶":                                          # 0x2236
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "比"
+ - "∾":                                          # 0x223e
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "最正值"
+ - "≠":                                          # 0x2260
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "不等于"
+ - "≡":                                          # 0x2261
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "恒等于"
+ - "⊂":                                          # 0x2282
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "子集"
+ - "⊃":                                          # 0x2283
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "超集"
+ - "⊄":                                          # 0x2284
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "非子集"
+ - "⊅":                                          # 0x2285
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "非超集"
+ - "⊆":                                          # 0x2286
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "子集或等于"
+ - "⊇":                                          # 0x2287
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "超集或等于"
+
+ # --- restored short definitions that differ from unicode-full ---
+ - "⇒": [T: "推出"]             # 0x21d2
+ - "∐": [T: "余积"]                          # 0x2210

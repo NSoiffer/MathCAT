@@ -1,0 +1,77 @@
+---
+
+# Use the mainland textbook noun phrases when both operands belong to one intent node.
+- name: textbook-vector-product-intent
+  tag: "*"
+  match: "count(*)=2 and (name(.)='dot-product' or name(.)='cross-product')"
+  replace:
+  - x: "*[1]"
+  - T: "与"
+  - x: "*[2]"
+  - test:
+      if: "name(.)='dot-product'"
+      then: [T: "的数量积"]
+      else: [T: "的叉积"]
+
+- name: scalar-determinant
+  tag: determinant
+  match: "count(*)=1 and not(*[1][self::m:mtr])"
+  replace:
+  - x: "*[1]"
+  - T: "的行列式"
+
+- name: linear-algebra-property
+  tag: [adjugate, magnitude, transpose, trace, dimension, kernel]
+  match: "count(*)=1"
+  replace:
+  - x: "*[1]"
+  - test:
+    - if: "self::m:adjugate"
+      then: [T: "的伴随矩阵"]
+    - else_if: "self::m:magnitude"
+      then: [T: "的模"]
+    - else_if: "self::m:transpose"
+      then: [T: "的转置"]
+    - else_if: "self::m:trace"
+      then: [T: "的迹"]
+    - else_if: "self::m:dimension"
+      then: [T: "的维数"]
+      else: [T: "的核"]
+
+- name: span
+  tag: span
+  match: "count(*)=1 or count(*)=2"
+  replace:
+  - T: "由"
+  - x: "*[1]"
+  - test:
+      if: "count(*)=2"
+      then: [T: "与", x: "*[2]"]
+  - T: "张成的空间"
+
+- name: homomorphism
+  tag: homomorphism
+  match: "count(*)=1 or count(*)=2"
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "count(*)=2"
+      then: [T: "到", x: "*[2]"]
+  - T: "的同态"
+
+
+- name: subscripted-norm
+  tag: subscripted-norm
+  match: "count(*)=2"
+  replace:
+  - x: "*[1]"
+  - T: "的"
+  - x: "*[2]"
+  - T: "范数"
+
+- name: norm
+  tag: norm
+  match: "count(*)=1"
+  replace:
+  - x: "*[1]"
+  - T: "的范数"

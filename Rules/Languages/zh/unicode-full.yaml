@@ -1,0 +1,3938 @@
+---
+
+
+ - "¢": [T: "分币符号"]                               # 0xa2
+ - "£": [T: "英镑符号"]                              # 0xa3
+ - "¤": [T: "货币符号"]                       # 0xa4
+ - "¥": [T: "日元符号"]                                 # 0xa5
+ - "¦": [T: "断竖线"]                          # 0xa6
+ - "§": [T: "章节号"]                             # 0xa7
+ - "¨": [T: "分音符"]                          # 0xa8
+ - "©": [T: "版权符号"]                           # 0xa9
+ - "ª": [T: "阴性序数指示符"]          # 0xaa
+ - "¬": [T: "非"]                                 # 0xac
+ - "«": [T: "左双角引号"] # 0xab
+ - "¯":                                            # 0xaf
+     - test:
+        if: "ancestor::m:modified-variable and preceding-sibling::*[1][self::m:mi]"
+        then: [T: "上横线"]
+        else: [T: "长音符"]
+ - "²": [T: "二"]                                 # 0xb2
+ - "³": [T: "三"]                               # 0xb3
+ - "´": [T: "锐音符"]                               # 0xb4
+ - "µ": [T: "微"]                               # 0xb5
+ - "¹": [T: "一"]                                 # 0xb9
+ - "º": [T: "阳性序数指示符"]                                 # 0xba
+ - "·":
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
+        then: [T: "乘"]
+        else: [T: "点"]
+ - "×":                                          # 0xd7
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
+        then: [T: "乘"]
+        else_test:
+            if: $ClearSpeak_MultSymbolX = 'By'
+            then: [T: "乘"]
+            else: [T: "叉乘"]
+ - "÷": [T: "除以"]                          # 0xf7
+ - "¡": [T: "倒置感叹号"]           # 0xa1
+ - "¶": [T: "段落号"]                      # 0xb6
+ - "¿": [T: "倒置问号"]              # 0xbf
+
+ - "ʰ": [T: "修饰用小写h"]                    # 0x2b0
+ - "ʱ": [T: "带钩的修饰用小写h"]          # 0x2b1
+ - "ʲ": [T: "修饰用小写j"]                    # 0x2b2
+ - "ʳ": [T: "修饰用小写r"]                    # 0x2b3
+ - "ʴ": [T: "修饰用小写倒置r"]             # 0x2b4
+ - "ʵ": [T: "带钩的修饰用小写倒置r"]   # 0x2b5
+ - "ʶ":                                            # 0x2b6
+    - T: "修饰用倒置小写字母"
+    - SPELL: "translate('R', 'R', 'R')"
+
+ - "ʷ": [T: "修饰用小写w"]                    # 0x2b7
+ - "ʸ": [T: "修饰用小写y"]                    # 0x2b8
+ - "ʹ": [T: "修饰用撇号"]                      # 0x2b9
+ - "ʺ": [T: "修饰用双撇号"]               # 0x2ba
+ - "ʻ": [T: "修饰用倒置逗号"]               # 0x2bb
+ - "ʼ": [T: "修饰用撇号"]                 # 0x2bc
+ - "ʽ": [T: "修饰用反向逗号"]             # 0x2bd
+ - "ʾ": [T: "修饰用右半圆环"]            # 0x2be
+ - "ʿ": [T: "修饰用左半圆环"]             # 0x2bf
+ - "ˀ": [T: "修饰用声门塞音"]               # 0x2c0
+ - "ˁ": [T: "修饰用反向声门塞音"]      # 0x2c1
+ - "˂": [T: "修饰字母左箭头尖"]             # 0x2c2
+ - "˃": [T: "修饰字母右箭头尖"]            # 0x2c3
+ - "˄": [T: "修饰字母上箭头尖"]               # 0x2c4
+ - "˅": [T: "修饰字母下箭头尖"]             # 0x2c5
+ - "ˆ": [T: "修饰用抑扬重音符"]          # 0x2c6
+ - "ˇ": [T: "倒抑扬符"]                               # 0x2c7
+ - "ˈ": [T: "修饰用竖直线"]              # 0x2c8
+ - "ˉ": [T: "修饰用长音"]                     # 0x2c9
+ - "ˊ": [T: "修饰用锐音重音符"]               # 0x2ca
+ - "ˋ": [T: "修饰用钝音重音符"]               # 0x2cb
+ - "ˌ": [T: "修饰用低竖直线"]          # 0x2cc
+ - "ˍ": [T: "修饰用低长音"]                 # 0x2cd
+ - "ˎ": [T: "修饰用低钝音重音符"]           # 0x2ce
+ - "ˏ": [T: "修饰用低锐音重音符"]           # 0x2cf
+ - "ː": [T: "修饰用三角形冒号"]           # 0x2d0
+ - "ˑ": [T: "修饰用半三角形冒号"]      # 0x2d1
+ - "˒": [T: "修饰字母居中右半圆圈"]   # 0x2d2
+ - "˓": [T: "修饰字母居中左半圆圈"]    # 0x2d3
+ - "˔": [T: "修饰字母上丁字"]                   # 0x2d4
+ - "˕": [T: "修饰字母下丁字"]                  # 0x2d5
+ - "˖": [T: "修饰字母加号"]                  # 0x2d6
+ - "˗": [T: "修饰字母减号"]                 # 0x2d7
+ - "˘": [T: "短音符"]                               # 0x2d8
+ - "˙": [T: "上点符"]                             # 0x2d9
+ - "˚": [T: "上圆圈"]                          # 0x2da
+ - "˛": [T: "下尾符"]                              # 0x2db
+ - "˜": [T: "小波浪号"]                         # 0x2dc
+ - "˝": [T: "双重锐音符"]                 # 0x2dd
+ - "˞": [T: "修饰字母卷舌钩"]                # 0x2de
+ - "˟": [T: "修饰字母十字重音"]               # 0x2df
+ - "ˠ": [T: "修饰用小写 gamma"]                # 0x2e0
+ - "ˡ": [T: "修饰用小写l"]                    # 0x2e1
+ - "ˢ": [T: "修饰用小写s"]                    # 0x2e2
+ - "ˣ": [T: "修饰用小写x"]                    # 0x2e3
+ - "ˤ": [T: "修饰用小型反向声门塞音"] # 0x2e4
+ - "˥": [T: "修饰字母特高声调横线"]        # 0x2e5
+ - "˦": [T: "修饰字母高声调横线"]              # 0x2e6
+ - "˧": [T: "修饰字母声调横线"]               # 0x2e7
+ - "˨": [T: "修饰字母低声调横线"]               # 0x2e8
+ - "˩": [T: "修饰字母特低声调横线"]         # 0x2e9
+ - "˪": [T: "阴去声调号"]    # 0x2ea
+ - "˫": [T: "阳去声调号"]   # 0x2eb
+ - "ˬ": [T: "修饰用浊音"]                    # 0x2ec
+ - "˭": [T: "修饰字母不送气"]                # 0x2ed
+ - "ˮ": [T: "修饰用双撇号"]          # 0x2ee
+ - "˯": [T: "修饰字母低位向下箭头尖"]   # 0x2ef
+ - "˰": [T: "修饰字母低位向上箭头尖"]   # 0x2f0
+ - "˱": [T: "修饰字母低位向左箭头尖"]   # 0x2f1
+ - "˲": [T: "修饰字母低位向右箭头尖"]   # 0x2f2
+ - "˳": [T: "修饰字母低圆圈"]                   # 0x2f3
+ - "˴": [T: "修饰字母中置钝重音"]        # 0x2f4
+ - "˵": [T: "修饰字母中置双钝重音"] # 0x2f5
+ - "˶": [T: "修饰字母中置双锐重音"] # 0x2f6
+ - "˷": [T: "修饰字母低波浪"]                  # 0x2f7
+ - "˸": [T: "修饰字母上标冒号"]               # 0x2f8
+ - "˹": [T: "修饰字母始高声调"]            # 0x2f9
+ - "˺": [T: "修饰字母终高声调"]              # 0x2fa
+ - "˻": [T: "修饰字母始低声调"]             # 0x2fb
+ - "˼": [T: "修饰字母终低声调"]               # 0x2fc
+ - "˽": [T: "修饰字母架"]                      # 0x2fd
+ - "˾": [T: "修饰字母开放架"]                 # 0x2fe
+ - "˿": [T: "修饰字母低左箭头"]             # 0x2ff
+ - "̀": [T: "上加钝音符"]          # 0x300
+ - "́": [T: "上加锐音符"]          # 0x301
+ - "̂": [T: "上加抑扬符"]     # 0x302
+ - "̃": [T: "上加波浪号"]                 # 0x303
+ - "̄": [T: "上加长音符"]                # 0x304
+ - "̅": [T: "上加横线"]               # 0x305
+ - "̆": [T: "上加短音符"]                   # 0x306
+ - "̇": [T: "上加点"]             # 0x307
+ - "̈": [T: "上加分音符"]                   # 0x308
+ - "̉": [T: "上加钩"]            # 0x309
+ - "̊": [T: "上加圆环"]            # 0x30a
+ - "̋": [T: "上加双锐音符"]                 # 0x30b
+ - "̌": [T: "上加倒抑扬符"]             # 0x30c
+ - "̍": [T: "上加竖线"]   # 0x30d
+ - "̎": [T: "上加双竖线"] # 0x30e
+ - "̏": [T: "上加双钝音符"]                 # 0x30f
+ - "̐": [T: "上加月点"]           # 0x310
+ - "̑": [T: "上加倒置短音符"]               # 0x311
+ - "̒": [T: "上加倒置逗号"]    # 0x312
+ - "̓": [T: "上加逗号"]           # 0x313
+ - "̔": [T: "上加反向逗号"]  # 0x314
+ - "̕": [T: "右上加逗号"]     # 0x315
+ - "̖": [T: "下加钝音重音符"]    # 0x316
+ - "̗": [T: "下加锐音重音符"]    # 0x317
+ - "̘": [T: "下加左丁字"]       # 0x318
+ - "̙": [T: "下加右丁字"]      # 0x319
+ - "̚": [T: "上加左角"]      # 0x31a
+ - "̛": [T: "上加角符"]                  # 0x31b
+ - "̜": [T: "下加左半圆环"]  # 0x31c
+ - "̝": [T: "下加上丁字"]         # 0x31d
+ - "̞": [T: "下加下丁字"]       # 0x31e
+ - "̟": [T: "下加加号"]       # 0x31f
+ - "̠": [T: "下加减号"]      # 0x320
+ - "̡": [T: "下加腭化钩"] # 0x321
+ - "̢": [T: "下加卷舌钩"]  # 0x322
+ - "̣": [T: "下加点"]             # 0x323
+ - "̤": [T: "下加分音"]       # 0x324
+ - "̥": [T: "下加圆环"]            # 0x325
+ - "̦": [T: "下加逗号"]           # 0x326
+ - "̧": [T: "下加软音符"]               # 0x327
+ - "̨": [T: "下加尾钩"]                     # 0x328
+ - "̩": [T: "下加竖线"]   # 0x329
+ - "̪": [T: "下加桥形符"]          # 0x32a
+ - "̫": [T: "下加倒置双弧"] # 0x32b
+ - "̬": [T: "下加倒抑扬"]           # 0x32c
+ - "̭": [T: "下加抑扬重音符"] # 0x32d
+ - "̮": [T: "下加短音符"]           # 0x32e
+ - "̯": [T: "下加倒置短音"]  # 0x32f
+ - "̰": [T: "下加波浪号"]           # 0x330
+ - "̱": [T: "下加长音"]          # 0x331
+ - "̲": [T: "下加下划线"]                 # 0x332
+ - "̳": [T: "下加双下划线"]               # 0x333
+ - "̴": [T: "叠加波浪号"]         # 0x334
+ - "̵": [T: "叠加短笔画"]  # 0x335
+ - "̶": [T: "叠加长笔画"]   # 0x336
+ - "̷": [T: "叠加短斜杠"] # 0x337
+ - "̸": [T: "叠加长斜杠"]  # 0x338
+ - "̹": [T: "下加右半圆环"] # 0x339
+ - "̺": [T: "下加倒置桥形符"] # 0x33a
+ - "̻": [T: "下加方形"]          # 0x33b
+ - "̼": [T: "下加海鸥形"]         # 0x33c
+ - "̽": [T: "上加x"]               # 0x33d
+ - "̾": [T: "上加竖直波浪号"]               # 0x33e
+ - "̿": [T: "上加双横线"]                   # 0x33f
+ - "̀": [T: "上加钝音声调标记"]             # 0x340
+ - "́": [T: "上加锐音声调标记"]             # 0x341
+ - "͆": [T: "上加桥形符"]                        # 0x346
+
+ - "ΪΫ":                                           # 0x3aa, 0x3ab
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [T: "大写"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        replace: [SPELL: "translate('.', 'ΪΫ', 'ιυ')"]
+    - T: "带分音符"
+ - "Ϗ":                                            # 0x3cf
+    - test:
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test:
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [T: "大写"]
+          else: [x: "$SpeechOverrides_CapitalLetters"]
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        replace: [T: "kai"]
+ - "ϊ": [T: "带分音符的 iota"]                 # 0x3ca
+ - "ϋ": [T: "带分音符的 upsilon"]              # 0x3cb
+ - "ό": [T: "带重音符的 omicron"]              # 0x3cc
+ - "ύ": [T: "带重音符的 upsilon"]               # 0x3cd
+ - "ώ": [T: "带重音符的 omega"]                 # 0x3ce
+ - "ϐ": [T: "beta"]                              # 0x3d0
+ - "ϑ": [T: "theta"]                             # 0x3d1
+ - "ϒ": [T: "带钩的 upsilon"]                    # 0x3d2
+ - "ϓ": [T: "带锐音与钩的 upsilon"]              # 0x3d3
+ - "ϔ": [T: "带分音与钩的 upsilon"]              # 0x3d4
+ - "ϕ": [T: "phi"]                                # 0x3d5
+ - "ϖ": [T: "pi"]                                 # 0x3d6
+ - "ϗ": [T: "kai"]                                # 0x3d7
+ - "Ϙ": [T: "大写 archaic koppa"]                 # 0x3d8
+ - "ϙ": [T: "archaic koppa"]                      # 0x3d9
+ - "ϵ": [T: "epsilon"]                            # 0x3f5
+ - "϶": [T: "反向 epsilon"]                       # 0x3f6
+ - "А-Я":                                          # 0x410 - 0x42f
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [T: "大写"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        replace: [SPELL: "translate('.', 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'абвгдежзийклмнопрстуфхцчшщъыьэюя')"]
+ - "а": [T: "西里尔字母阿"]                                   # 0x430
+ - "б": [T: "西里尔字母贝"]                                  # 0x431
+ - "в": [T: "西里尔字母韦"]                                  # 0x432
+ - "г": [T: "西里尔字母格"]                                 # 0x433
+ - "д": [T: "西里尔字母德"]                                  # 0x434
+ - "е": [T: "西里尔字母耶"]                                  # 0x435
+ - "ж": [T: "西里尔字母热"]                                 # 0x436
+ - "з": [T: "西里尔字母泽"]                                  # 0x437
+ - "и": [T: "西里尔字母伊"]                                   # 0x438
+ - "й": [T: "西里尔字母短伊"]                             # 0x439
+ - "к": [T: "西里尔字母卡"]                                  # 0x43a
+ - "л": [T: "西里尔字母埃勒"]                                  # 0x43b
+ - "м": [T: "西里尔字母埃姆"]                                  # 0x43c
+ - "н": [T: "西里尔字母恩"]                                  # 0x43d
+ - "о": [T: "西里尔字母奥"]                                   # 0x43e
+ - "п": [T: "西里尔字母佩"]                                  # 0x43f
+ - "р": [T: "西里尔字母埃尔"]                                  # 0x440
+ - "с": [T: "西里尔字母埃斯"]                                  # 0x441
+ - "т": [T: "西里尔字母特"]                                  # 0x442
+ - "у": [T: "西里尔字母乌"]                                   # 0x443
+ - "ф": [T: "西里尔字母埃弗"]                                  # 0x444
+ - "х": [T: "西里尔字母哈"]                                  # 0x445
+ - "ц": [T: "西里尔字母采"]                                 # 0x446
+ - "ч": [T: "西里尔字母切"]                                 # 0x447
+ - "ш": [T: "西里尔字母沙"]                                 # 0x448
+ - "щ": [T: "西里尔字母夏"]                               # 0x449
+ - "ъ": [T: "西里尔字母硬音符"]                           # 0x44a
+ - "ы": [T: "西里尔字母厄"]                                # 0x44b
+ - "ь": [T: "西里尔字母软音符"]                           # 0x44c
+ - "э": [T: "西里尔字母埃"]                                   # 0x44d
+ - "ю": [T: "西里尔字母尤"]                                  # 0x44e
+ - "я": [T: "西里尔字母雅"]                                  # 0x44f
+ - "؆": [T: "阿拉伯-印度立方根"]              # 0x606
+ - "؇": [T: "阿拉伯-印度四次方根"]            # 0x607
+ - "؈": [T: "阿拉伯文射线"]                          # 0x608
+ - "‐": [T: "连字符"]                              # 0x2010
+ - "‑": [T: "不换行连字符"]                              # 0x2011
+ - "‒": [T: "数字线"]                             # 0x2012
+ - "–": [T: "连接号"]                             # 0x2013 (CLDR zh: en dash)
+ - "—": [T: "破折号"]                             # 0x2014 (CLDR zh: em dash)
+ - "―": [T: "横条"]                      # 0x2015 (CLDR zh: horizontal bar)
+ - "‖": [T: "双竖线"]                # 0x2016
+ - "†": [T: "剑号"]                              # 0x2020
+ - "‡": [T: "双剑号"]                       # 0x2021
+
+ - " - ": [T: " "]                                 # 0x2000 - 0x2007
+
+ - "•":                                            # 0x2022
+    - test: 
+        if: "@data-chem-formula-op"
+        then: [T: "点"]
+        else: [T: "项目符号"]
+
+ - "…":                                          # 0x2026
+    test:
+        if:
+            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
+               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+               # speak '…' as 'and so on...' unless expr starts with '…'
+            - "../*[1][.='…']"
+        then: [T: "省略号"]
+        else_test:  # must have $ClearSpeak_Ellipses = 'AndSoOn'
+            if: "count(following-sibling::*) = 0"
+            then: [T: "等等"]
+            else: [T: "依此类推，直到"]
+
+ - "‰": [T: "千分号"]                           # 0x2030
+ - "‱": [T: "万分号"]                    # 0x2031
+ - "′": [T: "撇号"]                               # 0x2032
+ - "″": [T: "双撇号"]                        # 0x2033
+ - "‴": [T: "三撇号"]                        # 0x2034
+ - "‵": [T: "反撇号"]                      # 0x2035
+ - "‶": [T: "反向双撇号"]               # 0x2036
+ - "‷": [T: "反向三撇号"]               # 0x2037
+ - "‸": [T: "脱字符"]                              # 0x2038
+ - "‹": [T: "左单尖引号"] # 0x2039
+ - "›": [T: "右单尖引号"] # 0x203a
+ - "‼":                                            # 0x203c
+    - test:
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+        then: [T: "双感叹号"]      # 0x203c
+        else: [T: "双阶乘"]                # 0x203c
+ - "⁄":                                            # 0x2044
+    - test:
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+        then: [T: "分数斜杠"]      # 0x203c
+        else: [T: "除以"]              # 0x203c
+ - "⁅": [T: "带羽毛笔的左方括号"]      # 0x2045 (square bracket with quill)
+ - "⁆": [T: "带羽毛笔的右方括号"]     # 0x2046 (square bracket with quill)
+ - "※": [T: "参考标记"]                     # 0x203b
+ - "‿": [T: "下连线"]                          # 0x203F
+ - "⁀": [T: "字符连接符"]                                # 0x2040
+ - "⁎": [T: "低星号"]                        # 0x204e
+ - "⁏": [T: "反向分号"]                  # 0x204f
+ - "⁐": [T: "密排符"]                           # 0x2050
+ - "⁑": [T: "两个竖排星号"]              # 0x2051
+ - "⁒": [T: "商业减号"]               # 0x2052
+ - "⁗": [T: "四撇号"]                     # 0x2057
+ - "⁠": [T: ""]                                     # 0x2060
+ - "⁰":                                          # 0x2070
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "0"]
+        else: [T: "零次方"]
+ - "ⁱ":                                          # 0x2071
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "i"]
+        else: [T: "i次方"]
+ - "⁴":                                          # 0x2074
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "4"]
+        else: [T: "四次方"]
+ - "⁵":                                          # 0x2075
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "5"]
+        else: [T: "五次方"]
+ - "⁶":                                          # 0x2076
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "6"]
+        else: [T: "六次方"]
+ - "⁷":                                          # 0x2077
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "7"]
+        else: [T: "七次方"]
+ - "⁸":                                          # 0x2078
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "8"]
+        else: [T: "八次方"]
+ - "⁹":                                          # 0x2079
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "9"]
+        else: [T: "九次方"]
+ - "⁺":                                          # 0x207a
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "+"]
+        else: [T: "上标加号"]
+ - "⁻":                                          # 0x207b
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "−"]
+        else: [T: "上标减号"]
+ - "⁼":                                          # 0x207c
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "="]
+        else: [T: "上标等号"]
+ - "⁽":                                          # 0x207d
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "("]
+        else: [T: "上标左圆括号"]
+ - "⁾":                                          # 0x207e
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: ")"]
+        else: [T: "上标右圆括号"]
+ - "ⁿ":                                          # 0x207f
+    - test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='power' or name(.)='skip-super' or name(.)='say-super']"
+        then: [T: "n"]
+        else: [T: "n次方"]
+ - "₀":                                          # 0x2080
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "0"]
+        else: [T: "下标零"]
+ - "₁":                                          # 0x2081
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "1"]
+        else: [T: "下标一"]
+ - "₂":                                          # 0x2082
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "2"]
+        else: [T: "下标二"]
+ - "₃":                                          # 0x2083
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "3"]
+        else: [T: "下标三"]
+ - "₄":                                          # 0x2084
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "4"]
+        else: [T: "下标四"]
+ - "₅":                                          # 0x2085
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "5"]
+        else: [T: "下标五"]
+ - "₆":                                          # 0x2086
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "6"]
+        else: [T: "下标六"]
+ - "₇":                                          # 0x2087
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "7"]
+        else: [T: "下标七"]
+ - "₈":                                          # 0x2088
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "8"]
+        else: [T: "下标八"]
+ - "₉":                                          # 0x2089
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "9"]
+        else: [T: "下标九"]
+ - "₊":                                          # 0x208a
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "+"]
+        else: [T: "下标加号"]
+ - "₋":                                          # 0x208b
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "−"]
+        else: [T: "下标减号"]
+ - "₌":                                          # 0x208c
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "="]
+        else: [T: "下标等号"]
+ - "₍":                                          # 0x208d
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "("]
+        else: [T: "下标左圆括号"]
+ - "₎":                                          # 0x208e
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: ")"]
+        else: [T: "下标右圆括号"]
+ - "ₐ":                                          # 0x2090
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "a"]
+        else: [T: "下标a"]
+ - "ₑ":                                          # 0x2091
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "e"]
+        else: [T: "下标e"]
+ - "ₒ":                                          # 0x2092
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "o"]
+        else: [T: "下标o"]
+ - "ₓ":                                          # 0x2093
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "x"]
+        else: [T: "下标x"]
+ - "ₕ":                                          # 0x2095
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "h"]
+        else: [T: "下标h"]
+ - "ₖ":                                          # 0x2096
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "k"]
+        else: [T: "下标k"]
+ - "ₗ":                                          # 0x2097
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "l"]
+        else: [T: "下标l"]
+ - "ₘ":                                          # 0x2098
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "m"]
+        else: [T: "下标m"]
+ - "ₙ":                                          # 0x2099
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "n"]
+        else: [T: "下标n"]
+ - "ₚ":                                          # 0x209a
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "p"]
+        else: [T: "下标p"]
+ - "ₛ":                                          # 0x209b
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "s"]
+        else: [T: "下标s"]
+ - "ₜ":                                          # 0x209c
+    - test:
+        if: "parent::*[name(.)='msub' or name(.)='msubsup' or name(.)='indexed-by']"
+        then: [T: "t"]
+        else: [T: "下标t"]
+ - "₠": [T: "欧洲货币单位符号"]             # 0x20a0
+ - "₡": [T: "科朗符号"]                              # 0x20a1
+ - "₢": [T: "克鲁赛罗符号"]                            # 0x20a2
+ - "₣": [T: "法国法郎符号"]                               # 0x20a3
+ - "₤": [T: "里拉符号"]                                # 0x20a4
+ - "₥": [T: "密尔"]                               # 0x20a5
+ - "₦": [T: "奈拉符号"]                               # 0x20a6
+ - "₧": [T: "比塞塔符号"]                              # 0x20a7
+ - "₨": [T: "卢比符号"]                              # 0x20a8
+ - "₩": [T: "韩元符号"]                                 # 0x20a9
+ - "₪": [T: "新谢克尔符号"]                         # 0x20aa
+ - "₫": [T: "越南盾符号"]                                # 0x20ab
+ - "€": [T: "欧元符号"]                               # 0x20ac
+ - "₭": [T: "基普符号"]                                 # 0x20ad
+ - "₮": [T: "图格里克符号"]                              # 0x20ae
+ - "₯": [T: "德拉克马符号"]                             # 0x20af
+ - "₰": [T: "德国便士符号"]                      # 0x20b0
+ - "₱": [T: "比索符号"]                               # 0x20b1
+ - "₲": [T: "瓜拉尼符号"]                            # 0x20b2
+ - "₳": [T: "奥斯特拉尔货币符号"]                            # 0x20b3
+ - "₴": [T: "格里夫纳符号"]                            # 0x20b4
+ - "₵": [T: "塞地符号"]                               # 0x20b5
+ - "₶": [T: "图尔里弗尔"]                      # 0x20b6
+ - "₷": [T: "斯佩斯米洛"]                           # 0x20b7
+ - "₸": [T: "坚戈符号"]                              # 0x20b8
+ - "₹": [T: "印度卢比符号"]                       # 0x20b9
+ - "₺": [T: "土耳其里拉符号"]                       # 0x20ba
+ - "⃐": [T: "上加左鱼叉箭头"]    # 0x20d0
+ - "⃑": [T: "上加右鱼叉箭头"]   # 0x20d1
+ - "⃒": [T: "叠加长竖直线"] # 0x20d2
+ - "⃓": [T: "叠加短竖直线"] # 0x20d3
+ - "⃔": [T: "上加逆时针箭头"] # 0x20d4
+ - "⃕": [T: "上加顺时针箭头"] # 0x20d5
+ - "⃖": [T: "上加向左箭头"]      # 0x20d6
+ - "⃗": [T: "上加向右箭头"]     # 0x20d7
+ - "⃘": [T: "叠加圆环"]          # 0x20d8
+ - "⃙": [T: "叠加顺时针圆环"] # 0x20d9
+ - "⃚": [T: "叠加逆时针圆环"] # 0x20da
+ - "⃛": [T: "上加三点"]      # 0x20db
+ - "⃜": [T: "上加四点"]       # 0x20dc
+ - "⃝": [T: "外加圆圈"]      # 0x20dd
+ - "⃞": [T: "外加方形"]      # 0x20de
+ - "⃟": [T: "外加菱形"]     # 0x20df
+ - "⃠": [T: "外加圆圈反斜杠"] # 0x20e0
+ - "⃡": [T: "上加左右箭头"] # 0x20e1
+ - "⃢": [T: "外加屏幕"]      # 0x20e2
+ - "⃣": [T: "外加键帽"]      # 0x20e3
+ - "⃤": [T: "外加向上三角形"] # 0x20e4
+ - "⃥": [T: "叠加反斜杠"] # 0x20e5
+ - "⃦": [T: "叠加双竖线"] # 0x20e6
+ - "⃧": [T: "年金符号"]        # 0x20e7
+ - "⃨": [T: "下加三点"]       # 0x20e8
+ - "⃩": [T: "上加宽桥形符"]     # 0x20e9
+ - "⃪": [T: "叠加向左箭头"] # 0x20ea
+ - "⃫": [T: "叠加长双斜杠"] # 0x20eb
+ - "⃬": [T: "下加带向下倒钩的向右鱼叉箭头"] # 0x20ec
+ - "⃭": [T: "下加带向下倒钩的向左鱼叉箭头"] # 0x20ed
+ - "⃮": [T: "下加向左箭头"]      # 0x20ee
+ - "⃯": [T: "下加向右箭头"]     # 0x20ef
+ - "⃰": [T: "上加星号"]        # 0x20f0
+ - "℄": [T: "中心线"]                  # 0x2104
+ - "℅": [T: "转交"]                             # 0x2105
+ - "℆": [T: "每个"]                            # 0x2106
+ - "ℇ": [T: "欧拉常数"]                  # 0x2107
+ - "℈": [T: "斯克鲁普尔"]                            # 0x2108
+ - "℉": [T: "华氏度"]                  # 0x2109
+ - "ℊ": [T: "花体g"]                            # 0x210a
+ - "ℌℑℨℭ":                                # 0x210c, 0x2111, 0x2128, 0x212d
+    - T: "哥特体"
+    - SPELL: "translate('.', 'ℌℑℨℭ', 'HIZC')"
+
+ - "ℍℙℾℿ":                                          # 0x210d, 0x2119, 0x213e, 0x213f
+    - T: "双线体"
+    - SPELL: "translate('.', 'ℍℙℾℿ', 'HPΓΠ')" 
+
+ - "ℎ": [T: "普朗克常量"]                     # 0x210e
+ - "ℏ": [T: "约化普朗克常量"]                               # 0x210f
+
+ - "ℐℒ℘ℬℰℱℳ":                          # 0x2110, 0x2112, 0x2118, 0x2130, 0x2131, 0x2133
+    - T: "花体"
+    - SPELL: "translate('.', 'ℐℒ℘ℬℰℱℳ', 'ILPBEFM')"
+
+ - "ℓ": [T: "花体l"]                            # 0x2113
+ - "℔": [T: "磅符号"]                              # 0x2114
+ - "№": [T: "序号符号"]                              # 0x2116
+ - "℥": [T: "盎司"]                              # 0x2125
+ - "Ω": [T: "欧姆"]                                # 0x2126
+ - "℧": [T: "姆欧"]                                # 0x2127
+ - "℩": [T: "倒置希腊小写字母 iota"]                         # 0x2129
+ - "K": [T: "开尔文"]                              # 0x212a
+ - "Å": [T: "埃"]                           # 0x212b
+ - "ℯ": [T: "花体e"]                            # 0x212f
+
+   # coalesced some chars that use cap letters
+ - "Ⅎ℺⅁⅂⅃⅄":        # 0x2132, 0x213a, 0x2141, 0x2142, 0x2143, 0x2144 
+    - test:
+      - if: "'.' = '℺'"
+        then: [T: "旋转"]
+      - else_if: "'.' = 'Ⅎ'"
+        then: [T: "倒置"]
+      - else_if: "'.' = '⅃'"
+        then: [T: "反向无衬线体"]
+        else: [T: "倒置无衬线体"]
+    - SPELL: "translate('.', 'Ⅎ℺⅁⅂⅃⅄', 'FQGLLY')"
+
+ - "ℴ": [T: "花体o"]                             # 0x2134
+ - "ℵ": [T: "阿列夫"]           # 0x2135
+ - "ℶ": [T: "贝特"]          # 0x2136
+ - "ℷ": [T: "吉梅尔"]           # 0x2137
+ - "ℸ": [T: "达列特"]          # 0x2138
+ - "ℼ": [T: "双线体 pi"]                     # 0x213c
+ - "ℽ": [T: "双线体 gamma"]                  # 0x213d
+ - "⅀": [T: "双线体求和号"]           # 0x2140
+ - "⅋": [T: "倒置与号"]                    # 0x214b
+ - "⅌": [T: "每"]                                 # 0x214c
+ - "ⅎ": [T: "倒置小写 f"]                            # 0x214e
+ - "¼": [T: "四分之一"]                         # 0x00bc
+ - "½": [T: "二分之一"]                            # 0x00bd
+ - "¾": [T: "四分之三"]                      # 0x00be
+ - "⅐": [T: "七分之一"]                         # 0x2150
+ - "⅑": [T: "九分之一"]                           # 0x2151
+ - "⅒": [T: "十分之一"]                           # 0x2152
+ - "⅓": [T: "三分之一"]                           # 0x2153
+ - "⅔": [T: "三分之二"]                          # 0x2154
+ - "⅕": [T: "五分之一"]                           # 0x2155
+ - "⅖": [T: "五分之二"]                          # 0x2156
+ - "⅗": [T: "五分之三"]                        # 0x2157
+ - "⅘": [T: "五分之四"]                         # 0x2158
+ - "⅙": [T: "六分之一"]                           # 0x2159
+ - "⅚": [T: "六分之五"]                         # 0x215a
+ - "⅛": [T: "八分之一"]                          # 0x215b
+ - "⅜": [T: "八分之三"]                       # 0x215c
+ - "⅝": [T: "八分之五"]                        # 0x215d
+ - "⅞": [T: "八分之七"]                       # 0x215e
+ - "⅟": [T: "分子一"]                            # 0x215f
+ - "Ⅰ": [T: "罗马数字一"]                                   # 0x2160
+ - "Ⅱ": [T: "罗马数字二"]                                 # 0x2161
+ - "Ⅲ": [T: "罗马数字三"]                               # 0x2162
+ - "Ⅳ": [T: "罗马数字四"]                                 # 0x2163
+ - "Ⅴ": [T: "罗马数字五"]                                   # 0x2164
+ - "Ⅵ": [T: "罗马数字六"]                                 # 0x2165
+ - "Ⅶ": [T: "罗马数字七"]                               # 0x2166
+ - "Ⅷ": [T: "罗马数字八"]                             # 0x2167
+ - "Ⅸ": [T: "罗马数字九"]                                 # 0x2168
+ - "Ⅹ": [T: "罗马数字十"]                                   # 0x2169
+ - "Ⅺ": [T: "罗马数字十一"]                                 # 0x216a
+ - "Ⅻ": [T: "罗马数字十二"]                               # 0x216b
+ - "Ⅼ": [T: "罗马数字五十"]                                   # 0x216c
+ - "Ⅽ": [T: "罗马数字一百"]                                   # 0x216d
+ - "Ⅾ": [T: "罗马数字五百"]                                   # 0x216e
+ - "Ⅿ": [T: "罗马数字一千"]                                   # 0x216f
+ - "ⅰ": [T: "罗马数字一"]                                   # 0x2170
+ - "ⅱ": [T: "罗马数字二"]                                 # 0x2171
+ - "ⅲ": [T: "罗马数字三"]                               # 0x2172
+ - "ⅳ": [T: "罗马数字四"]                                 # 0x2173
+ - "ⅴ": [T: "罗马数字五"]                                   # 0x2174
+ - "ⅵ": [T: "罗马数字六"]                                 # 0x2175
+ - "ⅶ": [T: "罗马数字七"]                               # 0x2176
+ - "ⅷ": [T: "罗马数字八"]                             # 0x2177
+ - "ⅸ": [T: "罗马数字九"]                                 # 0x2178
+ - "ⅹ": [T: "罗马数字十"]                                   # 0x2179
+ - "ⅺ": [T: "罗马数字十一"]                                 # 0x217a
+ - "ⅻ": [T: "罗马数字十二"]                               # 0x217b
+ - "ⅼ": [T: "罗马数字五十"]                                   # 0x217c
+ - "ⅽ": [T: "罗马数字一百"]                                   # 0x217d
+ - "ⅾ": [T: "罗马数字五百"]                                   # 0x217e
+ - "ⅿ": [T: "罗马数字一千"]                                   # 0x217f
+ - "↉": [T: "三分之零"]                         # 0x2189
+ - "↔": [T: "左右箭头"]                    # 0x2194
+ - "↕": [T: "上下箭头"]                       # 0x2195
+ - "↖": [T: "左上箭头"]                    # 0x2196
+ - "↗":                                          # 0x2197
+    - test:
+        if: "ancestor::*[2][self::m:limit]"
+        then: [T: "从下方趋于"]
+        else: [T: "右上箭头"]
+
+ - "↘":                                          # 0x2198
+    - test:
+        if: "ancestor::*[2][self::m:limit]"
+        then: [T: "从上方趋于"]
+        else: [T: "右下箭头"]
+
+ - "↙": [T: "左下箭头"]                    # 0x2199
+ - "↚": [T: "向左带斜线箭头"]         # 0x219a
+ - "↛": [T: "向右带斜线箭头"]        # 0x219b
+ - "↜": [T: "向左波浪箭头"]                # 0x219c
+ - "↝": [T: "向右波浪箭头"]               # 0x219d
+ - "↞": [T: "向左双头箭头"]          # 0x219e
+ - "↟": [T: "向上双头箭头"]            # 0x219f
+ - "↠": [T: "向右双头箭头"]         # 0x21a0
+ - "↡": [T: "向下双头箭头"]          # 0x21a1
+ - "↢": [T: "向左带尾箭头"]           # 0x21a2
+ - "↣": [T: "向右带尾箭头"]          # 0x21a3
+ - "↤": [T: "从竖线出发的向左箭头"]            # 0x21a4
+ - "↥": [T: "从横线出发的向上箭头"]              # 0x21a5
+ - "↦": [T: "映射到"]           # 0x21a6
+ - "↧": [T: "从横线出发的向下箭头"]            # 0x21a7
+ - "↨": [T: "带底线的上下箭头"]             # 0x21a8
+ - "↩": [T: "向左带钩箭头"]           # 0x21a9
+ - "↪": [T: "向右带钩箭头"]          # 0x21aa
+ - "↫": [T: "向左带环箭头"]             # 0x21ab
+ - "↬": [T: "向右带环箭头"]             # 0x21ac
+ - "↭": [T: "左右波浪箭头"]               # 0x21ad
+ - "↮": [T: "带斜线的左右箭头"]        # 0x21ae
+ - "↯": [T: "向下之字形箭头"]              # 0x21af
+ - "↰": [T: "尖端向左的向上箭头"]    # 0x21b0
+ - "↱": [T: "尖端向右的向上箭头"]   # 0x21b1
+ - "↲": [T: "尖端向左的向下箭头"]  # 0x21b2
+ - "↳": [T: "尖端向右的向下箭头"] # 0x21b3
+ - "↴": [T: "先向右再向下转折的箭头"] # 0x21b4
+ - "↵": [T: "先向下再向左转折的箭头"] # 0x21b5
+ - "↶": [T: "逆时针上半圆箭头"]  # 0x21b6
+ - "↷": [T: "顺时针上半圆箭头"]      # 0x21b7
+ - "↸": [T: "指向长横线的左上箭头"]        # 0x21b8
+ - "↹": [T: "上方为指向竖线的向左箭头，下方为指向竖线的向右箭头"] # 0x21b9
+ - "↺": [T: "逆时针开口圆箭头"]     # 0x21ba
+ - "↻": [T: "顺时针开口圆箭头"]         # 0x21bb
+ - "↼": [T: "倒钩向上的向左鱼叉箭头"]                     # 0x21bc
+ - "↽": [T: "倒钩向下的向左鱼叉箭头"]                   # 0x21bd
+ - "↾": [T: "倒钩向右的向上鱼叉箭头"]                    # 0x21be
+ - "↿": [T: "倒钩向左的向上鱼叉箭头"]                     # 0x21bf
+ - "⇀": [T: "倒钩向上的向右鱼叉箭头"]                    # 0x21c0
+ - "⇁": [T: "倒钩向下的向右鱼叉箭头"]                  # 0x21c1
+ - "⇂": [T: "倒钩向右的向下鱼叉箭头"]                  # 0x21c2
+ - "⇃": [T: "倒钩向左的向下鱼叉箭头"]                   # 0x21c3
+ - "⇄": [T: "上方右箭头下方左箭头"] # 0x21c4
+ - "⇅": [T: "左侧上箭头右侧下箭头"] # 0x21c5
+ - "⇆": [T: "上方左箭头下方右箭头"] # 0x21c6
+ - "⇇": [T: "向左双平行箭头"]             # 0x21c7
+ - "⇈": [T: "向上双平行箭头"]               # 0x21c8
+ - "⇉": [T: "向右双平行箭头"]            # 0x21c9
+ - "⇊": [T: "向下双平行箭头"]             # 0x21ca
+ - "⇋": [T: "上方为向左鱼叉箭头，下方为向右鱼叉箭头"]     # 0x21cb
+ - "⇌": [T: "上方为向右鱼叉箭头，下方为向左鱼叉箭头"]     # 0x21cc
+ - "⇍": [T: "向左双线带斜线箭头"]  # 0x21cd
+ - "⇎": [T: "左右双线带斜线箭头"] # 0x21ce
+ - "⇏": [T: "向右双线带斜线箭头"] # 0x21cf
+ - "⇐": [T: "向左双线箭头"]              # 0x21d0
+ - "⇑": [T: "向上双线箭头"]                # 0x21d1
+ - "⇒": [T: "推出"]             # 0x21d2
+ - "⇓": [T: "向下双线箭头"]              # 0x21d3
+ - "⇔": [T: "当且仅当"]             # 0x21d4
+ - "⇕": [T: "上下双线箭头"]                # 0x21d5
+ - "⇖": [T: "左上双线箭头"]             # 0x21d6
+ - "⇗": [T: "右上双线箭头"]             # 0x21d7
+ - "⇘": [T: "右下双线箭头"]             # 0x21d8
+ - "⇙": [T: "左下双线箭头"]             # 0x21d9
+ - "⇚": [T: "向左三重箭头"]              # 0x21da
+ - "⇛": [T: "向右三重箭头"]             # 0x21db
+ - "⇜": [T: "向左曲线箭头"]            # 0x21dc
+ - "⇝": [T: "向右曲线箭头"]           # 0x21dd
+ - "⇞": [T: "带两条横线的向上箭头"]    # 0x21de
+ - "⇟": [T: "带两条横线的向下箭头"]  # 0x21df
+ - "⇠": [T: "向左虚线箭头"]              # 0x21e0
+ - "⇡": [T: "向上虚线箭头"]                # 0x21e1
+ - "⇢": [T: "向右虚线箭头"]             # 0x21e2
+ - "⇣": [T: "向下虚线箭头"]              # 0x21e3
+ - "⇤": [T: "指向竖线的向左箭头"]              # 0x21e4
+ - "⇥": [T: "指向竖线的向右箭头"]             # 0x21e5
+ - "⇦": [T: "向左白色箭头"]               # 0x21e6
+ - "⇧": [T: "向上白色箭头"]                 # 0x21e7
+ - "⇨": [T: "向右白色箭头"]              # 0x21e8
+ - "⇩": [T: "向下白色箭头"]               # 0x21e9
+ - "⇪": [T: "从横线向上的白色箭头"]        # 0x21ea
+ - "⇫": [T: "基座上的向上白色箭头"]     # 0x21eb
+ - "⇬": [T: "基座带横线的向上白色箭头"] # 0x21ec
+ - "⇭": [T: "基座带竖线的向上白色箭头"] # 0x21ed
+ - "⇮": [T: "向上白色双线箭头"]          # 0x21ee
+ - "⇯": [T: "基座上的向上白色双线箭头"] # 0x21ef
+ - "⇰": [T: "从竖线出发的向右白色箭头"]    # 0x21f0
+ - "⇱": [T: "指向角部的左上箭头"]          # 0x21f1
+ - "⇲": [T: "指向角部的右下箭头"]          # 0x21f2
+ - "⇳": [T: "上下白色双向箭头"]                 # 0x21f3
+ - "⇴": [T: "带小圆圈的向右箭头"]       # 0x21f4
+ - "⇵": [T: "左侧下箭头右侧上箭头"] # 0x21f5
+ - "⇶": [T: "三个向右箭头"]             # 0x21f6
+ - "⇷": [T: "带一条竖线的向左箭头"] # 0x21f7
+ - "⇸": [T: "带一条竖线的向右箭头"] # 0x21f8
+ - "⇹": [T: "带一条竖线的左右箭头"] # 0x21f9
+ - "⇺": [T: "带两条竖线的向左箭头"] # 0x21fa
+ - "⇻": [T: "带两条竖线的向右箭头"] # 0x21fb
+ - "⇼": [T: "带两条竖线的左右箭头"] # 0x21fc
+ - "⇽": [T: "向左开口箭头"]             # 0x21fd
+ - "⇾": [T: "向右开口箭头"]             # 0x21fe
+ - "⇿": [T: "左右开口箭头"]             # 0x21ff
+ - "∀": [T: "任意"]                             # 0x2200
+ - "∁":                                          # 0x2201
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [OT: ""]
+     - T: "补集"
+ - "∂":                                          # 0x2202
+     - test: 
+         if: "$Verbosity='Terse'"
+         then: [T: "偏微分"]
+         else: [T: "偏导数"]
+ - "∃": [T: "存在"]                        # 0x2203
+ - "∄": [T: "不存在"]                # 0x2204
+ - "∅": [T: "空集"]                           # 0x2205
+ - "∆": [T: "增量"]                            # 0x2206
+
+ - "∇": [T: "纳布拉"]                           # 0x2207
+ - "∉":                                          # 0x2209
+    # rule is identical to 0x2208
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [T: "不属于"]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "不属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "不属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "不属于"]
+              - else: [T: "不属于"]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "不属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "不属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "不属于"]
+              - else: [T: "不属于"]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+ - "∊":                                          # 0x220a
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then:
+        - test:
+            if: "$Verbosity!='Terse' and not(parent::m:set)"    # "the set x is an element of ..." sounds bad
+            then: [T: ""]
+        - T: "属于"
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "属于"]
+              - else: [T: "属于"]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "属于"]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "属于"]
+              - else: [T: "属于"]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+ - "∋": [T: "包含"]                 # 0x220b
+ - "∌": [T: "不包含"]         # 0x220c
+ - "∍": [T: "小型包含"]             # 0x220d
+ - "∎": [T: "证毕"]                        # 0x220e
+ - "∏": [T: "连乘"]                             # 0x220f
+ - "∐": [T: "余积"]                           # 0x2210
+ - "∑": [T: "求和"]                                 # 0x2211
+ - "−":
+    - test:
+        if: "(ancestor::*[@data-chem-formula] or ancestor::m:power) and not(following-sibling::*)"
+        then: [T: "负"]
+        else: [T: "减"]                               # 0x2212
+ - "∓":                                           # 0x2213
+    - test:
+        if: "preceding-sibling::* and following-sibling::*"
+        then: [T: "减或加"]
+        else: [T: "负或正"]
+ - "∔": [T: "点加号"]                            # 0x2214
+ - "∕": [T: "除以"]                          # 0x2215
+ - "∖": [T: "差集"]                           # 0x2216
+ - "∗": [T: "乘"]                               # 0x2217
+ - "∘": [T: "复合"]                       # 0x2218
+ - "∙":                                            # 0x2219
+    - test: 
+        if: "@data-chem-formula-op"
+        then: [T: "点"]
+        else: [T: "乘"]
+
+ - "√":                                          # 0x221a
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [OT: ""]
+     - T: "平方根"
+ - "∛":                                          # 0x221b
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [OT: ""]
+     - T: "立方根"
+ - "∜":                                          # 0x221c
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [OT: ""]
+     - T: "四次方根"
+ - "∝":                                          # 0x221d
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "正比于"
+ - "∞": [T: "无穷大"]                          # 0x221e
+ - "∟": [T: "直角"]                         # 0x221f
+ - "∠": [T: "角"]                               # 0x2220
+ - "∡": [T: "测量角"]                      # 0x2221
+ - "∢": [T: "球面角"]                     # 0x2222
+ - "∣": [T: "整除"]                              # 0x2223
+ - "∤": [T: "不整除"]                      # 0x2224
+ - "∧": [T: "且"]                                 # 0x2227
+ - "∨": [T: "或"]                                  # 0x2228
+ - "∩": [T: "交"]                        # 0x2229
+ - "∪": [T: "并"]                               # 0x222a
+ - "∫": [T: "积分"]                            # 0x222b
+ - "∬": [T: "二重积分"]                     # 0x222c
+ - "∭": [T: "三重积分"]                     # 0x222d
+ - "∮": [T: "围道积分"]                    # 0x222e
+ - "∯": [T: "曲面积分"]                  # 0x222f
+ - "∰": [T: "体积分"]                     # 0x2230
+ - "∱": [T: "顺时针积分"]                # 0x2231
+ - "∲": [T: "顺时针围道积分"]          # 0x2232
+ - "∳": [T: "逆时针围道积分"]      # 0x2233
+ - "∴": [T: "所以"]                           # 0x2234
+ - "∵": [T: "因为"]                             # 0x2235
+ - "∶":                                          # 0x2236
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "比"
+ - "∷": [T: "比例"]                                  # 0x2237
+ - "∸": [T: "点减号"]                           # 0x2238
+ - "∹": [T: "超出"]              # 0x2239
+ - "∺":                                          # 0x223a
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "几何比例"
+ - "∻":                                          # 0x223b
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "位似于"
+ - "∼": [T: "波浪运算符"]                         # 0x223c
+ - "∽": [T: "反转波浪号"]                      # 0x223d
+ - "∾":                                          # 0x223e
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "最正值"
+ - "∿": [T: "正弦波"]                           # 0x223f
+ - "≀": [T: "圈积"]                      # 0x2240
+ - "≁": [T: "非波浪号"]                           # 0x2241
+ - "≂": [T: "减波浪号"]                         # 0x2242
+ - "≃":                                          # 0x2243
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "渐近等于"
+ - "≄":                                          # 0x2244
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "不渐近等于"
+ - "≅":                                          # 0x2245
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "近似等于"
+ - "≆":                                          # 0x2246
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "近似但不等于"
+ - "≇":                                          # 0x2247
+     - test:
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "既不近似等于也不等于"
+ - "≈":                                          # 0x2248
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "约等于"
+ - "≉":                                          # 0x2249
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "不约等于"
+ - "≊":                                          # 0x224a
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "约等于或等于"
+ - "≋": [T: "三重波浪"]                        # 0x224b
+ - "≌": [T: "全等于"]                      # 0x224c
+ - "≍":                                          # 0x224d
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "等价于"
+ - "≎":                                          # 0x224e
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "几何等价于"
+ - "≏":                                          # 0x224f
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [OT: ""]
+     - T: "相差"
+ - "≐": [T: "趋于极限"]                # 0x2250
+ - "≑":                                          # 0x2251
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "几何上等于"
+ - "≒":                                          # 0x2252
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "约等于或为像"
+ - "≓":                                          # 0x2253
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "为像或约等于"
+ - "≔": [T: "定义为"]                        # 0x2254
+ - "≕": [T: "等号冒号"]                        # 0x2255
+ - "≖": [T: "环等于"]                    # 0x2256
+ - "≗":                                          # 0x2257
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "圆圈等于"
+ - "≘": [T: "对应"]                      # 0x2258
+ - "≙": [T: "估计"]                           # 0x2259
+ - "≚":                                          # 0x225a
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "等角于"
+ - "≛": [T: "星等号"]                         # 0x225b
+ - "≜": [T: "delta 等于"]                        # 0x225c
+ - "≝": [T: "定义为"]                    # 0x225d
+ - "≞":                                          # 0x225e
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "度量为"
+ - "≟": [T: "问号等于"]    # 0x225f
+ - "≠":                                          # 0x2260
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "不等于"
+ - "≡":                                          # 0x2261
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "恒等于"
+ - "≢":                                          # 0x2262
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "不恒等于"
+ - "≣":                                          # 0x2263
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "严格等价于"
+ - "≦": [T: "小于等于"]                       # 0x2266
+ - "≧": [T: "大于等于"]                       # 0x2267
+ - "≨":                                          # 0x2268
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "小于但不等于"
+ - "≩":                                          # 0x2269
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "大于但不等于"
+ - "≪":                                          # 0x226a
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "远小于"
+ - "≫":                                          # 0x226b
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "远大于"
+ - "≬":                                          # 0x226c
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "介于"
+ - "≭":                                          # 0x226d
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "不等价于"
+ - "≮":                                          # 0x226e
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "不小于"
+ - "≯":                                          # 0x226f
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "不大于"
+ - "≰":                                          # 0x2270
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "既不小于也不等于"
+ - "≱":                                          # 0x2271
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "既不大于也不等于"
+ - "≲":                                          # 0x2272
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "小于或等价于"
+ - "≳":                                          # 0x2273
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "大于或等价于"
+ - "≴":                                          # 0x2274
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "既不小于也不等价于"
+ - "≵":                                          # 0x2275
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "既不大于也不等价于"
+ - "≶":                                          # 0x2276
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "小于或大于"
+ - "≷":                                          # 0x2277
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "大于或小于"
+ - "≸":                                          # 0x2278
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "既不小于也不大于"
+ - "≹":                                          # 0x2279
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "既不大于也不小于"
+ - "≺": [T: "先于"]                            # 0x227a
+ - "≻": [T: "后于"]                            # 0x227b
+ - "≼": [T: "先于或等于"]             # 0x227c
+ - "≽": [T: "后于或等于"]             # 0x227d
+ - "≾": [T: "先于或等价于"]        # 0x227e
+ - "≿": [T: "后于或等价于"]        # 0x227f
+ - "⊀": [T: "不先于"]                    # 0x2280
+ - "⊁": [T: "不后于"]                    # 0x2281
+ - "⊂":                                          # 0x2282
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "子集"
+ - "⊃":                                          # 0x2283
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "超集"
+ - "⊄":                                          # 0x2284
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "非子集"
+ - "⊅":                                          # 0x2285
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "非超集"
+ - "⊆":                                          # 0x2286
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "子集或等于"
+ - "⊇":                                          # 0x2287
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "超集或等于"
+ - "⊈":                                          # 0x2288
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "既非子集也不等于"
+ - "⊉":                                          # 0x2289
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "既非超集也不等于"
+ - "⊊": [T: "真子集"]         # 0x228a
+ - "⊋": [T: "真超集"]       # 0x228b
+ - "⊌": [T: "多重集"]                            # 0x228c
+ - "⊍": [T: "多重集乘法"]             # 0x228d
+ - "⊎": [T: "多重集并集"]                      # 0x228e
+ - "⊏": [T: "方形像"]                     # 0x228f
+ - "⊐": [T: "方形原像"]                  # 0x2290
+ - "⊑": [T: "方形像或等于"]         # 0x2291
+ - "⊒": [T: "方形原像或等于"]      # 0x2292
+ - "⊓": [T: "方形交集"]                          # 0x2293
+ - "⊔": [T: "方形并集"]                          # 0x2294
+ - "⊕": [T: "带圈加号"]                        # 0x2295
+ - "⊖": [T: "带圈减号"]                       # 0x2296
+ - "⊗": [T: "带圈乘号"]                       # 0x2297
+ - "⊘": [T: "带圆圈除号斜线"]                 # 0x2298
+ - "⊙":                                           # 0x2299
+    - test:
+        if: "following-sibling::*[1][self::m:mi] and (not(preceding-sibling::*) or preceding-sibling::*[1][self::m:mo])"
+        then: [T: "圆"]
+        else: [T: "带圈点运算符"]
+ - "⊚": [T: "带圈环运算符"]                        # 0x229a
+ - "⊛": [T: "带圈星号运算符"]                    # 0x229b
+ - "⊜": [T: "带圈等号"]                      # 0x229c
+ - "⊝": [T: "带圈短横"]                        # 0x229d
+ - "⊞": [T: "方框加号"]                        # 0x229e
+ - "⊟": [T: "方框减号"]                        # 0x229f
+ - "⊠": [T: "方框乘号"]                        # 0x22a0
+ - "⊡": [T: "方框点运算符"]                    # 0x22a1
+ - "⊢": [T: "可推出"]                              # 0x22a2
+ - "⊣": [T: "左断言符"]                      # 0x22a3
+ - "⊤": [T: "真"]                                 # 0x22a4
+ - "⊦": [T: "断言符"]                          # 0x22a6
+ - "⊧": [T: "满足"]                              # 0x22a7
+ - "⊨":                                          # 0x22a8
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "为真"
+ - "⊩": [T: "力迫"]                              # 0x22a9
+ - "⊪": [T: "三重竖直线右断言符"] # 0x22aa
+ - "⊫": [T: "双竖直线双右断言符"] # 0x22ab
+ - "⊬": [T: "不能证明"]                      # 0x22ac
+ - "⊭":                                          # 0x22ad
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "不成立"
+ - "⊮": [T: "不力迫"]                            # 0x22ae
+ - "⊯": [T: "否定双竖直线双右断言符"] # 0x22af
+ - "⊰": [T: "先于关系"]             # 0x22b0
+ - "⊱": [T: "后于关系"]             # 0x22b1
+ - "⊲":                                          # 0x22b2
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "正规子群"
+ - "⊳": [T: "包含正规子群"]       # 0x22b3
+ - "⊴":                                          # 0x22b4
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "正规子群或等于"
+ - "⊵": [T: "包含正规子群或等于"] # 0x22b5
+ - "⊶":                                          # 0x22b6
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "原像"
+ - "⊷":                                          # 0x22b7
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "像"
+ - "⊸": [T: "多重映射"]                            # 0x22b8
+ - "⊹": [T: "厄米共轭矩阵"]          # 0x22b9
+ - "⊺": [T: "交错"]                         # 0x22ba
+ - "⊻": [T: "异或"]                                 # 0x22bb
+ - "⊼": [T: "与非"]                                # 0x22bc
+ - "⊽": [T: "或非"]                                 # 0x22bd
+ - "⊾": [T: "带弧的直角"]                # 0x22be
+ - "⊿": [T: "直角三角形"]                    # 0x22bf
+ - "⋀": [T: "n 元逻辑与"]                         # 0x22c0
+ - "⋁": [T: "n 元逻辑或"]                          # 0x22c1
+ - "⋂": [T: "n 元交集"]                        # 0x22c2
+ - "⋃": [T: "n 元并集"]                               # 0x22c3
+ - "⋄": [T: "菱形运算符"]                    # 0x22c4
+ - "⋅":                                             # 0x22c5
+    - test: 
+        if: "@data-chem-formula-op"
+        then: [T: "点"]
+        else: [T: "乘"]
+
+ - "⋆": [T: "星号运算符"]                               # 0x22c6
+ - "⋇": [T: "除号乘号"]                      # 0x22c7
+ - "⋈": [T: "自然连接"]                              # 0x22c8
+ - "⋉":                                          # 0x22c9
+    - test: 
+        if: "$Verbosity!='Terse'"
+        then: [T: ""]
+    - T: "左正规因子半直积"
+ - "⋊":                                          # 0x22ca
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "右正规因子半直积"
+ - "⋋":                                          # 0x22cb
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "左半直积"
+ - "⋌":                                          # 0x22cc
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "右半直积"
+ - "⋍": [T: "反向波浪等号"]               # 0x22cd
+ - "⋎": [T: "花体逻辑或"]                    # 0x22ce
+ - "⋏": [T: "花体逻辑与"]                   # 0x22cf
+ - "⋐": [T: "双子集"]                            # 0x22d0
+ - "⋑": [T: "双超集"]                            # 0x22d1
+ - "⋒": [T: "双交集"]                            # 0x22d2
+ - "⋓": [T: "双并集"]                            # 0x22d3
+ - "⋔": [T: "真相交"]                            # 0x22d4 (proper intersection)
+ - "⋕": [T: "等于且平行于"]                      # 0x22d5
+ - "⋖": [T: "带点小于"]                  # 0x22d6
+ - "⋗": [T: "带点大于"]               # 0x22d7
+ - "⋘": [T: "极小于"]                            # 0x22d8
+ - "⋙": [T: "极大于"]                            # 0x22d9
+ - "⋚": [T: "小于、等于或大于"]                  # 0x22da
+ - "⋛": [T: "大于、等于或小于"]                  # 0x22db
+ - "⋜": [T: "等于或小于"]                        # 0x22dc
+ - "⋝": [T: "等于或大于"]                        # 0x22dd
+ - "⋞": [T: "等于或先于"]                        # 0x22de
+ - "⋟": [T: "等于或后于"]                        # 0x22df
+ - "⋠": [T: "既不先于也不等于"]    # 0x22e0
+ - "⋡": [T: "既不后于也不等于"]    # 0x22e1
+ - "⋢": [T: "既非方形像也不等于"]        # 0x22e2
+ - "⋣": [T: "既非方形原像也不等于"]      # 0x22e3
+ - "⋤": [T: "方形像或不等于"]     # 0x22e4
+ - "⋥": [T: "方形原像或不等于"]  # 0x22e5
+ - "⋦":                                          # 0x22e6
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "小于但不等价于"
+ - "⋧":                                          # 0x22e7
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "大于但不等价于"
+ - "⋨": [T: "先于但不等价于"]   # 0x22e8
+ - "⋩": [T: "后于但不等价于"]   # 0x22e9
+ - "⋪":                                          # 0x22ea
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "不是正规子群"
+ - "⋫": [T: "不包含正规子群"] # 0x22eb
+ - "⋬":                                          # 0x22ec
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "既不是正规子群也不等于"
+ - "⋭": [T: "既不包含正规子群也不等于"] # 0x22ed
+ - "⋮": [T: "垂直省略号"]                   # 0x22ee
+ - "⋯": [T: "中线水平省略号"]                         # 0x22ef
+ - "⋰": [T: "右上对角线省略号"]           # 0x22f0
+ - "⋱": [T: "右下对角线省略号"]                   # 0x22f1
+ - "⋲": [T: "带长横线的属于号"] # 0x22f2
+ - "⋳": [T: "横线末端带竖线的属于号"] # 0x22f3
+ - "⋴": [T: "横线末端带竖线的较小属于号"] # 0x22f4
+ - "⋵": [T: "上方带点的属于号"]           # 0x22f5
+ - "⋶": [T: "上方带横线的属于号"]             # 0x22f6
+ - "⋷": [T: "上方带横线的较小属于号"]             # 0x22f7
+ - "⋸": [T: "下方带横线的属于号"]            # 0x22f8
+ - "⋹": [T: "带两条横线的属于号"] # 0x22f9
+ - "⋺": [T: "带长横线的包含号"] # 0x22fa
+ - "⋻": [T: "横线末端带竖线的包含号"] # 0x22fb
+ - "⋼": [T: "横线末端带竖线的较小包含号"] # 0x22fc
+ - "⋽": [T: "上方带横线的包含号"]               # 0x22fd
+ - "⋾": [T: "上方带横线的较小包含号"]               # 0x22fe
+ - "⋿": [T: "Z 记号多重集隶属符"]           # 0x22ff
+ - "⌀": [T: "直径"]                            # 0x2300
+ - "⌁": [T: "电箭头"]                      # 0x2301
+ - "⌂": [T: "房屋"]                               # 0x2302
+ - "⌃": [T: "向上箭头尖"]                      # 0x2303
+ - "⌄": [T: "向下箭头尖"]                      # 0x2304
+ - "⌅": [T: "射影"]                          # 0x2305
+ - "⌆": [T: "透视"]                         # 0x2306
+ - "⌇": [T: "波浪线"]                           # 0x2307
+ - "⌈": [T: "左上取整符号"]                        # 0x2308
+ - "⌉": [T: "右上取整符号"]                       # 0x2309
+ - "⌊": [T: "左下取整符号"]                          # 0x230a
+ - "⌋": [T: "右下取整符号"]                         # 0x230b
+ - "⌌": [T: "右下裁切符"]                   # 0x230c
+ - "⌍": [T: "左下裁切符"]                    # 0x230d
+ - "⌎": [T: "右上裁切符"]                      # 0x230e
+ - "⌏": [T: "左上裁切符"]                       # 0x230f
+ - "⌐": [T: "反向非"]                   # 0x2310
+ - "⌑": [T: "方菱形"]                      # 0x2311
+ - "⌒": [T: "弧"]                                 # 0x2312
+ - "⌓": [T: "弓形"]                             # 0x2313
+ - "⌔": [T: "扇形"]                              # 0x2314
+ - "⌕": [T: "电话记录器符号"]                  # 0x2315
+ - "⌖": [T: "位置指示十字线"]       # 0x2316
+ - "⌗": [T: "视图数据方框"]                     # 0x2317
+ - "⌘": [T: "命令键"]              # 0x2318
+ - "⌙": [T: "倒置非"]                     # 0x2319
+ - "⌚": [T: "手表"]                               # 0x231a
+ - "⌛": [T: "沙漏"]                           # 0x231b
+ - "⌜": [T: "左上角"]                     # 0x231c
+ - "⌝": [T: "右上角"]                    # 0x231d
+ - "⌞": [T: "左下角"]                  # 0x231e
+ - "⌟": [T: "右下角"]                 # 0x231f
+ - "⌠": [T: "积分号上半部"]                   # 0x2320
+ - "⌡": [T: "积分号下半部"]                # 0x2321
+ - "⌢": [T: "皱眉"]                               # 0x2322
+ - "⌣": [T: "微笑"]                               # 0x2323
+ - "⌤": [T: "回车键"] # 0x2324
+ - "⌥": [T: "选项键"]                          # 0x2325
+ - "⌦": [T: "向前删除键"]                  # 0x2326
+ - "⌧": [T: "矩形框内的 X"]                # 0x2327
+ - "⌨": [T: "键盘"]                            # 0x2328
+ - "〈": [T: "左尖括号"]         # 0x2329
+ - "〉": [T: "右尖括号"]        # 0x232a
+ - "⌫": [T: "退格键"]                   # 0x232b
+ - "⌬": [T: "苯环"]                        # 0x232c
+ - "⌭": [T: "圆柱度"]                        # 0x232d
+ - "⌮": [T: "全周轮廓符号"]                  # 0x232e
+ - "⌯": [T: "对称度"]                            # 0x232f
+ - "⌰": [T: "全跳动"]                        # 0x2330
+ - "⌱": [T: "尺寸原点"]                    # 0x2331
+ - "⌲": [T: "锥度"]                       # 0x2332
+ - "⌳": [T: "斜度"]                              # 0x2333
+ - "⌴": [T: "沉孔"]                         # 0x2334
+ - "⌵": [T: "沉头孔"]                         # 0x2335
+ - "⌶": [T: "APL 功能符号工字梁"]                         # 0x2336
+ - "⌽": [T: "APL 功能符号圆竖线"]                   # 0x233d
+ - "⌿": [T: "APL 功能符号斜杠横线"]                      # 0x233f
+ - "⍰": [T: "APL 功能符号方框问号"]                        # 0x2370
+ - "⍼": [T: "带向下之字形箭头的直角"]       # 0x237c
+ - "⎔": [T: "六边形"]                            # 0x2394
+ - "⎕": [T: "APL 功能符号方框"]                                # 0x2395
+ - "⎶": [T: "上方为下置方括号，下方为上置方括号"] # 0x23b6
+ - "⏜": [T: "上置圆括号"]                           # 0x23dc
+ - "⏝": [T: "下置圆括号"]                        # 0x23dd
+ - "⏞": [T: "上置花括号"]                           # 0x23de
+ - "⏟": [T: "下置花括号"]                        # 0x23df
+ - "⏠": [T: "上置六角括号"]          # 0x23e0
+ - "⏡": [T: "下置六角括号"]        # 0x23e1
+ - "⏢": [T: "白色梯形"]                    # 0x23e2
+ - "⏣": [T: "带圆圈的苯环"]          # 0x23e3
+ - "⏤": [T: "直线度"]                       # 0x23e4
+ - "⏥": [T: "平面度"]                           # 0x23e5
+ - "⏦": [T: "交流电"]                            # 0x23e6
+ - "⏧": [T: "电路交叉点"]            # 0x23e7
+ - "①-⑨":    # 0x2460 - 0x2468
+    - T: "带圈"
+    - SPELL: "translate('.', '①②③④⑤⑥⑦⑧⑨', '123456789')"
+ - "⑩": [T: "带圈数字十"]                         # 0x2469
+ - "⑪": [T: "带圈数字十一"]                      # 0x246a
+ - "⑫": [T: "带圈数字十二"]                      # 0x246b
+ - "⑬": [T: "带圈数字十三"]                    # 0x246c
+ - "⑭": [T: "带圈数字十四"]                    # 0x246d
+ - "⑮": [T: "带圈数字十五"]                     # 0x246e
+ - "⑯": [T: "带圈数字十六"]                     # 0x246f
+ - "⑰": [T: "带圈数字十七"]                   # 0x2470
+ - "⑱": [T: "带圈数字十八"]                    # 0x2471
+ - "⑲": [T: "带圈数字十九"]                    # 0x2472
+ - "⑳": [T: "带圈数字二十"]                      # 0x2473
+ - "⑴-⑼":    # 0x2474 - 0x247c
+    - T: "带括号"
+    - SPELL: "translate('.', '⑴⑵⑶⑷⑸⑹⑺⑻⑼', '123456789')"
+ - "⑽": [T: "带括号数字十"]                   # 0x247d
+ - "⑾": [T: "带括号数字十一"]                # 0x247e
+ - "⑿": [T: "带括号数字十二"]                # 0x247f
+ - "⒀": [T: "带括号数字十三"]              # 0x2480
+ - "⒁": [T: "带括号数字十四"]              # 0x2481
+ - "⒂": [T: "带括号数字十五"]               # 0x2482
+ - "⒃": [T: "带括号数字十六"]               # 0x2483
+ - "⒄": [T: "带括号数字十七"]             # 0x2484
+ - "⒅": [T: "带括号数字十八"]              # 0x2485
+ - "⒆": [T: "带括号数字十九"]              # 0x2486
+ - "⒇": [T: "带括号数字二十"]                # 0x2487
+ - "⒈-⒐":    # 0x2488 - 0x2490
+    - T: "带句点数字"
+    - SPELL: "translate('.', '⒈⒉⒊⒋⒌⒍⒎⒏⒐', '123456789')"
+ - "⒑": [T: "带句点数字十"]                     # 0x2491
+ - "⒒": [T: "带句点数字十一"]                  # 0x2492
+ - "⒓": [T: "带句点数字十二"]                  # 0x2493
+ - "⒔": [T: "带句点数字十三"]                # 0x2494
+ - "⒕": [T: "带句点数字十四"]                # 0x2495
+ - "⒖": [T: "带句点数字十五"]                 # 0x2496
+ - "⒗": [T: "带句点数字十六"]                 # 0x2497
+ - "⒘": [T: "带句点数字十七"]               # 0x2498
+ - "⒙": [T: "带句点数字十八"]                # 0x2499
+ - "⒚": [T: "带句点数字十九"]                # 0x249a
+ - "⒛": [T: "带句点数字二十"]                  # 0x249b
+ - "⒜-⒵":                                         # 0x249c - 0x24b5
+    - T: "带括号"
+    - SPELL: "translate('.', '⒜⒝⒞⒟⒠⒡⒢⒣⒤⒥⒦⒧⒨⒩⒪⒫⒬⒭⒮⒯⒰⒱⒲⒳⒴⒵', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "Ⓐ-Ⓩ":                                         # 0x24b6 - 0x24cf
+    - T: "带圈"
+    - SPELL: "translate('.', 'ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "🅐-🅩":                                         # 0x1f150 - 0x1f169
+    - T: "带圈反白"
+    - SPELL: "translate('.', '🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "ⓐ-ⓩ":                                         # 0x24d0 - 0x24e9
+    - T: "带圈"
+    - SPELL: "translate('.', 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ', 'abcdefghijklmnopqrstuvwxyz')"
+ - "⓪": [T: "带圈数字零"]                        # 0x24ea
+ - "⓫": [T: "带圈反白数字十一"]                # 0x24eb
+ - "⓬": [T: "带圈反白数字十二"]                # 0x24ec
+ - "⓭": [T: "带圈反白数字十三"]              # 0x24ed
+ - "⓮": [T: "带圈反白数字十四"]              # 0x24ee
+ - "⓯": [T: "带圈反白数字十五"]               # 0x24ef
+ - "⓰": [T: "带圈反白数字十六"]               # 0x24f0
+ - "⓱": [T: "带圈反白数字十七"]             # 0x24f1
+ - "⓲": [T: "带圈反白数字十八"]              # 0x24f2
+ - "⓳": [T: "带圈反白数字十九"]              # 0x24f3
+ - "⓴": [T: "带圈反白数字二十"]                # 0x24f4
+ - "⓵-⓽":    # 0x24f5 - 0x24fd
+    - T: "双圈"
+    - SPELL: "translate('.', '⓵⓶⓷⓸⓹⓺⓻⓼⓽', '123456789')"
+ - "⓾": [T: "双圈数字十"]                  # 0x24fe
+ - "⓿": [T: "带圈反白数字零"]                  # 0x24ff
+ - "■": [T: "黑色方块"]                        # 0x25a0
+ - "□": [T: "白色方块"]                        # 0x25a1
+ - "▢": [T: "圆角白色方块"]   # 0x25a2
+ - "▣": [T: "内含黑色小方块的白色方块"] # 0x25a3
+ - "▤": [T: "水平线填充方块"]         # 0x25a4
+ - "▥": [T: "竖直线填充方块"]           # 0x25a5
+ - "▦": [T: "横竖交叉线填充方块"] # 0x25a6
+ - "▧": [T: "左上至右下斜线填充方块"] # 0x25a7
+ - "▨": [T: "右上至左下斜线填充方块"] # 0x25a8
+ - "▩": [T: "对角交叉线填充方块"] # 0x25a9
+ - "▪": [T: "黑色小方块"]                  # 0x25aa
+ - "▫": [T: "白色小方块"]                  # 0x25ab
+ - "▬": [T: "黑色矩形"]                     # 0x25ac
+ - "▭": [T: "白色矩形"]                     # 0x25ad
+ - "▮": [T: "黑色竖直矩形"]            # 0x25ae
+ - "▯": [T: "白色竖直矩形"]            # 0x25af
+ - "▰": [T: "黑色平行四边形"]                 # 0x25b0
+ - "▱": [T: "白色平行四边形"]                 # 0x25b1
+ - "▲": [T: "黑色向上三角形"]          # 0x25b2
+ - "△": [T: "三角形"]                            # 0x25b3
+ - "▴": [T: "黑色向上小三角形"]    # 0x25b4
+ - "▵": [T: "白色向上小三角形"]    # 0x25b5
+ - "▶": [T: "黑色向右三角形"]       # 0x25b6
+ - "▷": [T: "白色向右三角形"]       # 0x25b7
+ - "▸": [T: "黑色向右小三角形"] # 0x25b8
+ - "▹": [T: "白色向右小三角形"] # 0x25b9
+ - "►": [T: "黑色向右指针"]        # 0x25ba
+ - "▻": [T: "白色向右指针"]        # 0x25bb
+ - "▼": [T: "黑色向下三角形"]        # 0x25bc
+ - "▽": [T: "白色向下三角形"]        # 0x25bd
+ - "▾": [T: "黑色向下小三角形"]  # 0x25be
+ - "▿": [T: "白色向下小三角形"]  # 0x25bf
+ - "◀": [T: "黑色向左三角形"]        # 0x25c0
+ - "◁": [T: "白色向左三角形"]        # 0x25c1
+ - "◂": [T: "黑色向左小三角形"]  # 0x25c2
+ - "◃": [T: "白色向左小三角形"]  # 0x25c3
+ - "◄": [T: "黑色向左指针"]         # 0x25c4
+ - "◅": [T: "白色向左指针"]         # 0x25c5
+ - "◆": [T: "黑色菱形"]                       # 0x25c6
+ - "◇": [T: "白色菱形"]                       # 0x25c7
+ - "◈": [T: "内含黑色小菱形的白色菱形"] # 0x25c8
+ - "◉": [T: "鱼眼"]                             # 0x25c9
+ - "◊": [T: "长菱形"]                             # 0x25ca
+ - "○": [T: "白色圆"]                        # 0x25cb
+ - "◌": [T: "点状圆圈"]                       # 0x25cc
+ - "◍": [T: "竖直线填充的圆"]           # 0x25cd
+ - "◎": [T: "靶心"]                            # 0x25ce
+ - "●": [T: "黑色圆"]                        # 0x25cf
+ - "◐": [T: "左半部为黑色的圆"]         # 0x25d0
+ - "◑": [T: "右半部为黑色的圆"]        # 0x25d1
+ - "◒": [T: "下半部为黑色的圆"]        # 0x25d2
+ - "◓": [T: "上半部为黑色的圆"]        # 0x25d3
+ - "◔": [T: "右上象限为黑色的圆"] # 0x25d4
+ - "◕": [T: "除左上象限外为黑色的圆"] # 0x25d5
+ - "◖": [T: "黑色左半圆"]              # 0x25d6
+ - "◗": [T: "黑色右半圆"]             # 0x25d7
+ - "◘": [T: "反白圆点"]                      # 0x25d8
+ - "◙": [T: "反白圆"]                # 0x25d9
+ - "◚": [T: "上半反白圆"]     # 0x25da
+ - "◛": [T: "下半反白圆"]     # 0x25db
+ - "◜": [T: "左上四分之一圆弧"]    # 0x25dc
+ - "◝": [T: "右上四分之一圆弧"]   # 0x25dd
+ - "◞": [T: "右下四分之一圆弧"]   # 0x25de
+ - "◟": [T: "左下四分之一圆弧"]    # 0x25df
+ - "◠": [T: "上半圆"]                   # 0x25e0
+ - "◡": [T: "下半圆"]                   # 0x25e1
+ - "◢": [T: "黑色右下三角形"]          # 0x25e2
+ - "◣": [T: "黑色左下三角形"]           # 0x25e3
+ - "◤": [T: "黑色左上三角形"]           # 0x25e4
+ - "◥": [T: "黑色右上三角形"]          # 0x25e5
+ - "◦": [T: "复合"]                              # 0x25e6
+ - "◧": [T: "左半部为黑色的方块"]         # 0x25e7
+ - "◨": [T: "右半部为黑色的方块"]        # 0x25e8
+ - "◩": [T: "左上对角半部为黑色的方块"]   # 0x25e9
+ - "◪": [T: "右下对角半部为黑色的方块"]  # 0x25ea
+ - "◫": [T: "带竖直平分线的白色方块"]    # 0x25eb
+ - "◬": [T: "带点的白色向上三角形"] # 0x25ec
+ - "◭": [T: "左半部为黑色的向上三角形"] # 0x25ed
+ - "◮": [T: "右半部为黑色的向上三角形"] # 0x25ee
+ - "◯": [T: "大空心圆"]                    # 0x25ef
+ - "◰": [T: "带左上象限的白色方块"] # 0x25f0
+ - "◱": [T: "带左下象限的白色方块"] # 0x25f1
+ - "◲": [T: "带右下象限的白色方块"] # 0x25f2
+ - "◳": [T: "带右上象限的白色方块"] # 0x25f3
+ - "◴": [T: "带左上象限的白色圆"] # 0x25f4
+ - "◵": [T: "带左下象限的白色圆"] # 0x25f5
+ - "◶": [T: "带右下象限的白色圆"] # 0x25f6
+ - "◷": [T: "带右上象限的白色圆"] # 0x25f7
+ - "◸": [T: "左上三角形"]                 # 0x25f8
+ - "◹": [T: "右上三角形"]                # 0x25f9
+ - "◺": [T: "左下三角形"]                 # 0x25fa
+ - "◻": [T: "白色中等方块"]                 # 0x25fb
+ - "◼": [T: "黑色中等方块"]                 # 0x25fc
+ - "◽": [T: "白色中小方块"]           # 0x25fd
+ - "◾": [T: "黑色中小方块"]           # 0x25fe
+ - "◿": [T: "右下三角形"]                # 0x25ff
+ - "★": [T: "黑星"]                          # 0x2605
+ - "☆": [T: "白星"]                          # 0x2606
+ - "☉": [T: "太阳符号"]                                 # 0x2609
+ - "☌": [T: "合"]                               # 0x260c
+ - "☒": [T: "带叉方框"]                   # 0x2612
+ - "☽": [T: "上弦月"]                         # 0x263d
+ - "☾": [T: "下弦月"]                         # 0x263e
+ - "☿": [T: "水星"]                             # 0x263f
+ - "♀": [T: "女性符号"]                              # 0x2640
+ - "♁": [T: "地球"]                               # 0x2641
+ - "♂": [T: "男性符号"]                                # 0x2642
+ - "♃": [T: "木星"]                            # 0x2643
+ - "♄": [T: "土星"]                             # 0x2644
+ - "♅": [T: "天王星"]                             # 0x2645
+ - "♆": [T: "海王星"]                           # 0x2646
+ - "♇": [T: "冥王星"]                             # 0x2647
+ - "♈": [T: "白羊座"]                           # 0x2648
+ - "♉": [T: "金牛座"]                          # 0x2649
+ - "♩": [T: "四分音符"]                      # 0x2669
+ - "♭": [T: "降号"]                              # 0x266d
+ - "♮": [T: "还原号"]                           # 0x266e
+ - "♯": [T: "升号"]                             # 0x266f
+ - "♠": [T: "实心黑桃"]                  # 0x2660
+ - "♡": [T: "空心红桃"]                  # 0x2661
+ - "♢": [T: "空心方块"]                # 0x2662
+ - "♣": [T: "实心梅花"]                   # 0x2663
+ - "♤": [T: "空心黑桃"]                  # 0x2664
+ - "♥": [T: "实心红桃"]                  # 0x2665
+ - "♦": [T: "实心方块"]                # 0x2666
+ - "♧": [T: "空心梅花"]                   # 0x2667
+ - "⚀": [T: "骰子一点"]                        # 0x2680
+ - "⚁": [T: "骰子二点"]                        # 0x2681
+ - "⚂": [T: "骰子三点"]                        # 0x2682
+ - "⚃": [T: "骰子四点"]                        # 0x2683
+ - "⚄": [T: "骰子五点"]                        # 0x2684
+ - "⚅": [T: "骰子六点"]                        # 0x2685
+ - "⚆": [T: "右侧带点的空心圆"]       # 0x2686
+ - "⚇": [T: "带两个点的空心圆"]        # 0x2687
+ - "⚈": [T: "右侧带白点的实心圆"]       # 0x2688
+ - "⚉": [T: "带两个白点的实心圆"]        # 0x2689
+ - "⚪": [T: "中等白色圆"]              # 0x26aa
+ - "⚫": [T: "中等黑色圆"]              # 0x26ab
+ - "⚬": [T: "中小型白色圆"]          # 0x26ac
+ - "⚲": [T: "无性别符号"]                            # 0x26b2
+ - "✓": [T: "勾号"]                        # 0x2713
+ - "✠": [T: "马耳他十字"]                     # 0x2720
+ - "✪": [T: "带圈白星"]                # 0x272a
+ - "✶": [T: "黑色六角星"]            # 0x2736
+ - "❨": [T: "中等左圆括号装饰符"]   # 0x2768
+ - "❩": [T: "中等右圆括号装饰符"]  # 0x2769
+ - "❪": [T: "中等扁平左圆括号装饰符"] # 0x276a
+ - "❫": [T: "中等扁平右圆括号装饰符"] # 0x276b
+ - "❬": [T: "中等左角括号装饰符"] # 0x276c
+ - "❭": [T: "中等右角括号装饰符"] # 0x276d
+ - "❮": [T: "粗左角引号装饰符"] # 0x276e
+ - "❯": [T: "粗右角引号装饰符"] # 0x276f
+ - "❰": [T: "粗左角括号装饰符"] # 0x2770
+ - "❱": [T: "粗右角括号装饰符"] # 0x2771
+ - "❲": [T: "细左六角括号装饰符"] # 0x2772
+ - "❳": [T: "细右六角括号装饰符"] # 0x2773
+ - "❴": [T: "中等左花括号装饰符"]          # 0x2774
+ - "❵": [T: "中等右花括号装饰符"]         # 0x2775
+ - "❶": [T: "带圈反白数字一"]                   # 0x2776
+ - "❷": [T: "带圈反白数字二"]                   # 0x2777
+ - "❸": [T: "带圈反白数字三"]                 # 0x2778
+ - "❹": [T: "带圈反白数字四"]                  # 0x2779
+ - "❺": [T: "带圈反白数字五"]                  # 0x277a
+ - "❻": [T: "带圈反白数字六"]                   # 0x277b
+ - "❼": [T: "带圈反白数字七"]                 # 0x277c
+ - "❽": [T: "带圈反白数字八"]                 # 0x277d
+ - "❾": [T: "带圈反白数字九"]                  # 0x277e
+ - "❿": [T: "带圈反白数字十"]                   # 0x277f
+ - "➀": [T: "无衬线带圈数字一"]              # 0x2780
+ - "➁": [T: "无衬线带圈数字二"]              # 0x2781
+ - "➂": [T: "无衬线带圈数字三"]            # 0x2782
+ - "➃": [T: "无衬线带圈数字四"]             # 0x2783
+ - "➄": [T: "无衬线带圈数字五"]             # 0x2784
+ - "➅": [T: "无衬线带圈数字六"]              # 0x2785
+ - "➆": [T: "无衬线带圈数字七"]            # 0x2786
+ - "➇": [T: "无衬线带圈数字八"]            # 0x2787
+ - "➈": [T: "无衬线带圈数字九"]             # 0x2788
+ - "➉": [T: "无衬线带圈数字十"]              # 0x2789
+ - "➊": [T: "无衬线带圈反白数字一"]        # 0x278a
+ - "➋": [T: "无衬线带圈反白数字二"]        # 0x278b
+ - "➌": [T: "无衬线带圈反白数字三"]      # 0x278c
+ - "➍": [T: "无衬线带圈反白数字四"]       # 0x278d
+ - "➎": [T: "无衬线带圈反白数字五"]       # 0x278e
+ - "➏": [T: "无衬线带圈反白数字六"]        # 0x278f
+ - "➐": [T: "无衬线带圈反白数字七"]      # 0x2790
+ - "➑": [T: "无衬线带圈反白数字八"]      # 0x2791
+ - "➒": [T: "无衬线带圈反白数字九"]       # 0x2792
+ - "➓": [T: "无衬线带圈反白数字十"]        # 0x2793
+ - "➔": [T: "粗宽头向右箭头"]                    # 0x2794
+ - "➕": [T: "粗加号"]                     # 0x2795
+ - "➖": [T: "粗减号"]                    # 0x2796
+ - "➗": [T: "粗除号"]                  # 0x2797
+ - "➘": [T: "粗向右下箭头"]              # 0x2798
+ - "➙": [T: "粗向右箭头"]              # 0x2799
+ - "➚": [T: "粗向右上箭头"]              # 0x279a
+ - "➛": [T: "制图笔尖向右箭头"]     # 0x279b
+ - "➜": [T: "粗圆头向右箭头"] # 0x279c
+ - "➝": [T: "三角头向右箭头"]    # 0x279d
+ - "➞": [T: "粗三角头向右箭头"] # 0x279e
+ - "➟": [T: "虚线三角头向右箭头"] # 0x279f
+ - "➠": [T: "粗虚线三角头向右箭头"] # 0x27a0
+ - "➡": [T: "黑色向右箭头"]              # 0x27a1
+ - "➢": [T: "顶部高亮的立体向右箭头尖"] # 0x27a2
+ - "➣": [T: "底部高亮的立体向右箭头尖"] # 0x27a3
+ - "➤": [T: "黑色向右箭头尖"]          # 0x27a4
+ - "➥": [T: "粗黑色向下再向右弯箭头"] # 0x27a5
+ - "➦": [T: "粗黑色向上再向右弯箭头"] # 0x27a6
+ - "➧": [T: "粗短黑色向右箭头"]        # 0x27a7
+ - "➨": [T: "粗凹尖黑色向右箭头"] # 0x27a8
+ - "➩": [T: "右侧带阴影的白色向右箭头"] # 0x27a9
+ - "➪": [T: "左侧带阴影的白色向右箭头"]  # 0x27aa
+ - "➫": [T: "后倾带阴影的白色向右箭头"] # 0x27ab
+ - "➬": [T: "前倾带阴影的白色向右箭头"] # 0x27ac
+ - "➭": [T: "粗右下带阴影的白色向右箭头"] # 0x27ad
+ - "➮": [T: "粗右上带阴影的白色向右箭头"] # 0x27ae
+ - "➯": [T: "带凹口且右下有阴影的白色向右箭头"] # 0x27af
+ - "➱": [T: "带凹口且右上有阴影的白色向右箭头"] # 0x27b1
+ - "➲": [T: "带圆圈的粗白色向右箭头"] # 0x27b2
+ - "➳": [T: "白色羽状向右箭头"]    # 0x27b3
+ - "➴": [T: "黑色羽状向右下箭头"]    # 0x27b4
+ - "➵": [T: "黑色羽状向右箭头"]    # 0x27b5
+ - "➶": [T: "黑色羽状向右上箭头"]    # 0x27b6
+ - "➷": [T: "粗黑色羽状向右下箭头"] # 0x27b7
+ - "➸": [T: "粗黑色羽状向右箭头"] # 0x27b8
+ - "➹": [T: "粗黑色羽状向右上箭头"] # 0x27b9
+ - "➺": [T: "泪滴形倒钩向右箭头"]    # 0x27ba
+ - "➻": [T: "粗泪滴形箭杆向右箭头"] # 0x27bb
+ - "➼": [T: "楔尾向右箭头"]       # 0x27bc
+ - "➽": [T: "粗楔尾向右箭头"] # 0x27bd
+ - "➾": [T: "轮廓开口的向右箭头"]      # 0x27be
+ - "⟀": [T: "三维角"]             # 0x27c0
+ - "⟁": [T: "内含小型白色三角形的白色三角形"] # 0x27c1
+ - "⟂⊥":                                          # 0x27c2, 22A5 (22A5 wrongly used for perpendicular by most editors)
+     - test:
+        - if: "$SpeechStyle = 'LiteralSpeak' and text()='⊥'"   # 22A5 (up tack/bottom)
+          then: [T: "上丁字"]
+        - else:
+          - test:
+              if: "$Verbosity!='Terse'"
+              then: [T: ""]
+          - T: "垂直于"
+ - "⟃":                                          # 0x27c3
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "开子集"
+ - "⟄":                                          # 0x27c4
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: "开超集"
+ - "⟅": [T: "左 S 形多重集定界符"]     # 0x27c5
+ - "⟆": [T: "右 S 形多重集定界符"]     # 0x27c6
+ - "⟇": [T: "内含点的逻辑或"]                  # 0x27c7
+ - "⟈": [T: "前置反斜杠的子集号"]   # 0x27c8
+ - "⟉": [T: "后置斜杠的超集号"]         # 0x27c9
+ - "⟊": [T: "带横线的竖线"] # 0x27ca
+ - "⟋": [T: "数学上升对角线"]        # 0x27cb
+ - "⟌": [T: "长除号"]                       # 0x27cc
+ - "⟍": [T: "数学下降对角线"]       # 0x27cd
+ - "⟎": [T: "带方框的逻辑与"]                 # 0x27ce
+ - "⟏": [T: "带方框的逻辑或"]                  # 0x27cf
+ - "⟐": [T: "中心带点的白色菱形"]     # 0x27d0
+ - "⟑": [T: "带点的逻辑与"]                        # 0x27d1
+ - "⟒": [T: "开口向上的属于号"]         # 0x27d2
+ - "⟓": [T: "带点的右下角"]         # 0x27d3
+ - "⟔": [T: "带点的左上角"]          # 0x27d4
+ - "⟕": [T: "左外连接"]                     # 0x27d5
+ - "⟖": [T: "右外连接"]                    # 0x27d6
+ - "⟗": [T: "全外连接"]                     # 0x27d7
+ - "⟘": [T: "大上丁字"]                       # 0x27d8
+ - "⟙": [T: "大下丁字"]                     # 0x27d9
+ - "⟚": [T: "左右双断言符"]       # 0x27da
+ - "⟛": [T: "左右丁字"]                 # 0x27db
+ - "⟜": [T: "左多重映射"]                       # 0x27dc
+ - "⟝": [T: "长右丁字"]                     # 0x27dd
+ - "⟞": [T: "长左丁字"]                      # 0x27de
+ - "⟟": [T: "上方带圆圈的上丁字"]           # 0x27df
+ - "⟠": [T: "被横线分割的长菱形"]      # 0x27e0
+ - "⟡": [T: "白色凹边菱形"]         # 0x27e1
+ - "⟢": [T: "带左短线的白色凹边菱形"] # 0x27e2
+ - "⟣": [T: "带右短线的白色凹边菱形"] # 0x27e3
+ - "⟤": [T: "带左短线的白色方块"]    # 0x27e4
+ - "⟥": [T: "带右短线的白色方块"]   # 0x27e5
+ - "⟦": [T: "数学左白方括号"]           # 0x27e6
+ - "⟧": [T: "数学右白方括号"]          # 0x27e7
+ - "⟨": [T: "数学左角括号"]                  # 0x27e8
+ - "⟩": [T: "数学右角括号"]                 # 0x27e9
+ - "⟪": [T: "数学左双角括号"]           # 0x27ea
+ - "⟫": [T: "数学右双角括号"]          # 0x27eb
+ - "⟬": [T: "左白六角括号"]   # 0x27ec
+ - "⟭": [T: "右白六角括号"]  # 0x27ed
+ - "⟮": [T: "左扁平圆括号"]          # 0x27ee
+ - "⟯": [T: "右扁平圆括号"]         # 0x27ef
+ - "⟰": [T: "向上四重箭头"]             # 0x27f0
+ - "⟱": [T: "向下四重箭头"]           # 0x27f1
+ - "⟲": [T: "逆时针缺口圆箭头"]       # 0x27f2
+ - "⟳": [T: "顺时针缺口圆箭头"]         # 0x27f3
+ - "⟴": [T: "带圈加号的向右箭头"]       # 0x27f4
+ - "⟵": [T: "长向左箭头"]                # 0x27f5
+ - "⟶": [T: "长向右箭头"]               # 0x27f6
+ - "⟷": [T: "长左右箭头"]               # 0x27f7
+ - "⟸": [T: "长向左双线箭头"]         # 0x27f8
+ - "⟹": [T: "推出"]        # 0x27f9
+ - "⟺": [T: "当且仅当"]        # 0x27fa
+ - "⟻": [T: "从竖线出发的长向左箭头"]       # 0x27fb
+ - "⟼": [T: "映射到"]      # 0x27fc
+ - "⟽": [T: "从竖线出发的长向左双线箭头"] # 0x27fd
+ - "⟾": [T: "从竖线出发的长向右双线箭头"] # 0x27fe
+ - "⟿": [T: "向右长曲线箭头"]      # 0x27ff
+ - "⤀": [T: "带竖线的向右双头箭头"] # 0x2900
+ - "⤁": [T: "带双竖线的向右双头箭头"] # 0x2901
+ - "⤂": [T: "带竖线的向左双线箭头"] # 0x2902
+ - "⤃": [T: "带竖线的向右双线箭头"] # 0x2903
+ - "⤄": [T: "带竖线的左右双线箭头"] # 0x2904
+ - "⤅": [T: "从竖线出发的向右双头箭头"] # 0x2905
+ - "⤆": [T: "从竖线出发的向左双线箭头"]     # 0x2906
+ - "⤇": [T: "从竖线出发的向右双线箭头"]    # 0x2907
+ - "⤈": [T: "带横线的向下箭头"] # 0x2908
+ - "⤉": [T: "带横线的向上箭头"] # 0x2909
+ - "⤊": [T: "向上三重箭头"]                    # 0x290a
+ - "⤋": [T: "向下三重箭头"]                    # 0x290b
+ - "⤌": [T: "由两段短线构成的向左箭头"]         # 0x290c
+ - "⤍": [T: "由两段短线构成的向右箭头"]        # 0x290d
+ - "⤎": [T: "由三段短线构成的向左箭头"]         # 0x290e
+ - "⤏": [T: "由三段短线构成的向右箭头"]        # 0x290f
+ - "⤐": [T: "由三段短线构成的向右双头箭头"] # 0x2910
+ - "⤑": [T: "箭杆为点线的向右箭头"]   # 0x2911
+ - "⤒": [T: "指向横线的向上箭头"]                # 0x2912
+ - "⤓": [T: "指向横线的向下箭头"]              # 0x2913
+ - "⤔": [T: "带尾且带竖线的向右箭头"] # 0x2914
+ - "⤕": [T: "带尾且带双竖线的向右箭头"] # 0x2915
+ - "⤖": [T: "带尾的向右双头箭头"] # 0x2916
+ - "⤗": [T: "带尾且带竖线的向右双头箭头"] # 0x2917
+ - "⤘": [T: "带尾且带双竖线的向右双头箭头"] # 0x2918
+ - "⤙": [T: "向左箭头尾部"]                # 0x2919
+ - "⤚": [T: "向右箭头尾部"]               # 0x291a
+ - "⤛": [T: "向左双线箭头尾部"]         # 0x291b
+ - "⤜": [T: "向右双线箭头尾部"]        # 0x291c
+ - "⤝": [T: "指向实心菱形的向左箭头"]   # 0x291d
+ - "⤞": [T: "指向实心菱形的向右箭头"]  # 0x291e
+ - "⤟": [T: "从竖线出发并指向实心菱形的向左箭头"] # 0x291f
+ - "⤠": [T: "从竖线出发并指向实心菱形的向右箭头"] # 0x2920
+ - "⤡": [T: "左上与右下箭头"]     # 0x2921
+ - "⤢": [T: "右上与左下箭头"]     # 0x2922
+ - "⤣": [T: "带钩的左上箭头"]          # 0x2923
+ - "⤤": [T: "带钩的右上箭头"]          # 0x2924
+ - "⤥": [T: "带钩的右下箭头"]          # 0x2925
+ - "⤦": [T: "带钩的左下箭头"]          # 0x2926
+ - "⤧": [T: "左上箭头与右上箭头"] # 0x2927
+ - "⤨": [T: "右上箭头与右下箭头"] # 0x2928
+ - "⤩": [T: "右下箭头与左下箭头"] # 0x2929
+ - "⤪": [T: "左下箭头与左上箭头"] # 0x292a
+ - "⤫": [T: "左下至右上斜线穿过左上至右下斜线"] # 0x292b
+ - "⤬": [T: "左上至右下斜线穿过左下至右上斜线"] # 0x292c
+ - "⤭": [T: "穿过右上箭头的右下箭头"] # 0x292d
+ - "⤮": [T: "穿过右下箭头的右上箭头"] # 0x292e
+ - "⤯": [T: "左上至右下斜线穿过右上箭头"] # 0x292f
+ - "⤰": [T: "穿过右下箭头的上升对角线"] # 0x2930
+ - "⤱": [T: "穿过左上箭头的右上箭头"] # 0x2931
+ - "⤲": [T: "穿过右上箭头的左上箭头"] # 0x2932
+ - "⤳": [T: "水平向右波浪箭头"]  # 0x2933
+ - "⤴": [T: "先向右再向上弯曲的箭头"] # 0x2934
+ - "⤵": [T: "先向右再向下弯曲的箭头"] # 0x2935
+ - "⤶": [T: "先向下再向左弯曲的箭头"] # 0x2936
+ - "⤷": [T: "先向下再向右弯曲的箭头"] # 0x2937
+ - "⤸": [T: "顺时针右侧弧形箭头"]      # 0x2938
+ - "⤹": [T: "逆时针左侧弧形箭头"]   # 0x2939
+ - "⤺": [T: "逆时针上弧形箭头"]         # 0x293a
+ - "⤻": [T: "逆时针下弧形箭头"]      # 0x293b
+ - "⤼": [T: "带减号的顺时针上弧形箭头"]  # 0x293c
+ - "⤽": [T: "带加号的逆时针上弧形箭头"] # 0x293d
+ - "⤾": [T: "顺时针右下半圆形箭头"] # 0x293e
+ - "⤿": [T: "逆时针左下半圆形箭头"] # 0x293f
+ - "⥀": [T: "逆时针闭合圆形箭头"]   # 0x2940
+ - "⥁": [T: "顺时针闭合圆形箭头"]       # 0x2941
+ - "⥂": [T: "短向左箭头上方的向右箭头"] # 0x2942
+ - "⥃": [T: "短向右箭头上方的向左箭头"] # 0x2943
+ - "⥄": [T: "向左箭头上方的短向右箭头"] # 0x2944
+ - "⥅": [T: "下方带加号的向右箭头"]    # 0x2945
+ - "⥆": [T: "下方带加号的向左箭头"]     # 0x2946
+ - "⥇": [T: "穿过叉号的向右箭头"]          # 0x2947
+ - "⥈": [T: "穿过小圆圈的左右箭头"]     # 0x2948
+ - "⥉": [T: "从小圆圈出发的向上双头箭头"] # 0x2949
+ - "⥊": [T: "倒钩向上的向左鱼叉箭头与倒钩向下的向右鱼叉箭头"] # 0x294a
+ - "⥋": [T: "倒钩向下的向左鱼叉箭头与倒钩向上的向右鱼叉箭头"] # 0x294b
+ - "⥌": [T: "倒钩向右的向上鱼叉箭头与倒钩向左的向下鱼叉箭头"] # 0x294c
+ - "⥍": [T: "倒钩向左的向上鱼叉箭头与倒钩向右的向下鱼叉箭头"] # 0x294d
+ - "⥎": [T: "倒钩均向上的左右鱼叉箭头"]  # 0x294e
+ - "⥏": [T: "倒钩均向右的上下鱼叉箭头"] # 0x294f
+ - "⥐": [T: "倒钩均向下的左右鱼叉箭头"] # 0x2950
+ - "⥑": [T: "倒钩均向左的上下鱼叉箭头"] # 0x2951
+ - "⥒": [T: "倒钩向上并指向竖线的向左鱼叉箭头"] # 0x2952
+ - "⥓": [T: "倒钩向上并指向竖线的向右鱼叉箭头"] # 0x2953
+ - "⥔": [T: "倒钩向右并指向横线的向上鱼叉箭头"] # 0x2954
+ - "⥕": [T: "倒钩向右并指向横线的向下鱼叉箭头"] # 0x2955
+ - "⥖": [T: "倒钩向下并指向竖线的向左鱼叉箭头"] # 0x2956
+ - "⥗": [T: "倒钩向下并指向竖线的向右鱼叉箭头"] # 0x2957
+ - "⥘": [T: "倒钩向左并指向横线的向上鱼叉箭头"] # 0x2958
+ - "⥙": [T: "倒钩向左并指向横线的向下鱼叉箭头"] # 0x2959
+ - "⥚": [T: "倒钩向上且从竖线出发的向左鱼叉箭头"] # 0x295a
+ - "⥛": [T: "倒钩向上且从竖线出发的向右鱼叉箭头"] # 0x295b
+ - "⥜": [T: "倒钩向右且从横线出发的向上鱼叉箭头"] # 0x295c
+ - "⥝": [T: "倒钩向右且从横线出发的向下鱼叉箭头"] # 0x295d
+ - "⥞": [T: "倒钩向下且从竖线出发的向左鱼叉箭头"] # 0x295e
+ - "⥟": [T: "倒钩向下且从竖线出发的向右鱼叉箭头"] # 0x295f
+ - "⥠": [T: "倒钩向左且从横线出发的向上鱼叉箭头"] # 0x2960
+ - "⥡": [T: "倒钩向左且从横线出发的向下鱼叉箭头"] # 0x2961
+ - "⥢": [T: "倒钩向上的向左鱼叉箭头在倒钩向下的向左鱼叉箭头上方"] # 0x2962
+ - "⥣": [T: "倒钩向左和向右的两个并列向上鱼叉箭头"] # 0x2963
+ - "⥤": [T: "倒钩向上的向右鱼叉箭头在倒钩向下的向右鱼叉箭头上方"] # 0x2964
+ - "⥥": [T: "倒钩向左和向右的两个并列向下鱼叉箭头"] # 0x2965
+ - "⥦": [T: "倒钩向上的向左鱼叉箭头在倒钩向上的向右鱼叉箭头上方"] # 0x2966
+ - "⥧": [T: "倒钩向下的向左鱼叉箭头在倒钩向下的向右鱼叉箭头上方"] # 0x2967
+ - "⥨": [T: "倒钩向上的向右鱼叉箭头在倒钩向上的向左鱼叉箭头上方"] # 0x2968
+ - "⥩": [T: "倒钩向下的向右鱼叉箭头在倒钩向下的向左鱼叉箭头上方"] # 0x2969
+ - "⥪": [T: "倒钩向上的向左鱼叉箭头在长横线上方"] # 0x296a
+ - "⥫": [T: "倒钩向下的向左鱼叉箭头在长横线下方"] # 0x296b
+ - "⥬": [T: "倒钩向上的向右鱼叉箭头在长横线上方"] # 0x296c
+ - "⥭": [T: "倒钩向下的向右鱼叉箭头在长横线下方"] # 0x296d
+ - "⥮": [T: "倒钩向左的向上鱼叉箭头与倒钩向右的向下鱼叉箭头并列"] # 0x296e
+ - "⥯": [T: "倒钩向左的向下鱼叉箭头与倒钩向右的向上鱼叉箭头并列"] # 0x296f
+ - "⥰": [T: "圆头向右双线箭头"]       # 0x2970
+ - "⥱": [T: "向右箭头上方的等号"]       # 0x2971
+ - "⥲": [T: "向右箭头上方的波浪运算符"] # 0x2972
+ - "⥳": [T: "波浪运算符上方的向左箭头"] # 0x2973
+ - "⥴": [T: "波浪运算符上方的向右箭头"] # 0x2974
+ - "⥵": [T: "约等号上方的向右箭头"] # 0x2975
+ - "⥶": [T: "向左箭头上方的小于号"]     # 0x2976
+ - "⥷": [T: "穿过小于号的向左箭头"]   # 0x2977
+ - "⥸": [T: "向右箭头上方的大于号"] # 0x2978
+ - "⥹": [T: "向右箭头上方的子集号"]       # 0x2979
+ - "⥺": [T: "穿过子集号的向左箭头"]      # 0x297a
+ - "⥻": [T: "向左箭头上方的超集号"]      # 0x297b
+ - "⥼": [T: "左鱼尾"]                      # 0x297c
+ - "⥽": [T: "右鱼尾"]                     # 0x297d
+ - "⥾": [T: "上鱼尾"]                        # 0x297e
+ - "⥿": [T: "下鱼尾"]                      # 0x297f
+ - "⦀": [T: "三重竖直线分隔符"]       # 0x2980
+ - "⦁": [T: "Z 记号点"]                     # 0x2981
+ - "⦂": [T: "Z 记号类型冒号"]               # 0x2982
+ - "⦃": [T: "左白色花括号"]                    # 0x2983
+ - "⦄": [T: "右白色花括号"]                   # 0x2984
+ - "⦅": [T: "左白圆括号"]              # 0x2985
+ - "⦆": [T: "右白圆括号"]             # 0x2986
+ - "⦇": [T: "Z 记号左像括号"]       # 0x2987
+ - "⦈": [T: "Z 记号右像括号"]      # 0x2988
+ - "⦉": [T: "Z 记号左绑定括号"]     # 0x2989
+ - "⦊": [T: "Z 记号右绑定括号"]    # 0x298a
+ - "⦋": [T: "带下横线的左方括号"]   # 0x298b
+ - "⦌": [T: "带下横线的右方括号"]  # 0x298c
+ - "⦍": [T: "上角带短线的左方括号"] # 0x298d
+ - "⦎": [T: "下角带短线的右方括号"] # 0x298e
+ - "⦏": [T: "下角带短线的左方括号"] # 0x298f
+ - "⦐": [T: "上角带短线的右方括号"] # 0x2990
+ - "⦑": [T: "带点的左角括号"]         # 0x2991
+ - "⦒": [T: "带点的右角括号"]        # 0x2992
+ - "⦓": [T: "左弧小于括号"]          # 0x2993
+ - "⦔": [T: "右弧大于括号"]      # 0x2994
+ - "⦕": [T: "双左弧大于括号"] # 0x2995
+ - "⦖": [T: "双右弧小于括号"]  # 0x2996
+ - "⦗": [T: "左黑六角括号"]   # 0x2997
+ - "⦘": [T: "右黑六角括号"]  # 0x2998
+ - "⦙": [T: "点状围栏"]                        # 0x2999
+ - "⦚": [T: "竖直之字形线"]                # 0x299a
+ - "⦛": [T: "开口向左的测量角"]         # 0x299b
+ - "⦜": [T: "带方框的直角变体"]     # 0x299c
+ - "⦝": [T: "带点的测量直角"]       # 0x299d
+ - "⦞": [T: "内含字母 S 的角"]                 # 0x299e
+ - "⦟": [T: "锐角"]                         # 0x299f
+ - "⦠": [T: "开口向左的球面角"]        # 0x29a0
+ - "⦡": [T: "开口向上的球面角"]          # 0x29a1
+ - "⦢": [T: "倒置角"]                        # 0x29a2
+ - "⦣": [T: "反向角"]                      # 0x29a3
+ - "⦤": [T: "带下横线的角"]                 # 0x29a4
+ - "⦥": [T: "带下横线的反向角"]        # 0x29a5
+ - "⦦": [T: "开口向上的斜角"]            # 0x29a6
+ - "⦧": [T: "开口向下的斜角"]          # 0x29a7
+ - "⦨": [T: "开口边末端带向上偏右箭头的测量角"] # 0x29a8
+ - "⦩": [T: "开口边末端带向上偏左箭头的测量角"] # 0x29a9
+ - "⦪": [T: "开口边末端带向下偏右箭头的测量角"] # 0x29aa
+ - "⦫": [T: "开口边末端带向下偏左箭头的测量角"] # 0x29ab
+ - "⦬": [T: "开口边末端带向右偏上箭头的测量角"] # 0x29ac
+ - "⦭": [T: "开口边末端带向左偏上箭头的测量角"] # 0x29ad
+ - "⦮": [T: "开口边末端带向右偏下箭头的测量角"] # 0x29ae
+ - "⦯": [T: "开口边末端带向左偏下箭头的测量角"] # 0x29af
+ - "⦰": [T: "反向空集"]                  # 0x29b0
+ - "⦱": [T: "上方带横线的空集"]              # 0x29b1
+ - "⦲": [T: "上方带小圆圈的空集"]   # 0x29b2
+ - "⦳": [T: "上方带向右箭头的空集"]    # 0x29b3
+ - "⦴": [T: "上方带向左箭头的空集"]     # 0x29b4
+ - "⦵": [T: "带横线的圆"]          # 0x29b5
+ - "⦶": [T: "带圈竖线"]                # 0x29b6
+ - "⦷": [T: "带圈平行号"]                    # 0x29b7
+ - "⦸": [T: "带圈反斜杠"]             # 0x29b8
+ - "⦹": [T: "带圈垂直号"]               # 0x29b9
+ - "⦺": [T: "被横线分割且上半部被竖线分割的圆"] # 0x29ba
+ - "⦻": [T: "叠加叉号的圆圈"]          # 0x29bb
+ - "⦼": [T: "带圈的逆时针旋转除号"] # 0x29bc
+ - "⦽": [T: "穿过圆圈的向上箭头"]             # 0x29bd
+ - "⦾": [T: "带圈白点"]                # 0x29be
+ - "⦿": [T: "带圈点"]                      # 0x29bf
+ - "⧀": [T: "带圈小于号"]                   # 0x29c0
+ - "⧁": [T: "带圈大于号"]                # 0x29c1
+ - "⧂": [T: "右侧带小圆圈的圆"] # 0x29c2
+ - "⧃": [T: "右侧带两条横线的圆"] # 0x29c3
+ - "⧄": [T: "方框内上升斜线"]       # 0x29c4
+ - "⧅": [T: "方框内下降斜线"]      # 0x29c5
+ - "⧆": [T: "带方框星号"]                    # 0x29c6
+ - "⧇": [T: "方框内的小圆圈"]                # 0x29c7
+ - "⧈": [T: "方框内的方块"]                      # 0x29c8
+ - "⧉": [T: "两个相连的方块"]                  # 0x29c9
+ - "⧊": [T: "上方带点的三角形"]             # 0x29ca
+ - "⧋": [T: "下方带横线的三角形"]              # 0x29cb
+ - "⧌": [T: "三角形内字母 S"]                       # 0x29cc
+ - "⧍": [T: "底部带衬线的三角形"]      # 0x29cd
+ - "⧎": [T: "向右三角形在向左三角形上方"]  # 0x29ce
+ - "⧏": [T: "右侧带竖线的向左三角形"]   # 0x29cf
+ - "⧐": [T: "左侧带竖线的向右三角形"]  # 0x29d0
+ - "⧑": [T: "左半部为黑色的蝴蝶结"]         # 0x29d1
+ - "⧒": [T: "右半部为黑色的蝴蝶结"]        # 0x29d2
+ - "⧓": [T: "黑色蝴蝶结"]                        # 0x29d3
+ - "⧔": [T: "左半部为黑色的乘号"]          # 0x29d4
+ - "⧕": [T: "右半部为黑色的乘号"]         # 0x29d5
+ - "⧖": [T: "白色沙漏"]                     # 0x29d6
+ - "⧗": [T: "黑色沙漏"]                     # 0x29d7
+ - "⧘": [T: "左波形围栏"]                   # 0x29d8
+ - "⧙": [T: "右波形围栏"]                  # 0x29d9
+ - "⧚": [T: "左双波形围栏"]            # 0x29da
+ - "⧛": [T: "右双波形围栏"]           # 0x29db
+ - "⧜": [T: "不完全无穷大"]                 # 0x29dc
+ - "⧝": [T: "无穷大上方的连接弧"]                   # 0x29dd
+ - "⧞": [T: "带竖线的否定无穷大"]  # 0x29de
+ - "⧟": [T: "双端多重映射"]               # 0x29df
+ - "⧠": [T: "带轮廓线的方块"]       # 0x29e0
+ - "⧡": [T: "增加"]                        # 0x29e1
+ - "⧢": [T: "混洗积"]                     # 0x29e2
+ - "⧣": [T: "等号与斜平行号"]    # 0x29e3
+ - "⧤": [T: "上方带波浪线的等号与斜平行号"] # 0x29e4
+ - "⧥": [T: "恒等且倾斜平行于"]   # 0x29e5
+ - "⧦": [T: "等势"]                        # 0x29e6
+ - "⧧": [T: "热力学"]                       # 0x29e7
+ - "⧨": [T: "左半部为黑色的向下三角形"] # 0x29e8
+ - "⧩": [T: "右半部为黑色的向下三角形"] # 0x29e9
+ - "⧪": [T: "带向下箭头的黑色菱形"]       # 0x29ea
+ - "⧫": [T: "黑色长菱形"]                     # 0x29eb
+ - "⧬": [T: "带向下箭头的白色圆"]        # 0x29ec
+ - "⧭": [T: "带向下箭头的黑色圆"]        # 0x29ed
+ - "⧮": [T: "带误差线的白色方形"]           # 0x29ee
+ - "⧯": [T: "带误差线的黑色方形"]           # 0x29ef
+ - "⧰": [T: "带误差线的白色菱形"]          # 0x29f0
+ - "⧱": [T: "带误差线的黑色菱形"]          # 0x29f1
+ - "⧲": [T: "带误差线的白色圆圈"]           # 0x29f2
+ - "⧳": [T: "带误差线的黑色圆圈"]           # 0x29f3
+ - "⧴": [T: "规则延迟"]                        # 0x29f4
+ - "⧵": [T: "反斜杠运算符"]            # 0x29f5
+ - "⧶": [T: "上方带横线的斜杠"]                # 0x29f6
+ - "⧷": [T: "中间带横线的反斜杠"] # 0x29f7
+ - "⧸": [T: "大斜杠"]                         # 0x29f8
+ - "⧹": [T: "大反斜杠"]                 # 0x29f9
+ - "⧺": [T: "双加号"]                         # 0x29fa
+ - "⧻": [T: "三重加号"]                         # 0x29fb
+ - "⧼": [T: "向左弯曲的角括号"]  # 0x29fc
+ - "⧽": [T: "向右弯曲的角括号"] # 0x29fd
+ # Unicode defines TINY and MINY as named combinatorial game theory operators.
+ - "⧾": [T: "Tiny 算子"]                                # 0x29fe
+ - "⧿": [T: "Miny 算子"]                                # 0x29ff
+ - "⨀": [T: "n 元带圈点运算符"]                 # 0x2a00
+ - "⨁": [T: "n 元带圈加号运算符"]               # 0x2a01
+ - "⨂": [T: "n 元带圈乘号运算符"]               # 0x2a02
+ - "⨃": [T: "带点的 n 元并集运算符"]            # 0x2a03
+ - "⨄": [T: "带加号的 n 元并集运算符"]          # 0x2a04
+ - "⨅": [T: "n 元方交集运算符"]                 # 0x2a05
+ - "⨆": [T: "n 元方并集运算符"]                 # 0x2a06
+ - "⨇": [T: "双逻辑与运算符"]                # 0x2a07
+ - "⨈": [T: "双逻辑或运算符"]                # 0x2a08
+ - "⨉": [T: "n 元乘号运算符"]                    # 0x2a09
+ - "⨊": [T: "模二和"]                      # 0x2a0a
+ - "⨋": [T: "带积分号的求和"]             # 0x2a0b
+ - "⨌": [T: "四重积分运算符"]         # 0x2a0c
+ - "⨍": [T: "有限部积分"]                # 0x2a0d
+ - "⨎": [T: "双线积分"]         # 0x2a0e
+ - "⨏": [T: "带斜线的平均积分号"]       # 0x2a0f
+ - "⨐": [T: "环流函数"]                # 0x2a10
+ - "⨑": [T: "逆时针积分"]           # 0x2a11
+ - "⨒": [T: "绕极点矩形路径线积分"] # 0x2a12
+ - "⨓": [T: "绕极点半圆路径线积分"] # 0x2a13
+ - "⨔": [T: "不包含极点的线积分"] # 0x2a14
+ - "⨕": [T: "绕点积分运算符"]    # 0x2a15
+ - "⨖": [T: "四元数积分运算符"]        # 0x2a16
+ - "⨗": [T: "带钩向左箭头的积分号"] # 0x2a17
+ - "⨘": [T: "带乘号的积分号"]            # 0x2a18
+ - "⨙": [T: "带交集号的积分号"]          # 0x2a19
+ - "⨚": [T: "带并集号的积分号"]                 # 0x2a1a
+ - "⨛": [T: "带上横线的积分号"]               # 0x2a1b
+ - "⨜": [T: "带下横线的积分号"]              # 0x2a1c
+ - "⨝": [T: "连接"]                                # 0x2a1d
+ - "⨞": [T: "大左三角运算符"]        # 0x2a1e
+ - "⨟": [T: "Z 记号模式组合"]       # 0x2a1f
+ - "⨠": [T: "Z 记号模式管道"]            # 0x2a20
+ - "⨡": [T: "Z 记号模式投影"]        # 0x2a21
+ - "⨢": [T: "上方带小圆圈的加号"]         # 0x2a22
+ - "⨣": [T: "上方带抑扬符的加号"] # 0x2a23
+ - "⨤": [T: "上方带波浪线的加号"]          # 0x2a24
+ - "⨥": [T: "下方带点的加号"]            # 0x2a25
+ - "⨦": [T: "下方带波浪线的加号"]          # 0x2a26
+ - "⨧": [T: "带下标二的加号"]        # 0x2a27
+ - "⨨": [T: "带黑色三角形的加号"]       # 0x2a28
+ - "⨩": [T: "上方带逗号的减号"]         # 0x2a29
+ - "⨪": [T: "下方带点的减号"]           # 0x2a2a
+ - "⨫": [T: "带下降点列的减号"]        # 0x2a2b
+ - "⨬": [T: "带上升点列的减号"]         # 0x2a2c
+ - "⨭": [T: "左半圆内的加号"]       # 0x2a2d
+ - "⨮": [T: "右半圆内的加号"]      # 0x2a2e
+ - "⨯":                                             # 0x2a2f
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: [T: "叉乘"]
+         else: [T: "向量叉乘"]
+ - "⨰": [T: "上方带点的乘号"]  # 0x2a30
+ - "⨱": [T: "下方带横线的乘号"]   # 0x2a31
+ - "⨲": [T: "底部闭合的半直积"] # 0x2a32
+ - "⨳": [T: "压缩积"]                       # 0x2a33
+ - "⨴": [T: "左半圆内的乘号"] # 0x2a34
+ - "⨵": [T: "右半圆内的乘号"] # 0x2a35
+ - "⨶": [T: "上方带抑扬符的圈乘号"] # 0x2a36
+ - "⨷": [T: "双圆圈内的乘号"] # 0x2a37
+ - "⨸": [T: "带圈除号"]               # 0x2a38
+ - "⨹": [T: "三角形内的加号"]               # 0x2a39
+ - "⨺": [T: "三角形内的减号"]              # 0x2a3a
+ - "⨻": [T: "三角形内的乘号"]     # 0x2a3b
+ - "⨼": [T: "内积"]                    # 0x2a3c
+ - "⨽": [T: "右内积"]          # 0x2a3d
+ - "⨾": [T: "Z 记号关系复合"]    # 0x2a3e
+ - "⨿": [T: "合并积或余积"]           # 0x2a3f
+ - "⩀": [T: "带点的交集号"]               # 0x2a40
+ - "⩁": [T: "带减号的并集号"]               # 0x2a41
+ - "⩂": [T: "上方带横线的并集号"]                  # 0x2a42
+ - "⩃": [T: "上方带横线的交集号"]           # 0x2a43
+ - "⩄": [T: "交集号与逻辑与号组合"]       # 0x2a44
+ - "⩅": [T: "并集号与逻辑或号组合"]               # 0x2a45
+ - "⩆": [T: "并集号在交集号上方"]            # 0x2a46
+ - "⩇": [T: "交集号在并集号上方"]            # 0x2a47
+ - "⩈": [T: "并集号、横线、交集号从上到下排列"]  # 0x2a48
+ - "⩉": [T: "交集号、横线、并集号从上到下排列"]  # 0x2a49
+ - "⩊": [T: "两个并列相连的并集号"]  # 0x2a4a
+ - "⩋": [T: "两个并列相连的交集号"] # 0x2a4b
+ - "⩌": [T: "带衬线的闭合并集"]            # 0x2a4c
+ - "⩍": [T: "带衬线的闭合交集"]     # 0x2a4d
+ - "⩎": [T: "双重方形交集"]          # 0x2a4e
+ - "⩏": [T: "双重方形并集"]                 # 0x2a4f
+ - "⩐": [T: "带衬线和压缩积的闭合并集"] # 0x2a50
+ - "⩑": [T: "上加点的逻辑与"]          # 0x2a51
+ - "⩒": [T: "上加点的逻辑或"]           # 0x2a52
+ - "⩓": [T: "双逻辑与"]                  # 0x2a53
+ - "⩔": [T: "双逻辑或"]                   # 0x2a54
+ - "⩕": [T: "两个相交的逻辑与"]        # 0x2a55
+ - "⩖": [T: "两个相交的逻辑或"]         # 0x2a56
+ - "⩗": [T: "倾斜大型逻辑或"]                    # 0x2a57
+ - "⩘": [T: "倾斜大型逻辑与"]                   # 0x2a58
+ - "⩙": [T: "逻辑或与逻辑与叠加"]  # 0x2a59
+ - "⩚": [T: "带中间竖线的逻辑与"]        # 0x2a5a
+ - "⩛": [T: "带中间竖线的逻辑或"]         # 0x2a5b
+ - "⩜": [T: "带横线的逻辑与"]    # 0x2a5c
+ - "⩝": [T: "带横线的逻辑或"]     # 0x2a5d
+ - "⩞": [T: "带双上横线的逻辑与"]     # 0x2a5e
+ - "⩟": [T: "带下横线的逻辑与"]           # 0x2a5f
+ - "⩠": [T: "带双下横线的逻辑与"]    # 0x2a60
+ - "⩡": [T: "带下横线的小逻辑或"]             # 0x2a61
+ - "⩢": [T: "带双上横线的逻辑或"]      # 0x2a62
+ - "⩣": [T: "带双下横线的逻辑或"]     # 0x2a63
+ - "⩤": [T: "Z 记号定义域反限制"]   # 0x2a64
+ - "⩥": [T: "Z 记号值域反限制"]    # 0x2a65
+ - "⩦": [T: "下方带点的等号"]          # 0x2a66
+ - "⩧": [T: "上方带点的恒等号"]            # 0x2a67
+ - "⩨": [T: "带两条竖线的三重横线"] # 0x2a68
+ - "⩩": [T: "带三条竖线的三重横线"] # 0x2a69
+ - "⩪": [T: "上方带点的波浪运算符"]       # 0x2a6a
+ - "⩫": [T: "带上升点列的波浪运算符"]     # 0x2a6b
+ - "⩬": [T: "相似号、减号、相似号"]               # 0x2a6c
+ - "⩭": [T: "上方带点的全等号"]            # 0x2a6d
+ - "⩮": [T: "带星号的等号"]                # 0x2a6e
+ - "⩯": [T: "上方带抑扬符的约等号"] # 0x2a6f
+ - "⩰": [T: "约等于或等于"]  # 0x2a70
+ - "⩱": [T: "等号在加号上方"]         # 0x2a71
+ - "⩲": [T: "加号在等号上方"]         # 0x2a72
+ - "⩳": [T: "等号在波浪运算符上方"]    # 0x2a73
+ - "⩴": [T: "双冒号等号"]                  # 0x2a74
+ - "⩵": [T: "连续两个等号"]        # 0x2a75
+ - "⩶": [T: "连续三个等号"]      # 0x2a76
+ - "⩷": [T: "上下各带两点的等号"] # 0x2a77
+ - "⩸": [T: "上方带四点的等价号"]     # 0x2a78
+ - "⩹": [T: "内含圆圈的小于号"]        # 0x2a79
+ - "⩺": [T: "内含圆圈的大于号"]     # 0x2a7a
+ - "⩻": [T: "上方带问号的小于号"]  # 0x2a7b
+ - "⩼": [T: "上方带问号的大于号"] # 0x2a7c
+ - "⩽": [T: "小于或倾斜等于"]       # 0x2a7d
+ - "⩾": [T: "大于或倾斜等于"]       # 0x2a7e
+ - "⩿": [T: "内含点的小于或斜等号"] # 0x2a7f
+ - "⪀": [T: "内含点的大于或斜等号"] # 0x2a80
+ - "⪁": [T: "上方带点的小于或倾斜等号"] # 0x2a81
+ - "⪂": [T: "上方带点的大于或倾斜等号"] # 0x2a82
+ - "⪃": [T: "右上方带点的小于或倾斜等号"] # 0x2a83
+ - "⪄": [T: "左上方带点的大于或倾斜等号"] # 0x2a84
+ - "⪅": [T: "小于或约等于"]            # 0x2a85
+ - "⪆": [T: "大于或约等于"]            # 0x2a86
+ - "⪇": [T: "小于且单线不等于"] # 0x2a87
+ - "⪈": [T: "大于且单线不等于"] # 0x2a88
+ - "⪉": [T: "小于且不约等于"]       # 0x2a89
+ - "⪊": [T: "大于且不约等于"]    # 0x2a8a
+ - "⪋": [T: "小于号、双线等号、大于号从上到下排列"] # 0x2a8b
+ - "⪌": [T: "大于号、双线等号、小于号从上到下排列"] # 0x2a8c
+ - "⪍": [T: "小于、相似或等于"]    # 0x2a8d
+ - "⪎": [T: "大于、相似或等于"] # 0x2a8e
+ - "⪏": [T: "小于号、相似号、大于号从上到下排列"] # 0x2a8f
+ - "⪐": [T: "大于号、相似号、小于号从上到下排列"] # 0x2a90
+ - "⪑": [T: "小于号、大于号、双线等号从上到下排列"] # 0x2a91
+ - "⪒": [T: "大于号、小于号、双线等号从上到下排列"] # 0x2a92
+ - "⪓": [T: "小于号、倾斜等号、大于号、倾斜等号从上到下排列"] # 0x2a93
+ - "⪔": [T: "大于号、倾斜等号、小于号、倾斜等号从上到下排列"] # 0x2a94
+ - "⪕": [T: "倾斜等号或小于"]       # 0x2a95
+ - "⪖": [T: "倾斜等号或大于"]    # 0x2a96
+ - "⪗": [T: "内含点的斜等号或小于号"] # 0x2a97
+ - "⪘": [T: "内含点的斜等号或大于号"] # 0x2a98
+ - "⪙": [T: "双线等号或小于"]   # 0x2a99
+ - "⪚": [T: "双线等号或大于"] # 0x2a9a
+ - "⪛": [T: "双线倾斜等号或小于"] # 0x2a9b
+ - "⪜": [T: "双线倾斜等号或大于"] # 0x2a9c
+ - "⪝": [T: "相似或小于"]                # 0x2a9d
+ - "⪞": [T: "相似或大于"]             # 0x2a9e
+ - "⪟": [T: "相似号、小于号与等号从上到下排列"] # 0x2a9f
+ - "⪠": [T: "相似号、大于号与等号从上到下排列"] # 0x2aa0
+ - "⪡": [T: "双嵌套小于"]             # 0x2aa1
+ - "⪢": [T: "双嵌套大于"]          # 0x2aa2
+ - "⪣": [T: "带下划线的双嵌套小于"] # 0x2aa3
+ - "⪤": [T: "大于号与小于号叠加"]  # 0x2aa4
+ - "⪥": [T: "并列的大于号与小于号"]       # 0x2aa5
+ - "⪦": [T: "曲线闭合的小于号"]           # 0x2aa6
+ - "⪧": [T: "曲线闭合的大于号"]        # 0x2aa7
+ - "⪨": [T: "曲线闭合的小于号在斜等号上方"] # 0x2aa8
+ - "⪩": [T: "曲线闭合的大于号在斜等号上方"] # 0x2aa9
+ - "⪪": [T: "小于"]                        # 0x2aaa
+ - "⪫": [T: "大于"]                         # 0x2aab
+ - "⪬": [T: "小于或等于"]            # 0x2aac
+ - "⪭": [T: "大于或等于"]             # 0x2aad
+ - "⪮": [T: "上方带波形线的等号"]        # 0x2aae
+ - "⪯": [T: "先于号在单线等号上方"] # 0x2aaf
+ - "⪰": [T: "后于号在单线等号上方"] # 0x2ab0
+ - "⪱": [T: "先于号在单线不等号上方"] # 0x2ab1
+ - "⪲": [T: "后于号在单线不等号上方"] # 0x2ab2
+ - "⪳": [T: "先于号在等号上方"]          # 0x2ab3
+ - "⪴": [T: "后于号在等号上方"]          # 0x2ab4
+ - "⪵": [T: "先于号在不等号上方"]         # 0x2ab5
+ - "⪶": [T: "后于号在不等号上方"]         # 0x2ab6
+ - "⪷": [T: "先于号在约等号上方"]      # 0x2ab7
+ - "⪸": [T: "后于号在约等号上方"]      # 0x2ab8
+ - "⪹": [T: "先于号在不约等号上方"]  # 0x2ab9
+ - "⪺": [T: "后于号在不约等号上方"]  # 0x2aba
+ - "⪻": [T: "双先于"]                     # 0x2abb
+ - "⪼": [T: "双后于"]                     # 0x2abc
+ - "⪽": [T: "带点的子集号"]                     # 0x2abd
+ - "⪾": [T: "带点的超集号"]                   # 0x2abe
+ - "⪿": [T: "下方带加号的子集符号"]         # 0x2abf
+ - "⫀": [T: "下方带加号的超集符号"]       # 0x2ac0
+ - "⫁": [T: "下方带乘号的子集符号"] # 0x2ac1
+ - "⫂": [T: "下方带乘号的超集符号"] # 0x2ac2
+ - "⫃": [T: "上方带点的子集或等于号"] # 0x2ac3
+ - "⫄": [T: "上方带点的超集或等于号"] # 0x2ac4
+ - "⫅": [T: "子集符号在等号上方"]         # 0x2ac5
+ - "⫆": [T: "超集符号在等号上方"]       # 0x2ac6
+ - "⫇": [T: "子集符号在波浪运算符上方"]      # 0x2ac7
+ - "⫈": [T: "超集符号在波浪运算符上方"]    # 0x2ac8
+ - "⫉": [T: "子集符号在约等号上方"]     # 0x2ac9
+ - "⫊": [T: "超集符号在约等号上方"]   # 0x2aca
+ - "⫋": [T: "真子集"]           # 0x2acb
+ - "⫌": [T: "真超集"]      # 0x2acc
+ - "⫍": [T: "左侧开口的方框运算符"]       # 0x2acd
+ - "⫎": [T: "右侧开口的方框运算符"]      # 0x2ace
+ - "⫏": [T: "闭子集"]                       # 0x2acf
+ - "⫐": [T: "闭超集"]                     # 0x2ad0
+ - "⫑": [T: "闭子集或等于"]           # 0x2ad1
+ - "⫒": [T: "闭超集或等于"]         # 0x2ad2
+ - "⫓": [T: "子集号在超集号上方"]               # 0x2ad3
+ - "⫔": [T: "超集号在子集号上方"]               # 0x2ad4
+ - "⫕": [T: "子集号在子集号上方"]                 # 0x2ad5
+ - "⫖": [T: "超集号在超集号上方"]             # 0x2ad6
+ - "⫗": [T: "超集号与子集号并列"]              # 0x2ad7
+ - "⫘": [T: "超集号与子集号并列并以短横线连接"] # 0x2ad8
+ - "⫙": [T: "开口向下的属于号"]        # 0x2ad9
+ - "⫚": [T: "顶部带丁字的叉形符号"]              # 0x2ada
+ - "⫛": [T: "横截相交"]            # 0x2adb
+ - "⫝̸": [T: "分叉"]                             # 0x2adc
+ - "⫝": [T: "非分叉"]                          # 0x2add
+ - "⫞": [T: "短左丁字"]                     # 0x2ade
+ - "⫟": [T: "短下丁字"]                     # 0x2adf
+ - "⫠": [T: "短上丁字"]                       # 0x2ae0
+ - "⫡": [T: "带 S 的垂直符号"]                    # 0x2ae1
+ - "⫢": [T: "竖直线三重右断言符"] # 0x2ae2
+ - "⫣": [T: "双竖直线左断言符"]  # 0x2ae3
+ - "⫤": [T: "竖直线双左断言符"]  # 0x2ae4
+ - "⫥": [T: "双竖直线双左断言符"] # 0x2ae5
+ - "⫦": [T: "从双竖线左线伸出的长横线"] # 0x2ae6
+ - "⫧": [T: "带上横线的短下丁字"]        # 0x2ae7
+ - "⫨": [T: "带下横线的短上丁字"]         # 0x2ae8
+ - "⫩": [T: "短上丁字在短下丁字上方"] # 0x2ae9
+ - "⫪": [T: "双下丁字"]                    # 0x2aea
+ - "⫫": [T: "双上丁字"]                      # 0x2aeb
+ - "⫬": [T: "双线非号"]              # 0x2aec
+ - "⫭": [T: "反向双线非号"]     # 0x2aed
+ - "⫮": [T: "带反向否定斜线的不整除"] # 0x2aee
+ - "⫯": [T: "上方带圆圈的竖线"]     # 0x2aef
+ - "⫰": [T: "下方带圆圈的竖线"]     # 0x2af0
+ - "⫱": [T: "下方带圆圈的下丁字"]         # 0x2af1
+ - "⫲": [T: "带横线的平行号"]     # 0x2af2
+ - "⫳": [T: "带波浪线的平行号"]        # 0x2af3
+ - "⫴": [T: "三竖线二元关系符"] # 0x2af4
+ - "⫵": [T: "带横线的三重竖线"] # 0x2af5
+ - "⫶": [T: "三重冒号运算符"]               # 0x2af6
+ - "⫷": [T: "三重嵌套小于"]             # 0x2af7
+ - "⫸": [T: "三重嵌套大于"]          # 0x2af8
+ - "⫹": [T: "双线倾斜小于或等于"] # 0x2af9
+ - "⫺": [T: "双线倾斜大于或等于"] # 0x2afa
+ - "⫻": [T: "三重斜杠关系"]      # 0x2afb
+ - "⫼": [T: "大三重竖直线运算符"]  # 0x2afc
+ - "⫽": [T: "双斜杠运算符"]             # 0x2afd
+ - "⫾": [T: "白色竖直线"]                  # 0x2afe
+ - "⫿": [T: "n 元白色竖线运算符"]                  # 0x2aff
+ - "⬀": [T: "向右上方的白色箭头"]              # 0x2b00
+ - "⬁": [T: "向左上方的白色箭头"]              # 0x2b01
+ - "⬂": [T: "向右下方的白色箭头"]              # 0x2b02
+ - "⬃": [T: "向左下方的白色箭头"]              # 0x2b03
+ - "⬄": [T: "白色左右双向箭头"]              # 0x2b04
+ - "⬅": [T: "向左的黑色箭头"]               # 0x2b05
+ - "⬆": [T: "向上的黑色箭头"]                 # 0x2b06
+ - "⬇": [T: "向下的黑色箭头"]               # 0x2b07
+ - "⬈": [T: "向右上方的黑色箭头"]              # 0x2b08
+ - "⬉": [T: "向左上方的黑色箭头"]              # 0x2b09
+ - "⬊": [T: "向右下方的黑色箭头"]              # 0x2b0a
+ - "⬋": [T: "向左下方的黑色箭头"]              # 0x2b0b
+ - "⬌": [T: "黑色左右双向箭头"]              # 0x2b0c
+ - "⬍": [T: "黑色上下双向箭头"]                 # 0x2b0d
+ - "⬎": [T: "箭头尖向下的向右箭头"] # 0x2b0e
+ - "⬏": [T: "箭头尖向上的向右箭头"]   # 0x2b0f
+ - "⬐": [T: "箭头尖向下的向左箭头"]  # 0x2b10
+ - "⬑": [T: "箭头尖向上的向左箭头"]    # 0x2b11
+ - "⬒": [T: "上半部为黑色的方块"]          # 0x2b12
+ - "⬓": [T: "下半部为黑色的方块"]       # 0x2b13
+ - "⬔": [T: "右上对角半部为黑色的方块"] # 0x2b14
+ - "⬕": [T: "左下对角半部为黑色的方块"] # 0x2b15
+ - "⬖": [T: "左半部为黑色的菱形"]        # 0x2b16
+ - "⬗": [T: "右半部为黑色的菱形"]       # 0x2b17
+ - "⬘": [T: "上半部为黑色的菱形"]         # 0x2b18
+ - "⬙": [T: "下半部为黑色的菱形"]      # 0x2b19
+ - "⬚": [T: "点状方框"]                                 # 0x2b1a
+ - "⬛": [T: "黑色大方块"]                  # 0x2b1b
+ - "⬜": [T: "白色大方块"]                  # 0x2b1c
+ - "⬝": [T: "黑色极小方块"]             # 0x2b1d
+ - "⬞": [T: "白色极小方块"]             # 0x2b1e
+ - "⬟": [T: "黑色五边形"]                      # 0x2b1f
+ - "⬠": [T: "白色五边形"]                      # 0x2b20
+ - "⬡": [T: "白色六边形"]                       # 0x2b21
+ - "⬢": [T: "黑色六边形"]                       # 0x2b22
+ - "⬣": [T: "横向黑色六边形"]            # 0x2b23
+ - "⬤": [T: "黑色大圆"]                  # 0x2b24
+ - "⬥": [T: "黑色中等菱形"]                # 0x2b25
+ - "⬦": [T: "白色中等菱形"]                # 0x2b26
+ - "⬧": [T: "黑色中等长菱形"]                # 0x2b27
+ - "⬨": [T: "白色中等长菱形"]                # 0x2b28
+ - "⬩": [T: "黑色小菱形"]                 # 0x2b29
+ - "⬪": [T: "黑色小长菱形"]                 # 0x2b2a
+ - "⬫": [T: "白色小长菱形"]                 # 0x2b2b
+ - "⬬": [T: "黑色横向椭圆"]            # 0x2b2c
+ - "⬭": [T: "白色横向椭圆"]            # 0x2b2d
+ - "⬮": [T: "黑色纵向椭圆"]              # 0x2b2e
+ - "⬯": [T: "白色纵向椭圆"]              # 0x2b2f
+ - "⬰": [T: "带小圆圈的向左箭头"]        # 0x2b30
+ - "⬱": [T: "三个向左箭头"]              # 0x2b31
+ - "⬲": [T: "带圈加号的向左箭头"]        # 0x2b32
+ - "⬳": [T: "向左长曲线箭头"]       # 0x2b33
+ - "⬴": [T: "带竖线的向左双头箭头"] # 0x2b34
+ - "⬵": [T: "带双竖线的向左双头箭头"] # 0x2b35
+ - "⬶": [T: "从竖线出发的向左双头箭头"] # 0x2b36
+ - "⬷": [T: "箭杆为三段短线的向左双头箭头"] # 0x2b37
+ - "⬸": [T: "点状箭杆的向左箭头"]    # 0x2b38
+ - "⬹": [T: "带箭尾和竖线的向左箭头"] # 0x2b39
+ - "⬺": [T: "带箭尾和双竖线的向左箭头"] # 0x2b3a
+ - "⬻": [T: "带箭尾的向左双头箭头"] # 0x2b3b
+ - "⬼": [T: "带箭尾和竖线的向左双头箭头"] # 0x2b3c
+ - "⬽": [T: "带箭尾和双竖线的向左双头箭头"] # 0x2b3d
+ - "⬾": [T: "穿过叉号的向左箭头"]           # 0x2b3e
+ - "⬿": [T: "水平向左波浪箭头"]   # 0x2b3f
+ - "⭀": [T: "向左箭头上方的等号"]   # 0x2b40
+ - "⭁": [T: "向左箭头上方的反向波浪运算符"] # 0x2b41
+ - "⭂": [T: "反向约等号上方的向左箭头"] # 0x2b42
+ - "⭃": [T: "穿过大于号的向右箭头"] # 0x2b43
+ - "⭄": [T: "穿过超集号的向右箭头"]   # 0x2b44
+ - "⭅": [T: "向左四重箭头"]           # 0x2b45
+ - "⭆": [T: "向右四重箭头"]          # 0x2b46
+ - "⭇": [T: "向右箭头上方的反向波浪运算符"] # 0x2b47
+ - "⭈": [T: "反向约等号上方的向右箭头"] # 0x2b48
+ - "⭉": [T: "向左箭头上方的波浪运算符"] # 0x2b49
+ - "⭊": [T: "约等号上方的向左箭头"] # 0x2b4a
+ - "⭋": [T: "反向波浪运算符上方的向左箭头"] # 0x2b4b
+ - "⭌": [T: "反向波浪运算符上方的向右箭头"] # 0x2b4c
+ - "⭐": [T: "白色中号星"]                   # 0x2b50
+ - "⭑": [T: "黑色小星"]                    # 0x2b51
+ - "⭒": [T: "白色小星"]                    # 0x2b52
+ - "⭓": [T: "向右黑色五边形"]       # 0x2b53
+ - "⭔": [T: "向右白色五边形"]       # 0x2b54
+ - "⭕": [T: "粗大圆圈"]                  # 0x2b55
+ - "⭖": [T: "内含椭圆的粗椭圆"]         # 0x2b56
+ - "⭗": [T: "内含圆的粗圆圈"]     # 0x2b57
+ - "⭘": [T: "粗圆圈"]                        # 0x2b58
+ - "⭙": [T: "粗圆圈内的叉号"]               # 0x2b59
+ - "⸀": [T: "直角替换标记"]     # 0x2e00
+ - "⸁": [T: "点状直角替换标记"] # 0x2e01
+ - "⸂": [T: "左替换括号"]           # 0x2e02
+ - "⸃": [T: "右替换括号"]          # 0x2e03
+ - "⸄": [T: "左点状替换括号"]    # 0x2e04
+ - "⸅": [T: "右点状替换括号"]   # 0x2e05
+ - "⸆": [T: "上置插入标记"]         # 0x2e06
+ - "⸇": [T: "上置点状插入标记"]  # 0x2e07
+ - "⸈": [T: "点状换位标记"]  # 0x2e08
+ - "⸉": [T: "左换位括号"]          # 0x2e09
+ - "⸊": [T: "右换位括号"]         # 0x2e0a
+ - "⸋": [T: "上置方框"]                       # 0x2e0b
+ - "⸌": [T: "左上置省略括号"]        # 0x2e0c
+ - "⸍": [T: "右上置省略括号"]       # 0x2e0d
+ - "⸎": [T: "校勘用冠状符"]                   # 0x2e0e
+ - "⸏": [T: "段落校勘符"]                         # 0x2e0f
+ - "⸐": [T: "分叉段落校勘符"]                  # 0x2e10
+ - "⸑": [T: "反向分叉段落校勘符"]         # 0x2e11
+ - "⸒": [T: "下置逗号"]                        # 0x2e12
+ - "⸓": [T: "带点奥贝洛斯符号"]                       # 0x2e13
+ - "⸔": [T: "向下锚形校勘符号"]                    # 0x2e14
+ - "⸕": [T: "向上锚形校勘符号"]                      # 0x2e15
+ - "⸖": [T: "带点的右指角"]         # 0x2e16
+ - "⸗": [T: "双斜连字符"]               # 0x2e17
+ - "⸘": [T: "倒置疑问感叹号"]                # 0x2e18
+ - "⸙": [T: "棕榈枝"]                         # 0x2e19
+ - "⸚": [T: "带分音符的连字符"]               # 0x2e1a
+ - "⸛": [T: "上方带圆环的波浪线"]               # 0x2e1b
+ - "⸜": [T: "左低释义括号"]         # 0x2e1c
+ - "⸝": [T: "右低释义括号"]        # 0x2e1d
+ - "⸞": [T: "上方带点的波浪线"]                # 0x2e1e
+ - "⸟": [T: "下方带点的波浪线"]                # 0x2e1f
+ - "⸠": [T: "带羽毛笔的左竖线"]        # 0x2e20
+ - "⸡": [T: "带羽毛笔的右竖线"]       # 0x2e21
+ - "⸢": [T: "左括号上半部"]               # 0x2e22
+ - "⸣": [T: "右括号上半部"]              # 0x2e23
+ - "⸤": [T: "左括号下半部"]            # 0x2e24
+ - "⸥": [T: "右括号下半部"]           # 0x2e25
+ - "⸦": [T: "左横置 U 形括号"]             # 0x2e26
+ - "⸧": [T: "右横置 U 形括号"]            # 0x2e27
+ - "⸨": [T: "左双圆括号"]             # 0x2e28
+ - "⸩": [T: "右双圆括号"]            # 0x2e29
+ - "⸪": [T: "上方两点下方一点标点"]   # 0x2e2a
+ - "⸫": [T: "上方一点下方两点标点"]   # 0x2e2b
+ - "⸬": [T: "方形排列四点标点"]        # 0x2e2c
+ - "⸭": [T: "五点标记"]                       # 0x2e2d
+ - "⸮": [T: "反向问号"]              # 0x2e2e
+ - "ⸯ": [T: "竖直波浪号"]                      # 0x2e2f
+ - "⸰": [T: "圆环点"]                          # 0x2e30
+ - "⸱": [T: "词分隔用中点"]           # 0x2e31
+ - "⸲": [T: "倒置逗号"]                        # 0x2e32
+ - "⸳": [T: "高位点"]                          # 0x2e33
+ - "⸴": [T: "高位逗号"]                        # 0x2e34
+ - "⸵": [T: "倒置分号"]                    # 0x2e35
+ - "⸶": [T: "左侧带护线的剑号"]              # 0x2e36
+ - "⸷": [T: "右侧带护线的剑号"]             # 0x2e37
+ - "⸸": [T: "倒置剑号"]                       # 0x2e38
+ - "⸹": [T: "章节号上半部"]               # 0x2e39
+ - "⸺": [T: "双倍长破折号"]                         # 0x2e3a
+ - "⸻": [T: "三倍长破折号"]                       # 0x2e3b
+ - "〃": [T: "同上"]                          # 0x3003
+ - "〈": [T: "左尖括号"]                  # 0x3008
+ - "〉": [T: "右尖括号"]                 # 0x3009
+ - "《": [T: "左双尖括号"]           # 0x300a
+ - "》": [T: "右双尖括号"]          # 0x300b
+ - "「": [T: "左角括号"]                 # 0x300c
+ - "」": [T: "右角括号"]                # 0x300d
+ - "『": [T: "左中空角括号"]           # 0x300e
+ - "』": [T: "右中空角括号"]          # 0x300f
+ - "【": [T: "左黑色透镜状方括号"]       # 0x3010
+ - "】": [T: "右黑色透镜状方括号"]      # 0x3011
+ - "〔": [T: "左六角括号"]         # 0x3014
+ - "〕": [T: "右六角括号"]        # 0x3015
+ - "〖": [T: "左中空透镜状方括号"]       # 0x3016
+ - "〗": [T: "右中空透镜状方括号"]      # 0x3017
+ - "〘": [T: "左白六角括号"]   # 0x3018
+ - "〙": [T: "右白六角括号"]  # 0x3019
+ - "〚": [T: "左白方括号"]           # 0x301a
+ - "〛": [T: "右白方括号"]          # 0x301b
+ - "〜": [T: "波浪号"]                           # 0x301c
+ - "〰": [T: "波浪型破折号"]                           # 0x3030
+ - "㉈": [T: "黑色方块上的带圈数字十"]  # 0x3248
+ - "㉉": [T: "黑色方块上的带圈数字二十"] # 0x3249
+ - "㉊": [T: "黑色方块上的带圈数字三十"] # 0x324a
+ - "㉋": [T: "黑色方块上的带圈数字四十"] # 0x324b
+ - "㉌": [T: "黑色方块上的带圈数字五十"] # 0x324c
+ - "㉍": [T: "黑色方块上的带圈数字六十"] # 0x324d
+ - "㉎": [T: "黑色方块上的带圈数字七十"] # 0x324e
+ - "㉏": [T: "黑色方块上的带圈数字八十"] # 0x324f
+ - "㉑": [T: "带圈数字二十一"]           # 0x3251
+ - "㉒": [T: "带圈数字二十二"]           # 0x3252
+ - "㉓": [T: "带圈数字二十三"]         # 0x3253
+ - "㉔": [T: "带圈数字二十四"]          # 0x3254
+ - "㉕": [T: "带圈数字二十五"]          # 0x3255
+ - "㉖": [T: "带圈数字二十六"]           # 0x3256
+ - "㉗": [T: "带圈数字二十七"]         # 0x3257
+ - "㉘": [T: "带圈数字二十八"]         # 0x3258
+ - "㉙": [T: "带圈数字二十九"]          # 0x3259
+ - "㉚": [T: "带圈数字三十"]               # 0x325a
+ - "㉛": [T: "带圈数字三十一"]           # 0x325b
+ - "㉜": [T: "带圈数字三十二"]           # 0x325c
+ - "㉝": [T: "带圈数字三十三"]         # 0x325d
+ - "㉞": [T: "带圈数字三十四"]          # 0x325e
+ - "㉟": [T: "带圈数字三十五"]          # 0x325f
+ - "㊱": [T: "带圈数字三十六"]           # 0x32b1
+ - "㊲": [T: "带圈数字三十七"]         # 0x32b2
+ - "㊳": [T: "带圈数字三十八"]         # 0x32b3
+ - "㊴": [T: "带圈数字三十九"]          # 0x32b4
+ - "㊵": [T: "带圈数字四十"]                # 0x32b5
+ - "㊶": [T: "带圈数字四十一"]            # 0x32b6
+ - "㊷": [T: "带圈数字四十二"]            # 0x32b7
+ - "㊸": [T: "带圈数字四十三"]          # 0x32b8
+ - "㊹": [T: "带圈数字四十四"]           # 0x32b9
+ - "㊺": [T: "带圈数字四十五"]           # 0x32ba
+ - "㊻": [T: "带圈数字四十六"]            # 0x32bb
+ - "㊼": [T: "带圈数字四十七"]          # 0x32bc
+ - "㊽": [T: "带圈数字四十八"]          # 0x32bd
+ - "㊾": [T: "带圈数字四十九"]           # 0x32be
+ - "㊿": [T: "带圈数字五十"]                # 0x32bf
+ - "㋌": [T: "汞"]                             # 0x32cc
+ - "㋍": [T: "尔格"]                                # 0x32cd
+ - "㋎": [T: "电子伏特"]                      # 0x32ce
+ - "㋏": [T: "有限责任"]              # 0x32cf
+ - "㍱": [T: "百帕"]                        # 0x3371
+ - "㍲": [T: "道尔顿"]                     # 0x3372
+ - "㍳": [T: "天文单位"]                  # 0x3373
+ - "㍴": [T: "巴"]                                # 0x3374
+ - "㍵": [T: "小写 o 大写 V"]                     # 0x3375
+ - "㍶": [T: "秒差距"]                             # 0x3376
+ - "㍷": [T: "分米"]                          # 0x3377
+ - "㍸": [T: "平方分米"]                  # 0x3378
+ - "㍹": [T: "立方分米"]                    # 0x3379
+ - "㍺": [T: "国际单位"]                  # 0x337a
+ - "㎀": [T: "皮安"]                            # 0x3380
+ - "㎁": [T: "纳安"]                            # 0x3381
+ - "㎂": [T: "微安"]                           # 0x3382
+ - "㎃": [T: "毫安"]                           # 0x3383
+ - "㎄": [T: "千安"]                            # 0x3384
+ - "㎅": [T: "千字节"]                           # 0x3385
+ - "㎆": [T: "兆字节"]                           # 0x3386
+ - "㎇": [T: "吉字节"]                           # 0x3387
+ - "㎈": [T: "卡"]                            # 0x3388
+ - "㎉": [T: "千卡"]                        # 0x3389
+ - "㎊": [T: "皮法"]                          # 0x338a
+ - "㎋": [T: "纳法"]                          # 0x338b
+ - "㎌": [T: "微法"]                         # 0x338c
+ - "㎍": [T: "微克"]                          # 0x338d
+ - "㎎": [T: "毫克"]                          # 0x338e
+ - "㎏": [T: "千克"]                           # 0x338f
+ - "㎐": [T: "赫兹"]                               # 0x3390
+ - "㎑": [T: "千赫"]                           # 0x3391
+ - "㎒": [T: "兆赫"]                           # 0x3392
+ - "㎓": [T: "吉赫"]                           # 0x3393
+ - "㎔": [T: "太赫"]                           # 0x3394
+ - "㎕": [T: "微升"]                         # 0x3395
+ - "㎖": [T: "毫升"]                         # 0x3396
+ - "㎗": [T: "分升"]                          # 0x3397
+ - "㎘": [T: "千升"]                          # 0x3398
+ - "㎙": [T: "飞米"]                         # 0x3399
+ - "㎚": [T: "纳米"]                          # 0x339a
+ - "㎛": [T: "微米"]                         # 0x339b
+ - "㎜": [T: "毫米"]                         # 0x339c
+ - "㎝": [T: "厘米"]                         # 0x339d
+ - "㎞": [T: "千米"]                          # 0x339e
+ - "㎟": [T: "平方毫米"]                 # 0x339f
+ - "㎠": [T: "平方厘米"]                 # 0x33a0
+ - "㎡": [T: "平方米"]                      # 0x33a1
+ - "㎢": [T: "平方千米"]                  # 0x33a2
+ - "㎣": [T: "立方毫米"]                   # 0x33a3
+ - "㎤": [T: "立方厘米"]                   # 0x33a4
+ - "㎥": [T: "立方米"]                        # 0x33a5
+ - "㎦": [T: "立方千米"]                    # 0x33a6
+ - "㎧": [T: "米每秒"]                   # 0x33a7
+ - "㎨": [T: "米每二次方秒"]           # 0x33a8
+ - "㎩": [T: "帕"]                             # 0x33a9
+ - "㎪": [T: "千帕"]                         # 0x33aa
+ - "㎫": [T: "兆帕"]                         # 0x33ab
+ - "㎬": [T: "吉帕"]                         # 0x33ac
+ - "㎭": [T: "弧度"]                                # 0x33ad
+ - "㎮": [T: "弧度每秒"]                     # 0x33ae
+ - "㎯": [T: "弧度每二次方秒"]             # 0x33af
+ - "㎰": [T: "皮秒"]                         # 0x33b0
+ - "㎱": [T: "纳秒"]                         # 0x33b1
+ - "㎲": [T: "微秒"]                        # 0x33b2
+ - "㎳": [T: "毫秒"]                        # 0x33b3
+ - "㎴": [T: "皮伏"]                           # 0x33b4
+ - "㎵": [T: "纳伏"]                           # 0x33b5
+ - "㎶": [T: "微伏"]                          # 0x33b6
+ - "㎷": [T: "毫伏"]                          # 0x33b7
+ - "㎸": [T: "千伏"]                           # 0x33b8
+ - "㎹": [T: "兆伏"]                           # 0x33b9
+ - "㎺": [T: "皮瓦"]                           # 0x33ba
+ - "㎻": [T: "纳瓦"]                           # 0x33bb
+ - "㎼": [T: "微瓦"]                          # 0x33bc
+ - "㎽": [T: "毫瓦"]                          # 0x33bd
+ - "㎾": [T: "千瓦"]                           # 0x33be
+ - "㎿": [T: "兆瓦"]                           # 0x33bf
+ - "㏀": [T: "千欧"]                           # 0x33c0
+ - "㏁": [T: "兆欧"]                            # 0x33c1
+ - "㏂": [T: "上午"]                          # 0x33c2 (square a.m.)
+ - "㏃": [T: "贝可勒尔"]                          # 0x33c3
+ - "㏄": [T: "立方厘米"]                   # 0x33c4
+ - "㏅": [T: "坎德拉"]                            # 0x33c5
+ - "㏆": [T: "库仑每千克"]               # 0x33c6
+ - "㏇": [T: "公司"]                    # 0x33c7
+ - "㏈": [T: "分贝"]                            # 0x33c8
+ - "㏉": [T: "戈瑞"]                               # 0x33c9
+ - "㏊": [T: "公顷"]                            # 0x33ca
+ - "㏋": [T: "马力"]                          # 0x33cb
+ - "㏌": [T: "英寸"]                              # 0x33cc
+ - "㏍": [T: "千开尔文"]                         # 0x33cd
+ - "㏎": [T: "千米"]                          # 0x33ce
+ - "㏏": [T: "节"]                               # 0x33cf
+ - "㏐": [T: "流明"]                              # 0x33d0
+ - "㏑": [T: "自然对数"]                         # 0x33d1
+ - "㏒": [T: "对数"]                           # 0x33d2
+ - "㏓": [T: "勒克斯"]                                 # 0x33d3
+ - "㏔": [T: "毫巴"]                            # 0x33d4 (millibar)
+ - "㏕": [T: "密耳"]                               # 0x33d5
+ - "㏖": [T: "摩尔"]                               # 0x33d6
+ - "㏗": [T: "pH 值"]                                 # 0x33d7
+ - "㏘": [T: "下午"]                          # 0x33d8 (square p.m.)
+ - "㏙": [T: "百万分之一"]                   # 0x33d9
+ - "㏚": [T: "拍伦琴"]                       # 0x33da
+ - "㏛": [T: "球面度"]                          # 0x33db
+ - "㏜": [T: "希沃特"]                            # 0x33dc
+ - "㏝": [T: "韦伯"]                              # 0x33dd
+ - "㏞": [T: "伏特每米"]                     # 0x33de
+ - "㏟": [T: "安培每米"]                      # 0x33df
+ - "㏿": [T: "伽"]                             # 0x33ff
+ - "": [T: "下加帽符的等号"]               # 0xe900
+ - "": [T: "上加加号的等号"]              # 0xe901
+ - "": [T: "下加加号的等号"]              # 0xe902
+ - "": [T: "上加加号的波浪号"]               # 0xe903
+ - "": [T: "下加加号的波浪号"]               # 0xe904
+ - "": [T: "大于号上方的双等号"]      # 0xe908
+ - "": [T: "小于号上方的双等号"]         # 0xe909
+ - "": [T: "包含或等于"]                # 0xe90a
+ - "": [T: "包含或等于"]             # 0xe90b
+ - "": [T: "包含于或等于"]               # 0xe90c
+ - "": [T: "小于号上方的等号"]                # 0xe90d
+ - "": [T: "属于或等于"]              # 0xe912
+ - "": [T: "等于或大于"]            # 0xe913
+ - "": [T: "近似超集符号"]             # 0xe914
+ - "": [T: "近似子集符号"]               # 0xe915
+ - "": [T: "带点的超集号"] # 0xe916
+ - "": [T: "带点的子集号"] # 0xe917
+ - "": [T: "下方带点的等号"]                # 0xe918
+ - "": [T: "右点上方为减号、减号上方为左点"]  # 0xe919
+ - "": [T: "左点上方为减号、减号上方为右点"]  # 0xe91a
+ - "": [T: "约等于减号"]               # 0xe91f
+ - "": [T: "双重方形并集"]                   # 0xe920
+ - "": [T: "双重方形交集"]                   # 0xe921
+ - "": [T: "小于、等于或大于"]  # 0xe922
+ - "": [T: "带点的波浪号"]                      # 0xe924
+ - "": [T: "带两点的波浪号"]                 # 0xe925
+ - "": [T: "小于、大于或等于"]  # 0xe926
+ - "": [T: "大于、小于或等于"]  # 0xe927
+ - "": [T: "等价于或小于"]          # 0xe928
+ - "": [T: "等价于或大于"]       # 0xe929
+ - "": [T: "左开口方框运算符"]              # 0xe92a
+ - "": [T: "右开口方框运算符"]             # 0xe92b
+ - "": [T: "带点的恒等号"]               # 0xe92c
+ - "": [T: "大于、等于或小于"]  # 0xe92d
+ - "": [T: "竖线运算符"]                    # 0xe92e
+ - "": [T: "双竖线运算符"]                  # 0xe92f
+ - "": [T: "三重竖线运算符"]                # 0xe930
+ - "": [T: "小于或约等于"] # 0xe932
+ - "": [T: "大于或约等于"] # 0xe933
+ - "": [T: "嵌套小于号"]                    # 0xe936
+ - "": [T: "嵌套大于号"]                 # 0xe937
+ - "": [T: "先于或等价于"]           # 0xe93a
+ - "": [T: "后于或等价于"]           # 0xe93b
+ - "": [T: "等号上方的先于"]                 # 0xe940
+ - "": [T: "等号上方的后于"]                 # 0xe941
+ - "": [T: "小于号、斜等号和大于号"]          # 0xe942
+ - "": [T: "大于号、斜等号和小于号"]          # 0xe943
+ - "": [T: "被满足"]                        # 0xe948
+ - "": [T: "反转波浪号"]                          # 0xe949 (MathType lazy s; glyph variant of U+223D)
+ - "": [T: "否定断言符"]                       # 0xe94a
+ - "": [T: "双等号"]                        # 0xe94b
+ - "": [T: "三重等号"]                        # 0xe94c
+ - "": [T: "延迟规则符号"]                        # 0xe94d
+ - "": [T: "别名分隔符"]                     # 0xe94e
+ - "": [T: "带竖线的正规包含于"]     # 0xe950
+ - "": [T: "带竖线的包含正规子群"] # 0xe951
+ - "": [T: "圆头蕴含符号"]                       # 0xe954
+ - "": [T: "线下方的笑弧"]                     # 0xe955
+ - "": [T: "线上方的皱弧"]                      # 0xe956
+ - "": [T: "包含或约等于"]      # 0xe957
+ - "": [T: "包含于或约等于"]        # 0xe958
+ - "": [T: "大于、约等于或小于"] # 0xe959
+ - "": [T: "小于、约等于或大于"] # 0xe95a
+ - "": [T: "双逻辑或"]                   # 0xe95c
+ - "": [T: "双逻辑与"]                  # 0xe95d
+ - "": [T: "下加双横线的逻辑或"]    # 0xe95e
+ - "": [T: "下加横线的逻辑或"]           # 0xe95f
+ - "": [T: "等号上方的约等号"]             # 0xe962
+ - "": [T: "带平分线的向左三角形"] # 0xe964
+ - "": [T: "带平分线的向右三角形"] # 0xe965
+ - "": [T: "顶线为点线的等号"]         # 0xe966
+ - "": [T: "带冒号的先于"]                 # 0xe967
+ - "": [T: "带冒号的后于"]                 # 0xe968
+ - "": [T: "小于或倾斜等于"]       # 0xe969
+ - "": [T: "大于或倾斜等于"]        # 0xe96a
+ - "": [T: "嵌套远小于号"]          # 0xe96b
+ - "": [T: "嵌套远大于号"]       # 0xe96c
+ - "": [T: "差异符号变体"]          # 0xe96d
+ - "": [T: "小于号与大于号叠加"]      # 0xe96e
+ - "": [T: "逻辑或与逻辑与叠加"]      # 0xe96f
+ - "": [T: "超集上方的超集"]              # 0xe970
+ - "": [T: "子集上方的子集"]                  # 0xe971
+ - "": [T: "子集上方的超集"]                # 0xe972
+ - "": [T: "超集上方的子集"]                # 0xe973
+ - "": [T: "三竖线"]                 # 0xe979
+ - "": [T: "成对四重竖点"]      # 0xe97a
+ - "": [T: "横线上方的垂直符号"]              # 0xe97b
+ - "": [T: "左断言符与双竖线"]  # 0xe97c
+ - "": [T: "双左断言符与双竖线"] # 0xe97d
+ - "": [T: "倒置垂直符号上方的垂直符号"] # 0xe97e
+ - "": [T: "双左断言符与竖线"]  # 0xe97f
+ - "": [T: "开口向上的球面角"]          # 0xe980
+ - "": [T: "双斜杠"]                        # 0xe981
+ - "": [T: "带方框的直角变体"]             # 0xe982
+ - "": [T: "带圈竖线"]                # 0xe984
+ - "": [T: "带圈除号"]               # 0xe985
+ - "": [T: "虚线斜杠"]                      # 0xe986
+ - "": [T: "虚线反斜杠"]                    # 0xe987
+ - "": [T: "中部虚线"]                     # 0xe988
+ - "": [T: "竖直虚线"]                 # 0xe989
+ - "": [T: "带字母 S 的垂直符号"]                # 0xe98a
+ - "": [T: "带字母 S 的角"]                        # 0xe98b
+ - "": [T: "开口向左的球面角"]        # 0xe98c
+ - "": [T: "开口向左的角"]                  # 0xe98d
+ - "": [T: "带双钩的竖线"]       # 0xe98e
+ - "": [T: "自由基点"]    # 0xe98f
+ - "": [T: "横线上方的白色向上三角形"] # 0xe990
+ - "": [T: "恒等于且平行于"]           # 0xe991
+ - "": [T: "压缩积"]                       # 0xe992
+ - "": [T: "带横线的三重竖线运算符"] # 0xe993
+ - "": [T: "带双斜杠的恒等号"]      # 0xe994
+ - "": [T: "带三条竖线的三重横线"]                 # 0xe995
+ - "": [T: "圆圈上方的竖线"]            # 0xe996
+ - "": [T: "竖直正比号"]            # 0xe997
+ - "": [T: "黑色下弦月"]             # 0xe998
+ - "": [T: "黑色上弦月"]            # 0xe999
+ - "": [T: "负正弦波"]                  # 0xe9a0
+ - "": [T: "带括号的点"]                   # 0xe9a1
+ - "": [T: "圆括号"]                              # 0xe9a2
+ - "": [T: "白色笑弧"]                         # 0xe9a3
+ - "": [T: "白色皱弧"]                         # 0xe9a4
+ - "": [T: "六边形"]                             # 0xe9a5
+ - "": [T: "加号上方的等价号"]             # 0xe9a6
+ - "": [T: "等价号上方的加号"]             # 0xe9a7
+ - "": [T: "带衬线交集"]                 # 0xe9b0
+ - "": [T: "带衬线并集"]                        # 0xe9b1
+ - "": [T: "带衬线方形交集"]          # 0xe9b2
+ - "": [T: "带衬线方形并集"]                 # 0xe9b3
+ - "": [T: "先于、等价于或后于"]  # 0xe9e0
+ - "": [T: "后于、等价于或先于"]  # 0xe9e1
+ - "": [T: "先于、约等于或后于"] # 0xe9e2
+ - "": [T: "后于、约等于或先于"] # 0xe9e3
+ - "": [T: "小于、等价于或大于"] # 0xe9f0
+ - "": [T: "大于、等价于或小于"] # 0xe9f1
+ - "": [T: "带竖线的非远小于"]             # 0xea00
+ - "": [T: "带竖线的非远大于"]          # 0xea01
+ - "": [T: "非远小于变体"]          # 0xea02
+ - "": [T: "非远大于变体"]       # 0xea03
+ - "": [T: "带竖线的小于且不等于"]         # 0xea04
+ - "": [T: "带竖线的大于且不等于"]           # 0xea05
+ - "": [T: "既不小于也不等于"]     # 0xea06
+ - "": [T: "既不大于也不等于"]     # 0xea07
+ - "": [T: "既不等于也不小于"]      # 0xea09
+ - "": [T: "不包含也不等于"]        # 0xea0a
+ - "": [T: "不包含也不等于"]    # 0xea0b
+ - "": [T: "不包含于也不等于"]      # 0xea0c
+ - "": [T: "带反斜杠的子集符号"]              # 0xea0d
+ - "": [T: "既不等于也不大于"]   # 0xea0e
+ - "": [T: "否定减波浪运算符"]            # 0xea0f
+ - "": [T: "既不等于也不小于"]      # 0xea10
+ - "": [T: "否定波浪号运算符"]                  # 0xea11
+ - "": [T: "既不属于也不等于"]          # 0xea12
+ - "": [T: "既不等于也不大于"]   # 0xea13
+ - "": [T: "不约等于"]                    # 0xea14
+ - "": [T: "既不后于也不相似于"]            # 0xea15
+ - "": [T: "带斜线的小于或倾斜等于"] # 0xea16
+ - "": [T: "带斜线的大于或倾斜等于"] # 0xea17
+ - "": [T: "带斜杠的超集符号"]                    # 0xea1a
+ - "": [T: "不包含"]                    # 0xea1b
+ - "": [T: "既不小于也不等于"]     # 0xea1d
+ - "": [T: "既不大于也不等于"]     # 0xea1e
+ - "": [T: "不约等于减号"]           # 0xea1f
+ - "": [T: "上加点的否定集合隶属符号"]    # 0xea22
+ - "": [T: "带竖线的否定角符号"]                      # 0xea2c
+ - "": [T: "倾斜不平行符号"]                # 0xea2d
+ - "": [T: "否定竖线运算符"]                    # 0xea2e
+ - "": [T: "否定双竖线运算符"]             # 0xea2f
+ - "": [T: "否定三重竖线运算符"]             # 0xea30
+ - "": [T: "小于但不约等于"] # 0xea32
+ - "": [T: "大于但不约等于"] # 0xea33
+ - "": [T: "小于或不等于"]           # 0xea34
+ - "": [T: "大于或不等于"]        # 0xea35
+ - "": [T: "非嵌套小于号"]                # 0xea36
+ - "": [T: "非嵌套大于号"]             # 0xea37
+ - "": [T: "非远小于"]                  # 0xea38
+ - "": [T: "非远大于"]               # 0xea39
+ - "": [T: "先于但不等价于"]      # 0xea3a
+ - "": [T: "后于但不等价于"]      # 0xea3b
+ - "": [T: "先于但不等于"]           # 0xea3c
+ - "": [T: "后于但不等于"]           # 0xea3d
+ - "": [T: "既不等于也不先于"]           # 0xea3e
+ - "": [T: "既不等于也不后于"]           # 0xea3f
+ - "": [T: "先于但不等于"]           # 0xea40
+ - "": [T: "后于但不等于"]           # 0xea41
+ - "": [T: "不包含于也不等于"]          # 0xea42
+ - "": [T: "不包含也不等于"]        # 0xea43
+ - "": [T: "包含于或不等于"]           # 0xea44
+ - "": [T: "包含或不等于"]         # 0xea45
+ - "": [T: "不包含于也不等于"]          # 0xea46
+ - "": [T: "不包含也不等于"]        # 0xea47
+ - "": [T: "非三重小于号"]                # 0xea48
+ - "": [T: "非三重大于号"]             # 0xea49
+ - "": [T: "不先于且不等于"]                 # 0xea4c
+ - "": [T: "不后于且不等于"]                 # 0xea4d
+ - "": [T: "带竖线的不是正规子群"] # 0xea50
+ - "": [T: "带竖线的不包含正规子群"] # 0xea51
+ - "": [T: "非差符号"]              # 0xea52
+ - "": [T: "几何不等价于"]     # 0xea53
+ - "": [T: "带竖线的非相似符号"]                    # 0xea54
+ - "": [T: "既不等于也不相似于"]        # 0xea55
+ - "": [T: "带竖线的非约等符号"]                # 0xea56
+ - "": [T: "不近似恒等于"]      # 0xea57
+ - "": [T: "非波形等号"]                    # 0xea58
+ - "": [T: "非波形单等号"]             # 0xea59
+ - "": [T: "带点的不等号"]                       # 0xea5a
+ - "": [T: "反向不等价号"]              # 0xea5b
+ - "": [T: "非方形子集符号"]                   # 0xea60
+ - "": [T: "非方形超集符号"]                 # 0xea61
+ - "": [T: "等号上方的不约等于"]         # 0xea62
+ - "": [T: "不严格等价于"]          # 0xea63
+ - "": [T: "带点的不全等符号"]                   # 0xea64
+ - "": [T: "反向不等号"]                   # 0xea65
+ - "": [T: "带竖线的既不是正规子群也不等于"]       # 0xea70
+ - "": [T: "带竖线的既不包含正规子群也不等于"]      # 0xea71
+ - "": [T: "否定偏微分符号"]                         # 0xea80
+ - "": [T: "箭头修饰符延伸段"]        # 0xeb00
+ - "": [T: "小型向左箭头上方的向右箭头"] # 0xeb01
+ - "": [T: "向左箭头上方的小型向右箭头"] # 0xeb02
+ - "": [T: "小型向左鱼叉箭头上方的向右鱼叉箭头"]     # 0xeb03
+ - "": [T: "向左鱼叉箭头上方的小型向右鱼叉箭头"]     # 0xeb04
+ - "": [T: "右上至左下双箭头"]    # 0xeb05
+ - "": [T: "左上至右下双箭头"]    # 0xeb06
+ - "": [T: "水平鱼叉箭头延伸段"]         # 0xeb07
+ - "": [T: "逆时针弧形向左箭头"]   # 0xeb08
+ - "": [T: "逆时针弧形向右箭头"]  # 0xeb09
+ - "": [T: "大型向右箭头重音符"]       # 0xeb0b
+ - "": [T: "大型向左箭头重音符"]        # 0xeb0c
+ - "": [T: "左箭头尖"]                 # 0xeb0d
+ - "": [T: "右箭头尖"]                # 0xeb0e
+ - "": [T: "带斜线的大型左右箭头"]  # 0xeb0f
+ - "": [T: "水平双箭头延伸段"]    # 0xeb10
+ - "": [T: "带斜线的大型左右双箭头"] # 0xeb11
+ - "": [T: "左侧下箭头右侧上箭头"] # 0xeb12
+ - "": [T: "带向下折角的向左箭头"] # 0xeb13
+ - "": [T: "带向上折角的向右箭头"] # 0xeb14
+ - "": [T: "带向上折角的向左箭头"] # 0xeb15
+ - "": [T: "带加号的逆时针上半圆箭头"] # 0xeb16
+ - "": [T: "带减号的顺时针上半圆箭头"] # 0xeb17
+ - "": [T: "带尾部和斜线的向右箭头"] # 0xeb18
+ - "": [T: "倒钩向下的向右鱼叉箭头"]                  # 0xeb19
+ - "": [T: "倒钩向下的向左鱼叉箭头"]                   # 0xeb1a
+ - "": [T: "倒钩向下的左右鱼叉箭头"]             # 0xeb1b
+ - "": [T: "倒钩向上的左右鱼叉箭头"]               # 0xeb1c
+ - "": [T: "倒钩向左的上下鱼叉箭头"]                # 0xeb1d
+ - "": [T: "倒钩向右的上下鱼叉箭头"]               # 0xeb1e
+ - "": [T: "向下箭头右侧的向上箭头"] # 0xeb1f
+ - "": [T: "带倒钩向上的指向竖线的左鱼叉箭头"] # 0xeb20
+ - "": [T: "带倒钩向上的指向竖线的右鱼叉箭头"] # 0xeb21
+ - "": [T: "带倒钩向下的指向竖线的左鱼叉箭头"] # 0xeb22
+ - "": [T: "带倒钩向下的指向竖线的右鱼叉箭头"] # 0xeb23
+ - "": [T: "带倒钩向上的从竖线出发的左鱼叉箭头"] # 0xeb24
+ - "": [T: "带倒钩向上的从竖线出发的右鱼叉箭头"] # 0xeb25
+ - "": [T: "带倒钩向下的从竖线出发的左鱼叉箭头"] # 0xeb26
+ - "": [T: "带倒钩向下的从竖线出发的右鱼叉箭头"] # 0xeb27
+ - "": [T: "带倒钩向左的指向横线的上鱼叉箭头"] # 0xeb28
+ - "": [T: "带倒钩向左的指向横线的下鱼叉箭头"] # 0xeb29
+ - "": [T: "带倒钩向右的指向横线的上鱼叉箭头"] # 0xeb2a
+ - "": [T: "带倒钩向右的指向横线的下鱼叉箭头"] # 0xeb2b
+ - "": [T: "带倒钩向左的从横线出发的上鱼叉箭头"] # 0xeb2c
+ - "": [T: "带倒钩向左的从横线出发的下鱼叉箭头"] # 0xeb2d
+ - "": [T: "带倒钩向右的从横线出发的上鱼叉箭头"] # 0xeb2e
+ - "": [T: "带倒钩向右的从横线出发的下鱼叉箭头"] # 0xeb2f
+ - "": [T: "指向横线的向上箭头"]                # 0xeb30
+ - "": [T: "指向横线的向下箭头"]              # 0xeb31
+ - "": [T: "下鱼叉箭头左侧的上鱼叉箭头"] # 0xeb32
+ - "": [T: "下鱼叉箭头右侧的上鱼叉箭头"] # 0xeb33
+ - "": [T: "上箭头尖"]                   # 0xeb34
+ - "": [T: "下箭头尖"]                 # 0xeb35
+ - "": [T: "左侧倒钩向下、右侧倒钩向上的双鱼叉箭头"] # 0xeb36
+ - "": [T: "左侧倒钩向上、右侧倒钩向下的双鱼叉箭头"] # 0xeb37
+ - "": [T: "线上方的向左箭头"]            # 0xeb38
+ - "": [T: "线上方的向右箭头"]           # 0xeb39
+ - "": [T: "线下方的向左箭头"]           # 0xeb3a
+ - "": [T: "线下方的向右箭头"]          # 0xeb3b
+ - "": [T: "左右三重箭头"]             # 0xeb3c
+ - "": [T: "右上与右下双箭头"]    # 0xeb3f
+ - "": [T: "逆时针左半圆箭头"] # 0xeb40
+ - "": [T: "顺时针左半圆箭头"]     # 0xeb41
+ - "": [T: "左端带空心圆点的左右箭头"]   # 0xeb42
+ - "": [T: "波浪号上方的向右箭头"]         # 0xeb44
+ - "": [T: "波浪号上方的向左箭头"]          # 0xeb45
+ - "": [T: "线上方的左鱼叉箭头"]          # 0xeb48
+ - "": [T: "线上方的右鱼叉箭头"]         # 0xeb49
+ - "": [T: "线下方的左鱼叉箭头"]         # 0xeb4a
+ - "": [T: "线下方的右鱼叉箭头"]        # 0xeb4b
+ - "": [T: "粗短黑色向左箭头"]         # 0xeb4c
+ - "": [T: "顺时针右半圆箭头"]    # 0xeb50
+ - "": [T: "逆时针右半圆箭头"] # 0xeb51
+ - "": [T: "左端带空心圆点的左右鱼叉箭头"] # 0xeb52
+ - "": [T: "竖线左侧的向上箭头"] # 0xeb58
+ - "": [T: "竖线左侧的向下箭头"] # 0xeb59
+ - "": [T: "竖线右侧的向上箭头"] # 0xeb5a
+ - "": [T: "竖线右侧的向下箭头"] # 0xeb5b
+ - "": [T: "带延长下钩的向右箭头"] # 0xeb5c
+ - "": [T: "带延长钩的向左箭头"]  # 0xeb5d
+ - "": [T: "带延长下钩的向左箭头"] # 0xeb5e
+ - "": [T: "带延长钩的向右箭头"] # 0xeb5f
+ - "": [T: "否定向右波浪箭头"]                # 0xeb60
+ - "": [T: "否定向右弯曲箭头"]              # 0xeb61
+ - "": [T: "竖线左侧的向上鱼叉箭头"] # 0xeb68
+ - "": [T: "竖线左侧的向下鱼叉箭头"] # 0xeb69
+ - "": [T: "竖线右侧的向上鱼叉箭头"] # 0xeb6a
+ - "": [T: "竖线右侧的向下鱼叉箭头"] # 0xeb6b
+ - "": [T: "竖直双箭头延伸段"]      # 0xeb6c
+ - "": [T: "倒钩向左的竖直鱼叉箭头延伸段"] # 0xeb6d
+ - "": [T: "倒钩向右的竖直鱼叉箭头延伸段"] # 0xeb6e
+ - "": [T: "左鱼叉箭头右部上方的右鱼叉箭头"] # 0xeb6f
+ - "": [T: "左鱼叉箭头左部上方的右鱼叉箭头"] # 0xeb70
+ - "": [T: "右鱼叉箭头右部上方的左鱼叉箭头"] # 0xeb71
+ - "": [T: "右鱼叉箭头左部上方的左鱼叉箭头"] # 0xeb72
+ - "": [T: "从竖线出发的向左箭头尖"]  # 0xeb73
+ - "": [T: "从竖线出发的左右箭头延伸段"] # 0xeb74
+ - "": [T: "从竖线出发的向左箭头尾部"]       # 0xeb75
+ - "": [T: "从竖线出发的向右箭头尾部"]      # 0xeb76
+ - "": [T: "从竖线出发的向右箭头尖"] # 0xeb77
+ - "": [T: "带倒钩左箭头尖的从横线出发的上鱼叉箭头"] # 0xeb78
+ - "": [T: "向左箭头右部上方的向右箭头"] # 0xeb79
+ - "": [T: "向左箭头左部上方的向右箭头"] # 0xeb7a
+ - "": [T: "向右箭头右部上方的向左箭头"] # 0xeb7b
+ - "": [T: "向右箭头左部上方的向左箭头"] # 0xeb7c
+ - "": [T: "从横线出发的向上箭头尖"]    # 0xeb7d
+ - "": [T: "从横线出发的向上箭头尾部"]         # 0xeb7e
+ - "": [T: "从横线出发的向下箭头尾部"]       # 0xeb7f
+ - "": [T: "从横线出发的向下箭头尖"]  # 0xeb80
+ - "": [T: "带倒钩右箭头尖的从横线出发的下鱼叉箭头"] # 0xeb81
+ - "": [T: "下鱼叉箭头底部左侧的上鱼叉箭头"] # 0xeb82
+ - "": [T: "下鱼叉箭头延伸段左侧的上鱼叉箭头"] # 0xeb83
+ - "": [T: "上鱼叉箭头顶部左侧的下鱼叉箭头"] # 0xeb84
+ - "": [T: "下鱼叉箭头顶部左侧的上鱼叉箭头"] # 0xeb85
+ - "": [T: "上鱼叉箭头延伸段左侧的下鱼叉箭头"] # 0xeb86
+ - "": [T: "上鱼叉箭头底部左侧的下鱼叉箭头"] # 0xeb87
+ - "": [T: "向下箭头底部左侧的向上箭头"] # 0xeb88
+ - "": [T: "向上箭头顶部左侧的向下箭头"] # 0xeb89
+ - "": [T: "向下箭头顶部左侧的向上箭头"] # 0xeb8a
+ - "": [T: "向上箭头底部左侧的向下箭头"] # 0xeb8b
+ - "": [T: "左右箭头延伸段"] # 0xeb8c
+ - "": [T: "右上箭头延伸段"]           # 0xeb8d
+ - "": [T: "左上箭头延伸段"]           # 0xeb8e
+ - "": [T: "向下的花括号左部"]            # 0xec00
+ - "": [T: "向下的花括号中部"]             # 0xec01
+ - "": [T: "向下的花括号右部"]           # 0xec02
+ - "": [T: "水平花括号延伸段"]           # 0xec03
+ - "": [T: "向上的花括号左部"]              # 0xec04
+ - "": [T: "向上的花括号中部"]               # 0xec05
+ - "": [T: "向上的花括号右部"]             # 0xec06
+ - "": [T: "左竖线"]                   # 0xec07
+ - "": [T: "右竖线"]                  # 0xec08
+ - "": [T: "左双竖线"]            # 0xec09
+ - "": [T: "右双竖线"]           # 0xec0a
+ - "": [T: "水平方括号延伸段"]         # 0xec0b
+ - "": [T: "下置方括号"]                # 0xec0c
+ - "⎵": [T: "下置方括号"]                # 0x23b5
+ - "": [T: "上置方括号"]                 # 0xec0d
+ - "⎴": [T: "上置方括号"]                 # 0x23b4
+ - "": [T: "下方方括号左部"]                  # 0xec0e
+ - "": [T: "下方方括号右部"]                 # 0xec0f
+ - "": [T: "上方方括号左部"]                   # 0xec10
+ - "": [T: "上方方括号右部"]                  # 0xec11
+ - "": [T: "左圆括号部件一"]                       # 0xec12
+ - "": [T: "左圆括号部件二"]                       # 0xec13
+ - "": [T: "左圆括号部件三"]                       # 0xec14
+ - "": [T: "左圆括号部件四"]                       # 0xec15
+ - "": [T: "右圆括号部件一"]                      # 0xec16
+ - "": [T: "右圆括号部件二"]                      # 0xec17
+ - "": [T: "右圆括号部件三"]                      # 0xec18
+ - "": [T: "右圆括号部件四"]                      # 0xec19
+ - "": [T: "根号部件一"]                           # 0xec1a
+ - "": [T: "根号部件二"]                           # 0xec1b
+ - "": [T: "根号部件三"]                           # 0xec1c
+ - "": [T: "根号部件四"]                           # 0xec1d
+ - "": [T: "根号部件五"]                           # 0xec1e
+ - "": [T: "根号底部"]                      # 0xec1f
+ - "": [T: "根号竖直延伸段"]           # 0xec20
+ - "": [T: "根号顶部"]                         # 0xec21
+ - "": [T: "左白色方括号顶部"]              # 0xec22
+ - "": [T: "左白色方括号延伸段"]         # 0xec23
+ - "": [T: "左白色方括号底部"]           # 0xec24
+ - "": [T: "右白色方括号顶部"]             # 0xec25
+ - "": [T: "右白色方括号延伸段"]        # 0xec26
+ - "": [T: "右白色方括号底部"]          # 0xec27
+ - "": [T: "左白色花括号"]            # 0xec30
+ - "": [T: "右白色花括号"]           # 0xec31
+ - "": [T: "长除号"]                  # 0xec32
+ - "": [T: "长除号延伸段"]         # 0xec33
+ - "": [T: "短除号"]                      # 0xec34
+ - "": [T: "左下至右上全长双键"] # 0xec40
+ - "": [T: "左上至右下全长双键"] # 0xec41
+ - "": [T: "水平全长单键"]           # 0xec42
+ - "": [T: "水平全长双键"]           # 0xec43
+ - "": [T: "水平全长三键"]           # 0xec44
+ - "": [T: "竖直全长单键"]             # 0xec45
+ - "": [T: "竖直全长双键"]             # 0xec46
+ - "": [T: "竖直全长三键"]             # 0xec47
+ - "": [T: "小于号形全长键"]                   # 0xec48
+ - "": [T: "大于号形全长键"]                # 0xec49
+ - "": [T: "水平半长单键"]           # 0xec4a
+ - "": [T: "水平半长双键"]           # 0xec4b
+ - "": [T: "水平半长三键"]           # 0xec4c
+ - "": [T: "矩形左上部"]                  # 0xec80
+ - "": [T: "矩形左下部"]               # 0xec81
+ - "": [T: "矩形右上部"]                 # 0xec90
+ - "": [T: "矩形右下部"]              # 0xec91
+ - "": [T: "综合除法角部"]           # 0xec92
+ - "": [T: "综合除法水平延伸段"] # 0xec93
+ - "": [T: "综合除法竖直延伸段"] # 0xec94
+ - "": [T: "左侧上下取整符号延伸段"]         # 0xec95
+ - "": [T: "右侧上下取整符号延伸段"]        # 0xec96
+ - "": [T: "上方括号延伸段"]               # 0xec97
+ - "": [T: "竖线延伸段"]               # 0xec98
+ - "": [T: "左双竖线延伸段"]   # 0xec99
+ - "": [T: "横线延伸段"]             # 0xec9a
+ - "": [T: "下方括号延伸段"]              # 0xec9c
+ - "": [T: "向下的圆括号右部"]           # 0xec9d
+ - "": [T: "向下的圆括号延伸段"]        # 0xec9e
+ - "": [T: "向下的圆括号左部"]            # 0xec9f
+ - "": [T: "向上的花括号延伸段"]          # 0xeca0
+ - "": [T: "向上的圆括号左部"]              # 0xeca1
+ - "": [T: "向上的圆括号延伸段"]          # 0xeca2
+ - "": [T: "向上的圆括号右部"]             # 0xeca3
+ - "": [T: "向下的花括号延伸段"]        # 0xeca4
+ - "": [T: "约化普朗克常量"]     # 0xed00
+ - "": [T: "倒置无衬线体大写 G"]                            # 0xed01
+ - "": [T: "无点 j"]                           # 0xed02
+ - "": [T: "digamma"]                             # 0xed03
+ - "ϝ": [T: "digamma"]                             # 0x3dd
+ - "": [T: "d"]                                   # 0xed10
+ - "ⅆ": [T: "d"]                                   # 0x2146
+ - "": [T: "e"]                                   # 0xed11
+ - "ⅇ": [T: "e"]                                   # 0x2147
+ - "": [T: "i"]                                   # 0xed12
+ - "ⅈ": [T: "i"]                                   # 0x2148
+ - "": [T: "j"]                                   # 0xed13
+ - "ⅅ":
+    - SPELL: "translate('.', 'ⅅ', 'DD')"                                         # 0xed16, 0x2145
+
+# The private use chars are from MathType
+ - "": [T: "逆时针围道积分环"] # 0xee00
+ - "": [T: "顺时针围道积分环"]     # 0xee01
+ - "": [T: ""]                                  # 0xee04
+ - "": [T: ""]                                  # 0xee05
+ - "": [T: ""]                                  # 0xee06
+ - "": [T: ""]                                  # 0xee07
+ - "": [T: ""]                                  # 0xee08
+ - "": [T: ""]                                  # 0xee09
+ - "": [T: ""]                                  # 0xee0a
+ - "": [T: ""]                                  # 0xee0b
+ - "": [T: ""]                                  # 0xee0c
+ - "": [T: "连接状态修饰符"]          # 0xee0d
+ - "": [T: "连接状态左侧修饰符"]     # 0xee0e
+ - "": [T: "连接状态右侧修饰符"]    # 0xee0f
+ - "": [T: "连接状态延伸段"] # 0xee10
+ - "": [T: "积分环"]                       # 0xee11
+ - "": [T: "双积分环"]                # 0xee12
+ - "": [T: "三重积分环"]                # 0xee13
+ - "": [T: "双扩展积分环"]      # 0xee15
+ - "": [T: "三重扩展积分环"]      # 0xee16
+ - "": [T: "渐近等于重音符"]      # 0xee17
+ - "": [T: "等号重音符"]                   # 0xee18
+ - "": [T: "四撇号"]                     # 0xee19
+ - "": [T: "左端带空心圆点的横线重音符"]    # 0xee1a
+ - "": [T: "左端带实心圆点的横线重音符"]  # 0xee1b
+ - "": [T: "右端带空心圆点的横线重音符"]   # 0xee1c
+ - "": [T: "带上点的横线重音符"]            # 0xee1d
+ - "": [T: "带下点的横线重音符"]           # 0xee1e
+ - "": [T: "带上方双点的横线重音符"]     # 0xee1f
+ - "": [T: "带下方双点的横线重音符"]    # 0xee20
+ - "": [T: "带脱字符的横线重音符"]               # 0xee21
+ - "": [T: "粗下横线重音符"]              # 0xee22
+ - "": [T: "右端带实心圆点的横线重音符"] # 0xee23
+ - "": [T: "上加大点"]                     # 0xee24
+ - "": [T: "对齐标记"]                      # 0xef00
+ - "": [T: ""]                                  # 0xef01
+ - "​": [T: ""]                                  # 0x200b
+ - "": [T: ""]                                  # 0xef02
+ - " ": [T: ""]                                  # 0x2009
+ - "": [T: ""]                                  # 0xef03
+ - " ": [T: ""]                                  # 0x205f
+ - "": [T: ""]                                  # 0xef04
+ - "": [T: ""]                                  # 0xef05
+ - "": [T: ""]                                  # 0xef06
+ - "": [T: ""]                                  # 0xef07
+ - "": [T: ""]                                  # 0xef08
+ - "": [T: ""]                                  # 0xef09
+ - "": [T: ""]                                  # 0xef0a
+ - " ": [T: ""]                                  # 0x200a
+ - "": [T: ""]                                  # 0xef22
+ - "": [T: ""]                                  # 0xef23
+ - "": [T: ""]                                  # 0xef24
+ - "": [T: ""]                                  # 0xef29
+ - "": [T: "缺项"]                        # 0xef41
+ - "": [T: "顺时针围道积分"] # 0xef80
+ - "": [T: "四元数积分运算符"]                # 0xef81
+ - "": [T: "带斜线的平均积分号"]                 # 0xef82
+ - "": [T: "反向积分号"]                   # 0xef83
+ - "": [T: "双零上方的双零"]        # 0xef90
+ - "": [T: "带斜线的零"]                     # 0xef91
+
+ # fraktur chars in math alphabetic block and also MathType private use area
+ # Some of these are reserved because they were used in Plane 0 -- that shouldn't be an issue other than causing the other chars to not display
+ - "𝔄-𝔜":    # 0x1d504 - 0x1d51c ('z' version is reserved)
+    - T: "哥特体"
+    - SPELL: "translate('.', '𝔄𝔅𝔆𝔇𝔈𝔉𝔊𝔋𝔌𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔𝔕𝔖𝔗𝔘𝔙𝔚𝔛𝔜', 'ABCDEFGHIJKLMNOPQRSTUVWXY')"
+
+ - "-":                                          # 0xf000 - 0xf018
+    - T: "哥特体"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXY')"
+
+ - "𝔞-𝔷":    # 0x1d51e - 0x1d537
+    - T: "哥特体"
+    - SPELL: "translate('.', '𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔧𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷', 'abcdefghijklmnopqrstuvwxyz')"
+ - "-":    # 0xf01a - 0xf033
+    - T: "哥特体"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    
+ - "𝕬-𝖅":    # 0x1D56C - 0x1D585
+    - T: "哥特体"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "-":                                          # 0xf040 - 0xf059
+    - T: "哥特体"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "𝖆-𝖟":    # 0x1d586 - 0x1d59f
+    - T: "哥特体"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝖆𝖇𝖈𝖉𝖊𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟', 'abcdefghijklmnopqrstuvwxyz')"
+ - "-":    # 0xf05a - 0xf073
+    - T: "哥特体"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+
+ # double struck (blackboard bold) chars in math alphabetic block and also MathType private use area
+ # Some of these are reserved because they were used in Plane 0 -- that shouldn't be an issue other than causing the other chars to not display
+ - "𝔸-𝕐":    # 0x1d538 - 0x1d550 ('z' version is reserved)
+    - T: "双线体"
+    - SPELL: "translate('.', '𝔸𝔹𝔺𝔻𝔼𝔽𝔾𝔿𝕀𝕁𝕂𝕃𝕄𝕅𝕆𝕇𝕈𝕉𝕊𝕋𝕌𝕍𝕎𝕏𝕐', 'ABCDEFGHIJKLMNOPQRSTUVWXY')"
+
+ - "-":                                          # 0xf080 - 0xf098
+    - T: "双线体"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXY')"
+
+ - "𝕒-𝕫":    # 0x1d552 - 0x1d56b
+    - T: "双线体"
+    - SPELL: "translate('.', '𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫', 'abcdefghijklmnopqrstuvwxyz')"
+ - "-":    # 0xf09a - 0xf0b3
+    - T: "双线体"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+ - "𝟘-𝟡":    # 0x1d7d8 - 0x1d7e1
+    - T: "双线体"
+    - SPELL: "translate('.', '𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡', '0123456789')"
+ - "-":    # 0xf0c0 - 0xf0c9
+    - T: "双线体"
+    - SPELL: "translate('.', '', '0123456789')"
+
+ - "": [T: "双线体纳布拉"]                 # 0xf0ca
+ - "": [T: "双线体欧拉常数"]        # 0xf0cb
+ 
+ # script chars in math alphabetic block and also MathType private use area
+ - "𝒜-𝒵":    # 0x1d49c - 0x1d4b5
+    - T: "花体"
+    - SPELL: "translate('.', '𝒜𝒝𝒞𝒟𝒠𝒡𝒢𝒣𝒤𝒥𝒦𝒧𝒨𝒩𝒪𝒫𝒬𝒭𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "-":                                          # 0xf100 - 0xf119
+    - T: "花体"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "𝒶-𝓏":    # 0x1d4b6 - 0x1d4cf
+    - T: "花体"
+    - SPELL: "translate('.', '𝒶𝒷𝒸𝒹𝒺𝒻𝒼𝒽𝒾𝒿𝓀𝓁𝓂𝓃𝓄𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏', 'abcdefghijklmnopqrstuvwxyz')"
+ - "-":    # 0xf11a - 0xf133
+    - T: "花体"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+
+ # bold script chars in math alphabetic block and also MathType private use area
+ - "𝓐-𝓩":    # 0x1d4d0 - 0x1d4e9
+    - T: "花体"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "-":                                          # 0xf140 - 0xf159
+    - T: "花体"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "𝓪-𝔃":    # 0x1d4ea - 0x1d503
+    - T: "花体"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃', 'abcdefghijklmnopqrstuvwxyz')"
+ - "-":    # 0xf15a - 0xf173
+    - T: "花体"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "-":                                          # 0xf180 - 0xf199
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')" 
+
+ - "":                                          # 0xf19a
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [T: "大写"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        replace: [T: "ae 连字"]
+ - "":                                          # 0xf19b
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [T: "大写"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        replace: [T: "德语双 s"]
+ - "":                                          # 0xf19c
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [T: "大写"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        replace: [T: "带斜线的 o"]
+
+ # MathType only has a few of the cap Greek letters in PUA
+ - "":                                          # 0xf201 - 0xf209
+    - T: "双线体"
+    - SPELL: "translate('.', '', 'ΔΞΛΠΣΘΓΩΥ')"
+
+ - "-":    # 0xf220 - 0xf236
+    - T: "双线体"
+    - SPELL: "translate('.', '', 'αβφζψδεγηιξκλμνϵπϑρστθω')"
+
+ - "": [T: "双线体 final sigma"]           # 0xf237
+ - "": [T: "双线体 rho"]                   # 0xf250
+ - "": [T: "双线体 phi"]                   # 0xf251
+ - "𝐀-𝐙":    # 0x1d400 - 0x1d419
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "-":    # 0xf260 - 0xf279
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "𝐚-𝐳":    # 0x1d41a - 0x1d433
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "-":    # 0xf27a - 0xf293
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "𝐴-𝑍":    # 0x1d434 - 0x1d44d
+    - SPELL: "translate('.', '𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "-":    # 0xf294 - 0xf2ad
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "𝑎-𝑧":    # 0x1d44e - 0x1d467
+    - SPELL: "translate('.', '𝑎𝑏𝑐𝑑𝑒𝑓𝑔𝑕𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "-":    # 0xf2ae - 0xf2c7
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "𝑨-𝒁":    # 0x1d468 - 0x1d481
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "-":    # 0xf2c8 - 0xf2e1
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "𝒂-𝒛":    # 0x1d482 - 0x1d49b
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "-":    # 0xf2e2 - 0xf2fb
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "𝖠-𝖹":    # 0x1d5a0 - 0x1d5b9
+    - SPELL: "translate('.', '𝖠𝖡𝖢𝖣𝖤𝖥𝖦𝖧𝖨𝖩𝖪𝖫𝖬𝖭𝖮𝖯𝖰𝖱𝖲𝖳𝖴𝖵𝖶𝖷𝖸𝖹', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "-":    # 0xf300 - 0xf319
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "𝖺-𝗓":    # 0x1d5ba - 0x1d5d3
+    - SPELL: "translate('.', '𝖺𝖻𝖼𝖽𝖾𝖿𝗀𝗁𝗂𝗃𝗄𝗅𝗆𝗇𝗈𝗉𝗊𝗋𝗌𝗍𝗎𝗏𝗐𝗑𝗒𝗓', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "-":    # 0xf31a - 0xf333
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+ 
+ - "𝗔-𝗭":    # 0x1d5d4 - 0x1d5ed
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "-":    # 0xf334 - 0xf34d
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "𝗮-𝘇":    # 0x1d5ee - 0x1d607
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "-":    # 0xf34e - 0xf367
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+ - "𝘈-𝘡":    # 0x1d608 - 0x1d621
+    # - t: "italic"
+    - SPELL: "translate('.', '𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+ - "-":    # 0xf368 - 0xf381
+      # - t: "italic"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "𝘢-𝘻":    # 0x1d622 - 0x1d63b
+      # - t: "italic"
+    - SPELL: "translate('.', '𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "-":    # 0xf382 - 0xf39b
+      # - t: "italic"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "𝘼-𝙕":    # 0x1d63c - 0x1d655
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "-":    # 0xf39c - 0xf3b5
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "𝙖-𝙯":    # 0x1d656 - 0x1d66f
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "-":    # 0xf3b6 - 0xf3cf
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "𝙰-𝚉":    # 0x1d670 - 0x1d689
+    - SPELL: "translate('.', '𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "-":    # 0xf3d0 - 0xf3e9
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
+ - "𝚊-𝚣":    # 0x1d68a - 0x1d6a3
+    - SPELL: "translate('.', '𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "-":    # 0xf3ea - 0xf403
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+
+ - "": [T: "无点 i"]                           # 0xf404
+ - "𝚤": [T: "无点 i"]                           # 0x1d6a4
+ - "𝚥": [T: "无点 j"]                           # 0x1d6a5
+
+ - "𝚨-𝛀":    # 0x1d6a8 - 0x1d6c0
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝚨𝚩𝚪𝚫𝚬𝚭𝚮𝚯𝚰𝚱𝚲𝚳𝚴𝚵𝚶𝚷𝚸𝚹𝚺𝚻𝚼𝚽𝚾𝚿𝛀', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΘΣΤΥΦΧΨΩ')"
+
+ - "-":    # 0xf408 - 0xf420
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΘΣΤΥΦΧΨΩ')"
+
+ - "𝛂-𝛚":    # 0x1d6c2 - 0x1d6da
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝛂𝛃𝛄𝛅𝛆𝛇𝛈𝛉𝛊𝛋𝛌𝛍𝛎𝛏𝛐𝛑𝛒𝛓𝛔𝛕𝛖𝛗𝛘𝛙𝛚', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+
+ - "-":    # 0xf422 - 0xf43a
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+
+ - "": [T: "粗体纳布拉"]                          # 0xf421
+ - "𝛁": [T: "粗体纳布拉"]                          # 0x1d6c1
+
+ - "𝛛𝛜𝛝𝛞𝛟𝛠𝛡":    # 0x1D6DB - 0x1D6E1
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝛛𝛜𝛝𝛞𝛟𝛠𝛡', '∂εθκφρπ')"
+
+ - "":    # 0xF43B - 0xF441
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', '∂εθκφρπ')"
+
+ - "𝛢-𝛺":    # 0x1d6e2 - 0x1d6fa
+      # - t: "italic"
+    - SPELL: "translate('.', '𝛢𝛣𝛤𝛥𝛦𝛧𝛨𝛩𝛪𝛫𝛬𝛭𝛮𝛯𝛰𝛱𝛲𝛳𝛴𝛵𝛶𝛷𝛸𝛹𝛺', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΘΣΤΥΦΧΨΩ')"
+
+ - "-":    # 0xf442 - 0xf45a
+      # - t: "italic"
+    - SPELL: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΘΣΤΥΦΧΨΩ')"
+
+ - "𝛼-𝜔":    # 0x1d6fc - 0x1d714
+      # - t: "italic"
+    - SPELL: "translate('.', '𝛼𝛽𝛾𝛿𝜀𝜁𝜂𝜃𝜄𝜅𝜆𝜇𝜈𝜉𝜊𝜋𝜌𝜍𝜎𝜏𝜐𝜑𝜒𝜓𝜔', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+
+ - "-":    # 0xf45c - 0xf474
+      # - t: "italic"
+    - SPELL: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+
+ - "": [T: "斜体纳布拉"]                          # 0xf45b
+ - "𝛻": [T: "斜体纳布拉"]                          # 0x1d6fb
+
+ - "𝜕𝜖𝜗𝜘𝜙𝜚𝜛":    # 0x1d715 - 0x1d71b
+      # - t: "italic"
+    - SPELL: "translate('.', '𝜕𝜖𝜗𝜘𝜙𝜚𝜛', '∂εθκφρπ')"
+
+ - "":    # 0xf475  - 0xf47b
+      # - t: "italic"
+    - SPELL: "translate('.', '', '∂εθκφρπ')"
+
+ - "𝜜-𝜴":    # 0x1d71c - 0x1d734
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩𝜪𝜫𝜬𝜭𝜮𝜯𝜰𝜱𝜲𝜳𝜴', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΘΣΤΥΦΧΨΩ')"
+
+ - "-":    # 0xf47c - 0xf494
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΘΣΤΥΦΧΨΩ')"
+
+ - "𝜶-𝝎":    # 0x1d736 - 0x1d74e
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝜶𝜷𝜸𝜹𝜺𝜻𝜼𝜽𝜾𝜿𝝀𝝁𝝂𝝃𝝄𝝅𝝆𝝇𝝈𝝉𝝊𝝋𝝌𝝍𝝎', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+
+ - "-":    # 0xf496 - 0xf4ae
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+
+ - "𝝏𝝐𝝑𝝒𝝓𝝔𝝕":    # 0x1d74f - 0x1d755
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝝏𝝐𝝑𝝒𝝓𝝔𝝕', '∂εθκφρπ')"
+
+ - "":    # 0xF4AF - 0xF4B5
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', '∂εθκφρπ')"
+
+ - "𝜵": [T: "粗斜体纳布拉"]                  # 0x1d735
+ - "": [T: "粗斜体纳布拉"]                  # 0xf495
+
+ - "𝝖-𝝮":    # 0x1d756 - 0x1d76e
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝝖𝝗𝝘𝝙𝝚𝝛𝝜𝝝𝝞𝝟𝝠𝝡𝝢𝝣𝝤𝝥𝝦𝝧𝝨𝝩𝝪𝝫𝝬𝝭𝝮', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΘΣΤΥΦΧΨΩ')"
+ - "-":    # 0xf4b6 - 0xf4ce
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΘΣΤΥΦΧΨΩ')"
+
+ - "𝝰-𝞈":    # 0x1d770 - 0x1d788
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝝰𝝱𝝲𝝳𝝴𝝵𝝶𝝷𝝸𝝹𝝺𝝻𝝼𝝽𝝾𝝿𝞀𝞁𝞂𝞃𝞄𝞅𝞆𝞇𝞈', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+
+ - "-":    # 0xf4d0 - 0xf4e8
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+
+ - "𝞉𝞊𝞋𝞌𝞍𝞎𝞏":    # 0x1d789 - 0x1d78f
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝞉𝞊𝞋𝞌𝞍𝞎𝞏', '∂εθκφρπ')"
+
+ - "":    # 0xf4e9 - 0xf4ef
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', '∂εθκφρπ')"
+
+ - "": [T: "粗体纳布拉"]                          # 0xf4cf
+ - "𝝯": [T: "粗体纳布拉"]                          # 0x1d76f
+
+ - "𝞐-𝞨":    # 0x1d790 - 0x1d7a8
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝞐𝞑𝞒𝞓𝞔𝞕𝞖𝞗𝞘𝞙𝞚𝞛𝞜𝞝𝞞𝞟𝞠𝞡𝞢𝞣𝞤𝞥𝞦𝞧𝞨', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΘΣΤΥΦΧΨΩ')"
+
+ - "-":    # 0xf4f0 - 0xf508
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΘΣΤΥΦΧΨΩ')"
+
+ - "𝞪-𝟂":    # 0x1d7aa - 0x1d7c2
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝞪𝞫𝞬𝞭𝞮𝞯𝞰𝞱𝞲𝞳𝞴𝞵𝞶𝞷𝞸𝞹𝞺𝞻𝞼𝞽𝞾𝞿𝟀𝟁𝟂', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+
+ - "-":    # 0xf50a - 0xf522
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+
+ - "𝟃𝟄𝟅𝟆𝟇𝟈𝟉":    # 0x1d7c3 - 0x1d7c9
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝟃𝟄𝟅𝟆𝟇𝟈𝟉', '∂εθκφρπ')"
+
+ - "":    # 0xf523 - 0xf529
+    # - t: "bold italic"
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', '∂εθκφρπ')"
+
+ - "": [T: "粗体纳布拉"]                          # 0xf509
+ - "𝞩": [T: "粗体纳布拉"]                          # 0x1d7a9
+
+ - "-":    # 0xf52e - 0xf537  (old MathType)
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', '0123456789')"
+
+ - "𝟎-𝟗":    # 0x1d7ce - 0x1d7d7  
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗', '0123456789')"
+
+ - "-":    # 0xf54c - 0xf555  (old MathType)
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '', '0123456789')"
+
+ - "𝟬-𝟵":    # 0x1D7EC - 0x1D7F5  
+    - test:
+        if: "not($IgnoreBold)"
+        then: [T: "粗体"]
+    - SPELL: "translate('.', '𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵', '0123456789')"
+
+ - "-":    # 0xf556 - 0xf55f  (old MathType)
+    - SPELL: "translate('.', '', '0123456789')"
+
+ - "𝟢-𝟫":    # 0x1d7e2 - 0x1d7eb  
+    - SPELL: "translate('.', '𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫', '0123456789')"
+
+
+ - "𝟶-𝟿":    # 0x1d7f6 - 0x1d7ff  
+    - SPELL: "translate('.', '𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿', '0123456789')"
+
+
+ - "": [T: "未知字符"]                   # 0xf700
+ - "": [T: "左下和右下三角形"] # 0xf726
+ - "": [T: "水平省略号延伸段"]        # 0xf72d
+ - "": [T: "中线水平省略号延伸段"] # 0xf72e
+ - "": [T: "根号延伸段"]                    # 0xf8e5
+ - "": [T: "竖直箭头延伸段"]             # 0xf8e6
+ - "": [T: "水平箭头延伸段"]           # 0xf8e7
+ - "": [T: "无衬线体注册符号"]          # 0xf8e8
+ - "": [T: "无衬线体版权符号"]           # 0xf8e9
+ - "": [T: "无衬线体商标符号"]          # 0xf8ea
+ - "": [T: "左圆括号顶部"]                      # 0xf8eb
+ - "": [T: "左圆括号延伸段"]                 # 0xf8ec
+ - "": [T: "左圆括号底部"]                   # 0xf8ed
+ - "": [T: "左方括号顶部"]                    # 0xf8ee
+ - "": [T: "左方括号延伸段"]               # 0xf8ef
+ - "": [T: "左方括号底部"]                 # 0xf8f0
+ - "": [T: "左花括号顶部"]                      # 0xf8f1
+ - "": [T: "左花括号中部"]                      # 0xf8f2
+ - "": [T: "左花括号底部"]                   # 0xf8f3
+ - "": [T: "花括号延伸段"]                      # 0xf8f4
+ - "": [T: "积分号延伸段"]                   # 0xf8f5
+ - "": [T: "右圆括号顶部"]                     # 0xf8f6
+ - "": [T: "右圆括号延伸段"]                # 0xf8f7
+ - "": [T: "右圆括号底部"]                  # 0xf8f8
+ - "": [T: "右方括号顶部"]                   # 0xf8f9
+ - "": [T: "右方括号延伸段"]              # 0xf8fa
+ - "": [T: "右方括号底部"]                # 0xf8fb
+ - "": [T: "右花括号顶部"]                     # 0xf8fc
+ - "": [T: "右花括号中部"]                     # 0xf8fd
+ - "": [T: "右花括号底部"]                  # 0xf8fe
+ - "": [T: "苹果标志"]                          # 0xf8ff
+ - "ﬀ": [T: "ff 连字"]                                  # 0xfb00
+ - "ﬁ": [T: "fi 连字"]                                  # 0xfb01
+ - "ﬂ": [T: "fl 连字"]                                  # 0xfb02
+ - "ﬃ": [T: "ffi 连字"]                                 # 0xfb03
+ - "ﬄ": [T: "ffl 连字"]                                 # 0xfb04
+ - "ﬅ": [T: "长 s t 连字"]                            # 0xfb05
+ - "ﬆ": [T: "st 连字"]                                  # 0xfb06
+ - "﬩": [T: "希伯来文替代加号"]      # 0xfb29
+ - "︠": [T: "上加连字左半部"]     # 0xfe20
+ - "︡": [T: "上加连字右半部"]    # 0xfe21
+ - "︢": [T: "上加双波浪号左半部"] # 0xfe22
+ - "︣": [T: "上加双波浪号右半部"] # 0xfe23
+ - "︤": [T: "上加长音符左半部"]      # 0xfe24
+ - "︥": [T: "上加长音符右半部"]     # 0xfe25
+ - "︦": [T: "上加连接长音符"]     # 0xfe26
+ - "︵": [T: "上置圆括号"]                          # 0xfe35
+ - "︶": [T: "下置圆括号"]                         # 0xfe36
+ - "︷": [T: "上置花括号"]                          # 0xfe37
+ - "︸": [T: "下置花括号"]                         # 0xfe38
+ - "︿": [T: "上置角括号"]                  # 0xfe3f
+ - "﹀": [T: "下置角括号"]                 # 0xfe40
+ - "﹡": [T: "小型星号"]                      # 0xfe61
+ - "﹢": [T: "小型加号"]                          # 0xfe62
+ - "﹣": [T: "小型连字符减号"]                         # 0xfe63
+ - "﹤": [T: "小型小于号"]                     # 0xfe64
+ - "﹥": [T: "小型大于号"]                  # 0xfe65
+ - "﹦": [T: "小型等号"]                        # 0xfe66
+ - "＋": [T: "全角加号"]                 # 0xff0b
+ - "＜": [T: "小于"]                           # 0xff1c
+ - "＝": [T: "等于"]                              # 0xff1d
+ - "＞": [T: "大于"]                        # 0xff1e
+ - "＼": [T: "反斜杠"]                           # 0xff3c
+ - "＾":                                           # 0xff3e
+    - test:
+        if: "parent::m:modified-variable or parent::m:mover"
+        then: [T: "帽符"]
+        else: [T: "全角脱字符"]
+ - "｜":                                            # 0xff5c
+    # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
+     - with:
+        variables: [DefaultToGiven: "count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and ../../../*[1][.='P']"] # P(A|B)
+        replace:
+        - test:
+            - if: "$SpeechStyle != 'ClearSpeak'"
+              then_test:
+                  if: "$DefaultToGiven"
+                  then: [T: "条件为"]
+                  else: [T: "竖线"]
+            - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
+              then: [T: "竖线"]
+            - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+              then: [T: "使得"]
+            - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
+              then: [T: "条件为"] 
+            - else: [T: "整除"]                   
+ - "～": [T: "波浪号"]                               # 0xff5e
+ - "￢": [T: "非"]                                 # 0xffe2
+ - "￩": [T: "向左箭头"]                           # 0xffe9
+ - "￪": [T: "向上箭头"]                             # 0xffea
+ - "￫": [T: "向右箭头"]                          # 0xffeb
+ - "￬": [T: "向下箭头"]                           # 0xffec
+ - "￼": [T: "未知或缺失的对象"]            # 0xfffc
+ - "�": [T: "缺失字符"]                       # 0xfffd  (used for missing input when entering braille)
+
+ - "🣑": [T: "上方为长向右鱼叉箭头，下方为长向左鱼叉箭头"] # 0x1F8D1
+ - "🣒": [T: "上方为长向右鱼叉箭头，下方为短向左鱼叉箭头"] # 0x1F8D2
+ - "🣓": [T: "上方为短向右鱼叉箭头，下方为长向左鱼叉箭头"] # 0x1F8D3
+
+# MathJax v4 has adopted these PUA values for some partial chem bonds that aren't in Unicode
+ - "\uE410": [T: "部分单键"]                        # 0xe410
+ - "\uE411": [T: "部分双键"]                        # 0xe411
+ - "\uE412": [T: "部分三键"]                        # 0xe412
+ - "\uE413": [T: "部分三键"]                        # 0xe413
+
+# MathJax v4 also adopted these PUA values for some arrows thar are in Unicode
+# Hopefully these will be exported properly in future versions of MathJax
+ - "\uE428": [SPELL: "'⟵'"]                      # 0xe428  defer to def of arrow
+ - "\uE429": [SPELL: "'⟶'"]                      # 0xe429  defer to def of arrow 
+ - "\uE42A": [SPELL: "'⟷'"]                      # 0xe42a  defer to def of arrow 
+ - "\uE408": [T: "可逆反应"]                      # 0xe408  MathJax mhchem longrightleftharpoons
+ - "\uE409": [T: "平衡偏右"]                      # 0xe409  MathJax mhchem longRightleftharpoons
+ - "\uE40A": [T: "平衡偏左"]                      # 0xe40a  MathJax mhchem longLeftrightharpoons
+ - "\uE42B": [SPELL: "'⇄'"]                       # 0xe42b  defer to def of arrow 
+ - "\uE42C": [SPELL: "'←'"]                       # 0xe42c  defer to def of arrow 
+ - "\uE42D": [SPELL: "'→'"]                       # 0xe42d  defer to def of arrow 
+ - "\uE42E": [SPELL: "'↔'"]                       # 0xe42e  defer to def of arrow

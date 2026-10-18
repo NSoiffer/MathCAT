@@ -1,0 +1,40 @@
+---
+
+- name: laplacian
+  tag: laplacian
+  match: "count(*) <= 1"   # can be on ∇^2 or on enclosing mrow
+  replace:
+  - test:
+      if: "count(*) = 1"
+      then:
+      - x: "*[1]"
+      - T: "的拉普拉斯算子"
+      else: [T: "拉普拉斯算子"]
+
+- name: divergence
+  tag: divergence
+  match: "count(*) = 1"
+  replace:
+  - x: "*[1]"
+  - T: "的散度"
+
+- name: curl
+  tag: curl
+  match: "count(*) = 1"
+  replace:
+  - x: "*[1]"
+  - T: "的旋度"
+
+- name: gradient
+  tag: gradient
+  match: "count(*) = 1"
+  replace:
+  - x: "*[1]"
+  - T: "的梯度"
+
+- name: partial-derivative
+  tag: partial-derivative
+  match: "count(*) = 1"
+  replace:
+  - x: "*[1]"
+  - T: "的偏导数"
