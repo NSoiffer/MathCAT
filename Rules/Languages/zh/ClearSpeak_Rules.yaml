@@ -548,55 +548,56 @@
           if: "$ClearSpeak_Sets != 'SilentBracket'"
           then: [T: "的集合"]
 
-- # intervals are controlled by a ClearSpeak Preference -- parens/brackets don't have to match, so we avoid IsBracketed
-  # alternatively, we could have four (or ten) rules, but there is a lot of duplication if we do that
-  # this one rule handles all ten cases listed as part $ClearSpeak_Paren = 'Interval'
-  # note that *[2] is an mrow with X, ",", Y, so getting X or Y is a double index
+- # Intervals are controlled by a ClearSpeak preference; parentheses and brackets need not match.
   name: ClearSpeak-intervals # avoid overriding with default "intervals" name
   variables:
-  - is_intervals_start_infinity: "*[1][self::m:minus and *[1][text()='∞']]"
-  - is_intervals_end_infinity: "*[2][text()='∞'or (self::m:plus and *[1][text()='∞'])]"
+  - is_intervals_start_infinity: "*[1][self::m:minus and count(*)=1 and *[1][.='∞']]"
+  - is_intervals_end_infinity: "*[2][.='∞' or (self::m:plus and count(*)=1 and *[1][.='∞'])]"
+  - is_intervals_end_positive_infinity: "*[2][self::m:plus and count(*)=1 and *[1][.='∞']]"
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
   match: "."
   replace:
-  - T: "从"      # phrase('the interval from' a to b)
-  - x: "*[1]"
-  - T: "到"      # phrase(the interval from a 'to' b)
-  - x: "*[2]"
-  - T: "的区间"
-  - pause: short
   - test:
-      if: "not($is_intervals_start_infinity)"
+    - if: "$is_intervals_start_infinity and $is_intervals_end_infinity"
+      then: [T: "实数集"]
+    - else_if: "$is_intervals_start_infinity"
       then:
-      - test:
-          if: "starts-with(name(.), 'open')"
-          then: [T: "不"]      # phrase(the interval from a to b 'not' including b)
-      - T: "包含"      # phrase(the interval from a to b not 'including' b)
-      - x: "*[1]"
-    # logic to deal with [not] arg #1
-  - test:
-      if: "not($is_intervals_start_infinity or $is_intervals_end_infinity)"
-      then_test:
-      - if: "name(.)='open-interval'"
-        then: [T: "或"]      # phrase(the interval including a 'or' b )
-      - else_if: "name(.)='closed-interval'"
-        then: [T: "且"]      # phrase(the interval including a 'and' b)
-        else: [T: "但"]      # phrase(the interval including a 'but' not b)
-    # some ugly logic dealing with connectives: or, but, but, and (cleaner to be part of next clause?)
-  - test:
-      if: not($is_intervals_end_infinity)
-      then:
-      - test:
-          # there is some asymmetry to the test because of the and/or/but logic above
-          if: not( name(.)='open-interval' or name(.)='closed-interval' ) or $is_intervals_start_infinity
-          then:
-          - test:
-              if: "name(.) = 'open-interval' or name(.) = 'closed-open-interval'"
-              then: [T: "不"]      # phrase(the interval 'not' including a)
-          - T: "包含"      # phrase(the interval not 'including' a)
+      - T: "从负无穷大到"
       - x: "*[2]"
-
-    # onto the [not] [including]... part
+      - T: "的区间"
+      - pause: short
+      - test:
+          if: "name(.) = 'closed-interval' or name(.) = 'open-closed-interval'"
+          then: [T: "包括端点"]
+          else: [T: "不包括端点"]
+      - x: "*[2]"
+    - else_if: "$is_intervals_end_infinity"
+      then:
+      - T: "从"
+      - x: "*[1]"
+      - test:
+          if: "$is_intervals_end_positive_infinity"
+          then: [T: "到正无穷大的区间"]
+          else: [T: "到无穷大的区间"]
+      - pause: short
+      - test:
+          if: "name(.) = 'closed-interval' or name(.) = 'closed-open-interval'"
+          then: [T: "包括端点"]
+          else: [T: "不包括端点"]
+      - x: "*[1]"
+      else:
+      - T: "从"
+      - x: "*[1]"
+      - T: "到"
+      - x: "*[2]"
+      - test:
+        - if: "name(.) = 'open-interval'"
+          then: [T: "的开区间"]
+        - else_if: "name(.) = 'closed-interval'"
+          then: [T: "的闭区间"]
+        - else_if: "name(.) = 'open-closed-interval'"
+          then: [T: "的左开右闭区间"]
+          else: [T: "的左闭右开区间"]
 - name: binomial-frac-vector
   tag: matrix
   match:

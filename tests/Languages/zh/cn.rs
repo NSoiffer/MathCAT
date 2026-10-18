@@ -799,19 +799,47 @@ fn multi_argument_set_intent_is_not_mistaken_for_empty_set() -> Result<()> {
 }
 
 #[test]
-fn half_open_intervals_name_both_ends() -> Result<()> {
-    test(
-        "zh",
-        "SimpleSpeak",
-        "<math><mrow><mo>(</mo><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo>]</mo></mrow></math>",
-        "左开右闭区间 a 逗号 b",
-    )?;
-    test(
-        "zh",
-        "SimpleSpeak",
-        "<math><mrow><mo>[</mo><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo>)</mo></mrow></math>",
-        "左闭右开区间 a 逗号 b",
-    )
+fn finite_intervals_use_mainland_textbook_readings() -> Result<()> {
+    let cases = [
+        (
+            "open",
+            "<math><mrow intent='open-interval($start,$end)'><mi arg='start'>a</mi><mi arg='end'>b</mi></mrow></math>",
+            "开区间 a 到 b",
+            "从 a 到 b 的开区间",
+        ),
+        (
+            "closed",
+            "<math><mrow><mo>[</mo><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo>]</mo></mrow></math>",
+            "闭区间 a 到 b",
+            "从 a 到 b 的闭区间",
+        ),
+        (
+            "open-closed",
+            "<math><mrow><mo>(</mo><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo>]</mo></mrow></math>",
+            "左开右闭区间 a 到 b",
+            "从 a 到 b 的左开右闭区间",
+        ),
+        (
+            "closed-open",
+            "<math><mrow><mo>[</mo><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo>)</mo></mrow></math>",
+            "左闭右开区间 a 到 b",
+            "从 a 到 b 的左闭右开区间",
+        ),
+        (
+            "decimal-membership",
+            "<math xmlns='http://www.w3.org/1998/Math/MathML'><mi>η</mi><mo>∈</mo><mrow><mo stretchy='false'>[</mo><mrow><mn>0.15</mn><mo separator='true'>,</mo><mn>0.25</mn></mrow><mo stretchy='false'>]</mo></mrow></math>",
+            "eta 属于 闭区间 0.15 到 0.25",
+            "eta 属于 从 0.15 到 0.25 的闭区间",
+        ),
+    ];
+
+    for (name, mathml, simple, clear) in cases {
+        test("zh", "SimpleSpeak", mathml, simple)
+            .map_err(|error| anyhow::anyhow!("SimpleSpeak/{name}: {error}"))?;
+        test("zh", "ClearSpeak", mathml, clear)
+            .map_err(|error| anyhow::anyhow!("ClearSpeak/{name}: {error}"))?;
+    }
+    Ok(())
 }
 
 #[test]
@@ -4057,8 +4085,8 @@ fn additional_cn_formula_cases_cover_common_notation() -> Result<()> {
         (
             "interval",
             "<math><mrow><mo>[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>)</mo></mrow></math>",
-            "左闭右开区间 0 逗号 1",
-            "从 0 到 1 的区间, 包含 0 但 不 包含 1",
+            "左闭右开区间 0 到 1",
+            "从 0 到 1 的左闭右开区间",
         ),
         (
             "universal-inequality",
@@ -4244,26 +4272,38 @@ fn additional_cn_edge_formulas_cover_uncommon_structure() -> Result<()> {
         (
             "open-interval-to-infinity",
             "<math><mrow><mo>(</mo><mi>c</mi><mo>,</mo><mo>∞</mo><mo>)</mo></mrow></math>",
-            "开区间 c 逗号 无穷大",
-            "从 c 到 无穷大 的区间, 不 包含 c",
+            "从 c 到无穷大的区间, 不包括端点 c",
+            "从 c 到无穷大的区间, 不包括端点 c",
         ),
         (
             "closed-open-interval-to-infinity",
-            "<math><mrow><mo>[</mo><mi>c</mi><mo>,</mo><mo>∞</mo><mo>)</mo></mrow></math>",
-            "左闭右开区间 c 逗号 无穷大",
-            "从 c 到 无穷大 的区间, 包含 c",
+            "<math><mrow><mo>[</mo><mi>c</mi><mo>,</mo><mo>+</mo><mo>∞</mo><mo>)</mo></mrow></math>",
+            "从 c 到正无穷大的区间, 包括端点 c",
+            "从 c 到正无穷大的区间, 包括端点 c",
+        ),
+        (
+            "negative-infinity-to-open",
+            "<math><mrow><mo>(</mo><mo>−</mo><mo>∞</mo><mo>,</mo><mi>d</mi><mo>)</mo></mrow></math>",
+            "从负无穷大到 d 的区间, 不包括端点 d",
+            "从负无穷大到 d 的区间, 不包括端点 d",
         ),
         (
             "negative-infinity-to-closed",
             "<math><mrow><mo>(</mo><mo>−</mo><mo>∞</mo><mo>,</mo><mi>d</mi><mo>]</mo></mrow></math>",
-            "左开右闭区间 负 无穷大 逗号 d",
-            "从 负 无穷大 到 d 的区间, 包含 d",
+            "从负无穷大到 d 的区间, 包括端点 d",
+            "从负无穷大到 d 的区间, 包括端点 d",
         ),
         (
             "whole-real-line",
             "<math><mrow><mo>(</mo><mo>−</mo><mo>∞</mo><mo>,</mo><mo>∞</mo><mo>)</mo></mrow></math>",
-            "开区间 负 无穷大 逗号 无穷大",
-            "从 负 无穷大 到 无穷大 的区间",
+            "实数集",
+            "实数集",
+        ),
+        (
+            "whole-real-line-explicit-positive-infinity",
+            "<math><mrow><mo>(</mo><mo>−</mo><mo>∞</mo><mo>,</mo><mo>+</mo><mo>∞</mo><mo>)</mo></mrow></math>",
+            "实数集",
+            "实数集",
         ),
         (
             "arccosine",
