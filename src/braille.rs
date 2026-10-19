@@ -2289,19 +2289,14 @@ fn handle_contractions(full_chars: &[char], start: usize, end: usize, mut result
     }
 
     fn init_patterns(contractions: &[Replacement]) -> RegexSet {
-        let mut vec: Vec<&str> = Vec::with_capacity(contractions.len());
-        for contraction in contractions {
-            vec.push(&contraction.pattern);
-        }
-        return RegexSet::new(&vec).unwrap();
+        let patterns = contractions.iter().map(|c| c.pattern.as_str());
+        return RegexSet::new(patterns).unwrap();
     }
 
     fn init_regex(contractions: &[Replacement]) -> Vec<Regex> {
-        let mut vec = Vec::with_capacity(contractions.len());
-        for contraction in contractions {
-            vec.push(Regex::new(&contraction.pattern).unwrap());
-        }
-        return vec;
+        return contractions.iter()
+            .map(|c| Regex::new(&c.pattern).unwrap())
+            .collect();
     }
 }
 
