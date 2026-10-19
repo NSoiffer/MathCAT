@@ -430,6 +430,9 @@ pub fn get_navigation_braille() -> Result<String> {
                                 Ok(found)
                             } else {
                                 let new_mathml = create_mathml_element(&new_doc, "math");
+                                #[cfg(feature = "no-unsafe")]
+                                new_mathml.append_child(copy_mathml_to_document(found, &new_doc));
+                                #[cfg(not(feature = "no-unsafe"))]
                                 new_mathml.append_child(copy_mathml(found));
                                 new_doc.root().append_child(new_mathml);
                                 Ok(new_mathml)
@@ -705,6 +708,39 @@ pub fn get_supported_languages() -> Result<Vec<String>> {
 /// Copy (recursively) the (MathML) element and return the new one.
 /// The Element type does not copy and modifying the structure of an element's child will modify the element, so we need a copy
 /// Convert the returned error from set_mathml, etc., to a useful string for display
+#[cfg(feature = "no-unsafe")]
+fn copy_mathml_to_document<'d>(mathml: Element, document: &Document<'d>) -> Element<'d> {
+    return copy_mathml_to_document_recursive(mathml, document, 0);
+}
+
+#[cfg(feature = "no-unsafe")]
+fn copy_mathml_to_document_recursive<'d>(mathml: Element, document: &Document<'d>, depth: usize) -> Element<'d> {
+    if depth > MAX_DEPTH {
+        return create_mathml_element(document, as_str!(name(mathml)));
+    }
+
+    let children = mathml.children();
+    let new_mathml = create_mathml_element(document, as_str!(name(mathml)));
+    mathml.attributes().iter().for_each(|attr| {
+        new_mathml.set_attribute_value(as_qname!(attr.name()), as_str!(attr.value()));
+    });
+
+    if children.len() == 1 &&
+       let Some(text) = children[0].text() {
+        new_mathml.set_text(as_str!(text.text()));
+        return new_mathml;
+    }
+
+    let mut new_children = Vec::with_capacity(children.len());
+    for child in children {
+        let child = as_element(child);
+        let new_child = copy_mathml_to_document_recursive(child, document, depth + 1);
+        new_children.push(new_child);
+    }
+    new_mathml.append_children(new_children);
+    return new_mathml;
+}
+
 pub fn copy_mathml(mathml: Element) -> Element {
     return copy_mathml_recursive(mathml, 0);
 }
@@ -1188,6 +1224,20 @@ mod tests {
         init_panic_handler();
         let result = catch_unwind(AssertUnwindSafe(f));
         return report_any_panic(result);
+    }
+
+    #[cfg(feature = "no-unsafe")]
+    #[test]
+    fn navigation_braille_copies_focused_node_into_temporary_document() -> Result<()> {
+        return interface_test(|| {
+            set_rules_dir(super::super::abs_rules_dir_path())?;
+            set_preference("BrailleCode", "LaTeX")?;
+            set_mathml("<math><mi id='focused'>x</mi><mo>+</mo><mi>y</mi></math>")?;
+            set_navigation_node("focused", 0)?;
+
+            assert_eq!(get_navigation_braille()?, "x");
+            Ok(())
+        });
     }
 
     fn are_parsed_strs_equal(test: &str, target: &str) -> bool {
