@@ -136,11 +136,16 @@ jobs:
               ? Array.from(shaSet).map(sha => `- https://github.com/${context.repo.owner}/${context.repo.repo}/commit/${sha}`).join("\n")
               : "(No commits specifically touched monitored files)";
 
+            const fileLinks = matchedList.map(file => {
+              const encodedPath = file.split("/").map(encodeURIComponent).join("/");
+              return `- [${file}](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${context.sha}/${encodedPath})`;
+            }).join("\n");
+
             const body = `
             Changes detected in english files.
             
             Changed files:
-            ${JSON.stringify(matchedList, null, 2)}
+            ${fileLinks}
             
             See changes in the commits affecting monitored files:
             ${commitUrls}

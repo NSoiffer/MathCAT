@@ -392,13 +392,7 @@ impl Function for IsNode {
 
         fn is_leaf_any_name(e: Element) -> bool {
             let children = e.children();
-            if children.is_empty() {
-                return true;
-            } else if children.len() == 1 &&
-                      let ChildOfElement::Text(_) = children[0] {
-                    return true;
-                }
-            return false
+            return children.is_empty() || (children.len() == 1 && children[0].text().is_some());
         }
     }
 }
@@ -864,24 +858,17 @@ impl IsBracketed {
             return false;
         }
 
-        if requires_comma {
-            if let ChildOfElement::Element(contents) = children[1] {
-                let children = contents.children();
-                if !is_tag(contents, "mrow") || children.len() <= 1 {
-                    return false;
-                }
-                // finally, we can check for a comma -- we might not have operands, so we to check first and second entry
-                if get_text_from_COE(&children[0]).as_str() == "," {
-                    return true;
-                }
-                if children.len() > 1 && get_text_from_COE(&children[1]).as_str() == "," {
-                    return true;
-                }
-            }
-            return false;
-        } else {
+        if !requires_comma {
             return true;
         }
+        let Some(contents) = children[1].element() else {
+            return false;
+        };
+        let children = contents.children();
+        // The comma can be the first or second child when operands are absent.
+        return is_tag(contents, "mrow")
+            && children.len() > 1
+            && (get_text_from_COE(&children[0]) == "," || get_text_from_COE(&children[1]) == ",");
     }
 }
 
