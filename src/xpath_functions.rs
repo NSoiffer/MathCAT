@@ -392,13 +392,7 @@ impl Function for IsNode {
 
         fn is_leaf_any_name(e: Element) -> bool {
             let children = e.children();
-            if children.is_empty() {
-                return true;
-            } else if children.len() == 1 &&
-                      let ChildOfElement::Text(_) = children[0] {
-                    return true;
-                }
-            return false
+            return children.is_empty() || (children.len() == 1 && children[0].text().is_some());
         }
     }
 }
