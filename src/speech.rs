@@ -1002,11 +1002,9 @@ impl ReplacementArray {
         }
 
         let new_element = create_mathml_element(&rules_with_context.doc, "Unknown");  // Hopefully set later (in Intent::Replace())
-        let mut new_children = Vec::with_capacity(self.replacements.len());
-        for child in self.replacements.iter() {
-            let child = rules_with_context.replace::<Element<'m>>(child, mathml)?;
-            new_children.push(ChildOfElement::Element(child));
-        };
+        let new_children = self.replacements.iter()
+            .map(|child| Ok(ChildOfElement::Element(rules_with_context.replace::<Element<'m>>(child, mathml)?)))
+            .collect::<Result<Vec<_>>>()?;
         new_element.append_children(new_children);
         return Ok(new_element);
     }
@@ -1710,13 +1708,10 @@ impl VariableDefinitions {
             return Ok( VariableDefinitions::new(0) );
         };
         if let Some(defs) = defs.as_vec() {
-            let mut definitions = VariableDefinitions::new(defs.len());
-            for def in defs {
-                let variable_def = VariableDefinition::build(def)
-                        .context("definition of 'variables'")?;
-                definitions.push( variable_def);
-            };
-            return Ok (definitions );
+            let defs = defs.iter()
+                .map(|def| VariableDefinition::build(def).context("definition of 'variables'"))
+                .collect::<Result<Vec<_>>>()?;
+            return Ok( VariableDefinitions{ defs } );
         }
         bail!( "'variables' is not an array of {{name: xpath-value}} definitions. Found {}'",
                 yaml_to_string(defs, 1) );
