@@ -347,7 +347,7 @@
 -
   name: limit
   tag: [msub, munder]
-  variables: [NoSpacesBase: "translate(*[1], ' \u00A0\u2004\u2005\u2006\u2007\u2008\u2009\u200A','')"]   # Sometimes these have (weird) spaces in them
+  variables: [NoSpacesBase: "translate(*[1], ' \u00A0\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2061','')"]   # Sometimes these have spaces or an invisible function-application character in them
   match: "*[1][$NoSpacesBase='lim' or $NoSpacesBase='limsup' or $NoSpacesBase='liminf']"
   replace: 
   - intent:
@@ -808,6 +808,22 @@
   - with:
       variables: [TableProperty: "'determinant'"]
       replace: [x: "*[2]"]
+
+-
+  # TeX's gathered environment is one derivation split across display lines,
+  # not a system whose rows are independent equations.
+  name: mtable-gathered-property
+  tag: mtable
+  match: "contains(concat(' ', normalize-space(@class), ' '), ' gathered ')"
+  replace:
+  - with:
+      variables:
+      - TableProperty: "'lines'"
+      replace:
+      - intent:
+          name: "lines"
+          children:
+          - x: "*"
 
 -
   name: mtable-equations-property

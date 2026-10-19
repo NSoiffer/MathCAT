@@ -40,6 +40,49 @@
       - x: "*[2]"
 
 -
+  # TeX4ht commonly attaches the norm's subscript to the closing bar only:
+  # <mrow><mo>∥</mo>...<msub><mo>∥</mo><mi>p</mi></msub></mrow>.
+  name: norm-with-subscripted-closing-bar
+  tag: mrow
+  match:
+    - "count(*) >= 3 and *[1][.='∥'] and *[last()][self::m:msub and *[1][.='∥']]"
+  replace:
+  - intent:
+      name: "subscripted-norm"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
+      children:
+      - x: "*[position() > 1 and position() < last()]"
+      - x: "*[last()]/*[2]"
+
+-
+  # The same TeX4ht shape can use two ordinary vertical bars for each double bar.
+  name: norm-with-doubled-bars-and-subscripted-closing-bar
+  tag: mrow
+  match:
+    - "count(*) >= 5 and *[1][.='|'] and *[2][.='|'] and *[last()-1][.='|'] and *[last()][self::m:msub and *[1][.='|']]"
+  replace:
+  - intent:
+      name: "subscripted-norm"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
+      children:
+      - x: "*[position() > 2 and position() < last()-1]"
+      - x: "*[last()]/*[2]"
+
+-
+  # Canonicalization groups ||x||_p as an indexed row containing a nested |x|.
+  name: norm-with-canonicalized-doubled-bars
+  tag: msub
+  match:
+    - "*[1][self::m:mrow and count(*)=3 and *[1][.='|'] and *[2][self::m:mrow and IsBracketed(., '|', '|')] and *[3][.='|']]"
+  replace:
+  - intent:
+      name: "subscripted-norm"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
+      children:
+      - x: "*[1]/*[2]/*[2]"
+      - x: "*[2]"
+
+-
   name: vector-magnitude
   tag: mrow
   match: "IsBracketed(., '‖', '‖')"

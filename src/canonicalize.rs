@@ -1684,12 +1684,12 @@ impl CanonicalizeContext {
 				return mathml;
 			} else if has_subscript {
 				set_mathml_name(mathml, "msub");
-				let children = vec!(children[0], children[1]);
+				let children = vec![children[0], children[1]];
 				mathml.replace_children(children);
 				return mathml;
 			} else if has_superscript {
 				set_mathml_name(mathml, "msup");
-				let children = vec!(children[0], children[2]);
+				let children = vec![children[0], children[2]];
 				mathml.replace_children(children);
 				return mathml;
 			} else {
