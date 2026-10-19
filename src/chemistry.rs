@@ -44,7 +44,8 @@ use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::{is_leaf, IsNode};
 use regex::Regex;
 use crate::xpath_functions::IsBracketed;
-use phf::{phf_map, phf_set};
+use phf::phf_set;
+use roman_numerals_rs::RomanNumeral;
 use std::convert::TryInto;
 #[allow(unused_imports)]
 use log::{error, debug};
@@ -1003,13 +1004,10 @@ fn likely_chem_subscript(subscript: Element) -> i32 {
     return -3
 }
 
-fn small_roman_to_number(text: &str) -> &str {
-    // simplest to do a look up
-    static ROMAN_TO_NUMBER: phf::Map<&str, &str> = phf_map! {
-        "I" => "1", "II" => "2", "III" => "3", "IV" => "4", "V" => "5", "VI" => "6", "VII" => "7", "VIII" => "8", "IX" => "9",
-    };
-    return ROMAN_TO_NUMBER.get(text).unwrap_or(&"");
-
+fn small_roman_to_number(text: &str) -> String {
+    return text.trim().parse::<RomanNumeral>()
+        .map(|roman| roman.as_u16().to_string())
+        .unwrap_or_default();
 }
 
 fn likely_chem_superscript(sup: Element) -> i32 {
@@ -1029,7 +1027,7 @@ fn likely_chem_superscript(sup: Element) -> i32 {
         }
         return if as_text(sup).len()==1 {1} else {2};
     } else if (sup_name == "mi" || sup_name == "mn" || sup_name=="mtext") && SMALL_UPPER_ROMAN_NUMERAL.is_match(as_str!(as_text(sup))){
-        sup.set_attribute_value("data-number", small_roman_to_number(as_str!(as_text(sup))));
+        sup.set_attribute_value("data-number", &small_roman_to_number(as_str!(as_text(sup))));
         sup.set_attribute_value(MAYBE_CHEMISTRY, "2");
         return 2;
     } else if sup_name == "mo" && !as_text(sup).is_empty() && as_str!(as_text(sup)).trim_matches(['\'', '′', '″', '‴']).is_empty() {
