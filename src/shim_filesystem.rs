@@ -290,7 +290,7 @@ cfg_if! {
         pub fn add_in_memory_file(path: &str, content: &str) {
             {
                 let mut files = IN_MEMORY_FILES.write().unwrap();
-                files.get_or_insert_with(HashMap::new).insert(path.to_string(), content.to_string());
+                files.get_or_insert_with(HashMap::new).insert(get_in_memory_key(Path::new(path)), content.to_string());
             }
 
             let path_obj = Path::new(path);
@@ -298,9 +298,9 @@ cfg_if! {
                 let mut dirs = IN_MEMORY_DIRS.write().unwrap();
                 let dirs = dirs.get_or_insert_with(HashSet::new);
                 for parent in path_obj.ancestors().skip(1) {
-                    let parent_str = parent.to_str().unwrap_or_default();
+                    let parent_str = get_in_memory_key(parent);
                     if !parent_str.is_empty() {
-                        dirs.insert(parent_str.to_string());
+                        dirs.insert(parent_str);
                     }
                 }
             }
