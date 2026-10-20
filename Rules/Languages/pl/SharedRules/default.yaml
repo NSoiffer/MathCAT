@@ -100,7 +100,7 @@
   tag: ms
   match: "."
   replace:
-  - t: "string"      # phrase('the string' is long)
+  - T: "string"      # phrase('the string' is long)
   - pause: short
   - x: "text()"
 
@@ -142,7 +142,7 @@
   - pause: short
   - test:
       if: "$Impairment = 'Blindness'"
-      then: [t: "koniec ułamka"]          # phrase("start of fraction x over y 'end over'")
+      then: [T: "koniec ułamka"]          # phrase("start of fraction x over y 'end over'")
   - pause: medium
 
 
@@ -332,7 +332,7 @@
               then:
               - T: "z"      # phrase(substitute x 'with' y)
               - x: "count($Prescripts) div 2"
-              - t: "lewe indeksy"      # phrase(in this equation certain 'prescripts' apply)
+              - T: "lewe indeksy"      # phrase(in this equation certain 'prescripts' apply)
               - pause: short
           - test:
               if: "not($Prescripts[1][self::m:none])"
@@ -367,9 +367,9 @@
               - test:
                   if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
                   then:
-                  - t: "i kolejne lewe indeksy"      # phrase(in this case there are values 'and alternating prescripts')
+                  - T: "i kolejne lewe indeksy"      # phrase(in this case there are values 'and alternating prescripts')
                   - x: "$Prescripts[position() > 4]"
-                  - t: "koniec lewych indeksów"      # phrase(This is where 'end prescripts' occurs)
+                  - T: "koniec lewych indeksów"      # phrase(This is where 'end prescripts' occurs)
   - test:
       if: "$Postscripts"
       then:
@@ -386,7 +386,7 @@
                   then: [T: "i"]      # phrase(10 is greater than 8 'and' less than 15)
               - T: "z"      # phrase(substitute x 'with' y)
               - x: "count($Postscripts) div 2"
-              - t: "prawe indeksy"      # phrase(this material includes several 'postscripts')
+              - T: "prawe indeksy"      # phrase(this material includes several 'postscripts')
               - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none])"
@@ -452,9 +452,9 @@
                       - test:
                           if: "count($Postscripts) > 8" # give up and just dump them out so at least the content is there
                           then:
-                          - t: "i kolejne indeksy"      # phrase(this situation involves complexities 'and alternating scripts')
+                          - T: "i kolejne indeksy"      # phrase(this situation involves complexities 'and alternating scripts')
                           - x: "$Postscripts[position() > 8]"
-                          - t: "koniec indeksów"      # phrase(At this point 'end scripts' occurs)
+                          - T: "koniec indeksów"      # phrase(At this point 'end scripts' occurs)
 
 - name: default
   tag: mtable
@@ -514,6 +514,18 @@
       - pause: medium
   - x: "*"
   - test:
+      if: "HasVisibleColumnLine(../.., count(preceding-sibling::*) + 1)"
+      then:
+      - pause: short
+      - T: "separator"
+  - test:
+      # Separator wiersza zapowiadamy tylko po ostatniej komórce wiersza, żeby
+      # wybrzmiał raz na każdą granicę poziomą.
+      if: "count(following-sibling::*) = 0 and HasVisibleRowLine(../.., count(../preceding-sibling::*) + 1)"
+      then:
+      - pause: short
+      - T: "separator wiersza"
+  - test:
     # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
     - if: count(following-sibling::*) > 0
       then: [pause: short]
@@ -528,7 +540,7 @@
   tag: menclose
   match: "@notation='box' and *[self::m:mtext and .=' ']"
   replace:
-  - t: "pusta ramka"      # phrase(the 'empty box' contains no values)
+  - T: "pusta ramka"      # phrase(the 'empty box' contains no values)
 
 - name: default
   # The ordering below is the order in which words come out when there is more than one value
@@ -538,29 +550,29 @@
   replace:
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
-      then: [t: "ramka", pause: short]      # phrase(the 'box' around the expression)
+      then: [T: "ramka", pause: short]      # phrase(the 'box' around the expression)
   - test:
       if: ".[contains(@notation,'roundedbox')]"
-      then: [t: "zaokrąglona ramka", pause: short]      # phrase(the 'round box' around the expression)
+      then: [T: "zaokrąglona ramka", pause: short]      # phrase(the 'round box' around the expression)
   - test:
       if: ".[contains(@notation,'circle')]"
-      then: [t: "okrąg", pause: short]      # phrase(the 'circle' around the expression)
+      then: [T: "okrąg", pause: short]      # phrase(the 'circle' around the expression)
   - test:
       if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or contains(concat(' ', normalize-space(@notation), ' '), ' right ') or contains(@notation,'top') or contains(@notation,'bottom') ]"
       then:
-      - t: "linia na"      # phrase(draw a straight 'line' on the page)
+      - T: "linia na"      # phrase(draw a straight 'line' on the page)
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
-          then: [t: "lewo", pause: short]      # phrase(line on 'left' of the expression)
+          then: [T: "lewo", pause: short]      # phrase(line on 'left' of the expression)
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
-          then: [t: "prawo", pause: short]      # phrase(line on 'right' of the expression)
+          then: [T: "prawo", pause: short]      # phrase(line on 'right' of the expression)
       - test:
           if: ".[contains(@notation,'top')]"
-          then: [t: "góra", pause: short]      # phrase(line on 'top' of the expression)
+          then: [T: "góra", pause: short]      # phrase(line on 'top' of the expression)
       - test:
           if: ".[contains(@notation,'bottom')]"
-          then: [t: "dół", pause: short]      # phrase(line on the 'bottom' of the expression)
+          then: [T: "dół", pause: short]      # phrase(line on the 'bottom' of the expression)
   - test:
       if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
       then:
@@ -570,77 +582,77 @@
           else:
           - test:
               if: ".[contains(@notation,'updiagonalstrike')]"
-              then: [t: "ukośnie w górę", pause: short]      # phrase(the line runs 'up diagonal')
+              then: [T: "ukośnie w górę", pause: short]      # phrase(the line runs 'up diagonal')
           - test:
               if: ".[contains(@notation,'downdiagonalstrike')]"
-              then: [t: "ukośnie w dół", pause: short]      # phrase(the line runs 'down diagonal')
+              then: [T: "ukośnie w dół", pause: short]      # phrase(the line runs 'down diagonal')
       - test:
           if: ".[contains(@notation,'verticalstrike')]"
-          then: [t: "pionowy", pause: short]      # phrase(the line is  'vertical')
+          then: [T: "pionowy", pause: short]      # phrase(the line is  'vertical')
       - test:
           if: ".[contains(@notation,'horizontalstrike')]"
-          then: [t: "poziomy", pause: short]      # phrase(the line is 'horizontal')
-      - t: "krzyż na zewnątrz"      # phrase(please 'cross out' the incorrect answer)
+          then: [T: "poziomy", pause: short]      # phrase(the line is 'horizontal')
+      - T: "krzyż na zewnątrz"      # phrase(please 'cross out' the incorrect answer)
       - pause: short
   - test:
       if: ".[contains(@notation,'uparrow')]"
-      then: [t: "strzałka w górę", pause: short]      # phrase(direction is shown by the 'up arrow')
+      then: [T: "strzałka w górę", pause: short]      # phrase(direction is shown by the 'up arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
-      then: [t: "strzałka w dół", pause: short]      # phrase(the trend is shown by the 'down arrow')
+      then: [T: "strzałka w dół", pause: short]      # phrase(the trend is shown by the 'down arrow')
   - test:
       if: ".[contains(@notation,'leftarrow')]"
-      then: [t: "strzałka w lewo", pause: short]      # phrase(the 'left arrow' indicates going back)
+      then: [T: "strzałka w lewo", pause: short]      # phrase(the 'left arrow' indicates going back)
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
-      then: [t: "strzałka w prawo", pause: short]      # phrase(the 'right arrow' indicates moving forward)
+      then: [T: "strzałka w prawo", pause: short]      # phrase(the 'right arrow' indicates moving forward)
   - test:
       if: ".[contains(@notation,'northeastarrow')]"
-      then: [t: "strzałka na północny wschód", pause: short]      # phrase(direction is indicated by the 'northeast arrow')
+      then: [T: "strzałka na północny wschód", pause: short]      # phrase(direction is indicated by the 'northeast arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
-      then: [t: "strzałka na południowy wschód", pause: short]      # phrase(direction is shown by the 'southeast arrow')
+      then: [T: "strzałka na południowy wschód", pause: short]      # phrase(direction is shown by the 'southeast arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
-      then: [t: "strzałka na południowy zachód", pause: short]      # phrase(direction is shown by the 'southwest arrow')
+      then: [T: "strzałka na południowy zachód", pause: short]      # phrase(direction is shown by the 'southwest arrow')
   - test:
       if: ".[contains(@notation,'northwestarrow')]"
-      then: [t: "strzałka na północny zachód", pause: short]      # phrase(direction is shown by the 'northwest arrow')
+      then: [T: "strzałka na północny zachód", pause: short]      # phrase(direction is shown by the 'northwest arrow')
   - test:
       if: ".[contains(@notation,'updownarrow')]"
-      then: [t: "strzałka dwukierunkowa pionowa", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
+      then: [T: "strzałka dwukierunkowa pionowa", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
   - test:
       if: ".[contains(@notation,'leftrightarrow')]"
-      then: [t: "strzałka dwukierunkowa pozioma", pause: short]      # phrase(progress is indicated by the 'double ended horizontal arrow')
+      then: [T: "strzałka dwukierunkowa pozioma", pause: short]      # phrase(progress is indicated by the 'double ended horizontal arrow')
   - test:
       if: ".[contains(@notation,'northeastsouthwestarrow')]"
-      then: [t: "strzałka dwukierunkowa ukośna w górę", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
+      then: [T: "strzałka dwukierunkowa ukośna w górę", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
   - test:
       if: ".[contains(@notation,'northwestsoutheastarrow')]"
-      then: [t: "strzałka dwukierunkowa ukośna w dół", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
+      then: [T: "strzałka dwukierunkowa ukośna w dół", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
   - test:
       if: ".[contains(@notation,'actuarial')]"
-      then: [t: "symbol aktuarialny", pause: short]      # phrase(the 'actuarial symbol' represents a specific quantity)
+      then: [T: "symbol aktuarialny", pause: short]      # phrase(the 'actuarial symbol' represents a specific quantity)
   - test:
       if: ".[contains(@notation,'madrub')]"
-      then: [t: "arabski symbol silni", pause: short]      # phrase(the 'arabic factorial symbol' represents a factorial operation)
+      then: [T: "arabski symbol silni", pause: short]      # phrase(the 'arabic factorial symbol' represents a factorial operation)
   - test:
       if: ".[contains(@notation,'phasorangle')]"
-      then: [t: "kąt fazowy", pause: short]      # phrase(the 'phasor angle' is used to measure electrical current)
+      then: [T: "kąt fazowy", pause: short]      # phrase(the 'phasor angle' is used to measure electrical current)
   - test:
       if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']" # default
-      then: [t: "znak dzielenia pisemnego", pause: short]      # phrase(the 'long division symbol' indicates  a long division calculation)
+      then: [T: "znak dzielenia pisemnego", pause: short]      # phrase(the 'long division symbol' indicates  a long division calculation)
   - test:
       if: ".[contains(@notation,'radical')]"
       then: [T: "pierwiastek kwadratowy", pause: short]      # phrase(5 is the 'square root' of 25)
-  - t: "obejmujący"      # phrase(parentheses are 'enclosing' part of the equation)
+  - T: "obejmujący"      # phrase(parentheses are 'enclosing' part of the equation)
   - test:
       if: "*[self::m:mtext and .=' ']"
       then: [T: "spacja"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
-      then: [t: "koniec obramowania"]      # phrase(reached the 'end enclosure' point)
+      then: [T: "koniec obramowania"]      # phrase(reached the 'end enclosure' point)
   - pause: short
 
 - name: semantics
@@ -737,21 +749,38 @@
 
 - name: function-intent
   # uncaught intent -- speak as foo of arg1 comma arg2 .... The MathML spec requires arguments to functions
+  # IntentMappings mogą dodać po nazwie opcje spoiwa "| ...":
+  #   * jedna opcja bez przecinka: separator dwuargumentowy po "z"
+  #     (np. "| podzielone przez" daje "część całkowita z x podzielone przez y")
+  #   * wiele opcji albo opcja z przecinkami: szablony arności; k słów spoiwa
+  #     opisuje k+1 argumentów (np. "| po | od,do")
+  #   * gdy arność nie pasuje, argumenty rozdziela przecinek
   tag: "*"
   match: "count(*)>0"
   replace:
   - x: "SpeakIntentName(name(.), $Verbosity, 'function')"
   - test:
-      if: "$Verbosity != 'Terse' and not(contains(@data-intent-property, ':literal:')) and
-           not(count(*)=2 and (IsInDefinition(*[1], 'TrigFunctionNames') or IsInDefinition(name(.), 'TerseFunctionNames')) and IsNode(*[2], 'simple'))"
-      then: [T: "z", pause: auto]      # phrase(sine 'of' 5)
-  - insert:
-      nodes: "*"
-      replace:
-      - test:
-          if: "not(contains(@data-intent-property, ':literal:'))"
-          then: [x: "','"]
+    - if: "IntentFunctionUseArityPath(name(.), 'function', count(*))"
+      then:
+      - x: "IntentFunctionGlueBefore(name(.), 'function', 1, count(*))"
       - pause: auto
+      - insert:
+          nodes: "*"
+          replace:
+          - x: "IntentFunctionGlueBefore(name(.), 'function', $InsertIndex, count(*))"
+          - pause: auto
+      else:
+      - test:
+          if: "$Verbosity != 'Terse' and not(contains(@data-intent-property, ':literal:')) and
+               not(count(*)=2 and (IsInDefinition(*[1], 'TrigFunctionNames') or IsInDefinition(name(.), 'TerseFunctionNames')) and IsNode(*[2], 'simple'))"
+          then: [T: "z", pause: auto]      # phrase(sine 'of' 5)
+      - insert:
+          nodes: "*"
+          replace:
+          - test:
+              if: "not(contains(@data-intent-property, ':literal:'))"
+              then: [x: "IntentFunctionArgSeparator(name(.), 'function', count(*))"]
+          - pause: auto
   - test:
       # speak "end ..." if not bracketed or last child is not simple and not last node
       if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"

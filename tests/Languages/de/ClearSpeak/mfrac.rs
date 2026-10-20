@@ -19,7 +19,7 @@ fn common_fraction_thirds() -> Result<()> {
     let expr = "<math>
                     <mfrac> <mn>2</mn> <mn>3</mn> </mfrac>
                 </math>";
-    test("de", "ClearSpeak", expr, "2 dritte")?;
+    test("de", "ClearSpeak", expr, "2 Drittel")?;
     return Ok(());
 
 }
@@ -29,8 +29,8 @@ fn common_fraction_tenths() -> Result<()> {
     let expr = "<math>
                     <mfrac> <mn>17</mn> <mn>10</mn> </mfrac>
                 </math>";
-    test_prefs("de", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "17 zehnte")?;
-    test_prefs("de", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "17 zehnte")?;
+    test_prefs("de", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "17 Zehntel")?;
+    test_prefs("de", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "17 Zehntel")?;
     return Ok(());
 
 }
@@ -42,7 +42,7 @@ fn not_ClearSpeak_common_fraction_tenths() -> Result<()> {
                     <mfrac> <mn>89</mn> <mn>10</mn> </mfrac>
                 </math>";
     test_prefs("de", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "89 durch 10")?;
-    test_prefs("de", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "89 zehnte")?;
+    test_prefs("de", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "89 Zehntel")?;
     return Ok(());
 
 }
@@ -172,14 +172,14 @@ fn nested_simple_fractions() -> Result<()> {
                 </mfrac>
                 </mrow>
             </math>";
-    test_prefs("de", "ClearSpeak", vec![("ClearSpeak_Fractions", "Auto")], expr, "1 hälfte durch 2 dritte")?;
-    test_prefs("de", "ClearSpeak", vec![("ClearSpeak_Fractions", "Ordinal")], expr, "1 hälfte durch 2 dritte")?;
+    test_prefs("de", "ClearSpeak", vec![("ClearSpeak_Fractions", "Auto")], expr, "1 hälfte durch 2 Drittel")?;
+    test_prefs("de", "ClearSpeak", vec![("ClearSpeak_Fractions", "Ordinal")], expr, "1 hälfte durch 2 Drittel")?;
     test_prefs("de", "ClearSpeak", vec![("ClearSpeak_Fractions", "Over")], expr, "1 durch 2 durch 2 durch 3")?;
     test_prefs("de", "ClearSpeak", vec![("ClearSpeak_Fractions", "FracOver")], expr,
             "der bruch der bruch 1 durch 2 durch der bruch 2 durch 3")?;
     test_prefs("de", "ClearSpeak", vec![("ClearSpeak_Fractions", "General")], expr,
             "der bruch mit zähler der bruch mit zähler 1; und nenner 2; und nenner der bruch mit zähler 2; und nenner 3")?;
-    test_prefs("de", "ClearSpeak", vec![("ClearSpeak_Fractions", "EndFrac")], expr, "1 hälfte durch 2 dritte")?;
+    test_prefs("de", "ClearSpeak", vec![("ClearSpeak_Fractions", "EndFrac")], expr, "1 hälfte durch 2 Drittel")?;
     test_prefs("de", "ClearSpeak", vec![("ClearSpeak_Fractions", "GeneralEndFrac")], expr,
             "der bruch mit zähler der bruch mit zähler 1; und nenner 2; ende des bruchs; und nenner der bruch mit zähler 2; und nenner 3; ende des bruchs; ende des bruchs")?;
     test_prefs("de", "ClearSpeak", vec![("ClearSpeak_Fractions", "OverEndFrac")], expr,
@@ -205,7 +205,7 @@ fn semi_nested_fraction() -> Result<()> {
                     </mfrac>
                 </mrow>
                 </math>";
-    test("de", "ClearSpeak", expr, "2 dritte x durch 6")?;
+    test("de", "ClearSpeak", expr, "2 Drittel x durch 6")?;
     return Ok(());
 
 }

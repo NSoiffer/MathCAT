@@ -36,8 +36,17 @@ fn main() {
       .init();
 
    let expr = r#"
-<math xmlns='http://www.w3.org/1998/Math/MathML'><mrow><mover accent='true'> <mrow><mi>R</mi><mi>T</mi></mrow><mo stretchy='true'>&#x2322;</mo></mover> </mrow></math>
-
+ <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>A</mi>
+  <mo>=</mo>
+  <mi>&#x1D70B;</mi>
+  <msup>
+    <mrow>
+      <mi>r</mi>
+    </mrow>
+    <mn>2</mn>
+  </msup>
+</math>
 "#;
   // let expr = "<math display='inline' xmlns='http://www.w3.org/1998/Math/MathML'>
   //       <msup intent='power($base(2, $base),silly($exp,-1.))'>
@@ -182,10 +191,10 @@ fn main() {
   info!("Version = '{}' using Rules dir {}", get_version(), get_rules_dir());
   set_preference("Language", "en").unwrap();
   set_preference("DecimalSeparator", "Auto").unwrap();
-  set_preference("BrailleCode", "UEB").unwrap();
+  set_preference("BrailleCode", "LaTeX").unwrap();
   set_preference("BrailleNavHighlight", "On").unwrap();
   set_preference("TTS", "None").unwrap();
-  set_preference("Verbosity", "Verbose").unwrap();
+  set_preference("Verbosity", "Medium").unwrap();
   set_preference("NavVerbosity", "Verbose").unwrap();
   set_preference("NavMode", "Enhanced").unwrap();
   set_preference("Impairment", "Blindness").unwrap();
@@ -277,7 +286,7 @@ fn main() {
   // info!("#xpath = {}; duplicates = {}", xpath_counts.0, xpath_counts.1);
   // info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
   // debug!("Hashmap sizes:\n{}", libmathcat::speech::SpeechRules::print_sizes());
-  timing_test(expr, 100);
+  timing_test(expr, 0);
 
 }
 

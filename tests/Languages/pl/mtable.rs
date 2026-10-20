@@ -265,8 +265,8 @@ fn augmented_matrix_2x3() -> Result<()> {
       <mo>]</mo></mrow></mrow>
     </math>
                                 ";
-    test("pl", "ClearSpeak",  expr, "2 na 3 macierz rozszerzona; wiersz 1; 3, 1, 4; wiersz 2; 0, 2, 6")?;
-    test("pl", "SimpleSpeak", expr, "2 na 3 macierz rozszerzona; wiersz 1; 3, 1, 4; wiersz 2; 0, 2, 6")?;
+    test("pl", "ClearSpeak",  expr, "2 na 3 macierz rozszerzona; wiersz 1; 3, 1, separator, 4; wiersz 2; 0, 2, separator, 6")?;
+    test("pl", "SimpleSpeak", expr, "2 na 3 macierz rozszerzona; wiersz 1; 3, 1, separator, 4; wiersz 2; 0, 2, separator, 6")?;
     Ok(())
 }
 
@@ -897,9 +897,9 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   </mrow>
 </math>";
 test_ClearSpeak("pl", "ClearSpeak_Matrix", "EndMatrix",
-        expr, "3 na 4 macierz rozszerzona; wiersz 1; kolumna 1; 1, kolumna 2; 2, kolumna 3; minus 1, kolumna 4; 3; wiersz 2; kolumna 1; minus 3, kolumna 2; 3, kolumna 3; minus 1, kolumna 4; 2; wiersz 3; kolumna 1; 2, kolumna 2; 3, kolumna 3; 2, kolumna 4; minus 1; koniec macierzy")?;
+        expr, "3 na 4 macierz rozszerzona; wiersz 1; kolumna 1; 1, kolumna 2; 2, kolumna 3; minus 1, separator, kolumna 4; 3; wiersz 2; kolumna 1; minus 3, kolumna 2; 3, kolumna 3; minus 1, separator, kolumna 4; 2; wiersz 3; kolumna 1; 2, kolumna 2; 3, kolumna 3; 2, separator, kolumna 4; minus 1; koniec macierzy")?;
     test("pl", "SimpleSpeak",
-        expr, "3 na 4 macierz rozszerzona; wiersz 1; kolumna 1; 1, kolumna 2; 2, kolumna 3; minus 1, kolumna 4; 3; wiersz 2; kolumna 1; minus 3, kolumna 2; 3, kolumna 3; minus 1, kolumna 4; 2; wiersz 3; kolumna 1; 2, kolumna 2; 3, kolumna 3; 2, kolumna 4; minus 1; koniec macierzy")?;
+        expr, "3 na 4 macierz rozszerzona; wiersz 1; kolumna 1; 1, kolumna 2; 2, kolumna 3; minus 1, separator, kolumna 4; 3; wiersz 2; kolumna 1; minus 3, kolumna 2; 3, kolumna 3; minus 1, separator, kolumna 4; 2; wiersz 3; kolumna 1; 2, kolumna 2; 3, kolumna 3; 2, separator, kolumna 4; minus 1; koniec macierzy")?;
     Ok(())
   }
 
@@ -1294,3 +1294,42 @@ fn single_line_with_label() -> Result<()> {
       expr, "1 równanie, z etykietą 2; b równa się 2")?;
     return Ok(());
   }
+
+/// Linia pionowa w tabeli jest zapowiadana jako separator (upstream #679).
+#[test]
+fn dashed_augmented_matrix_separator() -> Result<()> {
+    let expr = "
+    <math xmlns='http://www.w3.org/1998/Math/MathML'>
+      <mrow><mo>[</mo>
+        <mtable columnlines='dashed'>
+          <mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr>
+        </mtable>
+      <mo>]</mo></mrow>
+    </math>";
+    test("pl", "ClearSpeak", expr, "jeden na 3 wiersz macierz; 1, separator, 2, separator, 3")?;
+    test("pl", "SimpleSpeak", expr, "jeden na 3 wiersz macierz; 1, separator, 2, separator, 3")?;
+    Ok(())
+}
+
+/// Linia pozioma wybrzmiewa RAZ, po wierszu, ktory oddziela od nastepnego.
+#[test]
+fn matrix_row_separator() -> Result<()> {
+    let expr = "
+    <math xmlns='http://www.w3.org/1998/Math/MathML'>
+      <mrow><mo>[</mo>
+        <mtable rowlines='solid'>
+          <mtr>
+            <mtd><mn>1</mn></mtd>
+            <mtd><mn>2</mn></mtd>
+          </mtr>
+          <mtr>
+            <mtd><mn>3</mn></mtd>
+            <mtd><mn>4</mn></mtd>
+          </mtr>
+        </mtable>
+      <mo>]</mo></mrow>
+    </math>";
+    test("pl", "ClearSpeak", expr, "2 na 2 macierz; wiersz 1; 1, 2, separator wiersza; wiersz 2; 3, 4")?;
+    test("pl", "SimpleSpeak", expr, "2 na 2 macierz; wiersz 1; 1, 2, separator wiersza; wiersz 2; 3, 4")?;
+    Ok(())
+}

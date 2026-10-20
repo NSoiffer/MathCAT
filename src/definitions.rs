@@ -33,43 +33,12 @@ use std::path::{Path, PathBuf};
 use std::collections::{HashMap, HashSet};
 use crate::shim_filesystem::read_to_string_shim;
 
-/// An enum to paper over the different types of data access needed.
-///
-/// Having a Rc<RefCell<FromFileVariable>> seems a bit complicated in terms of types but...
-/// 1. The rust book seems to endorse the Rc<RefCell<...>>> approach when there are multiple owners of mutable date.
-///    See <https://doc.rust-lang.org/book/ch15-05-interior-mutability.html> towards the end
-/// 2. When a file is read, we need to clear and add data to the structure being read (reassigning could work for clearing).
-///    When we use the data, we either want to index into it or test if an item is there.
-///    The structures we use are either a Vec or a HashMap, so we need to abstract that away in `FromFileVariable`.
-///    Unfortunately, traits don't quite work as an option here:
-///    *  Vec implements extends (`add`), but there is no test/contains
-///    *  Hashmap implements `index`, but panics if the item isn't there
-///
-/// Because of the above limitations, we introduce the enum [`Contains`] which dispatches appropriately to Vec/Hashmap
 #[derive(Debug, Clone)]
-pub enum Contains {
+pub enum DefinitionCollection {
     Vec(Rc<RefCell<Vec<String>>>),
     Set(Rc<RefCell<HashSet<String>>>),
     Map(Rc<RefCell<HashMap<String, String>>>),
 }
-
-impl Contains {
-    // fn add(&mut self, item: String) {
-    //     match self {
-    //         Contains::Vec(v) => { v.borrow_mut().push(item); },
-    //         Contains::Set(s) => { s.borrow_mut().insert(item); }
-    //     }
-    // }
-
-    // fn clear(&mut self) {
-    //     match self {
-    //         Contains::Vec(v) => { v.borrow_mut().clear(); },
-    //         Contains::Set(s) => { s.borrow_mut().clear(); }
-    //     }
-    // }
-}
-pub type CollectionFromFile = Contains;
-type VariableDefHashMap = HashMap<String, CollectionFromFile>;
 
 /// Global structure containing all of the definitions.
 /// Each field in the structure corresponds to a named value read in from the `definitions.yaml` files.
@@ -80,7 +49,7 @@ type VariableDefHashMap = HashMap<String, CollectionFromFile>;
 /// There should only be one instance of this structure ([`DEFINITIONS`])
 // FIX: this probably can done with a macro to remove all the repetition
 pub struct Definitions {
-    pub name_to_var_mapping: VariableDefHashMap,
+    pub name_to_var_mapping: HashMap<String, DefinitionCollection>,
 }
 
 impl Default for Definitions {
@@ -100,7 +69,7 @@ impl Definitions {
 
     pub fn get_hashset(&self, name: &str) -> Option<Ref<'_, HashSet<String>>> {
         let names = self.name_to_var_mapping.get(name);
-        if let Some(Contains::Set(set)) = names {
+        if let Some(DefinitionCollection::Set(set)) = names {
             return Some(set.borrow());
         }
         return None;
@@ -108,7 +77,7 @@ impl Definitions {
 
     pub fn get_hashmap(&self, name: &str) ->  Option<Ref<'_, HashMap<String, String>>> {
         let names = self.name_to_var_mapping.get(name);
-        if let Some(Contains::Map(map)) = names {
+        if let Some(DefinitionCollection::Map(map)) = names {
             return Some(map.borrow());
         }
         return None;
@@ -116,7 +85,7 @@ impl Definitions {
 
     pub fn get_vec(&self, name: &str) -> Option<Ref<'_, Vec<String>>> {
         let names = self.name_to_var_mapping.get(name);
-        if let Some(Contains::Vec(vec)) = names {
+        if let Some(DefinitionCollection::Vec(vec)) = names {
             return Some(vec.borrow());
         }
         return None;
@@ -141,9 +110,20 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
     let file_path = pref_manager.get_definitions_file(use_speech_defs);
     let definitions = if use_speech_defs {&SPEECH_DEFINITIONS} else {&BRAILLE_DEFINITIONS};
     definitions.with( |defs| defs.borrow_mut().name_to_var_mapping.clear() );
-    let mut new_files = vec![file_path.to_path_buf()];
-    let mut files_read = read_one_definitions_file(use_speech_defs, file_path).with_context(|| format!("in file '{}", file_path.to_string_lossy()))?;
-    new_files.append(&mut files_read);
+    let mut files_read = read_one_definitions_file(use_speech_defs, file_path)
+        .with_context(|| format!("in file '{}'", file_path.to_string_lossy()))?;
+    let mut seen: HashSet<String> = HashSet::with_capacity(files_read.len());
+    let mut new_files: Vec<PathBuf> = Vec::with_capacity(files_read.len());
+    for p in files_read.drain(..) {
+        let canon = match crate::shim_filesystem::canonicalize_shim(&p) {
+            Ok(c) => c,
+            Err(_) => p,
+        };
+        let key = canon.to_string_lossy().to_string();
+        if seen.insert(key) {
+            new_files.push(canon);
+        }
+    }
 
     // merge the contents of `TrigFunctions` into a set that contains all the function names (from `AdditionalFunctionNames`).
     return definitions.with(|defs| {
@@ -161,12 +141,12 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
         // let name_to_mapping = defs.name_to_var_mapping.borrow_mut();
         for set_name in used_set_names {
             if defs.get_hashset(set_name).is_none() {
-                defs.name_to_var_mapping.insert(set_name.to_string(), Contains::Set( Rc::new( RefCell::new( HashSet::with_capacity(0) ) ) ));
+                defs.name_to_var_mapping.insert(set_name.to_string(), DefinitionCollection::Set( Rc::new( RefCell::new( HashSet::with_capacity(0) ) ) ));
             }
         }
         if defs.get_hashset("FunctionNames").is_none() {
             let all_functions = build_all_functions_set(defs);
-            defs.name_to_var_mapping.insert("FunctionNames".to_string(), Contains::Set( Rc::new( RefCell::new( all_functions ) ) ));
+            defs.name_to_var_mapping.insert("FunctionNames".to_string(), DefinitionCollection::Set( Rc::new( RefCell::new( all_functions ) ) ));
         }
     }
 
@@ -228,39 +208,21 @@ fn build_values(definition: &Yaml, use_speech_defs: bool, path: &Path) -> Result
         return Ok( Some(crate::speech::process_include(path, include_file_name, do_include_fn)?) );
     }
 
-    let result;
-    if def_name.starts_with("Numbers") || def_name.ends_with("_vec") {
-         result = Contains::Vec( Rc::new( RefCell::new( get_vec_values(value.as_vec().unwrap())? ) ) );
+    let result = if let Some(vec) = value.as_vec() {
+        DefinitionCollection::Vec( Rc::new( RefCell::new( get_vec_values(vec)? ) ) )
     } else {
-        // match value.as_vec() {
-        //     Some(vec) => {
-        //         result = Contains::Set( Rc::new( RefCell::new( get_set_values(vec)? ) ) );            },
-        //     None => {
-        //         let dict = value.as_hash().ok_or_else(|| anyhow!("definition list value '{}' is not an array or dictionary", yaml_to_type(value)))?;
-        //         result = Contains::Map( Rc::new( RefCell::new( get_map_values(dict)
-        //                     .chain_err(||format!("while reading value '{}'", def_name))? ) ) );
-
-        //     },
-        // }
         let dict = value.as_hash().ok_or_else(|| anyhow!("definition list value '{}' is not an array or dictionary", yaml_to_type(value)))?;
         if dict.is_empty() {
-            result = Contains::Set( Rc::new( RefCell::new( HashSet::with_capacity(0) ) ) );
+            DefinitionCollection::Set( Rc::new( RefCell::new( HashSet::with_capacity(0) ) ) )
         } else {
             // peak and see if this is a set or a map
             let (_, entry_value) = dict.iter().next().unwrap();
             if entry_value.is_null() {
-                result = Contains::Set( Rc::new( RefCell::new( get_set_values(dict)
-                            .with_context(||format!("while reading value '{def_name}'"))? ) ) );
+                DefinitionCollection::Set( Rc::new( RefCell::new( get_set_values(dict)
+                            .with_context(||format!("while reading value '{def_name}'"))? ) ) )
             } else {
-                // peak and see if this is a set or a map
-                let (_, entry_value) = dict.iter().next().unwrap();
-                if entry_value.is_null() {
-                    result = Contains::Set( Rc::new( RefCell::new( get_set_values(dict)
-                                .with_context(||format!("while reading value '{def_name}'"))? ) ) );
-                } else {
-                    result = Contains::Map( Rc::new( RefCell::new( get_map_values(dict)
-                                .with_context(||format!("while reading value '{def_name}'"))? ) ) );
-                }
+                DefinitionCollection::Map( Rc::new( RefCell::new( get_map_values(dict)
+                            .with_context(||format!("while reading value '{def_name}'"))? ) ) )
             }
         }
     };
@@ -366,6 +328,26 @@ mod tests {
             assert_eq!(names.len(), 7);
             assert!(names.contains("f"));
             assert!(!names.contains("a"));
+        });
+    }
+
+    #[test]
+    fn test_vec_not_numbers() {
+        let function_application_word = r#"[FunctionApplicationWord: ["of"]]"#;
+        let defs_build_fn = |variable_def_list: &Yaml| {
+            for variable_def in variable_def_list.as_vec().unwrap() {
+                if let Err(e) = build_values(variable_def, true, Path::new("")) {
+                    bail!("{}", crate::interface::errors_to_string(&e.context(format!("in file {:?}", function_application_word))));
+                }
+            }
+            return Ok(vec![]);
+        };
+        compile_rule(function_application_word, defs_build_fn).unwrap();
+        SPEECH_DEFINITIONS.with(|defs| {
+            let defs = defs.borrow();
+            let word = defs.get_vec("FunctionApplicationWord");
+            assert!(word.is_some());
+            assert_eq!(word.unwrap().as_slice(), ["of"]);
         });
     }
 

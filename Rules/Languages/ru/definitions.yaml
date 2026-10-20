@@ -1,57 +1,126 @@
 ---
 - include: "../../definitions.yaml"
 
-# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
-# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
-# If no ":"s are used, the same speech is used for all forms
-# If bracketing words make sense, they are separated with ";"s
-# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
-# If there are multiple fixities (e.g., see transpose), they are separated with "||
-#   for readability, spaces can be used around any of the delimiter characters
-# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+# IntentMappings Syntax:
+#
+# This section defines how each "intent" is spoken for various grammatical forms (fixities such as "prefix", "infix", "postfix", and "function"),
+#  along with supporting different verbosity levels.
+# The syntax is a little bit complicated, but allows a declarative syntax so you don't have to write as many rules.
+#
+# For each intent, you specify spoken forms for one or more fixities using the syntax below.
+#
+# - Each mapping has the form:
+#     "<intent>": "<fixity1>=<speech1> || <fixity2>=<speech2> || ...",
+#   Every alternative must name a fixity and use "="; the fixity requested when speaking selects one.
+#
+# - Separate multiple fixities with "||". Spaces are allowed around any delimiter for readability.
+# - Within a speech string, "|" selects the verbosity form:
+#     - one "|"  (two forms):   the first is 'terse', the second is used for 'medium' and 'verbose'
+#     - two "|"  (three forms): 'terse', 'medium', 'verbose', in that order
+#     - no "|":                 the same spoken form is used for all verbosity levels
+#
+# - Use semicolons ";" to divide opening; main; closing bracketing words within the name part,
+#   where such words make sense (a name with no ";" is just the main phrase).
+# - If an intent has multiple fixities but a definition does not specify one, the first fixity listed is chosen by default.
+#
+# Functions and argument glue (the part after the name):
+# - ":" separates the name/bracketing phrase from the argument-glue options that follow it.
+# - Arity template (two or more ":" options, or one option with ','-separated glue words): the
+#   number of glue words implies the arity, and the final argument is preceded by "of".
+#   Example: "sum: over: from,to"
+#      - 1 arg:  "sum of x"
+#      - 2 args: "sum over i of x"
+#      - 3 args: "sum from i to n of x"
+#   If no option matches the argument count, the arguments are separated with "comma".
+# - Binary separator (exactly one ":" option, no commas in it): after "of", that word joins the two args.
+#   Example: "quotient": "function=integer part: divided by" → "integer part of x divided by y"
+#   If there are not exactly two args, the arguments fall back to "comma".
+# - Paired "ratio-style" ("<name> : <glue> | <name2> : <glue2> | ..."): used when every "|"-separated
+#   piece is a single "name : glue" pair. Verbosity selects one pair, whose glue is the binary
+#   separator described above. Example: "ratio": "function=ratio : to | the ratio : to | the ratio : to"
+#
+# Conceptual grammar (with precedence):
+#
+#   IntentMappingsEntry ::= <intent> ":" <intent_speech>          # ":" is the YAML key/value separator
+#
+#   <intent_speech> ::= <fixity_speech> ( "||" <fixity_speech> )*
+#
+#   <fixity_speech> ::= <fixity> "=" <fixity_body>
+#
+#   <fixity> ::= "prefix" | "infix" | "postfix" | "function" | "nofix" | "silent"
+#
+#   <fixity_body> ::= <standard_body> | <paired_body>
+#
+#   # Standard form: a name/bracketing part, then ":"-separated argument-glue options.
+#   <standard_body> ::= <speech_part> ( ":" <arg_glue> )*
+#
+#   <speech_part> ::= <segment> [ ";" <segment> ";" <segment> ]   # 1 part: name; 3 parts: opening; main; closing
+#
+#   <segment>  ::= <word> [ "|" <word> [ "|" <word> ] ]           # terse | medium | verbose
+#
+#   <arg_glue> ::= <segment>                                      # a single glue word, or ","-separated arity words
+#
+#   # Paired "ratio-style" form: recognized only when every "|" piece is a single "name : glue" pair.
+#   <paired_body> ::= <pair> ( "|" <pair> )+
+#
+#   <pair> ::= <word> ":" <word>                                 # the glue <word> contains no ":"
+#
+#   <word> ::= text
+#
+# Precedence depends on the form:
+#   - Standard: split on ":" first (name vs. argument-glue options), then split each piece on "|"
+#     for terse|medium|verbose, and split only the name part on ";" for opening; main; closing.
+#   - Paired: split on "|" first into "name : glue" pairs, then verbosity selects one pair.
+#
+# Example:
+#   "absolute-value": "function= ; absolute value| the absolute value| the absolute value; end absolute value"
+#   "sum": "function=sum: over: from,to"
+#   "quotient": "function=integer part: divided by"
+#   "ratio": "function=ratio : to | the ratio : to | the ratio : to"  # verbosity of name:glue pairs
+#
 - IntentMappings: {
-    "indexed-by": "infix= ; с индексом; конец индекса: с индексом: с индексом",
+    "indexed-by": "infix= ; с индексом; конец индекса| с индексом| с индексом",
     "modified-variable": "silent= ",
-    "say-super": "infix=верхний индекс: верхний индекс: верхний индекс",   # used with 'mo' for superscripts (e.g, "<")
+    "say-super": "infix=верхний индекс| верхний индекс| верхний индекс",   # used with 'mo' for superscripts (e.g, "<")
     "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
 
-    "absolute-value": "function= ; модуль: модуль: модуль; конец модуля",
+    "absolute-value": "function= ; модуль| модуль| модуль; конец модуля",
     "binomial": "infix=число сочетаний из; по; конец числа сочетаний",
     # "closed-interval": "other=closed-interval; от,до; end closed-interval",
-    "greatest-common-divisor": "function=нод: нод: наибольший общий делитель",
+    "greatest-common-divisor": "function=нод| нод| наибольший общий делитель",
     "imaginary-part": "function=мнимая часть, мнимая часть, мнимая часть",
-    "least-common-multiple": "function=нок:нок:наименьшее общее кратное",
+    "least-common-multiple": "function=нок|нок|наименьшее общее кратное",
     # "large-op": "infix=над || other=от,до",
-    "limit": "prefix=предел при: предел при: предел при",
-    "lim-sup": "prefix=верхний предел при: верхний предел при: верхний предел при",
-    "lim-inf": "prefix=нижний предел при: нижний предел при: нижний предел при",
-    "logarithm-with-base": "prefix=логарифм по основанию: логарифм по основанию: логарифм по основанию",
-    "natural-logarithm": "function=эл эн: натуральный логарифм: натуральный логарифм",
+    "limit": "prefix=предел при| предел при| предел при",
+    "lim-sup": "prefix=верхний предел при| верхний предел при| верхний предел при",
+    "lim-inf": "prefix=нижний предел при| нижний предел при| нижний предел при",
+    "logarithm-with-base": "prefix=логарифм по основанию| логарифм по основанию| логарифм по основанию",
+    "natural-logarithm": "function=эл эн| натуральный логарифм| натуральный логарифм",
     "minus": "infix=минус || prefix=минус",
     "plus": "infix=плюс || prefix=плюс",
     # "pochhammer": "infix=permutations of",  # arguments are in reverse order, so can't work here
     "real-part": "function=действительная часть",
 
     "transpose": "postfix=транспонирование || function=транспонированная",
-    "norm": "function=; норма: норма: норма; конец нормы",
-    "trace": "function=;след : след: след; конец следа",
-    "dimension": "function=; размерность : размерность: размерность; конец размерности",
-    "homomorphism": "function= ; гомоморфизм : гомоморфизм: гомоморфизм; конец гомоморфизма",
-    "kernel": "function= ; ядро : ядро: ядро; конец ядра",
+    "norm": "function=; норма| норма| норма; конец нормы",
+    "trace": "function=;след | след| след; конец следа",
+    "dimension": "function=; размерность | размерность| размерность; конец размерности",
+    "homomorphism": "function= ; гомоморфизм | гомоморфизм| гомоморфизм; конец гомоморфизма",
+    "kernel": "function= ; ядро | ядро| ядро; конец ядра",
     "vector": "function= ; вектор || prefix=вектор",
-    "cross-product": "infix=векторное произведение: векторное произведение: векторное произведение",
-    "dot-product": "infix=скалярное произведение: скалярное произведение: скалярное произведение",
+    "cross-product": "infix=векторное произведение| векторное произведение| векторное произведение",
+    "dot-product": "infix=скалярное произведение| скалярное произведение| скалярное произведение",
     "perpendicular-to": "infix=перпендикулярно",
     "perpendicular to": "infix=перпендикулярно",
     "perpendicular_to": "infix=перпендикулярно",
     "forced": "prefix=форсид",
 
-    "divergence": "function= ; дивергенция: дивергенция: дивергенция; конец дивергенции",
+    "divergence": "function= ; дивергенция| дивергенция| дивергенция; конец дивергенции",
     "curl": "function= ; ротор; конец ротора",
-    "gradient": "function= ; градиент: градиент: градиент; конец градиента",
+    "gradient": "function= ; градиент| градиент| градиент; конец градиента",
     "laplacian": "function=лапласиан",   # speech engines don't do a good job with "laplacian"
 
-    "chemistry-concentration": "function= ; концентрация: концентрация: концентрация; конец концентрации",
+    "chemistry-concentration": "function= ; концентрация| концентрация| концентрация; конец концентрации",
   }
   # Names of functions that in terse mode don't say "of" (or it's equivalent in other languages)
 

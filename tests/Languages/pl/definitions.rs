@@ -91,7 +91,14 @@ fn set_difference_basic() -> Result<()> {
       </math>
     "#;
 
-    test("pl", "ClearSpeak", expr, "i z wielka a przecinek, wielka b")?;
+    // Separator dwuargumentowy: nazwa funkcji + "z" + argumenty spięte słowem "i".
+    // Wcześniej nazwa przepadała i zostawało samo spoiwo ("i z wielka a...").
+    test(
+        "pl",
+        "ClearSpeak",
+        expr,
+        "różnica zbiorów z wielka a i wielka b",
+    )?;
 
     Ok(())
 }
@@ -107,7 +114,9 @@ fn postfix_test() -> Result<()> {
                 <mo>T</mo>
             </msup>
             "#,
-            "transpozycja z x",
+            // Test postfiksowy: bez jawnej fixity silnik bierze PIERWSZĄ z listy
+            // w IntentMappings, a tam (jak w EN) postfix jest pierwszy.
+            "x transponowane",
         ),
         (
             "highlight",
@@ -205,9 +214,11 @@ fn functions_and_inverses_tests() -> Result<()> {
 
         //("fraction", "fraction x over y end fraction"),
         ("mixed-fraction", "x i y"),
-        ("quotient", "podzielone przez z x przecinek, y"),
+        // Separator dwuargumentowy z IntentMappings ("| podzielone przez"):
+        // nazwa funkcji wraca na swoje miejsce, a spoiwo łączy oba argumenty.
+        ("quotient", "część całkowita z x podzielone przez y"),
         ("evaluated-at", "x obliczone w y"),
-        ("remainder", "podzielone przez z x przecinek, y"),
+        ("remainder", "reszta z x podzielone przez y"),
 
         ("max", "maksimum z x przecinek, y przecinek, z"),
         ("min", "minimum z x przecinek, y przecinek, z"),
@@ -228,10 +239,18 @@ fn functions_and_inverses_tests() -> Result<()> {
         ("real-part", "część rzeczywista"),
         ("imaginary-part", "część urojona"),
 
-        ("polar-coordinate", "przecinek z x przecinek, y"),
-        ("spherical-coordinate", "przecinek z x przecinek, y przecinek, z"),
-        ("cartesian-coordinate", "przecinek z x przecinek, y przecinek, z"),
-        ("coordinate", "przecinek, x przecinek y przecinek z"),
+        // Współrzędne: po usunięciu zbędnego "; przecinek" z IntentMappings
+        // nazwa wraca na swoje miejsce (wcześniej wyjście brzmiało "przecinek z x...").
+        ("polar-coordinate", "współrzędna biegunowa z x przecinek, y"),
+        (
+            "spherical-coordinate",
+            "współrzędna sferyczna z x przecinek, y przecinek, z",
+        ),
+        (
+            "cartesian-coordinate",
+            "współrzędna kartezjańska z x przecinek, y przecinek, z",
+        ),
+        ("coordinate", "współrzędna z x przecinek, y przecinek, z"),
 
         ("floor", "podłoga z x"),
         ("ceiling", "sufit z x"),
@@ -403,7 +422,7 @@ fn sequence_and_series_intents() -> Result<()> {
                 <mi arg="x">x</mi>
             </mrow>
             "#,
-            "suma z i przecinek, x",
+            "suma przez i z x",
         ),
         (
             "sum-3",
@@ -415,7 +434,7 @@ fn sequence_and_series_intents() -> Result<()> {
                 <mi arg="x">x</mi>
             </mrow>
             "#,
-            "suma z i przecinek, n przecinek, x",
+            "suma od i do n z x",
         ),
         (
             "product-1",
@@ -436,7 +455,7 @@ fn sequence_and_series_intents() -> Result<()> {
                 <mi arg="x">x</mi>
             </mrow>
             "#,
-            "iloczyn z i przecinek, x",
+            "iloczyn przez i z x",
         ),
         (
             "product-3",
@@ -448,7 +467,7 @@ fn sequence_and_series_intents() -> Result<()> {
                 <mi arg="x">x</mi>
             </mrow>
             "#,
-            "iloczyn z i przecinek, n przecinek, x",
+            "iloczyn od i do n z x",
         ),
     ];
 
@@ -598,6 +617,11 @@ fn linear_algebra_tests() -> Result<()> {
               </math>"
               .to_string()
           }
+          "transpose" => "<math>
+                  <mrow intent='transpose:function($x)'>
+                      <mi arg='x'>x</mi>
+                  </mrow>
+              </math>".to_string(),
           _ => format!(
               "<math>
                   <mrow intent='{intent}($x)'>

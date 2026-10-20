@@ -7,56 +7,125 @@
 # - name: [] "...", "..." "..." ]
 
 
-# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
-# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
-# If no ":"s are used, the same speech is used for all forms
-# If bracketing words make sense, they are separated with ";"s
-# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
-# If there are multiple fixities (e.g., see transpose), they are separated with "||
-#   for readability, spaces can be used around any of the delimiter characters
-# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+# IntentMappings Syntax:
+#
+# This section defines how each "intent" is spoken for various grammatical forms (fixities such as "prefix", "infix", "postfix", and "function"),
+#  along with supporting different verbosity levels.
+# The syntax is a little bit complicated, but allows a declarative syntax so you don't have to write as many rules.
+#
+# For each intent, you specify spoken forms for one or more fixities using the syntax below.
+#
+# - Each mapping has the form:
+#     "<intent>": "<fixity1>=<speech1> || <fixity2>=<speech2> || ...",
+#   Every alternative must name a fixity and use "="; the fixity requested when speaking selects one.
+#
+# - Separate multiple fixities with "||". Spaces are allowed around any delimiter for readability.
+# - Within a speech string, "|" selects the verbosity form:
+#     - one "|"  (two forms):   the first is 'terse', the second is used for 'medium' and 'verbose'
+#     - two "|"  (three forms): 'terse', 'medium', 'verbose', in that order
+#     - no "|":                 the same spoken form is used for all verbosity levels
+#
+# - Use semicolons ";" to divide opening; main; closing bracketing words within the name part,
+#   where such words make sense (a name with no ";" is just the main phrase).
+# - If an intent has multiple fixities but a definition does not specify one, the first fixity listed is chosen by default.
+#
+# Functions and argument glue (the part after the name):
+# - ":" separates the name/bracketing phrase from the argument-glue options that follow it.
+# - Arity template (two or more ":" options, or one option with ','-separated glue words): the
+#   number of glue words implies the arity, and the final argument is preceded by "of".
+#   Example: "sum: over: from,to"
+#      - 1 arg:  "sum of x"
+#      - 2 args: "sum over i of x"
+#      - 3 args: "sum from i to n of x"
+#   If no option matches the argument count, the arguments are separated with "comma".
+# - Binary separator (exactly one ":" option, no commas in it): after "of", that word joins the two args.
+#   Example: "quotient": "function=integer part: divided by" → "integer part of x divided by y"
+#   If there are not exactly two args, the arguments fall back to "comma".
+# - Paired "ratio-style" ("<name> : <glue> | <name2> : <glue2> | ..."): used when every "|"-separated
+#   piece is a single "name : glue" pair. Verbosity selects one pair, whose glue is the binary
+#   separator described above. Example: "ratio": "function=ratio : to | the ratio : to | the ratio : to"
+#
+# Conceptual grammar (with precedence):
+#
+#   IntentMappingsEntry ::= <intent> ":" <intent_speech>          # ":" is the YAML key/value separator
+#
+#   <intent_speech> ::= <fixity_speech> ( "||" <fixity_speech> )*
+#
+#   <fixity_speech> ::= <fixity> "=" <fixity_body>
+#
+#   <fixity> ::= "prefix" | "infix" | "postfix" | "function" | "nofix" | "silent"
+#
+#   <fixity_body> ::= <standard_body> | <paired_body>
+#
+#   # Standard form: a name/bracketing part, then ":"-separated argument-glue options.
+#   <standard_body> ::= <speech_part> ( ":" <arg_glue> )*
+#
+#   <speech_part> ::= <segment> [ ";" <segment> ";" <segment> ]   # 1 part: name; 3 parts: opening; main; closing
+#
+#   <segment>  ::= <word> [ "|" <word> [ "|" <word> ] ]           # terse | medium | verbose
+#
+#   <arg_glue> ::= <segment>                                      # a single glue word, or ","-separated arity words
+#
+#   # Paired "ratio-style" form: recognized only when every "|" piece is a single "name : glue" pair.
+#   <paired_body> ::= <pair> ( "|" <pair> )+
+#
+#   <pair> ::= <word> ":" <word>                                 # the glue <word> contains no ":"
+#
+#   <word> ::= text
+#
+# Precedence depends on the form:
+#   - Standard: split on ":" first (name vs. argument-glue options), then split each piece on "|"
+#     for terse|medium|verbose, and split only the name part on ";" for opening; main; closing.
+#   - Paired: split on "|" first into "name : glue" pairs, then verbosity selects one pair.
+#
+# Example:
+#   "absolute-value": "function= ; absolute value| the absolute value| the absolute value; end absolute value"
+#   "sum": "function=sum: over: from,to"
+#   "quotient": "function=integer part: divided by"
+#   "ratio": "function=ratio : to | the ratio : to | the ratio : to"  # verbosity of name:glue pairs
+#
 - IntentMappings: {
     "indexed-by": "infix= ; índice; fim do índice",
     "modified-variable": "silent= ",
     "say-super": "infix=sobrescrito",   # used with 'mo' for superscripts (e.g, "<")
     "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
 
-    "absolute-value": "function= ; valor absoluto: o valor absoluto de: o valor absoluto de; fim do valor absoluto",
+    "absolute-value": "function= ; valor absoluto| o valor absoluto de| o valor absoluto de; fim do valor absoluto",
     "binomial": "infix=binomial; escolhe; fim do binomial",
     "limit": "prefix=limite quando",
-    "lim-sup": "prefix=lim sup quando: o limite superior quando: o limite superior quando",
-    "lim-inf": "prefix=lim inf quando: o limite inferior quando: o limite inferior quando",
-    "logarithm-with-base": "prefix=log na base: o log na base: o logaritmo na base",
+    "lim-sup": "prefix=lim sup quando| o limite superior quando| o limite superior quando",
+    "lim-inf": "prefix=lim inf quando| o limite inferior quando| o limite inferior quando",
+    "logarithm-with-base": "prefix=log na base| o log na base| o logaritmo na base",
     "minus": "infix=menos || prefix=menos",
     "plus": "infix=mais || prefix=positivo",
 
     "transpose": "postfix=transposta || function=transposta",
-    "norm": "function=; norma: norma: a norma; fim da norma",
+    "norm": "function=; norma| norma| a norma; fim da norma",
     # ‖x‖ é inferido pelo motor como 'magnitude' (não 'norm'); sem esta linha
     # vazava "magnitude de x" em inglês. Mesma fala da norma.
-    "magnitude": "function=; norma: norma: a norma; fim da norma",
-    "trace": "function=; traço: traço de: o traço de; fim do traço",
-    "dimension": "function=; dimensão: dimensão de: a dimensão de; fim da dimensão",
-    "homomorphism": "function= ; homomorfismo: homomorfismo de: o homomorfismo de; fim do homomorfismo",
-    "kernel": "function= ; núcleo: núcleo de: o núcleo de; fim do núcleo",
+    "magnitude": "function=; norma| norma| a norma; fim da norma",
+    "trace": "function=; traço| traço de| o traço de; fim do traço",
+    "dimension": "function=; dimensão| dimensão de| a dimensão de; fim da dimensão",
+    "homomorphism": "function= ; homomorfismo| homomorfismo de| o homomorfismo de; fim do homomorfismo",
+    "kernel": "function= ; núcleo| núcleo de| o núcleo de; fim do núcleo",
     "vector": "function= ; vetor || prefix=vetor",
     # O motor infere ⃗a × ⃗b como um <cross-product> SEM filhos (o operador vira
     # o próprio elemento); aí a fixidade infix não se aplica e ele falava o nome
     # literal, "cross product". A fixidade nofix cobre esse caso. Idem dot-product.
-    "cross-product": "infix=vetorial: produto vetorial: produto vetorial || nofix=vetorial: produto vetorial: produto vetorial",
-    "dot-product": "infix=escalar: produto escalar: produto escalar || nofix=escalar: produto escalar: produto escalar",
+    "cross-product": "infix=vetorial| produto vetorial| produto vetorial || nofix=vetorial| produto vetorial| produto vetorial",
+    "dot-product": "infix=escalar| produto escalar| produto escalar || nofix=escalar| produto escalar| produto escalar",
 
-    "divergence": "function= ; div: divergente: divergente; fim do divergente",
+    "divergence": "function= ; div| divergente| divergente; fim do divergente",
     "curl": "function= ; rotacional; fim do rotacional",
-    "gradient": "function= ; grad: gradiente: gradiente; fim do gradiente",
+    "gradient": "function= ; grad| gradiente| gradiente; fim do gradiente",
     "laplacian": "function=laplaciano",
 
-    "chemistry-concentration": "function= ; concentração: concentração de: a concentração de; fim da concentração",
+    "chemistry-concentration": "function= ; concentração| concentração de| a concentração de; fim da concentração",
     # CORREÇÃO: o en tem duas fixidades (nofix || function); só com a function
     # a fala ganha o "de" ("probabilidade de x"). E o separador de palavras do
     # conditional-probability é "|", como no en — ";" não é reconhecido aqui.
-    "probability": "nofix=P: probabilidade || function=probabilidade",
-    "conditional-probability": "function=probabilidade | dado",
+    "probability": "nofix=P| probabilidade || function=probabilidade",
+    "conditional-probability": "function=probabilidade : dado",
     "intersection": "infix=interseção",
     "union": "infix=união",
   }

@@ -80,6 +80,24 @@ fn floor_basic() -> Result<()> {
 }
 
 #[test]
+fn ratio_function_basic() -> Result<()> {
+    let expr = r#"
+      <math>
+        <mrow intent="ratio($x,$y)">
+          <mi arg="x">6</mi>
+          <mi arg="y">3</mi>
+        </mrow>
+      </math>
+    "#;
+
+    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "ratio 6 to 3")?;
+    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "the ratio of 6 to 3")?;
+    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "the ratio of 6 to 3")?;
+    test("en", "ClearSpeak", expr, "the ratio of 6 to 3")?;
+    Ok(())
+}
+
+#[test]
 fn set_difference_basic() -> Result<()> {
     let expr = r#"
       <math>
@@ -944,7 +962,7 @@ fn infix_default_fixity_tests() -> Result<()> {
         ("precedes", "x precedes y"),
         ("proportional", "x proportional to y"),
         ("range-separator", "x through y"),
-        ("ratio", "x ratio y"),
+        ("ratio", "the ratio of x to y"),
         ("similar", "x similar to y"),
         ("subset", "x subset of y"),
         ("subset-or-equal", "x subset or equal to y"),

@@ -7,12 +7,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "odcinek od"      # phrase('the line segment from' A to B)
+      - T: "odcinek od"      # phrase('the line segment from' A to B)
       - x: "*[1]"
       - T: "do"                         # phrase(the line segment from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "odcinek"               # phrase(the 'line segment' A  B)
+      - T: "odcinek"               # phrase(the 'line segment' A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -23,12 +23,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "półprosta od"             # phrase('the ray from' A to B)
+      - T: "półprosta od"             # phrase('the ray from' A to B)
       - x: "*[1]"
       - T: "do"                       # phrase(the ray from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "półprosta"                      # phrase(the 'ray'A  B)
+      - T: "półprosta"                      # phrase(the 'ray'A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -47,9 +47,9 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "miara kąta"      # phrase('the measure of the angle' ABC)
+      - T: "miara kąta"      # phrase('the measure of the angle' ABC)
       else:
-      - t: "miara kąta"      # phrase('measure of angle' ABC)
+      - T: "miara kąta"      # phrase('measure of angle' ABC)
   - x: "*[1]"
   - x: "*[2]"
   - x: "*[3]"
@@ -57,12 +57,16 @@
 
 - name: coordinate
   tag: coordinate
-  match: "."
+  # Intencje postaci coordinate($x,...) mają @arg i spadają do function-intent / IntentMappings
+  match: "not(*[@arg])"
   replace:
-  - T: "przecinek"      # phrase(the 'point' at 1, 2)
   - test:
       if: "$Verbosity='Verbose'"
-      then: [t: "w"]      # phrase('the' point at 1, 2)
+      then: [OT: "ten"]      # phrase('the' point at 1, 2)
+  - T: "punkt"      # phrase(the 'point' at 1, 2)
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [T: "w"]      # phrase('the' point at 1, 2)
   - pause: short
   - insert:
       nodes: "*"
@@ -70,4 +74,4 @@
   - pause: short
   - test:
       if: "($SpeechStyle='ClearSpeak' and $Verbosity='Verbose') or not(IsNode(*[last()],'leaf'))"
-      then: [t: "punkt końcowy"]      # phrase(start point, 'end point')
+      then: [T: "punkt końcowy"]      # phrase(start point, 'end point')

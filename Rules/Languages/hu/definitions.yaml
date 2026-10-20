@@ -11,67 +11,79 @@
 #
 # - Each mapping has the form:
 #     "<intent>": "<fixity1>=<speech1> || <fixity2>=<speech2> || ...",
-#   or just
-#     "<intent>": "<speech>",
-#   where <speech> is used for all forms if fixity and '=' are omitted.
+#   Every alternative must name a fixity and use "="; the fixity requested when speaking selects one.
 #
-# - If an intent has multiple fixities, separate them with "||". Spaces are allowed around delimiters for readability.
-# - If only one ":" is present in *<speech>*, it provides the 'terse' form, and the following string is used for both 'medium' and 'verbose'.
-# - If more than one ":" is present, the string is split into 'terse', 'medium', and 'verbose' forms, in that order (each separated by ":").
-# - If no ":" is present, the same spoken form is used for all styles.
+# - Separate multiple fixities with "||". Spaces are allowed around any delimiter for readability.
+# - Within a speech string, "|" selects the verbosity form:
+#     - one "|"  (two forms):   the first is 'terse', the second is used for 'medium' and 'verbose'
+#     - two "|"  (three forms): 'terse', 'medium', 'verbose', in that order
+#     - no "|":                 the same spoken form is used for all verbosity levels
 #
-# - Use semicolons ";" to divide opening, main, and closing bracketing words within a speech string, where such words make sense.
+# - Use semicolons ";" to divide opening; main; closing bracketing words within the name part,
+#   where such words make sense (a name with no ";" is just the main phrase).
 # - If an intent has multiple fixities but a definition does not specify one, the first fixity listed is chosen by default.
 #
-# Functions and argument glue:
-# - The "|" character delimits options describing how to glue arguments together when speaking function arguments.
-# - Arity templates (multiple "|" options, or one option with ','-separated glue words): glue-word count
-#   implies arity; the final argument is preceded by "of". Example: "sum | over | from,to"
+# Functions and argument glue (the part after the name):
+# - ":" separates the name/bracketing phrase from the argument-glue options that follow it.
+# - Arity template (two or more ":" options, or one option with ','-separated glue words): the
+#   number of glue words implies the arity, and the final argument is preceded by "of".
+#   Example: "sum: over: from,to"
 #      - 1 arg:  "sum of x"
 #      - 2 args: "sum over i of x"
 #      - 3 args: "sum from i to n of x"
-#   If no option matches the argument count, separators fall back to "comma".
-# - Binary separator (exactly one "|" option, no commas in it): after "of", that word joins the two args.
-#   Example: "quotient": "function=integer part | divided by" → "integer part of x divided by y"
-#   If there are not exactly two args, separators fall back to "comma" (no real n-ary use of these words).
+#   If no option matches the argument count, the arguments are separated with "comma".
+# - Binary separator (exactly one ":" option, no commas in it): after "of", that word joins the two args.
+#   Example: "quotient": "function=integer part: divided by" → "integer part of x divided by y"
+#   If there are not exactly two args, the arguments fall back to "comma".
+# - Paired "ratio-style" ("<name> : <glue> | <name2> : <glue2> | ..."): used when every "|"-separated
+#   piece is a single "name : glue" pair. Verbosity selects one pair, whose glue is the binary
+#   separator described above. Example: "ratio": "function=ratio : to | the ratio : to | the ratio : to"
 #
-# BNF-like description:
+# Conceptual grammar (with precedence):
 #
-#   IntentMappingsEntry ::= <intent> ":" <intent_speech>
+#   IntentMappingsEntry ::= <intent> ":" <intent_speech>          # ":" is the YAML key/value separator
 #
 #   <intent_speech> ::= <fixity_speech> ( "||" <fixity_speech> )*
-#                    | <simple_speech>
 #
-#   <fixity_speech> ::= <fixity> "=" <speech_options>
+#   <fixity_speech> ::= <fixity> "=" <fixity_body>
 #
 #   <fixity> ::= "prefix" | "infix" | "postfix" | "function" | "nofix" | "silent"
 #
-#   <speech_options> ::= <speech_string>
-#                     | <speech_string> "|" <arg_glue> ( "|" <arg_glue> )*
+#   <fixity_body> ::= <standard_body> | <paired_body>
 #
-#   <speech_string> ::= text
-#       # May use ":" to separate terse:medium:verbose forms.
-#       # May use ";" for bracketing (opening; main; closing).
+#   # Standard form: a name/bracketing part, then ":"-separated argument-glue options.
+#   <standard_body> ::= <speech_part> ( ":" <arg_glue> )*
 #
-#   <arg_glue> ::= text
-#       # One option, no commas: binary separator after "of" (e.g. "divided by").
-#       # One option with "," or several "|" options: arity templates
-#       # (glue-word count = arg_count - 1; last arg preceded by "of").
-#       # Unmatched arity (or binary glue with ≠2 args): fall back to "comma".
+#   <speech_part> ::= <segment> [ ";" <segment> ";" <segment> ]   # 1 part: name; 3 parts: opening; main; closing
 #
-#   <simple_speech> ::= <speech_string> (applies to all fixities)
+#   <segment>  ::= <word> [ "|" <word> [ "|" <word> ] ]           # terse | medium | verbose
+#
+#   <arg_glue> ::= <segment>                                      # a single glue word, or ","-separated arity words
+#
+#   # Paired "ratio-style" form: recognized only when every "|" piece is a single "name : glue" pair.
+#   <paired_body> ::= <pair> ( "|" <pair> )+
+#
+#   <pair> ::= <word> ":" <word>                                 # the glue <word> contains no ":"
+#
+#   <word> ::= text
+#
+# Precedence depends on the form:
+#   - Standard: split on ":" first (name vs. argument-glue options), then split each piece on "|"
+#     for terse|medium|verbose, and split only the name part on ";" for opening; main; closing.
+#   - Paired: split on "|" first into "name : glue" pairs, then verbosity selects one pair.
 #
 # Example:
-#   "absolute-value": "function= ; absolute value: the absolute value: the absolute value; end absolute value"
-#   "sum": "function=sum | over | from,to"
-#   "quotient": "function=integer part | divided by"
+#   "absolute-value": "function= ; absolute value| the absolute value| the absolute value; end absolute value"
+#   "sum": "function=sum: over: from,to"
+#   "quotient": "function=integer part: divided by"
+#   "ratio": "function=ratio : to | the ratio : to | the ratio : to"  # verbosity of name:glue pairs
 #
 - IntentMappings: {
-    "indexed-by": "infix= alsó index kezdete; alsó index; alsó index vége: alsó index vége: alsó index vége",
-    "say-super": "infix=felső index: felső index: felső index",   # used with 'mo' for superscripts (e.g, "<")
+    "indexed-by": "infix= alsó index kezdete; alsó index; alsó index vége| alsó index vége| alsó index vége",
+    "say-super": "infix=felső index| felső index| felső index",   # used with 'mo' for superscripts (e.g, "<")
     "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
 
-    "absolute-value": "function= ; abszolút érték: az abszolút érték: az abszolút érték; abszolút érték vége",
+    "absolute-value": "function= ; abszolút érték| az abszolút érték| az abszolút érték; abszolút érték vége",
     "binomial": "infix=binomiális kezdete; a; binomiális vége",
     "dimension-product": "infix=by",
     ### Functions and Inverses
@@ -87,15 +99,15 @@
     #"fraction":"function=fraction; over; end fraction", # NOTE: Fails
     "mixed-fraction":"infix=és", # NOTE: in website says function, but follow infix speech pattern.
     "greatest-common-divisor": "function=a legnagyobb közös osztó",
-    "quotient":"function=egész rész | osztva", # NOTE: Logic somewhere here failing, becomes "divided by of x comma, y" instead of "integer part of x divided by y"
+    "quotient":"function=egész rész : osztva", # NOTE: Logic somewhere here failing, becomes "divided by of x comma, y" instead of "integer part of x divided by y"
     "evaluated-at":"infix=értékelve || postfix=értékként",
-    "remainder":"function=a maradék | osztva",
+    "remainder":"function=a maradék : osztva",
     "max":"function=max",
     "min":"function=min",
     "power":"infix=a hatványra",
     "root":"function=root",
-    "imaginary-part": "function=a képzeletbeli rész: a képzeletbeli rész: a képzeletbeli rész",
-    "least-common-multiple": "function=lcm: a legkisebb közös többszörös: a legkisebb közös többszörös",
+    "imaginary-part": "function=a képzeletbeli rész| a képzeletbeli rész| a képzeletbeli rész",
+    "least-common-multiple": "function=lcm| a legkisebb közös többszörös| a legkisebb közös többszörös",
     "complex-conjugate":"function=Komplex konjugált",
     "complex-arg":"function=argumentum",
     "polar-coordinate":"function=poláris koordináta",
@@ -107,47 +119,47 @@
     "round":"function=kerekített érték",
     "fractional-part":"function=tört rész",
     # "large-op": "infix=over || other=from,to",
-    "limit": "prefix=határérték: határérték: határérték",
-    "lim-sup": "prefix=lim-sup: a határérték, amely nagyobb, mint: a határérték, amely nagyobb, mint",
-    "lim-inf": "prefix=lim inf mint: az alsó határérték, mint: a határérték alsó határértéke, mint",
-    "logarithm-with-base": "prefix=alap logaritmus: alap logaritmus: alap logaritmus",
+    "limit": "prefix=határérték| határérték| határérték",
+    "lim-sup": "prefix=lim-sup| a határérték, amely nagyobb, mint| a határérték, amely nagyobb, mint",
+    "lim-inf": "prefix=lim inf mint| az alsó határérték, mint| a határérték alsó határértéke, mint",
+    "logarithm-with-base": "prefix=alap logaritmus| alap logaritmus| alap logaritmus",
     # "pochhammer": "infix=permutations of",  # arguments are in reverse order, so can't work here
     "real-part": "function=az igazi rész",
-    "trace": "function= ; nyom : nyom: a nyom; nyom vége",
-    "dimension": "function=; dimenzió : dimenzió: a dimenzió; dimenzió vége",
-    "homomorphism": "function= ; homomorfizmus : homomorfizmus: a homomorfizmus; homomorfizmus vége",
-    "kernel": "function= ; kernel : kernel: a kernel; kernel vége",
+    "trace": "function= ; nyom | nyom| a nyom; nyom vége",
+    "dimension": "function=; dimenzió | dimenzió| a dimenzió; dimenzió vége",
+    "homomorphism": "function= ; homomorfizmus | homomorfizmus| a homomorfizmus; homomorfizmus vége",
+    "kernel": "function= ; kernel | kernel| a kernel; kernel vége",
     "dot-product": "infix=skaláris szorzat",
 
     #"divergence": "function= ; dihv: divergencia: divergencia; divergencia vége",
     #"laplacian": "function=laplaciáns",   # speech engines don't do a good job with "laplacian"
 
-    "chemistry-concentration": "function= ; koncentráció: koncentrációja ennek: a koncentrációja; koncentráció vége",
+    "chemistry-concentration": "function= ; koncentráció| koncentrációja ennek| a koncentrációja; koncentráció vége",
     ### Calculus
-    "definite-integral":"function=integrál felett || function=integrál innen:; ide:", # Property ???
-    "derivative":"function=a deriváltja; mely erre vonatkozik:", # Property ???
+    "definite-integral":"function=integrál felett || function=integrál innen|; ide|", # Property ???
+    "derivative":"function=a deriváltja; mely erre vonatkozik|", # Property ???
     "tends-to":"infix=ehhez tart",
     "tends-to-from-above":"infix=általában alulról indul",
     "tends-to-from-below":"infix=alulról indul",
     ### Sets
-    "set": "function= ; halmaz: a halmaz",
-    "set-difference":"function=különbséghalmaz | és || infix=mínusz",
+    "set": "function= ; halmaz| a halmaz",
+    "set-difference":"function=különbséghalmaz : és || infix=mínusz",
     "complement":"function=komplemens",
     "empty-set":"nofix=üres halmaz",
     "cardinality":"function=számosság", # NOTE: does not have a defined speech template in website
     "list":"function=lista",
-    "tuple": "function= ; tuple: a tuple",
+    "tuple": "function= ; tuple| a tuple",
     ### Sequence and Series
     "sum": "function=összeg",
     "product":"function=szorzat",
 
     ### Elementary classical functions
-    "sine":"function=szinusz: szinusz",
-    "cosine":"function=koszinusz: koszinusz",
-    "tangent":"function=tangens: tangens",
-    "secant":"function=szekáns: szekáns",
-    "cosecant":"function=koszekáns: koszekáns",
-    "cotangent":"function=kotangens: kotangens",
+    "sine":"function=szinusz| szinusz",
+    "cosine":"function=koszinusz| koszinusz",
+    "tangent":"function=tangens| tangens",
+    "secant":"function=szekáns| szekáns",
+    "cosecant":"function=koszekáns| koszekáns",
+    "cotangent":"function=kotangens| kotangens",
     "arcsine":"function=arkusz szinusz",
     "arccosine":"function=arkusz koszinusz",
     "arctangent":"function=arkusz tangens",
@@ -167,7 +179,7 @@
     "arc-hyperbolic-cosecant":"function=arkusz hiperbolikus koszekáns",
     "arc-hyperbolic-cotangent":"function=arkusz hiperbolikus kotangens",
     "exponential":"function=exponenciális",
-    "natural-logarithm": "function=l n: természetes alapú logaritmus: természetes alapú logaritmus",
+    "natural-logarithm": "function=l n| természetes alapú logaritmus| természetes alapú logaritmus",
     "logarithm":"function=logaritmus", ##Check arity 2 
     ### Statistics and Probability
     "mean":"function=jelentése", 
@@ -184,7 +196,7 @@
     "determinant":"function=determináns",
     "adjugate":"function=adjugált",
     "magnitude":"function=nagyságrend",
-    "norm": "function=; normalizálás: normalizálás: normalizálás; normalizálás vége",
+    "norm": "function=; normalizálás| normalizálás| normalizálás; normalizálás vége",
     "span":"function=fesztávolság",
 
     "unit-vector":"prefix=egységvektor",
@@ -195,12 +207,12 @@
 
 
     ### Constants and Sets
-    "set-of-integers":"nofix=ℤ: az összes egész szám halmaza",
-    "set-of-reals":"nofix=valós számok halmaza: az összes valós szám halmaza",
-    "set-of-rationals":"nofix=ℚ: az összes racionális szám halmaza",
-    "set-of-natural-numbers":"nofix=ℕ: az összes természetes szám halmaza",
-    "set-of-complex-numbers":"nofix=ℂ: az összes komplex szám halmaza",
-    "set-of-primes":"nofix=ℙ: az összes prímszám halmaza",
+    "set-of-integers":"nofix=ℤ| az összes egész szám halmaza",
+    "set-of-reals":"nofix=valós számok halmaza| az összes valós szám halmaza",
+    "set-of-rationals":"nofix=ℚ| az összes racionális szám halmaza",
+    "set-of-natural-numbers":"nofix=ℕ| az összes természetes szám halmaza",
+    "set-of-complex-numbers":"nofix=ℂ| az összes komplex szám halmaza",
+    "set-of-primes":"nofix=ℙ| az összes prímszám halmaza",
 
 
     ### Geometry
@@ -221,7 +233,7 @@
     ### General Concepts 
     "fenced-group":"function=bekerített csoport", # appears both under general concepts and grouping
      # NOTE: in site mentions "the pair x and y", due to being defined as function, needs the "of" keyword
-    "ordered-pair": "function=a pár | és", # Needs to be tested, test converts "and" to "comma,"
+    "ordered-pair": "function=a pár : és", # Needs to be tested, test converts "and" to "comma,"
     "highlight":"postfix=kiemelt",
     "least-common-denominator":"function=legkisebb közös nevező",
     "rate":"infix=per",
@@ -236,8 +248,8 @@
     ### Other
     ## Default fixity function
     "curl": "function=rotáció",
-    "divergence": "function=eltérés:eltérés",
-    "gradient": "function=gradiens:gradiens",
+    "divergence": "function=eltérés|eltérés",
+    "gradient": "function=gradiens|gradiens",
     "laplacian": "function=laplaciánus",
 
     ## Default fixity prefix
@@ -262,7 +274,7 @@
     "congruent": "infix=egybeesik",
     "cartesian-product": "infix=derékszögű szorzat",
     "composed-with": "infix=komponálva",
-    "cross-product": "infix=kereszt szorzata: kereszt szorzata: kereszt szorzata",
+    "cross-product": "infix=kereszt szorzata| kereszt szorzata| kereszt szorzata",
     "defined-as": "infix=definiálva",
     "divided-by": "infix=osztva",
     "divides": "infix=osztja",
@@ -325,11 +337,11 @@
     "percent": "postfix=százalék",
 
     ## Default fixity nofix
-    "diameter":"nofix=átmérő: átmérő",
-    "distance":"nofix=távolság; távolság: távolság",
-    "probability":"nofix=P: valószínűség || function=valószínűség",
-    "radius":"nofix=r: sugár",
-    "volume":"nofix=hangerő: hangerő || function=hangerő",
+    "diameter":"nofix=átmérő| átmérő",
+    "distance":"nofix=távolság; távolság| távolság",
+    "probability":"nofix=P| valószínűség || function=valószínűség",
+    "radius":"nofix=r| sugár",
+    "volume":"nofix=hangerő| hangerő || function=hangerő",
     "exponential-e":"nofix=e",
     "imaginary-i":"nofix=képzeletbeli én",
     "differential-d":"nofix=d",
@@ -339,6 +351,10 @@
     ## Other : Not tested, don't appear in https://w3c.github.io/mathml-docs/intent-core-concepts/
     "modified-variable": "silent= "
   }
+  # The connector word to say for functional 'IntentMappings' (in English, "of")
+  # This is likely the word used for U+2061 in unicode.yaml, but for technical reasons needs to be defined here
+  # vector of length=1 because scalars not supported
+- FunctionApplicationWord: ["a(z)"]
 
   # Names of functions that in terse mode don't say "of" (or it's equivalent in other languages)
 - TerseFunctionNames: {
@@ -347,30 +363,30 @@
 
 - NavigationParts: {
     # These are the parts of a formula that can be navigated to
-    "large-op": "base; lower limit; upper limit",
-    "mfrac": "numerator; denominator",
+    "large-op": "alap; alsó határ; felső határ",
+    "mfrac": "számláló; nevező",
     "fraction": "számláló; nevező",
     "msqrt": "gyök",
     "square-root": "gyök",
-    "mroot": "root; root index",
+    "mroot": "gyök; gyök index",
     "root": "gyök; gyök index",
-    "msub": "base; subscript",
-    "sub": "base; subscript",
-    "logarithm-with-base": "base",
-    "indexed-by": "base; subscript",
-    "msup": "base; superscript",
-    "say-super": "base; superscript",
-    "skip-super": "base; superscript",
-    "power": "base; exponent",
-    "msubsup": "base; subscript; superscript",
-    "munder": "base; under limit",
-    "mover": "base; upper limit",
-    "munderover": "base; under limit; upper limit",
+    "msub": "alap; alsó index",
+    "sub": "alap; alsó index",
+    "logarithm-with-base": "alap logaritmus",
+    "indexed-by": "alap; alsó index",
+    "msup": "alap; felső index",
+    "say-super": "alap; felső index",
+    "skip-super": "alap; felső index",
+    "power": "alap; kitevő",
+    "msubsup": "alap; alsó index; felső index",
+    "munder": "alap; határérték alatt",
+    "mover": "alap; határérték felett",
+    "munderover": "alap; határérték alatt; határérték felett",
 
     # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
     # it's a hack to put them here, but at least they are grouped with the other navigation parts
-    "in": "in",
-    "out": "out of",
+    "in": "ban/ben",
+    "out": "ki",
   }
 
 - KnownWords: {

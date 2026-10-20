@@ -40,7 +40,7 @@ fn prefix_sweep() -> Result<()> {
         <mi intent=":unit">qg</mi>
         </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "kwetta-grams, przecinek; ronna-grams, przecinek; jotta-grams, przecinek; zetta-grams, przecinek; eksa-grams, przecinek; peta-grams, przecinek; tera-grams, przecinek; giga-grams, przecinek; mega-grams, przecinek; kilo-grams, przecinek; hekto-grams, przecinek; deka-grams, przecinek; decy-grams, przecinek; centy-grams, przecinek; mili-grams, przecinek; mikro-grams, przecinek; nano-grams, przecinek; piko-grams, przecinek; femto-grams, przecinek; atto-grams, przecinek; zepto-grams, przecinek; jokto-grams, przecinek; ronto-grams, przecinek; kwekto-grams")?;
+        "kwetta-gramów, przecinek; ronna-gramów, przecinek; jotta-gramów, przecinek; zetta-gramów, przecinek; eksa-gramów, przecinek; peta-gramów, przecinek; tera-gramów, przecinek; giga-gramów, przecinek; mega-gramów, przecinek; kilo-gramów, przecinek; hekto-gramów, przecinek; deka-gramów, przecinek; decy-gramów, przecinek; centy-gramów, przecinek; mili-gramów, przecinek; mikro-gramów, przecinek; nano-gramów, przecinek; piko-gramów, przecinek; femto-gramów, przecinek; atto-gramów, przecinek; zepto-gramów, przecinek; jokto-gramów, przecinek; ronto-gramów, przecinek; kwekto-gramów")?;
                 return Ok(());
 
 }
@@ -61,7 +61,7 @@ fn si_base() -> Result<()> {
         <mn>1</mn><mi intent=":unit">sec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">sec</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 amper, przecinek; 2 ampers, przecinek; 1 kandela, przecinek; 2 kandelas, przecinek; 1 kelwin, przecinek; 2 kelwins, przecinek; 1 kelwin, przecinek; 2 kelwins, przecinek; 1 gram, przecinek; 2 grams, przecinek; 1 metr, przecinek; 2 metrs, przecinek, 1 mol, przecinek; 2 mols, przecinek; 1 sekunda, przecinek; 2 sekundas, przecinek; 1 sekunda, przecinek; 2 sekundas, przecinek; 1 sekunda, przecinek; 2 sekundas, przecinek; 1 sekunda, przecinek; 2 sekundas")?;
+        "1 amper, przecinek; 2 ampery, przecinek; 1 kandela, przecinek; 2 kandele, przecinek; 1 kelwin, przecinek; 2 kelwiny, przecinek; 1 kelwin, przecinek; 2 kelwiny, przecinek; 1 gram, przecinek; 2 gramy, przecinek; 1 metr, przecinek; 2 metry, przecinek, 1 mol, przecinek; 2 mole, przecinek; 1 sekunda, przecinek; 2 sekundy, przecinek; 1 sekunda, przecinek; 2 sekundy, przecinek; 1 sekunda, przecinek; 2 sekundy, przecinek; 1 sekunda, przecinek; 2 sekundy")?;
                 return Ok(());
 
 }
@@ -80,7 +80,7 @@ fn si_base_with_prefixes() -> Result<()> {
         <mn>1</mn><mi intent=":unit">nsec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">psec</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 kwetta-amper, przecinek; 2 ronna-ampers, przecinek; 1 jotta-kandela, przecinek; 2 zetta-kandelas; przecinek; 1 eksa-kelwin, przecinek; 2 peta-kelwins, przecinek; 1 tera-kelwin, przecinek; 2 giga-kelwins, przecinek; 1 mega-gram, przecinek; 2 kilo-grams, przecinek; 1 hekto-metr, przecinek; 2 deka-metrs, przecinek; 1 decy-mol, przecinek; 2 centy-mols, przecinek; 1 mili-sekunda, przecinek; 2 mikro-sekundas; przecinek; 1 nano-sekunda, przecinek; 2 piko-sekundas")?;
+        "1 kwetta-amper, przecinek; 2 ronna-ampery, przecinek; 1 jotta-kandela, przecinek; 2 zetta-kandele, przecinek; 1 eksa-kelwin, przecinek; 2 peta-kelwiny, przecinek; 1 tera-kelwin, przecinek; 2 giga-kelwiny, przecinek; 1 mega-gram, przecinek; 2 kilo-gramy, przecinek; 1 hekto-metr, przecinek; 2 deka-metry, przecinek; 1 decy-mol, przecinek; 2 centy-mole, przecinek; 1 mili-sekunda, przecinek; 2 mikro-sekundy, przecinek; 1 nano-sekunda, przecinek; 2 piko-sekundy")?;
                 return Ok(());
 
 }
@@ -103,7 +103,7 @@ fn si_derived_1() -> Result<()> {
         <mn>1</mn><mi intent=":unit">lx</mi><mo>,</mo><mn>2</mn><mi intent=":unit">lx</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 bekerel, przecinek; 2 bekerels, przecinek; 1 kulomb, przecinek; 2 kulombs, przecinek; 1 stopień Celsjusza, przecinek; 2 stopnie Celsjusza, przecinek; 1 stopień Celsjusza, przecinek; 2 stopnie Celsjusza, przecinek; 1 farad, przecinek; 2 farads, przecinek; 1 grej, przecinek; 2 grejs, przecinek; 1 henr, przecinek; 2 henry, przecinek; 1 herce, przecinek; 2 herces, przecinek; 1 dżul, przecinek; 2 dżuls, przecinek; 1 katal, przecinek; 2 katals, przecinek; 1 lumen, przecinek; 2 lumens, przecinek; 1 luks, przecinek; 2 luksy")?;
+        "1 bekerel, przecinek; 2 bekerele, przecinek; 1 kulomb, przecinek; 2 kulomby, przecinek; 1 stopień Celsjusza, przecinek; 2 stopnie Celsjusza, przecinek; 1 stopień Celsjusza, przecinek; 2 stopnie Celsjusza, przecinek; 1 farad, przecinek; 2 farady, przecinek; 1 grej, przecinek; 2 greje, przecinek; 1 henr, przecinek; 2 henry, przecinek; 1 herc, przecinek; 2 herce, przecinek; 1 dżul, przecinek; 2 dżule, przecinek; 1 katal, przecinek; 2 katale, przecinek; 1 lumen, przecinek; 2 lumeny, przecinek; 1 luks, przecinek; 2 luksy")?;
                 return Ok(());
 
 }
@@ -125,7 +125,7 @@ fn si_derived_1_with_prefixes() -> Result<()> {
         <mn>1</mn><mi intent=":unit">p℃</mi><mo>,</mo><mn>2</mn><mi intent=":unit">n℃</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 kwetta-bekerel, przecinek; 2 ronna-bekerels; przecinek; 1 jotta-kulomb, przecinek; 2 zetta-kulombs; przecinek; 1 eksa-farad, przecinek; 2 peta-farads, przecinek; 1 tera-grej, przecinek; 2 giga-grejs, przecinek; 1 mega-henr, przecinek; 2 kilo-henry, przecinek; 1 deka-herce, przecinek; 2 decy-herces, przecinek; 1 centy-dżul, przecinek; 2 mili-dżuls, przecinek; 1 mikro-katal, przecinek; 2 nano-katals, przecinek; 1 piko-lumen, przecinek; 2 femto-lumens, przecinek; 1 atto-luks, przecinek; 2 zepto-luksy, przecinek; 1 mili-stopień Celsjusza; przecinek; 2 mikro-stopnie Celsjusza; przecinek; 1 piko-stopień Celsjusza; przecinek; 2 nano-stopnie Celsjusza")?;
+        "1 kwetta-bekerel, przecinek; 2 ronna-bekerele, przecinek; 1 jotta-kulomb, przecinek; 2 zetta-kulomby, przecinek; 1 eksa-farad, przecinek; 2 peta-farady, przecinek; 1 tera-grej, przecinek; 2 giga-greje, przecinek; 1 mega-henr, przecinek; 2 kilo-henry, przecinek; 1 deka-herc, przecinek; 2 decy-herce, przecinek; 1 centy-dżul, przecinek; 2 mili-dżule, przecinek; 1 mikro-katal, przecinek; 2 nano-katale, przecinek; 1 piko-lumen, przecinek; 2 femto-lumeny, przecinek; 1 atto-luks, przecinek; 2 zepto-luksy, przecinek; 1 mili-stopień Celsjusza; przecinek; 2 mikro-stopnie Celsjusza; przecinek; 1 piko-stopień Celsjusza; przecinek; 2 nano-stopnie Celsjusza")?;
                 return Ok(());
 
 }
@@ -145,7 +145,7 @@ fn si_derived_2() -> Result<()> {
         <mn>1</mn><mi intent=":unit">Wb</mi><mo>,</mo><mn>2</mn><mi intent=":unit">Wb</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 niuton, przecinek; 2 niutons, przecinek, 1 om przecinek; 2 oms, przecinek, 1 om przecinek; 2 oms, przecinek; 1 paskal, przecinek; 2 paskals, przecinek; 1 siemens, przecinek; 2 siemens, przecinek; 1 siwert, przecinek; 2 siwerts, przecinek; 1 tesla, przecinek; 2 teslas, przecinek; 1 wolt, przecinek; 2 wolty, przecinek, 1 wat, przecinek; 2 waty, przecinek; 1 weber, przecinek; 2 webers")?;
+        "1 niuton, przecinek; 2 niutony, przecinek, 1 om przecinek, 2 omy, przecinek, 1 om przecinek, 2 omy, przecinek; 1 paskal, przecinek; 2 paskale, przecinek; 1 siemens, przecinek; 2 siemensy, przecinek; 1 siwert, przecinek; 2 siwerty, przecinek; 1 tesla, przecinek; 2 tesle, przecinek; 1 wolt, przecinek; 2 wolty, przecinek, 1 wat, przecinek; 2 waty, przecinek; 1 weber, przecinek; 2 webery")?;
                 return Ok(());
 
 }
@@ -165,7 +165,7 @@ fn si_derived_2_with_prefixes() -> Result<()> {
         <mn>1</mn><mi intent=":unit">PWb</mi><mo>,</mo><mn>2</mn><mi intent=":unit">EWb</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 kwekto-niuton, przecinek; 2 ronto-niutons; przecinek; 1 jokto-om, przecinek; 2 zepto-oms, przecinek; 1 atto-om, przecinek; 2 femto-oms, przecinek; 1 piko-paskal, przecinek; 2 nano-paskals, przecinek; 1 mikro-siemens, przecinek; 2 mili-siemens, przecinek; 1 centy-siwert, przecinek; 2 decy-siwerts, przecinek; 1 deka-tesla, przecinek; 2 hekto-teslas, przecinek; 1 kilo-wolt, przecinek; 2 mega-wolty, przecinek; 1 giga-wat, przecinek; 2 tera-waty, przecinek; 1 peta-weber, przecinek; 2 eksa-webers")?;
+        "1 kwekto-niuton, przecinek; 2 ronto-niutony, przecinek; 1 jokto-om, przecinek; 2 zepto-omy, przecinek; 1 atto-om, przecinek; 2 femto-omy, przecinek; 1 piko-paskal, przecinek; 2 nano-paskale, przecinek; 1 mikro-siemens, przecinek; 2 mili-siemensy, przecinek; 1 centy-siwert, przecinek; 2 decy-siwerty, przecinek; 1 deka-tesla, przecinek; 2 hekto-tesle, przecinek; 1 kilo-wolt, przecinek; 2 mega-wolty, przecinek; 1 giga-wat, przecinek; 2 tera-waty, przecinek; 1 peta-weber, przecinek; 2 eksa-webery")?;
                 return Ok(());
 
 }
@@ -191,7 +191,7 @@ fn si_accepted() -> Result<()> {
         <mn>1</mn><mi intent=":unit">Bd</mi><mo>,</mo><mn>2</mn><mi intent=":unit">Bd</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 litr, przecinek; 2 litrs, przecinek; 1 litr, przecinek; 2 litrs, przecinek; 1 litr, przecinek; 2 litrs, przecinek; 1 tona, przecinek; 2 tonas, przecinek; 1 dalton, przecinek; 2 daltons, przecinek; 1 neper, przecinek; 2 nepers, przecinek; 1 jednostka masy atomowej, przecinek; 2 jednostka masy atomowejs; przecinek; 1 elektronowolt, przecinek; 2 elektronowolts, przecinek; 1 radian, przecinek; 2 radians, przecinek; 1 steradian, przecinek; 2 steradians, przecinek, 1 rok, przecinek; 2 roks, przecinek; 1 sekunda łuku, przecinek; 2 sekunda łukus, przecinek, 1 bit, przecinek; 2 bits, przecinek; 1 bajt, przecinek; 2 bajts, przecinek, 1 bod, przecinek; 2 bods")?;
+        "1 litr, przecinek; 2 litry, przecinek; 1 litr, przecinek; 2 litry, przecinek; 1 litr, przecinek; 2 litry, przecinek; 1 tona, przecinek; 2 tony, przecinek; 1 dalton, przecinek; 2 daltony, przecinek; 1 neper, przecinek; 2 nepery, przecinek; 1 jednostka masy atomowej, przecinek; 2 jednostki masy atomowej, przecinek; 1 elektronowolt, przecinek; 2 elektronowolty, przecinek; 1 radian, przecinek; 2 radiany, przecinek; 1 steradian, przecinek; 2 steradiany, przecinek, 1 rok, przecinek; 2 lata, przecinek; 1 sekunda łuku, przecinek; 2 sekundy łuku, przecinek, 1 bit, przecinek; 2 bity, przecinek; 1 bajt, przecinek; 2 bajty, przecinek, 1 bod, przecinek; 2 body")?;
                 return Ok(());
 
 }
@@ -216,7 +216,7 @@ fn si_accepted_with_prefixes() -> Result<()> {
         <mn>1</mn><mi intent=":unit">TBd</mi><mo>,</mo><mn>2</mn><mi intent=":unit">EBd</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 kwetta-litr, przecinek; 2 ronna-litrs, przecinek; 1 jotta-litr, przecinek; 2 zetta-litrs, przecinek; 1 eksa-litr, przecinek; 2 peta-litrs, przecinek; 1 tera-tona, przecinek; 2 giga-tonas, przecinek; 1 mega-dalton, przecinek; 2 kilo-daltons, przecinek; 1 decy-neper, przecinek; 2 centy-nepers, przecinek; 1, hekto-jednostka masy atomowej; przecinek; 2, deka-jednostka masy atomowejs; przecinek; 1 mili-elektronowolt; przecinek; 2 mikro-elektronowolts; przecinek; 1 nano-radian, przecinek; 2 piko-radians, przecinek; 1 femto-steradian, przecinek; 2 atto-steradians; przecinek; 1 giga-rok, przecinek; 2 mega-roks, przecinek; 1 zepto-sekunda łuku; przecinek; 2 jokto-sekunda łukus; przecinek; 1 kilo-bit, przecinek; 2 mega-bits, przecinek; 1 giga-bajt, przecinek; 2 tera-bajts, przecinek; 1 tera-bod, przecinek; 2 eksa-bods")?;
+        "1 kwetta-litr, przecinek; 2 ronna-litry, przecinek; 1 jotta-litr, przecinek; 2 zetta-litry, przecinek; 1 eksa-litr, przecinek; 2 peta-litry, przecinek; 1 tera-tona, przecinek; 2 giga-tony, przecinek; 1 mega-dalton, przecinek; 2 kilo-daltony, przecinek; 1 decy-neper, przecinek; 2 centy-nepery, przecinek; 1, hekto-jednostka masy atomowej; przecinek; 2, deka-jednostki masy atomowej; przecinek; 1 mili-elektronowolt; przecinek; 2 mikro-elektronowolty; przecinek; 1 nano-radian, przecinek; 2 piko-radiany, przecinek; 1 femto-steradian, przecinek; 2 atto-steradiany, przecinek; 1 giga-rok, przecinek; 2 mega-lata, przecinek; 1 zepto-sekunda łuku; przecinek; 2 jokto-sekundy łuku; przecinek; 1 kilo-bit, przecinek; 2 mega-bity, przecinek; 1 giga-bajt, przecinek; 2 tera-bajty, przecinek; 1 tera-bod, przecinek; 2 eksa-body")?;
                 return Ok(());
 
 }
@@ -240,7 +240,7 @@ fn without_prefix_time() -> Result<()> {
         <mn>1</mn><mi intent=":unit">yr</mi><mo>,</mo><mn>2</mn><mi intent=":unit">yr</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 sekunda, przecinek; 2 sekundas, przecinek; 1 sekunda, przecinek; 2 sekundas, przecinek; 1 minuta, przecinek; 2 minutas, przecinek; 1 minuta, przecinek; 2 minutas, przecinek; 1 minuta, przecinek; 2 minutas, przecinek; 1 godzina, przecinek; 2 godzinas, przecinek; 1 godzina, przecinek; 2 godzinas, przecinek; 1 godzina, przecinek; 2 godzinas, przecinek; 1 dzień, przecinek; 2 dzieńs, przecinek; 1 dzień, przecinek; 2 dzieńs, przecinek; 1 tydzień, przecinek; 2 tydzieńs, przecinek; 1 tydzień, przecinek; 2 tydzieńs, przecinek, 1 rok, przecinek; 2 roks, przecinek, 1 rok, przecinek; 2 roks")?;
+        "1 sekunda, przecinek; 2 sekundy, przecinek; 1 sekunda, przecinek; 2 sekundy, przecinek; 1 minuta, przecinek; 2 minuty, przecinek; 1 minuta, przecinek; 2 minuty, przecinek; 1 minuta, przecinek; 2 minuty, przecinek; 1 godzina, przecinek; 2 godziny, przecinek; 1 godzina, przecinek; 2 godziny, przecinek; 1 godzina, przecinek; 2 godziny, przecinek; 1 dzień, przecinek, 2 dni, przecinek; 1 dzień, przecinek, 2 dni, przecinek; 1 tydzień, przecinek; 2 tygodnie, przecinek; 1 tydzień, przecinek; 2 tygodnie, przecinek, 1 rok, przecinek; 2 lata, przecinek, 1 rok, przecinek; 2 lata")?;
                 return Ok(());
 
 }
@@ -258,7 +258,7 @@ fn without_prefix_angles() -> Result<()> {
         <mn>1</mn><mi intent=":unit">asec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">asec</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 stopień, przecinek; 2 stopnie, przecinek; 1 stopień, przecinek; 2 stopnie, przecinek; 1 minuta łuku, przecinek; 2 minuta łukus, przecinek; 1 minuta łuku, przecinek; 2 minuta łukus, przecinek; 1 minuta łuku, przecinek; 2 minuta łukus, przecinek; 1 minuta łuku, przecinek; 2 minuta łukus, przecinek; 1 sekunda łuku, przecinek; 2 sekunda łukus, przecinek; 1 sekunda łuku, przecinek; 2 sekunda łukus")?;
+        "1 stopień, przecinek; 2 stopnie, przecinek; 1 stopień, przecinek; 2 stopnie, przecinek; 1 minuta łuku, przecinek; 2 minuty łuku, przecinek; 1 minuta łuku, przecinek; 2 minuty łuku, przecinek; 1 minuta łuku, przecinek; 2 minuty łuku, przecinek; 1 minuta łuku, przecinek; 2 minuty łuku, przecinek; 1 sekunda łuku, przecinek; 2 sekundy łuku, przecinek; 1 sekunda łuku, przecinek; 2 sekundy łuku")?;
                 return Ok(());
 
 }
@@ -274,7 +274,7 @@ fn without_prefix_distance() -> Result<()> {
         <mn>1</mn><mi intent=":unit">fm</mi><mo>,</mo><mn>2</mn><mi intent=":unit">fm</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 jednostka astronomiczna, przecinek; 2 jednostka astronomicznas; przecinek; 1 rok świetlny, przecinek; 2 rok świetlnys, przecinek; 1 parsek, przecinek; 2 parseks, przecinek; 1 angstrem, przecinek; 2 angstrems, przecinek; 1 angstrem, przecinek; 2 angstrems, przecinek; 1 fermi, przecinek; 2 fermis")?;
+        "1 jednostka astronomiczna, przecinek; 2 jednostki astronomiczne, przecinek; 1 rok świetlny, przecinek; 2 lata świetlne, przecinek; 1 parsek, przecinek; 2 parseki, przecinek; 1 angstrem, przecinek; 2 angstremy, przecinek; 1 angstrem, przecinek; 2 angstremy, przecinek; 1 fermi, przecinek; 2 fermi")?;
                 return Ok(());
 
 }
@@ -299,7 +299,7 @@ fn without_prefix_other() -> Result<()> {
         <mn>1</mn><mi intent=":unit">erg</mi><mo>,</mo><mn>2</mn><mi intent=":unit">erg</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 hektar, przecinek; 2 hektars, przecinek; 1 decybel, przecinek; 2 decybels, przecinek; 1 atmosfera, przecinek; 2 atmosferas, przecinek; 1 jednostka masy atomowej, przecinek; 2 jednostka masy atomowejs; przecinek, 1 bar, przecinek; 2 bars, przecinek; 1 kaloria, przecinek; 2 kalorias, przecinek; 1 kiur, przecinek; 2 kiurs, przecinek; 1 grad, przecinek; 2 grads, przecinek; 1 molowy, przecinek; 2 molowys, przecinek; 1 rentgen, przecinek; 2 rentgens, przecinek; 1 obrót na minutę, przecinek; 2 obroty na minutę, przecinek; 1 drachma płynu, przecinek; 2 drachma płynus, przecinek; 1 M h o, przecinek; 2 M h os, przecinek; 1 dyna, przecinek; 2 dynas, przecinek, 1 erg, przecinek; 2 ergs")?;
+        "1 hektar, przecinek; 2 hektary, przecinek; 1 decybel, przecinek; 2 decybele, przecinek; 1 atmosfera, przecinek; 2 atmosfery, przecinek; 1 jednostka masy atomowej, przecinek; 2 jednostki masy atomowej, przecinek, 1 bar, przecinek; 2 bary, przecinek; 1 kaloria, przecinek; 2 kalorie, przecinek; 1 kiur, przecinek; 2 kiury, przecinek; 1 grad, przecinek; 2 grady, przecinek; 1 molowy, przecinek; 2 molowe, przecinek; 1 rentgen, przecinek; 2 rentgeny, przecinek; 1 obrót na minutę, przecinek; 2 obroty na minutę, przecinek; 1 drachma płynu, przecinek; 2 drachmy płynu, przecinek, 1 mho, przecinek, 2 mho, przecinek; 1 dyna, przecinek; 2 dyny, przecinek, 1 erg, przecinek; 2 ergi")?;
                 return Ok(());
 
 }
@@ -325,7 +325,7 @@ fn without_prefix_powers_of_2() -> Result<()> {
         <mn>1</mn><mi intent=":unit">YiB</mi><mo>,</mo><mn>2</mn><mi intent=":unit">YiB</mi>
     </math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "1 kibibit, przecinek; 2 kibibits, przecinek; 1 mebibit, przecinek; 2 mebibits, przecinek; 1 gibibit, przecinek; 2 gibibits, przecinek; 1 tebibit, przecinek; 2 tebibits, przecinek; 1 pebibit, przecinek; 2 pebibits, przecinek; 1 eksbibit, przecinek; 2 eksbibits, przecinek; 1 zebibit, przecinek; 2 zebibits, przecinek; 1 jobibit, przecinek; 2 jobibits, przecinek; 1 kibibajt, przecinek; 2 kibibajts, przecinek; 1 mebibajt, przecinek; 2 mebibajts, przecinek; 1 gibibajt, przecinek; 2 gibibajts, przecinek; 1 tebibajt, przecinek; 2 tebibajts, przecinek; 1 pebibajt, przecinek; 2 pebibajts, przecinek; 1 eksbibajt, przecinek; 2 eksbibajts, przecinek; 1 zebibajt, przecinek; 2 zebibajts, przecinek; 1 jobibajt, przecinek; 2 jobibajts")?;
+        "1 kibibit, przecinek; 2 kibibity, przecinek; 1 mebibit, przecinek; 2 mebibity, przecinek; 1 gibibit, przecinek; 2 gibibity, przecinek; 1 tebibit, przecinek; 2 tebibity, przecinek; 1 pebibit, przecinek; 2 pebibity, przecinek; 1 eksbibit, przecinek; 2 eksbibity, przecinek; 1 zebibit, przecinek; 2 zebibity, przecinek; 1 jobibit, przecinek; 2 jobibity, przecinek; 1 kibibajt, przecinek; 2 kibibajty, przecinek; 1 mebibajt, przecinek; 2 mebibajty, przecinek; 1 gibibajt, przecinek; 2 gibibajty, przecinek; 1 tebibajt, przecinek; 2 tebibajty, przecinek; 1 pebibajt, przecinek; 2 pebibajty, przecinek; 1 eksbibajt, przecinek; 2 eksbibajty, przecinek; 1 zebibajt, przecinek; 2 zebibajty, przecinek; 1 jobibajt, przecinek; 2 jobibajty")?;
                 return Ok(());
 
 }
@@ -342,11 +342,11 @@ fn si_other_numbers() -> Result<()> {
                             <mn>2.5</mn><mi intent=":unit">&#xB5;sec</mi><mo>,</mo>
                             <mn>32.34</mn><mi intent=":unit">mol</mi></math>"#;
     test_prefs("pl", "SimpleSpeak", vec![("Verbosity", "Terse")], expr,
-            "10 l przecinek, 20 m przecinek; x mili-sekundas; przecinek; y mikro-sekundas; przecinek; deka-grams, przecinek; 1235 deka-niutons; przecinek; 25 mikro-sekundas; przecinek; 3234 mols")?;
+            "10 l przecinek, 20 m przecinek; x mili-sekund, przecinek; y mikro-sekund, przecinek; deka-gramów, przecinek; 1235 deka-niutonów; przecinek; 25 mikro-sekundy, przecinek; 3234 mole")?;
     test_prefs("pl", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-            "10 litr, przecinek; 20 metrs, przecinek; x mili-sekundas; przecinek; y mikro-sekundas; przecinek; deka-grams, przecinek; 1235 deka-niutons; przecinek; 25 mikro-sekundas; przecinek; 3234 mols")?;
+            "10 litr, przecinek; 20 metry, przecinek; x mili-sekund, przecinek; y mikro-sekund, przecinek; deka-gramów, przecinek; 1235 deka-niutonów; przecinek; 25 mikro-sekundy, przecinek; 3234 mole")?;
     test_prefs("pl", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-            "10 litr, przecinek; 20 metrs, przecinek; x mili-sekundas; przecinek; y mikro-sekundas; przecinek; deka-grams, przecinek; 1235 deka-niutons; przecinek; 25 mikro-sekundas; przecinek; 3234 mols")?;
+            "10 litr, przecinek; 20 metry, przecinek; x mili-sekund, przecinek; y mikro-sekund, przecinek; deka-gramów, przecinek; 1235 deka-niutonów; przecinek; 25 mikro-sekundy, przecinek; 3234 mole")?;
                     return Ok(());
 
 }
@@ -361,7 +361,7 @@ fn test_mtext_inference() -> Result<()> {
                 <mn>4.5</mn><mtext>mT</mtext>
             <mo>]</mo></math>"#;
     test("pl", "SimpleSpeak", expr, 
-        "nawias kwadratowy otwierający; 1 tona, przecinek; 2 peta-ampers, przecinek; 3 paskals, przecinek; 45 mili-teslas; nawias kwadratowy zamykający")?;
+        "nawias kwadratowy otwierający; 1 tona, przecinek; 2 peta-ampery, przecinek; 3 paskale, przecinek; 45 mili-tesli; nawias kwadratowy zamykający")?;
                 return Ok(());
 
 }
@@ -376,7 +376,7 @@ fn test_mtext_inference() -> Result<()> {
             <msub><mi>m</mi><mi>min</mi></msub>
             </math>"#;
         test("pl", "SimpleSpeak", expr, 
-            "3 metrs, przecinek; 1 kilo-metr, przecinek; 3 metrs, przecinek; 3 dziesiąte farads, przecinek; m indeks dolny minimum koniec indeksu dolnego")?;
+            "3 metry, przecinek; 1 kilo-metr, przecinek; 3 metry, przecinek; 3 dziesiąte faradów, przecinek; m indeks dolny minimum koniec indeksu dolnego")?;
             return Ok(());
 
     }

@@ -1196,7 +1196,7 @@ fn identity_matrix_false_positive_negative_one() -> Result<()> {
       <mo>]</mo>
   </math>";
     test_prefs("de", "SimpleSpeak", vec![("Verbosity", "Terse")],
-        expr, "die 2 mal 2 diagonalmatrix; spalte 1; 1; spalte 2; negativ 1")?;
+        expr, "die 2 mal 2 diagonalmatrix; spalte 1; 1; spalte 2; minus 1")?;
     Ok(())
 }
 

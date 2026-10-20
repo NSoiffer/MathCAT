@@ -1,8 +1,83 @@
 ---
 - include: "../../definitions.yaml"
 
-# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here.
-# Polish entries below are source-level speech strings used by MathCAT.
+# IntentMappings Syntax:
+#
+# This section defines how each "intent" is spoken for various grammatical forms (fixities such as "prefix", "infix", "postfix", and "function"),
+#  along with supporting different verbosity levels.
+# The syntax is a little bit complicated, but allows a declarative syntax so you don't have to write as many rules.
+#
+# For each intent, you specify spoken forms for one or more fixities using the syntax below.
+#
+# - Each mapping has the form:
+#     "<intent>": "<fixity1>=<speech1> || <fixity2>=<speech2> || ...",
+#   Every alternative must name a fixity and use "="; the fixity requested when speaking selects one.
+#
+# - Separate multiple fixities with "||". Spaces are allowed around any delimiter for readability.
+# - Within a speech string, "|" selects the verbosity form:
+#     - one "|"  (two forms):   the first is 'terse', the second is used for 'medium' and 'verbose'
+#     - two "|"  (three forms): 'terse', 'medium', 'verbose', in that order
+#     - no "|":                 the same spoken form is used for all verbosity levels
+#
+# - Use semicolons ";" to divide opening; main; closing bracketing words within the name part,
+#   where such words make sense (a name with no ";" is just the main phrase).
+# - If an intent has multiple fixities but a definition does not specify one, the first fixity listed is chosen by default.
+#
+# Functions and argument glue (the part after the name):
+# - ":" separates the name/bracketing phrase from the argument-glue options that follow it.
+# - Arity template (two or more ":" options, or one option with ','-separated glue words): the
+#   number of glue words implies the arity, and the final argument is preceded by "of".
+#   Example: "sum: over: from,to"
+#      - 1 arg:  "sum of x"
+#      - 2 args: "sum over i of x"
+#      - 3 args: "sum from i to n of x"
+#   If no option matches the argument count, the arguments are separated with "comma".
+# - Binary separator (exactly one ":" option, no commas in it): after "of", that word joins the two args.
+#   Example: "quotient": "function=integer part: divided by" → "integer part of x divided by y"
+#   If there are not exactly two args, the arguments fall back to "comma".
+# - Paired "ratio-style" ("<name> : <glue> | <name2> : <glue2> | ..."): used when every "|"-separated
+#   piece is a single "name : glue" pair. Verbosity selects one pair, whose glue is the binary
+#   separator described above. Example: "ratio": "function=ratio : to | the ratio : to | the ratio : to"
+#
+# Conceptual grammar (with precedence):
+#
+#   IntentMappingsEntry ::= <intent> ":" <intent_speech>          # ":" is the YAML key/value separator
+#
+#   <intent_speech> ::= <fixity_speech> ( "||" <fixity_speech> )*
+#
+#   <fixity_speech> ::= <fixity> "=" <fixity_body>
+#
+#   <fixity> ::= "prefix" | "infix" | "postfix" | "function" | "nofix" | "silent"
+#
+#   <fixity_body> ::= <standard_body> | <paired_body>
+#
+#   # Standard form: a name/bracketing part, then ":"-separated argument-glue options.
+#   <standard_body> ::= <speech_part> ( ":" <arg_glue> )*
+#
+#   <speech_part> ::= <segment> [ ";" <segment> ";" <segment> ]   # 1 part: name; 3 parts: opening; main; closing
+#
+#   <segment>  ::= <word> [ "|" <word> [ "|" <word> ] ]           # terse | medium | verbose
+#
+#   <arg_glue> ::= <segment>                                      # a single glue word, or ","-separated arity words
+#
+#   # Paired "ratio-style" form: recognized only when every "|" piece is a single "name : glue" pair.
+#   <paired_body> ::= <pair> ( "|" <pair> )+
+#
+#   <pair> ::= <word> ":" <word>                                 # the glue <word> contains no ":"
+#
+#   <word> ::= text
+#
+# Precedence depends on the form:
+#   - Standard: split on ":" first (name vs. argument-glue options), then split each piece on "|"
+#     for terse|medium|verbose, and split only the name part on ";" for opening; main; closing.
+#   - Paired: split on "|" first into "name : glue" pairs, then verbosity selects one pair.
+#
+# Example:
+#   "absolute-value": "function= ; absolute value| the absolute value| the absolute value; end absolute value"
+#   "sum": "function=sum: over: from,to"
+#   "quotient": "function=integer part: divided by"
+#   "ratio": "function=ratio : to | the ratio : to | the ratio : to"  # verbosity of name:glue pairs
+#
 - IntentMappings: {
     "binomial": "infix=symbol newtona; po; koniec symbolu newtona",
 
@@ -13,9 +88,9 @@
 
     "image":"function=obraz", 
     "mixed-fraction":"infix=i",
-    "quotient":"function=część całkowita; podzielone przez",
+    "quotient":"function=część całkowita : podzielone przez",
     "evaluated-at":"infix=obliczone w",
-    "remainder":"function=reszta; podzielone przez",
+    "remainder":"function=reszta : podzielone przez",
 
     "max":"function=maksimum",
     "min":"function=minimum",
@@ -23,19 +98,19 @@
     "power":"infix=do potęgi",
     "root":"function=pierwiastek",
 
-    "greatest-common-divisor": "function=nwd: największy wspólny dzielnik: największy wspólny dzielnik",
-    "least-common-multiple":"function=nww: najmniejsza wspólna wielokrotność: najmniejsza wspólna wielokrotność",
+    "greatest-common-divisor": "function=nwd| największy wspólny dzielnik| największy wspólny dzielnik",
+    "least-common-multiple":"function=nww| najmniejsza wspólna wielokrotność| najmniejsza wspólna wielokrotność",
 
-    "absolute-value": "function=; wartość bezwzględna: wartość bezwzględna: wartość bezwzględna; koniec wartości bezwzględnej",
+    "absolute-value": "function=; wartość bezwzględna| wartość bezwzględna| wartość bezwzględna; koniec wartości bezwzględnej",
     "complex-conjugate":"function=sprzężenie zespolone",
     "complex-arg":"function=arg",
     "real-part": "function=część rzeczywista",
-    "imaginary-part": "function=część urojona: część urojona: część urojona",
+    "imaginary-part": "function=część urojona| część urojona| część urojona",
 
-    "polar-coordinate":"function=współrzędna biegunowa; przecinek",
-    "spherical-coordinate":"function=współrzędna sferyczna; przecinek; przecinek",
-    "cartesian-coordinate":"function=współrzędna kartezjańska; przecinek",
-    "coordinate":"function=współrzędna; przecinek",
+    "polar-coordinate":"function=współrzędna biegunowa",
+    "spherical-coordinate":"function=współrzędna sferyczna",
+    "cartesian-coordinate":"function=współrzędna kartezjańska",
+    "coordinate":"function=współrzędna",
     "floor":"function=podłoga",
     "ceiling":"function=sufit",
     "round":"function=zaokrąglenie",
@@ -50,26 +125,31 @@
 
 
     ### Sets
-    "set": "function=; zbiór: zbiór",
-    "set-difference":"function=różnica zbiorów; i || infix=minus", # NOTE: not tested
+    "set": "function=; zbiór| zbiór",
+    "set-difference":"function=różnica zbiorów : i || infix=minus",
     "complement":"function=dopełnienie",
+    "empty-set":"nofix=zbiór pusty",
     "cardinality":"function=moc zbioru",
     "list":"function=lista",
-    "tuple": "function=; krotka: krotka",
+    "tuple": "function=; krotka| krotka",
 
 
     ### Sequence and Series
-    "sum":"function=; suma po: suma; ",
-    "product":"function=iloczyn || function=iloczyn po || function=iloczyn od; do",
+    # Szablony arności działają od czasu, gdy słowo łączące przestało być zaszyte
+    # w kodzie (issue #739): ostatni argument poprzedza teraz FunctionApplicationWord
+    # z tego pliku, czyli polskie "z". Słowa "przez" i "od,do" dobrane tak, jak mówią
+    # o tym istniejące reguły dużych operatorów ("suma przez wielka s z i").
+    "sum":"function=suma : przez : od,do",
+    "product":"function=iloczyn : przez : od,do",
 
 
     ### Elementary classical functions
-    "sine":"function=sin: sinus",
-    "cosine":"function=cos: cosinus",
-    "tangent":"function=tan: tangens",
-    "secant":"function=sec: sekans",
-    "cosecant":"function=cosec: kosekans",
-    "cotangent":"function=cot: cotangens",
+    "sine":"function=sin| sinus",
+    "cosine":"function=cos| cosinus",
+    "tangent":"function=tan| tangens",
+    "secant":"function=sec| sekans",
+    "cosecant":"function=cosec| kosekans",
+    "cotangent":"function=cot| cotangens",
 
     "arcsine":"function=arcus sinus",
     "arccosine":"function=arcus cosinus",
@@ -93,7 +173,7 @@
     "arc-hyperbolic-cotangent":"function=arcus cotangens hiperboliczny",
 
     "exponential":"function=funkcja wykładnicza",
-    "natural-logarithm": "function=L N: logarytm naturalny: logarytm naturalny",
+    "natural-logarithm": "function=L N| logarytm naturalny| logarytm naturalny",
     "logarithm":"function=logarytm", ##Check arity 2 
 
 
@@ -104,7 +184,7 @@
     "median":"function=mediana",
     "mode":"function=dominanta",
 
-    "conditional-probability":"function=prawdopodobieństwo; pod warunkiem", # NOTE: Check test
+    "conditional-probability":"function=prawdopodobieństwo : pod warunkiem",
 
 
     ### Linear Algebra
@@ -114,23 +194,23 @@
     "determinant":"function=wyznacznik",
     "adjugate":"function=macierz dopełnień algebraicznych",
     "magnitude":"function=długość",
-    "norm": "function=; norma: norma: norma; koniec normy",
+    "norm": "function=; norma| norma| norma; koniec normy",
     "span":"function=powłoka liniowa",
 
     "unit-vector":"prefix=wektor jednostkowy",
 
     "identity-matrix":"nofix=macierz jednostkowa", # NOTE: no function specified
-    "transpose":"function=transpozycja || postfix=transponowane",
+    "transpose":"postfix=transponowane || function=transpozycja",
     "dimensional-product":"infix=na", # INFIX
 
 
     ### Constants and Sets
-    "set-of-integers":"nofix=ℤ: zbiór liczb całkowitych",
-    "set-of-reals":"nofix=ℝ: zbiór liczb rzeczywistych",
-    "set-of-rationals":"nofix=ℚ: zbiór liczb wymiernych",
-    "set-of-natural-numbers":"nofix=ℕ: zbiór liczb naturalnych",
-    "set-of-complex-numbers":"nofix=ℂ: zbiór liczb zespolonych",
-    "set-of-primes":"nofix=ℙ: zbiór liczb pierwszych",
+    "set-of-integers":"nofix=ℤ| zbiór liczb całkowitych",
+    "set-of-reals":"nofix=ℝ| zbiór liczb rzeczywistych",
+    "set-of-rationals":"nofix=ℚ| zbiór liczb wymiernych",
+    "set-of-natural-numbers":"nofix=ℕ| zbiór liczb naturalnych",
+    "set-of-complex-numbers":"nofix=ℂ| zbiór liczb zespolonych",
+    "set-of-primes":"nofix=ℙ| zbiór liczb pierwszych",
 
     
     ### Geometry
@@ -150,13 +230,13 @@
 
     ### General Concepts 
     "fenced-group":"function=grupa w nawiasach",
-    "ordered-pair": "function=; para; i",
+    "ordered-pair": "function=para : i",
     "indexed-by": "infix=; indeks dolny; koniec indeksu dolnego",
     
     "highlight":"postfix=podświetlone",
     "least-common-denominator":"function=najmniejszy wspólny mianownik",
     "rate":"infix=na",
-    "translation":"function=przesunięcie o; przecinek",
+    "translation":"function=przesunięcie o",
     "constraint":"infix=; przy warunku; ", 
     
     "binomial-coefficient":"infix=po",
@@ -198,7 +278,7 @@
     "congruent": "infix=przystające do",
     "cartesian-product": "infix=iloczyn kartezjański",
     "composed-with": "infix=złożone z",
-    "cross-product": "infix=krzyż: iloczyn wektorowy: iloczyn wektorowy",
+    "cross-product": "infix=krzyż| iloczyn wektorowy| iloczyn wektorowy",
     "defined-as": "infix=zdefiniowane jako",
     "divided-by": "infix=podzielone przez",
     "divides": "infix=dzieli",
@@ -262,11 +342,11 @@
     "percent": "postfix=procent",
 
     ## Default fixity nofix
-    "diameter":"nofix=d: średnica",
-    "distance":"nofix=d; D: odległość",
-    "probability":"nofix=P: prawdopodobieństwo",
-    "radius":"nofix=r: promień",
-    "volume":"nofix=V: objętość || function=objętość",
+    "diameter":"nofix=d| średnica",
+    "distance":"nofix=d; D| odległość",
+    "probability":"nofix=P| prawdopodobieństwo || function=prawdopodobieństwo",
+    "radius":"nofix=r| promień",
+    "volume":"nofix=V| objętość || function=objętość",
     "exponential-e":"nofix=e",
     "imaginary-i":"nofix=i",
     "differential-d":"nofix=d",
@@ -275,21 +355,26 @@
 
     ## Other : Not tested, don't appear in https://w3c.github.io/mathml-docs/intent-core-concepts/
     "modified-variable": "silent=",
-    "say-super": "infix=indeks górny: indeks górny: indeks górny",   # used with 'mo' for superscripts (e.g, "<")
+    "say-super": "infix=indeks górny| indeks górny| indeks górny",   # used with 'mo' for superscripts (e.g, "<")
     "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
     # "large-op": "infix=przez|| other=od,do",
-    "lim-sup": "prefix=lim sup gdy: granica górna gdy: granica górna gdy",
-    "lim-inf": "prefix=lim inf gdy: granica dolna gdy: granica dolna gdy",
-    "limit-sup": "prefix=lim sup gdy: granica górna gdy: granica górna gdy",
-    "limit-inf": "prefix=lim inf gdy: granica dolna gdy: granica dolna gdy",
-    "logarithm-with-base": "prefix=log podstawa: logarytm o podstawie: logarytm o podstawie",
-    "trace": "function=; ślad: ślad: ślad; koniec śladu",
-    "dimension": "function=; wymiar: wymiar: wymiar; koniec wymiaru",
-    "homomorphism": "function=; homomorfizm: homomorfizm: homomorfizm; koniec homomorfizmu",
-    "kernel": "function=; jądro: jądro: jądro; koniec jądra",
+    "lim-sup": "prefix=lim sup gdy| granica górna gdy| granica górna gdy",
+    "lim-inf": "prefix=lim inf gdy| granica dolna gdy| granica dolna gdy",
+    "limit-sup": "prefix=lim sup gdy| granica górna gdy| granica górna gdy",
+    "limit-inf": "prefix=lim inf gdy| granica dolna gdy| granica dolna gdy",
+    "logarithm-with-base": "prefix=log podstawa| logarytm o podstawie| logarytm o podstawie",
+    "trace": "function=; ślad| ślad| ślad; koniec śladu",
+    "dimension": "function=; wymiar| wymiar| wymiar; koniec wymiaru",
+    "homomorphism": "function=; homomorfizm| homomorfizm| homomorfizm; koniec homomorfizmu",
+    "kernel": "function=; jądro| jądro| jądro; koniec jądra",
     
-    "chemistry-concentration": "function=; stężenie: stężenie: stężenie; koniec stężenia",
+    "chemistry-concentration": "function=; stężenie| stężenie| stężenie; koniec stężenia",
   }
+
+  # The connector word to say for functional 'IntentMappings' (in English, "of")
+  # This is likely the word used for U+2061 in unicode.yaml, but for technical reasons needs to be defined here
+  # vector of length=1 because scalars not supported
+- FunctionApplicationWord: ["z"]
 
   # Names of functions that in terse mode don't say "of" (or it's equivalent in other languages)
 - TerseFunctionNames: {
@@ -356,7 +441,7 @@
     "F": "farad",
     "Gy": "grej",
     "H": "henr",
-    "Hz": "herce",
+    "Hz": "herc",
     "J": "dżul",
     "kat": "katal",
     "lm": "lumen",
@@ -431,7 +516,7 @@
     "M": "molowy",
     "R": "rentgen",
     "rpm": "obrót na minutę",
-    "℧": "M h o",
+    "℧": "mho",
     "dyn": "dyna",
     "erg": "erg",
 
@@ -488,7 +573,7 @@
     "lb t": "funt trojański",
 
     # energy
-    "hp": "konie mechaniczne",
+    "hp": "koń mechaniczny",
     "BTU": "btu",
     "°F": "stopień Fahrenheita", "℉": "stopień Fahrenheita",
 
@@ -504,25 +589,319 @@
   }
 
 - PluralForms: {
-  # FIX: this needs to be flushed out
-    "cal": "cale", "cal kwadratowy": "cale kwadratowe", "cal sześcienny": "cale sześcienne",
-    "stopa": "stopy", "stopa kwadratowa": "stopy kwadratowe", "stopa sześcienna": "stopy sześcienne",
+  # Nominative plural - after the numerals 2, 3, 4 (but not 12-14 or 112-114).
+  # The genitive plural (5 and above) lives in PluralGenitive below.
+    "akr": "akry",
+    "amper": "ampery",
+    "angstrem": "angstremy",
+    "atmosfera": "atmosfery",
+    "bajt": "bajty",
+    "bar": "bary",
+    "baryłka": "baryłki",
+    "bekerel": "bekerele",
+    "bel": "bele",
+    "bit": "bity",
+    "bitcoin": "bitcoiny",
+    "bod": "body",
+    "btu": "btu",
+    "buszel": "buszle",
+    "cal": "cale",
+    "cal kwadratowy": "cale kwadratowe",
+    "cal sześcienny": "cale sześcienne",
+    "cent": "centy",
+    "cetnar": "cetnary",
+    "colon": "colony",
+    "dalton": "daltony",
+    "decybel": "decybele",
+    "dolar": "dolary",
+    "drachma": "drachmy",
+    "drachma płynu": "drachmy płynu",
+    "dyna": "dyny",
+    "dzień": "dni",
+    "dżul": "dżule",
+    "eksbibajt": "eksbibajty",
+    "eksbibit": "eksbibity",
+    "elektronowolt": "elektronowolty",
+    "erg": "ergi",
+    "euro": "euro",
+    "farad": "farady",
+    "fermi": "fermi",
+    "funt": "funty",
+    "funt trojański": "funty trojańskie",
+    "galon": "galony",
+    "gibibajt": "gibibajty",
+    "gibibit": "gibibity",
+    "gill": "gille",
+    "godzina": "godziny",
+    "grad": "grady",
+    "gram": "gramy",
+    "gran": "grany",
+    "grej": "greje",
+    "hektar": "hektary",
+    "henr": "henry",
+    "herc": "herce",
+    "jard kwadratowy": "jardy kwadratowe",
+    "jard sześcienny": "jardy sześcienne",
+    "jednostka astronomiczna": "jednostki astronomiczne",
+    "jednostka masy atomowej": "jednostki masy atomowej",
+    "jobibajt": "jobibajty",
+    "jobibit": "jobibity",
+    "kaloria": "kalorie",
+    "kandela": "kandele",
+    "katal": "katale",
+    "kelwin": "kelwiny",
+    "kibibajt": "kibibajty",
+    "kibibit": "kibibity",
+    "kiur": "kiury",
+    "koń mechaniczny": "konie mechaniczne",
+    "kubek": "kubki",
+    "kulomb": "kulomby",
+    "kwarta": "kwarty",
+    "lir": "liry",
+    "litr": "litry",
+    "luks": "luksy",
+    "lumen": "lumeny",
+    "mebibajt": "mebibajty",
+    "mebibit": "mebibity",
+    "metr": "metry",
+    "mho": "mho",
+    "mila": "mile",
+    "mila kwadratowa": "mile kwadratowe",
+    "mila na galon": "mile na galon",
+    "mila na godzinę": "mile na godzinę",
+    "minuta": "minuty",
+    "minuta łuku": "minuty łuku",
+    "mol": "mole",
+    "molowy": "molowe",
+    "neper": "nepery",
+    "niuton": "niutony",
+    "obrót na minutę": "obroty na minutę",
+    "ogniwo": "ogniwa",
+    "om": "omy",
+    "parsek": "parseki",
+    "paskal": "paskale",
+    "pebibajt": "pebibajty",
+    "pebibit": "pebibity",
+    "pek": "peki",
+    "pennyweight": "pennyweight",
+    "peso": "peso",
+    "pinta": "pinty",
+    "pręt": "pręty",
+    "radian": "radiany",
+    "rentgen": "rentgeny",
+    "rok": "lata",
+    "rok świetlny": "lata świetlne",
+    "rupia": "rupie",
+    "sekunda": "sekundy",
+    "sekunda łuku": "sekundy łuku",
+    "siemens": "siemensy",
+    "siwert": "siwerty",
+    "steradian": "steradiany",
+    "stopa": "stopy",
     "stopa deskowa": "stopy deskowe",
+    "stopa kwadratowa": "stopy kwadratowe",
+    "stopa sześcienna": "stopy sześcienne",
     "stopień": "stopnie",
     "stopień Celsjusza": "stopnie Celsjusza",
     "stopień Fahrenheita": "stopnie Fahrenheita",
-    "degree celsius": "stopnie Celsjusza",
-    "degree fahrenheit": "stopnie Fahrenheita",
-    "henr": "henry",
-    "wolt": "wolty",
+    "szekel": "szekle",
+    "tebibajt": "tebibajty",
+    "tebibit": "tebibity",
+    "tesla": "tesle",
+    "tona": "tony",
+    "tydzień": "tygodnie",
+    "uncja": "uncje",
+    "uncja płynu": "uncje płynu",
+    "uncja trojańska": "uncje trojańskie",
     "wat": "waty",
-    "hertz": "herce",
-    "luks": "luksy",
-    "siemens": "siemens",
-    "obrót na minutę": "obroty na minutę",
-    "mila na godzinę": "mile na godzinę",
-    "mila na galon": "mile na galon",
-    "colon": "colony", "lir": "liry", "won": "wony", "bitcoin": "bitcoiny"
+    "weber": "webery",
+    "wolt": "wolty",
+    "won": "wony",
+    "zebibajt": "zebibajty",
+    "zebibit": "zebibity",
+    "łańcuch": "łańcuchy",
+    "łyżeczka": "łyżeczki",
+    "łyżka stołowa": "łyżki stołowe"
+  }
+
+- AccusativeCase: {
+  # Accusative singular, used after the preposition "na" in the
+  # 'per-fraction' rule: "62 mile na godzinę", not "na godzina".
+  # Only feminine nouns differ from the nominative, so masculine and
+  # neuter names are deliberately absent - a missing entry means
+  # "the form does not change" (na litr, na mol, na metr).
+  # An adjective agrees with its noun (milę kwadratową), while a
+  # dependent noun keeps its own case (uncję płynu, minutę łuku).
+    "atmosfera": "atmosferę",
+    "baryłka": "baryłkę",
+    "drachma": "drachmę",
+    "drachma płynu": "drachmę płynu",
+    "dyna": "dynę",
+    "godzina": "godzinę",
+    "jednostka astronomiczna": "jednostkę astronomiczną",
+    "jednostka masy atomowej": "jednostkę masy atomowej",
+    "kaloria": "kalorię",
+    "kandela": "kandelę",
+    "kwarta": "kwartę",
+    "mila": "milę",
+    "mila kwadratowa": "milę kwadratową",
+    "mila na galon": "milę na galon",
+    "mila na godzinę": "milę na godzinę",
+    "minuta": "minutę",
+    "minuta łuku": "minutę łuku",
+    "pinta": "pintę",
+    "rupia": "rupię",
+    "sekunda": "sekundę",
+    "sekunda łuku": "sekundę łuku",
+    "stopa": "stopę",
+    "stopa deskowa": "stopę deskową",
+    "stopa kwadratowa": "stopę kwadratową",
+    "stopa sześcienna": "stopę sześcienną",
+    "tesla": "teslę",
+    "tona": "tonę",
+    "uncja": "uncję",
+    "uncja płynu": "uncję płynu",
+    "uncja trojańska": "uncję trojańską",
+    "łyżeczka": "łyżeczkę",
+    "łyżka stołowa": "łyżkę stołową"
+  }
+
+- PluralGenitive: {
+  # Genitive plural - after 5 and above, and after 12-14, 112-114.
+  # Polish inflects the noun according to the numeral, so a single plural
+  # form is not enough: 2 metry but 5 metrów. The 'unit' and 'currency'
+  # rules pick the section based on the value of the numeral.
+    "akr": "akrów",
+    "amper": "amperów",
+    "angstrem": "angstremów",
+    "atmosfera": "atmosfer",
+    "bajt": "bajtów",
+    "bar": "barów",
+    "baryłka": "baryłek",
+    "bekerel": "bekereli",
+    "bel": "beli",
+    "bit": "bitów",
+    "bitcoin": "bitcoinów",
+    "bod": "bodów",
+    "btu": "btu",
+    "buszel": "buszli",
+    "cal": "cali",
+    "cal kwadratowy": "cali kwadratowych",
+    "cal sześcienny": "cali sześciennych",
+    "cent": "centów",
+    "cetnar": "cetnarów",
+    "colon": "colonów",
+    "dalton": "daltonów",
+    "decybel": "decybeli",
+    "dolar": "dolarów",
+    "drachma": "drachm",
+    "drachma płynu": "drachm płynu",
+    "dyna": "dyn",
+    "dzień": "dni",
+    "dżul": "dżuli",
+    "eksbibajt": "eksbibajtów",
+    "eksbibit": "eksbibitów",
+    "elektronowolt": "elektronowoltów",
+    "erg": "ergów",
+    "euro": "euro",
+    "farad": "faradów",
+    "fermi": "fermi",
+    "funt": "funtów",
+    "funt trojański": "funtów trojańskich",
+    "galon": "galonów",
+    "gibibajt": "gibibajtów",
+    "gibibit": "gibibitów",
+    "gill": "gilli",
+    "godzina": "godzin",
+    "grad": "gradów",
+    "gram": "gramów",
+    "gran": "granów",
+    "grej": "grejów",
+    "hektar": "hektarów",
+    "henr": "henrów",
+    "herc": "herców",
+    "jard kwadratowy": "jardów kwadratowych",
+    "jard sześcienny": "jardów sześciennych",
+    "jednostka astronomiczna": "jednostek astronomicznych",
+    "jednostka masy atomowej": "jednostek masy atomowej",
+    "jobibajt": "jobibajtów",
+    "jobibit": "jobibitów",
+    "kaloria": "kalorii",
+    "kandela": "kandeli",
+    "katal": "katali",
+    "kelwin": "kelwinów",
+    "kibibajt": "kibibajtów",
+    "kibibit": "kibibitów",
+    "kiur": "kiurów",
+    "koń mechaniczny": "koni mechanicznych",
+    "kubek": "kubków",
+    "kulomb": "kulombów",
+    "kwarta": "kwart",
+    "lir": "lirów",
+    "litr": "litrów",
+    "luks": "luksów",
+    "lumen": "lumenów",
+    "mebibajt": "mebibajtów",
+    "mebibit": "mebibitów",
+    "metr": "metrów",
+    "mho": "mho",
+    "mila": "mil",
+    "mila kwadratowa": "mil kwadratowych",
+    "mila na galon": "mil na galon",
+    "mila na godzinę": "mil na godzinę",
+    "minuta": "minut",
+    "minuta łuku": "minut łuku",
+    "mol": "moli",
+    "molowy": "molowych",
+    "neper": "neperów",
+    "niuton": "niutonów",
+    "obrót na minutę": "obrotów na minutę",
+    "ogniwo": "ogniw",
+    "om": "omów",
+    "parsek": "parseków",
+    "paskal": "paskali",
+    "pebibajt": "pebibajtów",
+    "pebibit": "pebibitów",
+    "pek": "peków",
+    "pennyweight": "pennyweight",
+    "peso": "peso",
+    "pinta": "pint",
+    "pręt": "prętów",
+    "radian": "radianów",
+    "rentgen": "rentgenów",
+    "rok": "lat",
+    "rok świetlny": "lat świetlnych",
+    "rupia": "rupii",
+    "sekunda": "sekund",
+    "sekunda łuku": "sekund łuku",
+    "siemens": "siemensów",
+    "siwert": "siwertów",
+    "steradian": "steradianów",
+    "stopa": "stóp",
+    "stopa deskowa": "stóp deskowych",
+    "stopa kwadratowa": "stóp kwadratowych",
+    "stopa sześcienna": "stóp sześciennych",
+    "stopień": "stopni",
+    "stopień Celsjusza": "stopni Celsjusza",
+    "stopień Fahrenheita": "stopni Fahrenheita",
+    "szekel": "szekli",
+    "tebibajt": "tebibajtów",
+    "tebibit": "tebibitów",
+    "tesla": "tesli",
+    "tona": "ton",
+    "tydzień": "tygodni",
+    "uncja": "uncji",
+    "uncja płynu": "uncji płynu",
+    "uncja trojańska": "uncji trojańskich",
+    "wat": "watów",
+    "weber": "weberów",
+    "wolt": "woltów",
+    "won": "wonów",
+    "zebibajt": "zebibajtów",
+    "zebibit": "zebibitów",
+    "łańcuch": "łańcuchów",
+    "łyżeczka": "łyżeczek",
+    "łyżka stołowa": "łyżek stołowych"
   }
 
 # Lines starting with "#" are a comment
