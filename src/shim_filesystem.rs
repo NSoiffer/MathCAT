@@ -108,7 +108,9 @@ cfg_if! {
                         let path = match file.enclosed_name() {
                             Some(path) => PathBuf::from(containing_dir).join(path),
                             None => {
-                                bail!("Entry {} has a suspicious path (outside of archive)", file.name());
+                                // zip 9's name() fails on non-UTF-8 names; still report the bad entry.
+                                let entry_name = file.name().unwrap_or_else(|e| e.to_string().into());
+                                bail!("Entry {entry_name} has a suspicious path (outside of archive)");
                             }
                         };
                         // debug!("read_zip_file: file path='{}'", path.display());
