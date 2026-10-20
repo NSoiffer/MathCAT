@@ -1128,49 +1128,19 @@ pub fn is_same_element(e1: Element, e2: Element, ignore_attrs: &[&str]) -> Resul
     }
     return Ok(());
 
-    /// compares attributes -- '==' didn't seems to work
+    /// sxd's `==` on nodes is identity, so compare names/values; order doesn't matter in XML
     fn attrs_are_same(attrs1: Vec<Attribute>, attrs2: Vec<Attribute>, ignore: &[&str]) -> Result<()> {
-        let attrs1 = attrs1.iter()
-                .filter(|a| !ignore.contains(&as_qname!(a.name()).local_part())).cloned()
-                .collect::<Vec<Attribute>>();
-        let attrs2 = attrs2.iter()
-                .filter(|a| !ignore.contains(&as_qname!(a.name()).local_part())).cloned()
-                .collect::<Vec<Attribute>>();
-        if attrs1.len() != attrs2.len() {
-            bail!("Attributes have different length: {:?} != {:?}", attrs1, attrs2);
-        }
-        // can't guarantee attrs are in the same order
-        for attr1 in attrs1 {
-            if let Some(found_attr2) = attrs2
-                .iter()
-                .find(|&attr2| as_qname!(attr1.name()).local_part() == as_qname!(attr2.name()).local_part())
-            {
-                if attr1.value() == found_attr2.value() {
-                    continue;
-                } else {
-                    bail!(
-                        "Attribute named {} has differing values:\n  '{}'\n  '{}'",
-                        as_qname!(attr1.name()).local_part(),
-                        attr1.value(),
-                        found_attr2.value()
-                    );
-                }
-            } else {
-                bail!(
-                    "Attribute name {} not in [{}]",
-                    print_attr(&attr1),
-                    print_attrs(&attrs2)
-                );
-            }
+        let normalize = |attrs: Vec<Attribute>| -> std::collections::BTreeMap<String, String> {
+            attrs.iter()
+                .map(|a| (as_qname!(a.name()).local_part().to_string(), a.value().to_string()))
+                .filter(|(name, _)| !ignore.contains(&name.as_str()))
+                .collect()
+        };
+        let (attrs1, attrs2) = (normalize(attrs1), normalize(attrs2));
+        if attrs1 != attrs2 {
+            bail!("Attributes differ:\n  {:?}\n  {:?}", attrs1, attrs2);
         }
         return Ok(());
-
-        fn print_attr(attr: &Attribute) -> String {
-            return format!("@{}='{}'", as_qname!(attr.name()).local_part(), attr.value());
-        }
-        fn print_attrs(attrs: &[Attribute]) -> String {
-            return attrs.iter().map(print_attr).collect::<Vec<String>>().join(", ");
-        }
     }
 }
 
