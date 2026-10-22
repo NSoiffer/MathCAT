@@ -1,11 +1,29 @@
 # Fuzzing on Linux (libFuzzer). Uses fuzz/mathml.dict for structured MathML tokens.
-# Corpus is cached between runs so libFuzzer can accumulate interesting inputs over time.
+# Push and pull_request smoke runs replay only the committed corpus. libFuzzer executes
+# every corpus file before -max_total_time starts, so the shared cache is restored
+# only for the weekly run and for manual runs.
 # Crash artifacts are uploaded on failure for reproduction and regression test generation.
 name: Fuzz
 
 on:
   push:
+    paths:
+      - "src/**"
+      - "fuzz/**"
+      - "Rules/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "build.rs"
+      - ".github/workflows/fuzz.yml"
   pull_request:
+    paths:
+      - "src/**"
+      - "fuzz/**"
+      - "Rules/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "build.rs"
+      - ".github/workflows/fuzz.yml"
   workflow_dispatch:
   schedule:
     # Weekly long run (1 hour per configuration); corpus is cached between runs.
@@ -17,7 +35,7 @@ env:
 
 jobs:
   fuzz:
-    name: Build and fuzz (with MathML dict + corpus cache)
+    name: Build and fuzz (with MathML dict)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -25,8 +43,10 @@ jobs:
       - name: Ensure corpus directory exists
         run: mkdir -p "${{ env.FUZZ_CORPUS_ROOT }}"
 
-      # Restore latest corpus; unique key each run so we always save an updated snapshot after fuzzing.
+      # Push/PR skip this and replay the committed corpus only. Weekly and manual runs
+      # restore the accumulated corpus; a unique key each run saves an updated snapshot.
       - name: Restore fuzz corpus
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         uses: actions/cache@v5
         with:
           path: ${{ env.FUZZ_CORPUS_ROOT }}
