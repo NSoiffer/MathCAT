@@ -2669,7 +2669,6 @@
  - "𝛠": [t: "\\mathbf{\\varrho}"]        # 0x1d6e0
  - "𝛡": [t: "\\mathbf{\\varpi}"]         # 0x1d6e1
  - "𝛢-𝛯":    # 0x1d6e2 - 0x1d6ef (Alpha - Xi)
-    - tc: "\\mathmit"
     - spell: "translate('.', '𝛢𝛣𝛤𝛥𝛦𝛧𝛨𝛩𝛪𝛫𝛬𝛭𝛮𝛯', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞ')"
  - "𝛰":                                  # 0x1d6f0
      - test:
@@ -2677,19 +2676,17 @@
          then: [t: "~O"]
          else: [t: "\\O"]
  - "𝛱-𝛺":    # 0x1d6f1 - 0x1d6fa (Pi - Omega)
-    - tc: "\\mathmit"
     - spell: "translate('.', '𝛱𝛲𝛳𝛴𝛵𝛶𝛷𝛸𝛹𝛺', 'ΠΡΣΤΥΦΧΨΩ')"
- - "𝛻": [t: "\\mathmit{\\nabla}"]        # 0x1d6fb
+ - "𝛻": [t: "\\nabla"]        # 0x1d6fb
  - "𝛼-𝜔":    # 0x1d6fc - 0x1d714 (alpha - omega)
-    - tc: "\\mathmit"
     - spell: "translate('.', '𝛼𝛽𝛾𝛿𝜀𝜁𝜂𝜃𝜄𝜅𝜆𝜇𝜈𝜉𝜊𝜋𝜌𝜍𝜎𝜏𝜐𝜑𝜒𝜓𝜔', 'αβγδεζηθικλμνξοπρςστυφχψω')"
  - "𝜕": [t: "\\partial𝐖"]                # 0x1d715
  - "𝜖": [t: "\\in𝐖"]                     # 0x1d716
- - "𝜗": [t: "\\mathmit{\\vartheta}"]     # 0x1d717
- - "𝜘": [t: "\\mathmit{\\varkappa}"]     # 0x1d718
- - "𝜙": [t: "\\mathmit{\\phi}"]          # 0x1d719
- - "𝜚": [t: "\\mathmit{\\varrho}"]       # 0x1d71a
- - "𝜛": [t: "\\mathmit{\\varpi}"]        # 0x1d71b
+ - "𝜗": [t: "\\vartheta"]     # 0x1d717
+ - "𝜘": [t: "\\varkappa"]     # 0x1d718
+ - "𝜙": [t: "\\phi"]          # 0x1d719
+ - "𝜚": [t: "\\varrho"]       # 0x1d71a
+ - "𝜛": [t: "\\varpi"]        # 0x1d71b
  - "𝜜-𝜩":    # 0x1d71c - 0x1d729 (Alpha - Xi)
     - tc: "\\mathbit"
     - spell: "translate('.', '𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞ')"

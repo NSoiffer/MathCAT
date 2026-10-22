@@ -469,7 +469,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             (mathml, mathml)
         } else {
             let intent = crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?;
-            (intent, add_fixity_children(copy_mathml(intent)))
+            (intent, add_fixity_children(copy_mathml(intent, intent.document())))
         };
 
         let mut properties = "";

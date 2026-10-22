@@ -10,8 +10,6 @@ MathCAT is a tool used together with a screen reader. Through MathCAT, you can h
 
 In screen readers NVDA and JAWS, MathCAT comes built-in. This means you don’t have to install it as an addon.
 
-MathCAT is still available as an addon to NVDA. You can use it if you want access to the very latest features between NVDA releases. [How to use MathCAT as an addon is described here](#how-to-install-mathcat-as-an-addon-in-nvda).
-
 ## Get started with MathCAT
 
 Use your screen reader on a web page or in an e-book as usual. When you get to a mathematical expression, the screen reader will read it out automatically. If you want to investigate the expression more closely you can activate the navigation mode by pressing Space. In NVDA, the NVDA-key+Alt+M can also be used. If you want to leave the navigation mode, press Escape.
