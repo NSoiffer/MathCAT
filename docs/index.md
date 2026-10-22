@@ -12,6 +12,10 @@ To do: incorporation of third party libraries to support a common subset of TeX 
 
 # Documentation for different MathCAT Users
 
+Watch the short explainer video below for an introduction to MathCAT.
+
+<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1228948748?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Introduction to MathCAT"></iframe></div>
+
 There are many different audiences for MathCAT and each audience has different interests/needs. Please see the following documentation for details based on your needs:
 * AT users: [information about preferences you can set](users.md)
 * AT developers/library users: [information about the API that MathCAT exposes](callers.md)
