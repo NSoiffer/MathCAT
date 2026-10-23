@@ -1129,13 +1129,9 @@ pub fn is_same_element(e1: Element, e2: Element, ignore_attrs: &[&str]) -> Resul
     return Ok(());
 
     /// compares attributes -- '==' didn't seems to work
-    fn attrs_are_same(attrs1: Vec<Attribute>, attrs2: Vec<Attribute>, ignore: &[&str]) -> Result<()> {
-        let attrs1 = attrs1.iter()
-                .filter(|a| !ignore.contains(&as_qname!(a.name()).local_part())).cloned()
-                .collect::<Vec<Attribute>>();
-        let attrs2 = attrs2.iter()
-                .filter(|a| !ignore.contains(&as_qname!(a.name()).local_part())).cloned()
-                .collect::<Vec<Attribute>>();
+    fn attrs_are_same(mut attrs1: Vec<Attribute>, mut attrs2: Vec<Attribute>, ignore: &[&str]) -> Result<()> {
+        attrs1.retain(|a| !ignore.contains(&as_qname!(a.name()).local_part()));
+        attrs2.retain(|a| !ignore.contains(&as_qname!(a.name()).local_part()));
         if attrs1.len() != attrs2.len() {
             bail!("Attributes have different length: {:?} != {:?}", attrs1, attrs2);
         }
