@@ -5061,6 +5061,57 @@ mod canonicalize_tests {
     }
 
     #[test]
+    fn mfenced_too_many_separators() -> Result<()> {
+        let test_str = "<math><mfenced separators=';,'><mi>x</mi><mi>y</mi></mfenced></math>";
+        let target_str = "<math>
+			<mrow>
+				<mo data-changed='from_mfenced'>(</mo>
+				<mrow data-changed='added'>
+					<mi>x</mi>
+					<mo data-changed='from_mfenced'>;</mo>
+					<mi>y</mi>
+				</mrow>
+				<mo data-changed='from_mfenced'>)</mo>
+			</mrow>
+		</math>";
+        are_strs_canonically_equal_result(test_str, target_str, &[])
+    }
+
+    #[test]
+    fn mfenced_default_separator() -> Result<()> {
+        let test_str = "<math><mfenced><mi>x</mi><mi>y</mi></mfenced></math>";
+        let target_str = "<math>
+			<mrow>
+				<mo data-changed='from_mfenced'>(</mo>
+				<mrow data-changed='added'>
+					<mi>x</mi>
+					<mo data-changed='from_mfenced'>,</mo>
+					<mi>y</mi>
+				</mrow>
+				<mo data-changed='from_mfenced'>)</mo>
+			</mrow>
+		</math>";
+        are_strs_canonically_equal_result(test_str, target_str, &[])
+    }
+
+    #[test]
+    fn mfenced_whitespace_only_separators() -> Result<()> {
+        let test_str = "<math><mfenced separators=' '><mn>5</mn><mo>+</mo><mn>3</mn></mfenced></math>";
+        let target_str = "<math>
+			<mrow>
+				<mo data-changed='from_mfenced'>(</mo>
+				<mrow data-changed='added'>
+					<mn>5</mn>
+					<mo>+</mo>
+					<mn>3</mn>
+				</mrow>
+				<mo data-changed='from_mfenced'>)</mo>
+			</mrow>
+		</math>";
+        are_strs_canonically_equal_result(test_str, target_str, &[])
+    }
+
+    #[test]
     fn canonical_one_element_mrow_around_mrow() -> Result<()> {
         let test_str = "<math><mrow><mrow><mo>-</mo><mi>a</mi></mrow></mrow></math>";
         let target_str = "<math><mrow><mo>-</mo><mi>a</mi></mrow></math>";
