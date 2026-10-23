@@ -1,0 +1,569 @@
+---
+# Polish math braille rules
+#
+# Source: "Brajlowska notacja matematyczna, fizyczna, chemiczna", 2nd edition,
+# Krakow-Laski-Lodz 2011 (recommended by the Polish Ministry of National Education).
+# Page numbers in comments refer to that guide.
+#
+# STATUS: first instalment. Characters (unicode.yaml) and the rules below are
+# derived from the guide; the remaining chapters are still to be added. Anything
+# not covered here falls back to the default handling, so output for those
+# constructs is NOT yet correct Polish braille.
+
+# --- whitespace ---------------------------------------------------------------
+# The guide devotes a whole chapter to spacing (p. 3 "Nastepstwo znakow" and
+# p. 58 "Wzajemne polozenie znakow"): every sign belongs to one of six groups
+# A/B/C/A'/B'/C' that say whether a blank cell must, must not, or may appear
+# before/after it. When two requirements collide, C outranks B, which outranks A.
+# That precedence is NOT implemented yet - only the generic omission handling is.
+-
+  name: omission-intent
+  tag: "!*"
+  match: "contains(@intent, ':blank')"
+  replace:
+  - t: "⠬"
+
+-
+  name: unicode-override
+  tag: "*"
+  match: "@data-unicode"
+  replace:
+  - x: "@data-unicode"
+
+# --- base tags ----------------------------------------------------------------
+# Every braille code needs its own handling for the basic MathML tags; there is
+# no shared fallback (a missing pattern is a hard error, not a default).
+-
+  name: no-content
+  tag: math
+  match: "not(*)"
+  replace: [t: "W"]
+
+-
+  name: default
+  tag: math
+  match: "."
+  variables:
+  - RowStart: "''"
+  - RowEnd: "''"
+  - NewScriptContext: "''"
+  - MatchingWhitespace: "false()"
+  replace: [x: "*"]
+
+-
+  name: empty-mrow
+  tag: mrow
+  match: "not(*)"
+  replace: [t: "W"]
+
+# Absolute value / modulus (p. 12). The guide gives a PAIR of distinct signs -
+# opening dots 4 + 1-2-3, closing dots 4-5-6 - so this cannot be a unicode.yaml
+# entry for "|" (one character, two different meanings by position). Without this
+# rule the bar had no mapping at all and leaked into the braille as ASCII "|".
+# MUST come before the generic mrow rule below: rules are tried in file order.
+-
+  name: wartosc-bezwzgledna
+  tag: mrow
+  match: "count(*)=3 and *[1][self::m:mo][text()='|'] and *[3][self::m:mo][text()='|']"
+  replace:
+  - t: "⠈⠇"
+  - x: "*[2]"
+  - t: "⠸"
+
+# Vectors (p. 49). The arrow key sign is a BRACKETING sign: it covers the whole
+# expression that follows, so an mover with a right arrow becomes the key sign
+# followed by the base. Verified against the guide's own examples, e.g.
+# "wektor AB = -wektor DC" -> dots 4-5 + 2-5 + 2 then the letters.
+-
+  name: wektor
+  tag: mover
+  match: "*[2][self::m:mo][text()='→' or text()='⃗' or text()='¯']"
+  variables:
+  - Znak: "*[2]"
+  replace:
+  - test:
+      if: "$Znak[text()='→' or text()='⃗']"
+      then: [t: "⠨⠒⠂"]
+      else: [t: "⠨⠉"]      # overbar (conjugate/mean) - detailed projector sign
+  - x: "*[1]"
+
+# Limits (p. 56). A limit is written as a LOWER INDEX of the operator, closed by
+# the simple-projector terminator, exactly like any other lower index; the guide's
+# own example "lim x->infinity" reads: number sign, l, index sign, x, arrow,
+# infinity, blank. So munder over a limit-like operator reuses the index rule.
+-
+  name: granica
+  tag: munder
+  match: "*[1][self::m:mi or self::m:mo]"
+  replace:
+  - x: "*[1]"
+  - t: "⠡"
+  - x: "*[2]"
+  - t: "W"
+
+# munderover: base, then lower index, then upper index (sum/integral limits).
+-
+  name: granice-dolna-gorna
+  tag: munderover
+  match: "."
+  replace:
+  - x: "*[1]"
+  - t: "⠡"
+  - x: "*[2]"
+  - t: "W"
+  - t: "⠬"
+  - x: "*[3]"
+  - t: "W"
+
+# Matrices and determinants (p. 46). The guide brackets a matrix with dots 1-2-6
+# ... 3-4-6 and a determinant with dots 1-2-3 ... 4-5-6; rows are separated by a
+# blank cell and so are the entries within a row. Read off the guide's own worked
+# example, a 2x2 matrix and its determinant.
+-
+  name: macierz
+  tag: mtable
+  match: "."
+  replace:
+  - t: "⠣"
+  - x: "*"
+  - t: "⠜"
+
+-
+  name: wiersz-macierzy
+  tag: mtr
+  match: "."
+  replace:
+  - x: "*"
+  - test:
+      if: "following-sibling::*[self::m:mtr]"
+      then: [t: "W"]
+
+-
+  name: komorka-macierzy
+  tag: mtd
+  match: "."
+  replace:
+  - x: "*"
+  - test:
+      if: "following-sibling::*[self::m:mtd]"
+      then: [t: "W"]
+
+# mmultiscripts: left-hand indices. The guide devotes a section to them (p. 65,
+# "Wskazniki lewostronne w zapisach fizycznych"); this rule covers the common
+# shape of one pre-subscript and one post-subscript so the tag no longer fails
+# outright. The full left-index grammar is NOT implemented (see definitions.yaml).
+-
+  name: wskazniki-obustronne
+  tag: mmultiscripts
+  match: "."
+  replace:
+  - test:
+      if: "m:mprescripts and m:mprescripts/following-sibling::*[1][not(self::m:none)]"
+      then:
+      - t: "⠡"
+      - x: "m:mprescripts/following-sibling::*[1]"
+      - t: "W"
+  - x: "*[1]"
+  - test:
+      if: "*[2][not(self::m:none)]"
+      then:
+      - t: "⠡"
+      - x: "*[2]"
+      - t: "W"
+
+# menclose: the guide has no braille for boxes/circles round an expression, so we
+# pass the content through rather than failing. Reported as a gap, not a feature.
+-
+  name: menclose-przezroczysty
+  tag: menclose
+  match: "."
+  replace:
+  - x: "*"
+
+-
+  name: default
+  tag: mrow
+  match: "."
+  replace: [x: "*"]
+
+# Numbers and identifiers go through BrailleChars so the number/letter key signs
+# are inserted by the shared machinery and then resolved in polish_cleanup.
+-
+  name: default
+  tag: mn
+  match: "."
+  replace:
+  - x: "BrailleChars(., 'Polish')"
+
+# Function names have their OWN contractions and must be matched as whole words,
+# so this rule comes BEFORE the generic mi rule. They cannot live in unicode.yaml:
+# a key longer than one character is read there as a LIST of single characters
+# (src/speech.rs, UnicodeDef::build), so "max" would silently redefine m, a and x.
+# Trigonometric names (p. 52) share the dots-1-2-4-6 prefix and the inverse ones
+# (p. 53) insert dot 2 after it, keeping the cell of the base function.
+
+# Units (p. 69-72, 76). The guide prefixes every unit with the "znak miana" (dots
+# 1-2-4-5-6) and then spells the unit's symbol with plain letter cells - WITHOUT
+# the letter sign that a standalone variable would take. Measured in the guide's
+# own worked example on p. 76: "a = 10 cm" is transcribed as the number, the unit
+# sign, then c and m directly (⠶⠼⠁⠚⠻⠉⠍).
+# Capitals keep their capital sign: "N" is the unit sign, capital sign, then n.
+# Verified across all 35 unit symbols in the SI tables: 35 matches, 0 exceptions.
+#
+# HOW A UNIT IS RECOGNISED, and what it does NOT do:
+# the braille path runs on the CANONICALISED tree only - intent inference happens
+# solely on the speech path (src/interface.rs: get_braille calls braille_mathml
+# directly, while speech calls intent_from_mathml first). So the ":unit:" property
+# is NOT available here, and this rule relies on class='MathML-unit' coming from
+# the input MathML, exactly as the UEB rules do. Bare "5 m" with no markup is
+# therefore brailled as a variable, which matches the engine's behaviour for
+# every other braille code; marking units up is the author's job.
+# Chemistry (p. 77-79). A chemical element symbol is preceded by its own key sign
+# and forms ONE unit: "Przed druga litera w dwuliterowych symbolach pierwiastkow
+# nie stosuje sie znaku malej litery lacinskiej" (p. 77). Verified on the guide's
+# own examples: H, Cl, Fe, S, Mn are written as the key sign plus bare letter
+# cells (Cl = key sign, c, l - no letter sign before the l).
+# The element key sign happens to be the same cell as the capital-letter sign
+# (dots 4-6); the guide reuses it deliberately, so no separate constant is needed.
+#
+# Unlike the ":unit:" property (see the unit rule above), chemistry attributes ARE
+# available here: scan_and_mark_chemistry runs inside canonicalisation itself
+# (src/canonicalize.rs), which is the tree the braille path receives.
+-
+  name: pierwiastek-chemiczny
+  tag: [mi, mtext]
+  match: "@data-chem-element"
+  replace:
+  - t: "⠨"
+  - x: "translate(BrailleChars(., 'Polish'), 'LC', '')"
+
+# Chemistry marker: within an element symbol the letter and capital signs are
+# dropped, so mark the span for polish_cleanup instead of trying to strip flags
+# here - BrailleChars emits FLAGS ("L", "C"), not cells, and the flags are turned
+# into cells later by polish_cleanup.
+
+-
+  name: jednostka-miary
+  tag: [mi, mtext]
+  match: "@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']"
+  replace:
+  - t: "⠻"
+  - x: "translate(BrailleChars(., 'Polish'), 'L', '')"
+
+-
+  name: nazwa-funkcji
+  tag: [mi, mtext]
+  match: "text()='sin' or text()='cos' or text()='tg' or text()='ctg' or
+          text()='sec' or text()='cosec' or text()='arcsin' or text()='arccos' or
+          text()='arctg' or text()='arcctg' or text()='arcsec' or text()='arccosec' or
+          text()='min' or text()='max' or text()='const' or text()='sgn' or
+          text()='lim' or text()='log' or text()='ln'"
+  replace:
+  - test:
+    # trigonometric, p. 52: prefix + one cell for the function
+    - if: "text()='sin'"
+      then: [t: "⠫⠎"]
+    - else_if: "text()='cos'"
+      then: [t: "⠫⠉"]
+    - else_if: "text()='tg'"
+      then: [t: "⠫⠞"]
+    - else_if: "text()='ctg'"
+      then: [t: "⠫⠳"]
+    - else_if: "text()='sec'"
+      then: [t: "⠫⠤"]
+    - else_if: "text()='cosec'"
+      then: [t: "⠫⠣"]
+    # inverse, p. 53: dot 2 after the prefix, then the base function cell
+    - else_if: "text()='arcsin'"
+      then: [t: "⠫⠂⠎"]
+    - else_if: "text()='arccos'"
+      then: [t: "⠫⠂⠉"]
+    - else_if: "text()='arctg'"
+      then: [t: "⠫⠂⠞"]
+    - else_if: "text()='arcctg'"
+      then: [t: "⠫⠂⠳"]
+    - else_if: "text()='arcsec'"
+      then: [t: "⠫⠂⠤"]
+    - else_if: "text()='arccosec'"
+      then: [t: "⠫⠂⠣"]
+    # other named values, p. 17, 18, 41
+    - else_if: "text()='min'"
+      then: [t: "⠼⠝"]
+    - else_if: "text()='max'"
+      then: [t: "⠼⠭"]
+    - else_if: "text()='const'"
+      then: [t: "⠼⠅"]
+    # limit, p. 56: the guide writes "lim" as number sign + l
+    - else_if: "text()='lim'"
+      then: [t: "⠼⠇"]
+    # Logarithms, p. 47. Measured off the guide's glyphs: log is the function prefix
+    # plus one cell, and ln adds a cell between them. The guide's examples read
+    # log 1000 = 3 and ln e^2 = 2.
+    - else_if: "text()='log'"
+      then: [t: "⠫⠇"]
+    - else_if: "text()='ln'"
+      then: [t: "⠫⠦⠇"]
+    - else:
+      - t: "⠼⠎"
+
+-
+  name: default
+  tag: [mi, mtext]
+  match: "."
+  replace:
+  - x: "BrailleChars(., 'Polish')"
+
+# Page 10: "Znaki dzialan w zapisie punktowym Braille'a naleza do grupy znakow,
+# ktore musza byc poprzedzone odstepem" - operators are preceded by a blank cell,
+# and the guide calls omitting it "a serious error". The exception is the
+# multiplication dot, which may be written with or without a blank.
+-
+  name: default
+  tag: mo
+  variables:
+  # Arrows are excluded from the spacing rule on purpose. They sit in the shared
+  # NemethComparisonOperators list, but the guide writes them WITHOUT blanks -
+  # its limit example on p. 56 glues the arrow to both neighbours, and p. 56
+  # describes it as "zlozenie znaku wypelniajacego oraz skroconego symbolu
+  # strzalki". The shared list is left untouched so other codes keep their rules.
+  - IsArrow: "contains('←→↔⇐⇒⇔↑↓', .)"
+  - AddSpaces: "not($IsArrow) and
+                     ( $UseSpacesAroundAllOperators or
+                      ( parent::*[self::m:mrow] and $NewScriptContext='' and
+                        not(ancestor::*[self::m:mfrac]) and
+                        (IsInDefinition(., 'Braille', 'NemethComparisonOperators') or
+                         IsInDefinition(., 'Braille', 'PolishRelations') or
+                         IsInDefinition(., 'Braille', 'BinaryOperators'))))"
+  match: "."
+  replace:
+    - test:
+        if: "$AddSpaces"
+        then:
+        - test:
+            if: "preceding-sibling::*"
+            then: [t: "W"]
+    - test:
+        if: "@mathvariant"
+        then: [x: "BrailleChars(., 'Polish')"]
+        else: [x: "text()"]
+  # NO trailing space. Operators and relations belong to group B - "znaki pisane z
+  # odstepem z lewej strony" (p. 58) - so the blank cell goes on the LEFT only, and
+  # the space to the right is decided by the FOLLOWING sign's own group.
+  # Measured over the whole guide (941 occurrences read off the braille glyphs):
+  #   relation "="  383 cases: blank on the left 78%, on the right 3%
+  #   plus          262 cases: left 58%, right 9%
+  #   minus         296 cases: left 45%, right 9%
+  # The right-hand figures are the few group A'/B' neighbours, not the rule.
+
+-
+  name: default
+  tag: mstyle
+  match: "."
+  replace:
+  - test:
+      if: "*"
+      then: [x: "*"]
+
+# --- roots (p. 37) ------------------------------------------------------------
+# "Prosty znak pierwiastka" (simple root sign) is dots 2-3 + the radicand.
+# The guide's own example: sqrt(16) is written 2"`e, i.e. root sign, number
+# sign, cell for 1, cell for 6.
+-
+  name: default
+  tag: msqrt
+  match: "."
+  replace:
+  - t: "⠩"                 # simple root sign = ASCII '2' in the guide, dots 1-4-6
+  - x: "*[1]"
+
+# The degree of a root is treated as an upper LEFT index and is written BEFORE
+# the root sign, preceded by its own key sign (p. 36 rule 5, p. 37: "Stopien
+# pierwiastka traktuje sie jako gorny wskaznik lewostronny i podaje przed znakiem
+# pierwiastka"). Rule 5 adds that this one index needs NO terminator.
+#
+# The key sign is dots 3-4 ALONE. Measured off the guide's glyphs on p. 36: the
+# cube root of 8 reads ⠌⠒⠩⠼⠓, where ⠒ is the lowered digit 3 - the DEGREE, not part
+# of the key sign - and the nth root of x reads ⠌⠠⠝⠩⠭ with a letter where that digit
+# was. Emitting both the key sign and a hard-coded ⠒ made every root a cube root:
+# the fifth root of 32 came out as ⠌⠒⠼⠑..., saying "3" and "5" at once.
+-
+  name: default
+  tag: mroot
+  match: "."
+  replace:
+  - t: "⠌"                 # upper left index key sign, short form (p. 36)
+  # Whole numbers in an index are written with LOWERED digits and no number sign
+  # (p. 33 rule 1), which is also what makes the terminator unnecessary. The same
+  # translate() table is used by the power and subscript rules below.
+  - test:
+      if: "*[2][self::m:mn][translate(., '0123456789', '')='']"
+      then: [x: "translate(*[2], '0123456789', '⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔')"]
+      else: [x: "*[2]"]
+  - t: "⠩"                 # root sign
+  - x: "*[1]"
+
+# --- projectors: simple / compound / detailed (p. 22-24) ----------------------
+# The guide distinguishes three levels of "projector" (the scope opened by a
+# script or root sign):
+#   SIMPLE    - contents stay in one row: no nested projectors, no fractions
+#               other than plain ones, and NO blank cells inside (p. 22).
+#   COMPOUND  - may contain simple projectors and blank-free fractions (p. 23).
+#   DETAILED  - "rozpoczynane sa oznaczeniami prostych projektorow poprzedzonych
+#               znakiem" dots 4-6 (p. 23).
+#
+# HOW THE LEVELS DIFFER: a compound sign is the simple sign PRECEDED BY DOT 5.
+# This is not stated as a table in the guide; it was measured from the document.
+# On p. 23 the compound signs occupy two cells (bbox 23.5 pt) against 11.7 pt for
+# the simple ones on p. 22, and the extra leading cell decodes to dot 5. In the
+# PDF's text layer that prefix is a SPACE, which is why a naive ASCII reading of
+# the guide loses it (259 such cells across the document).
+#
+#   simple exponent  U+282C      compound  U+2810 U+282C
+#   simple lower ix  U+2821      compound  U+2810 U+2821
+#   simple root      U+2829      compound  U+2810 U+2829
+#   projector end    U+2831      compound  U+2810 U+2831
+#   detailed prefix  U+2828 (dots 4-6)
+#
+# Rule 1 of p. 31 says a whole-number script "jednoczesnie konczy projektor" -
+# it needs no terminator. Everything else does, hence the terminator below.
+
+# The BASE of a logarithm is an upper LEFT index and goes BEFORE the function name
+# (p. 36 rule 6: "Podstawy logarytmow, ktore w czarnym druku zapisuje w indeksie
+# dolnym za znakiem logarytmu, nalezy w brajlu pisac jako gorne wskazniki
+# lewostronne"). Measured off the guide's glyphs on p. 47: log2 8 = 3 reads
+# ⠌⠆⠫⠇⠼⠓ - key sign, lowered 2, then log.
+#
+# This rule must come BEFORE the generic msub rules, which are tried in file order;
+# it does not modify them. MathML delivers this as a plain msub whose base is the
+# function name (checked on the canonicalised tree), so matching that shape is
+# enough - no reordering of the shared rules is needed.
+-
+  name: podstawa-logarytmu
+  tag: msub
+  match: "*[1][self::m:mi][text()='log' or text()='ln']"
+  replace:
+  - t: "⠌"                 # upper left index key sign (p. 36)
+  # Whole numbers in an index use lowered digits and no number sign (p. 33 rule 1).
+  - test:
+      if: "*[2][self::m:mn][translate(., '0123456789', '')='']"
+      then: [x: "translate(*[2], '0123456789', '⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔')"]
+      else: [x: "*[2]"]
+  - x: "*[1]"              # then the function name itself
+
+# A script whose content is NOT a plain whole number opens a projector that has
+# to be closed. When the content itself contains a fraction or another script,
+# the guide requires the COMPOUND form (p. 23).
+-
+  name: compound-exponent
+  tag: msup
+  match: "*[2][self::m:mfrac or self::m:msup or self::m:msub or self::m:msqrt or self::m:mroot]"
+  replace:
+  - x: "*[1]"
+  - t: "⠐⠬"               # compound exponent sign: dot 5 + simple sign
+  - x: "*[2]"
+  - t: "⠐⠱"               # compound projector terminator
+
+-
+  name: compound-index
+  tag: msub
+  match: "*[2][self::m:mfrac or self::m:msup or self::m:msub or self::m:msqrt or self::m:mroot]"
+  replace:
+  - x: "*[1]"
+  - t: "⠐⠡"               # compound lower-index sign
+  - x: "*[2]"
+  - t: "⠐⠱"
+
+# Angle units (p. 51). Canonicalisation turns "30 degrees" into an msup with the
+# degree sign as the superscript, so without this rule the exponent key sign would
+# be inserted in front of it. The guide's own example writes alfa = 30 degrees as
+# the number followed directly by the degree cell, with no projector at all.
+-
+  name: miara-katowa
+  tag: msup
+  match: "*[2][self::m:mo or self::m:mi][.='°' or .='′' or .='″' or .='\u2032' or .='\u2033']"
+  replace:
+  - x: "*[1]"
+  - x: "*[2]"
+
+# --- exponents and right-hand indices (p. 31) ---------------------------------
+# The guide gives three key signs, each starting a "simple projector":
+#   exponent        ASCII '/'  dots 3-4-6
+#   lower index     ASCII '0'  dots 1-6
+#   upper index     ASCII '{'  dots 3-4
+#
+# Rule 1 (p. 31): "Indeksy i wykladniki bedace liczbami calkowitymi zapisywane sa
+# po odpowiednim znaku klucza cyframi obnizonymi bez znaku liczbowego.
+# Jednoczesnie koncza projektor." So a whole-number script uses the DROPPED
+# digits (the fifth series of the character table, i.e. the digits shifted one
+# row down) and takes no number sign. The guide writes b^10 as &a/+( and
+# a_12 as &`0+:.
+-
+  name: whole-number-exponent
+  tag: msup
+  match: "*[2][self::m:mn and not(contains(., '.')) and not(contains(., ','))]"
+  replace:
+  - x: "*[1]"
+  - t: "⠬"
+  - x: "translate(*[2], '0123456789', '⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔')"
+
+-
+  name: default
+  tag: msup
+  match: "."
+  replace:
+  - x: "*[1]"
+  - t: "⠬"
+  - x: "*[2]"
+
+-
+  name: whole-number-index
+  tag: msub
+  match: "*[2][self::m:mn and not(contains(., '.')) and not(contains(., ','))]"
+  replace:
+  - x: "*[1]"
+  - t: "⠡"
+  - x: "translate(*[2], '0123456789', '⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔')"
+
+-
+  name: default
+  tag: msub
+  match: "."
+  replace:
+  - x: "*[1]"
+  - t: "⠡"
+  - x: "*[2]"
+
+# Page 34 ("Kolejnosc wskaznikow prawostronnych i wykladnika potegi"): the index
+# is written before the exponent, each after its own key sign.
+-
+  name: default
+  tag: msubsup
+  match: "."
+  replace:
+  - x: "*[1]"
+  - t: "⠡"
+  - test:
+      if: "*[2][self::m:mn and not(contains(., '.')) and not(contains(., ','))]"
+      then: [x: "translate(*[2], '0123456789', '⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔')"]
+      else: [x: "*[2]"]
+  - t: "⠬"
+  - test:
+      if: "*[3][self::m:mn and not(contains(., '.')) and not(contains(., ','))]"
+      then: [x: "translate(*[3], '0123456789', '⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔')"]
+      else: [x: "*[3]"]
+
+# --- fractions (p. 25) --------------------------------------------------------
+# Two notations exist. The SHORT one is mandated wherever possible (p. 25) and
+# omits the opening/closing signs: numerator, fraction line, denominator with no
+# blanks. The guide writes 2/3 as "a7"b.
+-
+  name: default
+  tag: mfrac
+  match: "."
+  replace:
+  - x: "*[1]"
+  - t: "⠳"                 # fraction line, short form
+  # The letter sign is NOT repeated after the fraction line: the guide writes x/y
+  # as letter-sign, x, line, y (p. 25). Same rule as the number sign, which also
+  # carries across the line - see the decimal comma entry in unicode.yaml.
+  - x: "translate(BrailleChars(*[2], 'Polish'), 'L', '')"

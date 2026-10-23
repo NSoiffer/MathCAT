@@ -33,6 +33,10 @@ mod braille {
         mod swedish;
     }
 
+    mod Polish {
+        mod polish;
+    }
+
     mod LaTeX {
         mod augenbit;
         mod other;

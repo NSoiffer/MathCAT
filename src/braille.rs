@@ -265,6 +265,7 @@ fn get_braille_code(code: &str) -> Option<&'static dyn BrailleCode> {
         "Vietnam" => &Vietnam,
         "CMU" => &Cmu,
         "Finnish" => &Finnish,
+        "Polish" => &Polish,
         "Russian" => &Russian,
         "Swedish" => &Swedish,
         "French" => &French,
@@ -279,6 +280,7 @@ struct Ueb;
 struct Vietnam;
 struct Cmu;
 struct Finnish;
+struct Polish;
 struct Russian;
 struct Swedish;
 struct French;
@@ -346,6 +348,12 @@ impl BrailleCode for Finnish {
     fn cleanup(&self, pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String { finnish_cleanup(pref_manager, raw_braille) }
     fn get_braille_chars(&self, node: Element, text_range: Option<Range<usize>>) -> Result<String> { BrailleChars::get_braille_ueb_chars(node, text_range) }    // FIX: need to figure out what to implement
     fn needs_grouping(&self, mathml: Element, is_base: bool) -> StdResult<bool, XPathError> { Ok(NeedsToBeGrouped::needs_grouping_for_finnish(mathml, is_base)) }
+}
+
+impl BrailleCode for Polish {
+    fn name(&self) -> &'static str { "Polish" }
+    fn cleanup(&self, pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String { polish_cleanup(pref_manager, raw_braille) }
+    fn get_braille_chars(&self, node: Element, text_range: Option<Range<usize>>) -> Result<String> { BrailleChars::get_braille_ueb_chars(node, text_range) }    // FIX: needs the Polish letter/number key signs
 }
 
 impl BrailleCode for Russian {
@@ -2607,6 +2615,83 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     // let result = result.trim_start_matches('⠀').trim_end_matches('⠀');
     let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
    
+    return result.to_string();
+}
+
+
+static POLISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
+    // Key signs taken from the Polish guide and cross-checked against the cells
+    // decoded from its own character table:
+    //   number sign            dots 3-4-5-6  (p. 4)
+    //   lower-case Latin sign  dot 6         (p. 6)
+    //   upper-case Latin sign  dots 4-6      (p. 6)
+    // Note the upper-case sign REPLACES the lower-case one rather than preceding
+    // it, so the "CL" pair is collapsed in polish_cleanup before we get here.
+    "N" => "⠼",     // number sign
+    "n" => "⠼",     // number sign for drop numbers
+    "L" => "⠠",     // lower-case Latin letter sign
+    "C" => "⠨",     // upper-case Latin letter sign (see polish_cleanup)
+    "𝐶" => "⠨",     // capital that must not get whitespace in front
+    "𝑐" => "",      // second or later cell of a capital letter
+    "G" => "⠰",     // lower-case Greek letter sign, dots 5-6 (guide p. 7)
+    "𝑔" => "⠸",     // upper-case Greek letter sign, dots 4-5-6 (see polish_cleanup)
+    "W" => "⠀",     // whitespace
+    "𝐖"=> "⠀",     // whitespace
+    "R" => "",      // roman
+    "B" => "⠸",     // bold: the guide's "znak druku wyroznionego" (p. 6)
+    "I" => "⠸",     // italic: same sign as bold in the guide's table (p. 1)
+    "S" => "XXX",   // sans-serif -- not defined by the guide
+    "𝔹" => "XXX",   // blackboard -- not defined by the guide
+    "T" => "XXX",   // script -- not defined by the guide
+    "D" => "XXX",   // Fraktur -- not defined by the guide
+    "E" => "",      // English
+    "V" => "XXX",   // Greek variants
+    "1" => "",      // Grade 1 symbol: no equivalent in the Polish code
+    "s" => "",      // typeface single char indicator
+    "w" => "",      // typeface word indicator
+    "e" => "",      // typeface & capital terminator
+    "t" => "⠱",     // projector terminator (p. 37: "znak konczacy projektor")
+    "," => "⠂",     // comma
+    "." => "⠲",     // period
+    "-" => "-",     // hyphen
+    "(" => "⠦",
+    ")" => "⠴",
+    "↑" => "⠬",     // superscript
+    "↓" => "⠡",     // subscript
+    "#" => "",      // signals end of script
+    "Z" => "⠐",     // zone change
+};
+
+/// Post-processing for the Polish braille code.
+///
+/// STATUS: minimal. It resolves the letter/number key signs and drops the mode
+/// indicators the shared machinery leaves behind. The spacing precedence from the
+/// guide's chapters "Nastepstwo znakow" (p. 3) and "Wzajemne polozenie znakow"
+/// (p. 58) - six sign groups where C outranks B outranks A - is NOT implemented.
+fn polish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
+    static REPLACE_INDICATORS: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"([SB𝔹TIREDGg𝑔VUP𝐏C𝐶LlMmb↑↓Nn𝑁WwZ,()])").unwrap());
+
+    let typeforms = UserTypeforms::from_prefs(&pref_manager, "Vietnam");
+
+    // Get rid of unnecessary "L"s and "N"s (shared with the other codes).
+    let result = remove_unneeded_mode_changes(&raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage);
+
+    // In Polish the capital sign REPLACES the lower-case letter sign instead of
+    // stacking with it, so collapse the pair before the table below turns a lone
+    // "L" into the lower-case sign.
+    let result = result.replace("CL", "C").replace("𝐶L", "𝐶");
+
+    // Greek follows the same principle: the guide has ONE sign for a lower-case
+    // Greek letter (dots 5-6) and ONE for an upper-case Greek letter (dots 4-5-6),
+    // rather than a capital sign stacked on a Greek sign. Map the "CG" pair onto
+    // the single upper-case Greek sign.
+    let result = result.replace("CG", "𝑔").replace("𝐶G", "𝑔");
+
+    let result = apply_indicator_replacements(&result, &REPLACE_INDICATORS,
+        &POLISH_INDICATOR_REPLACEMENTS, "POLISH_INDICATOR_REPLACEMENTS", &typeforms);
+
+    let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
     return result.to_string();
 }
 

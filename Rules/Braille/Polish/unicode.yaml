@@ -1,0 +1,287 @@
+---
+# Polish math braille (Brajlowska notacja matematyczna, fizyczna, chemiczna)
+#
+# Source: "Brajlowska notacja matematyczna, fizyczna, chemiczna", 2nd edition,
+# Krakow-Laski-Lodz 2011, recommended by the Polish Ministry of National Education
+# for braille textbooks and examination papers. The code descends from
+# H. Epheser, "Internationale Mathematikschrift fuer Blinde", Marburg.
+#
+# The guide prints braille with a 6-dot font, so the cells below were decoded from
+# the document's own character table (page 1) and its definition tables.
+#
+# Flags used by MathCAT (see UEB/Swedish unicode.yaml):
+#    L -- what follows is a letter
+#    N -- what follows is a digit
+#    C -- precedes L for capital letters
+#    G -- precedes L for Greek letters (after C for capitals)
+# The Polish notation has its own key signs for these roles: number sign,
+# lower-case Latin letter sign and upper-case Latin letter sign (pages 4 and 6).
+
+# MathML invisible operators carry no braille of their own. Without these entries
+# the engine spells out the code point instead: "sin x" came out as the sin sign
+# followed by the digits 002061.
+ - "⁡": [t: ""]                # 0x2061 (invisible function apply)
+ - "⁢": [t: ""]                # 0x2062 (invisible times)
+ - "⁣": [t: ""]                # 0x2063 (invisible separator)
+ - "⁤": [t: ""]                # 0x2064 (invisible plus)
+
+# Big operators. The guide gives them no sign of their own - it lists only the
+# Greek capitals (p. 7) - so sum and product are written as capital sigma and
+# capital pi. Swedish and UEB map 0x2211 onto the Greek capital in the same way.
+ - "∑": [t: "CG⠎"]   # 0x2211 (n-ary sum = capital sigma)
+ - "∏": [t: "CG⠏"]   # 0x220F (n-ary product = capital pi)
+
+# Decimal comma (p. 5). The guide is explicit: "W liczbach dziesietnych czesc
+# calkowita od ulamkowej oddziela sie przecinkiem" - dot 2 - and a footnote adds
+# that braille uses ONLY the comma, never the decimal point, so the ambiguity of
+# print notation does not arise. Verified on the guide's examples 7,29 and 0,072.
+ - ",": [t: "N⠂"]             # 0x002C (decimal comma; guide p. 5)
+
+# Per cent and per mille (p. 5), written after the number.
+ - "%": [t: "⠼⠚⠴"]        # 0x0025 (per cent; guide p. 5)
+ - "‰": [t: "⠼⠚⠴⠴"]   # 0x2030 (per mille; guide p. 5)
+
+# ASCII hyphen-minus. MathML in the wild carries U+002D far more often than the
+# proper minus U+2212, and without an entry it fell through to the output as a raw
+# ASCII byte. Same cell as U+2212 (p. 10); Swedish keeps both for the same reason.
+ - "-": [t: "⠤"]              # 0x002D (hyphen-minus, same cell as U+2212)
+
+# Brackets (p. 11). Four pairs, each its own sign - the guide lists them together
+# with worked examples such as "(14 - 5) + 7" and a nested one three levels deep.
+# Without these entries the engine fell back to unrelated cells and printed digits
+# where brackets belong.
+ - "(": [t: "⠣"]              # 0x0028 (round, opening; guide p. 11)
+ - ")": [t: "⠜"]              # 0x0029 (round, closing)
+ - "[": [t: "⠷"]              # 0x005B (square, opening; guide p. 11)
+ - "]": [t: "⠾"]              # 0x005D (square, closing)
+ - "{": [t: "⠪"]              # 0x007B (curly, opening; guide p. 11)
+ - "}": [t: "⠕"]              # 0x007D (curly, closing)
+ - "⟨": [t: "⠷⠄"]        # 0x27E8 (angle, opening; guide p. 11)
+ - "⟩": [t: "⠠⠾"]        # 0x27E9 (angle, closing)
+
+# Multiplication dot (p. 10). The guide gives it a cell of its own and notes that
+# multiplication is the ONE operator allowed either with or without a leading blank
+# ("wyjatek stanowi znak mnozenia"). Its example 12 . 3 confirms the cell.
+ - "⋅": [t: "⠄"]              # 0x22C5 (multiplication dot; guide p. 10)
+
+# Divisibility (p. 12): "jest dzielnikiem" and its negation, which adds the same
+# dots 3-5 cell that negates any relation (p. 58). NOTE this is the SAME cell pair
+# as the opening absolute value (p. 12) - the guide reuses it, and position tells
+# them apart.
+ - "∣": [t: "⠈⠇"]        # 0x2223 (divides; guide p. 12)
+ - "∤": [t: "⠔⠈⠇"]  # 0x2224 (does not divide; guide p. 12)
+
+# Punctuation after a number (p. 13). These signs are written with NO blank on their
+# left, and a number before them takes dot 6 first so the punctuation cannot be read
+# as a continuation of the number: the guide's example 12; reads number sign, 1, 2,
+# dot 6, semicolon. The dot-6 part is handled by the engine's own punctuation
+# indicator; these entries only supply the cells, which were missing and reached the
+# output as raw ASCII.
+ - ";": [t: "⠆"]              # 0x003B (semicolon; guide p. 13)
+ - ":": [t: "⠒"]              # 0x003A (colon; guide p. 13)
+ - "?": [t: "⠢"]              # 0x003F (question mark; guide p. 13)
+ - "!": [t: "⠖"]              # 0x0021 (exclamation mark; guide p. 13)
+
+# digits (number sign + first series, page 4)
+ - "0": [t: "N⠚"]                # 0x0030 (digit 0)
+ - "1": [t: "N⠁"]                # 0x0031 (digit 1)
+ - "2": [t: "N⠃"]                # 0x0032 (digit 2)
+ - "3": [t: "N⠉"]                # 0x0033 (digit 3)
+ - "4": [t: "N⠙"]                # 0x0034 (digit 4)
+ - "5": [t: "N⠑"]                # 0x0035 (digit 5)
+ - "6": [t: "N⠋"]                # 0x0036 (digit 6)
+ - "7": [t: "N⠛"]                # 0x0037 (digit 7)
+ - "8": [t: "N⠓"]                # 0x0038 (digit 8)
+ - "9": [t: "N⠊"]                # 0x0039 (digit 9)
+
+# lower-case Latin letters (letter sign + series, page 6)
+ - "a": [t: "L⠁"]                # 0x0061
+ - "b": [t: "L⠃"]                # 0x0062
+ - "c": [t: "L⠉"]                # 0x0063
+ - "d": [t: "L⠙"]                # 0x0064
+ - "e": [t: "L⠑"]                # 0x0065
+ - "f": [t: "L⠋"]                # 0x0066
+ - "g": [t: "L⠛"]                # 0x0067
+ - "h": [t: "L⠓"]                # 0x0068
+ - "i": [t: "L⠊"]                # 0x0069
+ - "j": [t: "L⠚"]                # 0x006A
+ - "k": [t: "L⠅"]                # 0x006B
+ - "l": [t: "L⠇"]                # 0x006C
+ - "m": [t: "L⠍"]                # 0x006D
+ - "n": [t: "L⠝"]                # 0x006E
+ - "o": [t: "L⠕"]                # 0x006F
+ - "p": [t: "L⠏"]                # 0x0070
+ - "q": [t: "L⠟"]                # 0x0071
+ - "r": [t: "L⠗"]                # 0x0072
+ - "s": [t: "L⠎"]                # 0x0073
+ - "t": [t: "L⠞"]                # 0x0074
+ - "u": [t: "L⠥"]                # 0x0075
+ - "v": [t: "L⠧"]                # 0x0076
+ - "x": [t: "L⠭"]                # 0x0078
+ - "y": [t: "L⠽"]                # 0x0079
+ - "z": [t: "L⠵"]                # 0x007A
+ - "ż": [t: "L⠯"]                # 0x017C
+ - "ź": [t: "L⠮"]                # 0x017A
+ - "ą": [t: "L⠡"]                # 0x0105
+ - "ł": [t: "L⠣"]                # 0x0142
+ - "ć": [t: "L⠩"]                # 0x0107
+ - "ń": [t: "L⠹"]                # 0x0144
+ - "ę": [t: "L⠱"]                # 0x0119
+ - "ś": [t: "L⠪"]                # 0x015B
+ - "w": [t: "L⠺"]                # 0x0077
+ - "ó": [t: "L⠬"]                # 0x00F3 (o with acute; guide p. 1, series 6)
+
+# upper-case Latin letters (capital + letter sign, page 6)
+ - "A": [t: "CL⠁"]               # 0x0041
+ - "B": [t: "CL⠃"]               # 0x0042
+ - "C": [t: "CL⠉"]               # 0x0043
+ - "D": [t: "CL⠙"]               # 0x0044
+ - "E": [t: "CL⠑"]               # 0x0045
+ - "F": [t: "CL⠋"]               # 0x0046
+ - "G": [t: "CL⠛"]               # 0x0047
+ - "H": [t: "CL⠓"]               # 0x0048
+ - "I": [t: "CL⠊"]               # 0x0049
+ - "J": [t: "CL⠚"]               # 0x004A
+ - "K": [t: "CL⠅"]               # 0x004B
+ - "L": [t: "CL⠇"]               # 0x004C
+ - "M": [t: "CL⠍"]               # 0x004D
+ - "N": [t: "CL⠝"]               # 0x004E
+ - "O": [t: "CL⠕"]               # 0x004F
+ - "P": [t: "CL⠏"]               # 0x0050
+ - "Q": [t: "CL⠟"]               # 0x0051
+ - "R": [t: "CL⠗"]               # 0x0052
+ - "S": [t: "CL⠎"]               # 0x0053
+ - "T": [t: "CL⠞"]               # 0x0054
+ - "U": [t: "CL⠥"]               # 0x0055
+ - "V": [t: "CL⠧"]               # 0x0056
+ - "X": [t: "CL⠭"]               # 0x0058
+ - "Y": [t: "CL⠽"]               # 0x0059
+ - "Z": [t: "CL⠵"]               # 0x005A
+ - "Ż": [t: "CL⠯"]               # 0x017B
+ - "Ź": [t: "CL⠮"]               # 0x0179
+ - "Ą": [t: "CL⠡"]               # 0x0104
+ - "Ł": [t: "CL⠣"]               # 0x0141
+ - "Ć": [t: "CL⠩"]               # 0x0106
+ - "Ń": [t: "CL⠹"]               # 0x0143
+ - "Ę": [t: "CL⠱"]               # 0x0118
+ - "Ś": [t: "CL⠪"]               # 0x015A
+ - "W": [t: "CL⠺"]               # 0x0057
+ - "Ó": [t: "CL⠬"]               # 0x00D3 (O with acute; guide p. 1, series 6)
+
+# operators and relations (definition tables, pages 10-11)
+ - "!": [t: "⠫"]                # 0x0021 silnia [guide p. 55]
+ - "+": [t: "⠖"]                # 0x002B dodawanie [guide p. 10]
+ - "<": [t: "⠪⠄"]                # 0x003C mniejszy [guide p. 11]
+ - "=": [t: "⠶"]                # 0x003D równa się [guide p. 11]
+ - ">": [t: "⠕⠂"]                # 0x003E większy [guide p. 11]
+ - "°": [t: "⠴"]                # 0x00B0 znak stopnia kątowego [guide p. 51]
+ - "±": [t: "⠖⠤"]                # 0x00B1 plus-minus [guide p. 10]
+ - "×": [t: "⠦"]                # 0x00D7 krzyżyk [guide p. 10]
+ - "÷": [t: "⠲"]                # 0x00F7 znak dzielenia [guide p. 10]
+ - "′": [t: "⠔"]                # 0x2032 znak minuty kątowej [guide p. 51]
+ - "″": [t: "⠔⠔"]                # 0x2033 znak sekundy kątowej [guide p. 51]
+ - "ℕ": [t: "⠨⠨⠝"]                # 0x2115 zbiór liczb naturalnych [guide p. 16]
+ - "ℚ": [t: "⠨⠨⠺"]                # 0x211A zbiór liczb wymiernych [guide p. 16]
+ - "ℝ": [t: "⠨⠨⠗"]                # 0x211D zbiór liczb rzeczywistych [guide p. 16]
+ - "ℤ": [t: "⠨⠨⠉"]                # 0x2124 zbiór liczb całkowitych [guide p. 16]
+ - "←": [t: "⠐⠒"]                # 0x2190 strzałka zwrócona w lewo [guide p. 48]
+ - "↑": [t: "⠸⠒⠁"]                # 0x2191 - ulatnianie się gazu [guide p. 79]
+ - "→": [t: "⠒⠂"]                # 0x2192 strzałka zwrócona w prawo [guide p. 48]
+ - "↓": [t: "⠸⠒⠄"]                # 0x2193 - strącanie się osadu [guide p. 79]
+ - "↔": [t: "⠐⠒⠂"]                # 0x2194 strzałka zwrócona w prawo i w lewo [guide p. 48]
+ - "⇒": [t: "⠶⠂"]                # 0x21D2 to [guide p. 54]
+ - "⇔": [t: "⠐⠶⠂"]                # 0x21D4 wtedy i tylko wtedy gdy [guide p. 18]
+ - "∀": [t: "⠯⠂"]                # 0x2200 ogólny (dla każdego ... ) [guide p. 54]
+ - "∂": [t: "⠹"]                # 0x2202 znak pochodnej cząstkowej [guide p. 57]
+ - "∃": [t: "⠯⠢"]                # 0x2203 szczegółowy (istnieje takie ..., że) [guide p. 54]
+ - "∅": [t: "⠯⠕"]                # 0x2205 zbiór pusty [guide p. 16]
+ - "∈": [t: "⠈⠑"]                # 0x2208 należy [guide p. 16]
+ - "∉": [t: "⠔⠈⠑"]                # 0x2209 nie należy [guide p. 16]
+ - "−": [t: "⠤"]                # 0x2212 odejmowanie [guide p. 10]
+ - "∓": [t: "⠤⠖"]                # 0x2213 minus-plus [guide p. 10]
+ - "∖": [t: "⠡⠄"]                # 0x2216 różnica zbiorów [guide p. 17]
+ - "∞": [t: "⠼⠿"]                # 0x221E symbol nieskończoności [guide p. 56]
+ - "∟": [t: "⠻⠦"]                # 0x221F kąt prosty [guide p. 48]
+ - "∠": [t: "⠻⠪"]                # 0x2220 kąt [guide p. 48]
+ - "∥": [t: "⠈⠇⠇"]                # 0x2225 równoległe [guide p. 48]
+ - "∦": [t: "⠔⠈⠇⠇"]                # 0x2226 nierównoległe [guide p. 48]
+ - "∨": [t: "⠼⠑⠈⠇⠼⠃⠑"]                # 0x2228 lub [guide p. 12]
+ - "∩": [t: "⠬⠄"]                # 0x2229 iloczyn zbiorów [guide p. 17]
+ - "∪": [t: "⠩⠄"]                # 0x222A suma zbiorów [guide p. 17]
+ - "∫": [t: "⠮"]                # 0x222B znak całki [guide p. 57]
+ - "∼": [t: "⠢"]                # 0x223C jest podobny [guide p. 48]
+ - "≁": [t: "⠔⠢"]                # 0x2241 nie jest podobny [guide p. 48]
+ - "≅": [t: "⠶⠶"]                # 0x2245 jest przystający [guide p. 48]
+ - "≇": [t: "⠔⠶⠶"]                # 0x2247 nie jest przystający [guide p. 48]
+ - "≈": [t: "⠢⠢"]                # 0x2248 równa się w przybliżeniu [guide p. 11]
+ - "≔": [t: "⠒⠶"]                # 0x2254 równa się z definicji [guide p. 11]
+ - "≠": [t: "⠔⠶"]                # 0x2260 nie równa się [guide p. 11]
+ - "≡": [t: "⠶⠶"]                # 0x2261 równa się tożsamościowo [guide p. 11]
+ - "≢": [t: "⠔⠶⠶"]                # 0x2262 nie równa się tożsamościowo [guide p. 11]
+ - "≤": [t: "⠪⠶"]                # 0x2264 mniejszy lub równy [guide p. 11]
+ - "≥": [t: "⠕⠶"]                # 0x2265 większy lub równy [guide p. 11]
+ - "≪": [t: "⠪⠪⠄"]                # 0x226A znacznie mniejszy [guide p. 11]
+ - "≫": [t: "⠕⠕⠂"]                # 0x226B znacznie większy [guide p. 11]
+ - "≮": [t: "⠔⠪⠄"]                # 0x226E nie mniejszy [guide p. 11]
+ - "≯": [t: "⠔⠕⠂"]                # 0x226F nie większy [guide p. 11]
+ - "⊂": [t: "⠣⠄"]                # 0x2282 zawiera się, jest zawarty, jest podzbiorem [guide p. 16]
+ - "⊃": [t: "⠜⠂"]                # 0x2283 zawiera [guide p. 16]
+ - "⊅": [t: "⠔⠜⠂"]                # 0x2285 nie zawiera [guide p. 16]
+ - "⊥": [t: "⠼⠄"]                # 0x22A5 prostopadłe [guide p. 48]
+ - "⊮": [t: "⠔⠼⠄"]                # 0x22AE nieprostopadłe [guide p. 48]
+ - "⌀": [t: "⠻⠔"]                # 0x2300 średnica [guide p. 48]
+ - "□": [t: "⠻⠶"]                # 0x25A1 kwadrat [guide p. 48]
+ - "▭": [t: "⠻⠿"]                # 0x25AD prostokąt [guide p. 48]
+ - "△": [t: "⠻⠲"]                # 0x25B3 trójkąt [guide p. 48]
+ - "○": [t: "⠻⠴"]                # 0x25CB okrąg [guide p. 48]
+
+# Greek letters (guide p. 7). The key sign is emitted by the "G" flag,
+# so only the letter cell is listed here.
+ - "Α": [t: "CG⠁"]                # 0x0391
+ - "Β": [t: "CG⠃"]                # 0x0392
+ - "Γ": [t: "CG⠛"]                # 0x0393
+ - "Δ": [t: "CG⠙"]                # 0x0394 (document uses '∆')
+ - "Ε": [t: "CG⠑"]                # 0x0395
+ - "Ζ": [t: "CG⠵"]                # 0x0396
+ - "Η": [t: "CG⠱"]                # 0x0397
+ - "Θ": [t: "CG⠹"]                # 0x0398
+ - "Ι": [t: "CG⠊"]                # 0x0399
+ - "Κ": [t: "CG⠅"]                # 0x039A
+ - "Λ": [t: "CG⠇"]                # 0x039B
+ - "Μ": [t: "CG⠍"]                # 0x039C
+ - "Ν": [t: "CG⠝"]                # 0x039D
+ - "Ξ": [t: "CG⠭"]                # 0x039E
+ - "Ο": [t: "CG⠕"]                # 0x039F
+ - "Π": [t: "CG⠏"]                # 0x03A0
+ - "Ρ": [t: "CG⠗"]                # 0x03A1
+ - "Σ": [t: "CG⠎"]                # 0x03A3
+ - "Τ": [t: "CG⠞"]                # 0x03A4
+ - "Υ": [t: "CG⠥"]                # 0x03A5
+ - "Φ": [t: "CG⠋"]                # 0x03A6
+ - "Χ": [t: "CG⠯"]                # 0x03A7
+ - "Ψ": [t: "CG⠽"]                # 0x03A8
+ - "Ω": [t: "CG⠺"]                # 0x03A9 (document uses 'Ω')
+ - "α": [t: "G⠁"]                # 0x03B1
+ - "β": [t: "G⠃"]                # 0x03B2
+ - "γ": [t: "G⠛"]                # 0x03B3
+ - "δ": [t: "G⠙"]                # 0x03B4
+ - "ε": [t: "G⠑"]                # 0x03B5
+ - "ζ": [t: "G⠵"]                # 0x03B6
+ - "η": [t: "G⠱"]                # 0x03B7
+ - "θ": [t: "G⠹"]                # 0x03B8
+ - "ι": [t: "G⠊"]                # 0x03B9
+ - "κ": [t: "G⠅"]                # 0x03BA
+ - "λ": [t: "G⠇"]                # 0x03BB
+ - "μ": [t: "G⠍"]                # 0x03BC (document uses 'µ')
+ - "ν": [t: "G⠝"]                # 0x03BD
+ - "ξ": [t: "G⠭"]                # 0x03BE
+ - "ο": [t: "G⠕"]                # 0x03BF
+ - "π": [t: "G⠏"]                # 0x03C0
+ - "ρ": [t: "G⠗"]                # 0x03C1
+ - "σ": [t: "G⠎"]                # 0x03C3
+ - "τ": [t: "G⠞"]                # 0x03C4
+ - "υ": [t: "G⠥"]                # 0x03C5
+ - "χ": [t: "G⠯"]                # 0x03C7
+ - "ψ": [t: "G⠽"]                # 0x03C8
+ - "ω": [t: "G⠺"]                # 0x03C9
+ - "ϕ": [t: "G⠋"]                # 0x03D5

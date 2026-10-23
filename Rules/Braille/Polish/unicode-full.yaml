@@ -1,0 +1,12 @@
+---
+# Polish math braille - additional character ranges.
+#
+# This file must exist and must contain a YAML ARRAY: PreferenceManager requires
+# unicode.yaml, unicode-full.yaml, definitions.yaml and <Code>_Rules.yaml for
+# every braille code (src/prefs.rs, set_braille_files), and a comments-only file
+# parses as Null, which the rule loader rejects with "does not begin with an array".
+#
+# Styled alphabets (bold/italic/script ranges) and the Greek letters from the
+# guide's chapter "Znaki alfabetu" (p. 6-7) belong here. Until they are decoded
+# from the guide, the file holds a single harmless entry.
+- "\uE000": [t: ""]     # placeholder, private-use char that never occurs in MathML

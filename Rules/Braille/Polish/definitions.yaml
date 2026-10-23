@@ -1,0 +1,75 @@
+---
+- include: "../definitions.yaml"
+
+# Operators that take a blank cell in front of them. The guide is explicit
+# (p. 10): "Znaki dzialan w zapisie punktowym Braille'a naleza do grupy znakow,
+# ktore musza byc poprzedzone odstepem - pustym znakiem", and omitting that blank
+# is called "a serious error" because 5+x written without it reads as a fraction.
+# The multiplication dot is the one sign the guide allows both ways.
+- BinaryOperators: {
+    '+', '-', '−', '±', '∓', '×', '÷', '·', '•', '∗', '∘',
+    '∩', '∪', '∖', '⊕', '⊗', '∧', '∨',
+  }
+
+# SPACING GROUPS AND THEIR PRECEDENCE (p. 58-59) - NOT IMPLEMENTED.
+# The guide sorts every sign into six groups by how it meets the "blank cell":
+#   A  / A'  - blank on the left / right OPTIONAL
+#   B  / B'  - blank on the left / right REQUIRED
+#   C  / C'  - blank on the left / right FORBIDDEN
+# and fixes an order for conflicts: "Absolutnie obowiazujace sa okreslenia z grup
+# C i C'. Nastepne pod wzgledem waznosci sa definicje grupy B i B'. Miejsce
+# ostatnie zajmuja grupy A i A'." Rule 1: no blank when the first sign is from C'
+# or the second from C. Rule 2: a blank is required between B' and B/A, or between
+# B/A' and B. Rule 3: between A' and A the transcriber may choose.
+#
+# What IS implemented: the group-B blank on the left of relations and binary
+# operators (see PolishRelations below and the mo rule).
+# What is NOT: the precedence itself. An attempt to add a "next sign is group C"
+# guard to the mo rule turned out to be DEAD CODE - deleting the guard left every
+# test unchanged, and forcing it to always-true changed nothing either, so it was
+# removed rather than left in place looking functional. Doing this properly needs
+# per-sign group membership for all six groups plus the pairwise rules above,
+# which the mo spacing rule cannot express on its own.
+#
+# The group membership WAS measured, though, by reading the braille glyphs of the
+# whole guide and counting how often each sign meets a blank
+# (scripts/mathcat_brajl_grupy.py, kept outside the repo):
+#
+#   sign          n     blank on left   blank on right   groups
+#   equals      380         0.79             0.07         B, C'
+#   plus        254         0.88             0.09         B, C'
+#   minus       254         0.74             0.11         B, C'
+#
+# Three things had to be filtered out before the numbers meant anything, each
+# found by inspecting the contexts rather than assumed:
+#   - the FILLER sign (dot 4) satisfies a required blank where a real blank cannot
+#     be written (p. 21, 26), so it counts as one - without this, plus measured
+#     0.60 and looked optional;
+#   - a leading minus is unary after a bracket, a fraction opener or a relation,
+#     where the blank belongs to the PRECEDING sign - without this, minus measured
+#     0.65;
+#   - the same cell serves several signs (64 of our 214 entries share cells), so
+#     digits and letters had to be excluded by context.
+#
+# Multiplication and division are deliberately NOT in that table: their cells are
+# dominated by other uses in this document (dot 3 is the ordinal-number full stop
+# of p. 4, dots 2-5-6 the date separator of p. 9), so the statistic measured those
+# instead. For them a single worked example is the stronger evidence - p. 10 writes
+# 67:14 with a blank before the division sign and prints 12 . 3 both ways.
+- PolishGroupC: {
+    '′', '″', '‴', '\u2032', '\u2033', '\u2034',
+  }
+
+# Relations that the guide writes with a blank on the left (group B, p. 58) but
+# which are NOT in the engine's shared NemethComparisonOperators list. Without
+# this list "a is-not-parallel-to b" came out with no blanks at all.
+- PolishRelations: {
+    '⊥', '⊮', '∥', '∦', '∼', '≁', '≅', '≇', '≐', '≗',
+    '∣', '∤',
+  }
+
+# Arrows are NOT in the list above on purpose. The guide writes them WITHOUT
+# surrounding blanks: its own limit example "lim x -> infinity" (p. 56) is
+# transcribed with the arrow glued to its neighbours, the arrow itself being
+# "zlozeniem znaku wypelniajacego oraz skroconego symbolu strzalki". Adding the
+# blanks that binary operators require would therefore be wrong here.
