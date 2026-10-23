@@ -81,30 +81,10 @@ impl IsNode {
     /// this is fairly detailed, so we define a few local functions (at end) to help out
     /// Also, it doesn't help that the structure is a bit complicated Elements->ChildOfElement->Element/Text
     pub fn is_simple(elem: Element) -> bool {
-        if is_trivially_simple(elem) {
-            return true;
-        }
-
-        if is_negative_of_trivially_simple(elem) {
-            // -3 or -x
-            return true;
-        }
-
-        if !is_tag(elem, "mrow") || elem.children().is_empty() {
-            return false;
-        }
-
-        // x y or -x or -3 x or -x y or -3 x y or x° or n° or -x° or -n°
-        #[allow(clippy::if_same_then_else)]
-        if is_times_mi(elem) {
-            return true;    // x y
-        } else if is_degrees(elem) {
-            return true;    // x° or n°
-        } else if is_function(elem) {
-            return true;
-        }
-
-        return false;
+        return is_trivially_simple(elem) ||
+               is_negative_of_trivially_simple(elem) ||
+               (is_tag(elem, "mrow") &&
+                (is_times_mi(elem) || is_degrees(elem) || is_function(elem)));
 
 
         // returns the element's text value
@@ -139,19 +119,10 @@ impl IsNode {
 
         // checks the single element to see if it is simple (mn, mi that is a single char, common fraction)
         fn is_trivially_simple(elem: Element) -> bool {
-            if is_tag(elem, "mn")  {
-                return true;
-            }
-            if is_tag(elem, "mi") && is_single_char(&to_str(elem)) {
-                // "simple" only if it is a single char (which can be multiple bytes)
-                return true;
-            }
-
             // FIX: need to consult preference Fraction_Ordinal
-            if IsNode::is_common_fraction(elem, 10, 19) {
-                return true;
-            }
-            return false;
+            is_tag(elem, "mn") ||
+                  (is_tag(elem, "mi") && is_single_char(&to_str(elem))) ||
+                  IsNode::is_common_fraction(elem, 10, 19)
         }
 
         // true if the negative of a single element that is simple
@@ -1941,6 +1912,18 @@ mod tests {
                     "<mrow><mi>C</mi><mrow><mo>(</mo><mo>−</mo><mn>2</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>4</mn><mo>)</mo></mrow></mrow>")?;
         return Ok( () );
         });
+    }
+
+    /// Degree forms are simple, while longer products and identifiers exceed the limit.
+    #[test]
+    fn is_simple_shape_boundaries() -> Result<()> {
+        xpath_test(|| {
+            test_is_simple("variable with degrees", "<mrow><mi>x</mi><mo>°</mo></mrow>")?;
+            test_is_simple("number with degrees", "<mrow><mn>30</mn><mo>°</mo></mrow>")?;
+            test_is_not_simple("longer product", "<mrow><mi>x</mi><mo>&#x2062;</mo><mi>yz</mi></mrow>")?;
+            test_is_not_simple("non-simple function argument", "<mrow><mi>f</mi><mo>&#x2061;</mo><msqrt><mi>x</mi></msqrt></mrow>")?;
+            Ok(())
+        })
     }
 
     fn check_table_dims(mathml: &str, dims: (usize, usize)) -> Result<()> {
