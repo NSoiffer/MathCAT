@@ -81,10 +81,10 @@ impl IsNode {
     /// this is fairly detailed, so we define a few local functions (at end) to help out
     /// Also, it doesn't help that the structure is a bit complicated Elements->ChildOfElement->Element/Text
     pub fn is_simple(elem: Element) -> bool {
-        return is_trivially_simple(elem)
-            || is_negative_of_trivially_simple(elem)
-            || (is_tag(elem, "mrow")
-                && (is_times_mi(elem) || is_degrees(elem) || is_function(elem)));
+        return is_trivially_simple(elem) ||
+               is_negative_of_trivially_simple(elem) ||
+               (is_tag(elem, "mrow") &&
+                (is_times_mi(elem) || is_degrees(elem) || is_function(elem)));
 
 
         // returns the element's text value
@@ -120,9 +120,9 @@ impl IsNode {
         // checks the single element to see if it is simple (mn, mi that is a single char, common fraction)
         fn is_trivially_simple(elem: Element) -> bool {
             // FIX: need to consult preference Fraction_Ordinal
-            is_tag(elem, "mn")
-                || (is_tag(elem, "mi") && is_single_char(&to_str(elem)))
-                || IsNode::is_common_fraction(elem, 10, 19)
+            is_tag(elem, "mn") ||
+                  (is_tag(elem, "mi") && is_single_char(&to_str(elem))) ||
+                  IsNode::is_common_fraction(elem, 10, 19)
         }
 
         // true if the negative of a single element that is simple
