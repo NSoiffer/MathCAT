@@ -2794,61 +2794,80 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         return Ok(result);
     }
 
-    fn replace_single_char(&'r mut self, ch: char, mathml: Element<'c>) -> Result<String> {
-        let ch_as_u32 = ch as u32;
-        let rules =  self.speech_rules;
-        let mut unicode = rules.unicode_short.borrow();
-        let mut replacements = unicode.get( &ch_as_u32 );
-        // debug!("replace_single_char: looking for unicode {} for char '{}'/{:#06x}, found: {:?}", rules.name, ch, ch_as_u32, replacements);
-        if replacements.is_none() {
-            // see if it in the full unicode table (if it isn't loaded already)
-            let pref_manager = rules.pref_manager.borrow();
-            let unicode_pref_files = if rules.name == RulesFor::Braille {pref_manager.get_braille_unicode_file()} else {pref_manager.get_speech_unicode_file()};
-            let should_ignore_file_time = pref_manager.pref_to_string("CheckRuleFiles") != "All";
-            if rules.unicode_full.borrow().is_empty() || !rules.unicode_full_files.borrow().is_file_up_to_date(unicode_pref_files.1, should_ignore_file_time) {
-                info!("*** Loading full unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
-                rules.unicode_full.borrow_mut().clear();
-                rules.unicode_full_files.borrow_mut().set_files_and_times(rules.read_unicode(None, false)?);
-                // when debugging, run a check across the short and full tables to ensure no characters are repeated
-                if cfg!(debug_assertions) {
-                    let unicode_full = rules.unicode_full.borrow();
-                    for ch in unicode.keys() {
-                        if unicode_full.get(ch).is_some() {
-                            error!("*** Character '{}' (0x{:X}) is repeated in both short and full unicode tables", *ch, *ch);
-                        }
-                    }
-                }
-                info!("# Unicode defs = {}/{}", rules.unicode_short.borrow().len(), rules.unicode_full.borrow().len());
-            }
-            unicode = rules.unicode_full.borrow();
-            replacements = unicode.get( &ch_as_u32 );
-            if replacements.is_none() {
-                self.translate_count = 0;     // not in loop
-                // debug!("*** Did not find unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
-                if rules.translate_single_chars_only || ch.is_ascii() {  // speech or if braille, avoid loop (ASCII remains ASCII if not found)
-                  return Ok(self.escape_string_for_safety(String::from(ch)));
-                } else {
-                  let ch_as_int = ch as u32;
-                  if ('\u{2800}'..='\u{28ff}').contains(&ch) {   // braille -- leave as braille
-                      return Ok(self.escape_string_for_safety(String::from(ch)));
-                  } else {                                    // Emulate what NVDA does: generate (including single quotes) '\xhhhh' or '\yhhhhhh'
-                      let prefix_indicator = if ch_as_int < 1<<16 {'x'} else {'y'};
-                      return self.replace_chars( &format!("'\\{prefix_indicator}{:06x}'", ch_as_int), mathml);
-                  }
-                }
-              }
-          };
-
+    /// Run a character's replacement list. `replacements` may borrow a unicode table;
+    /// the caller decides whether that borrow is safe across the nested lookup.
+    fn finish_replacements(&'r mut self, replacements: &[Replacement], mathml: Element<'c>) -> Result<String> {
         // map across all the parts of the replacement, collect them up into a Vec, and then concat them together
-        let result = replacements.unwrap()
-                    .iter()
+        let result = replacements.iter()
                     .map(|replacement|
                          self.replace(replacement, mathml)
                                 .with_context(|| format!("Unicode replacement error: {replacement}")) )
                     .collect::<Result<Vec<String>>>()?
                     .join(" ");
-         self.translate_count = 0;     // found a replacement, so not in a loop
+        self.translate_count = 0;     // found a replacement, so not in a loop
         return Ok(result);
+    }
+
+    fn replace_single_char(&'r mut self, ch: char, mathml: Element<'c>) -> Result<String> {
+        let ch_as_u32 = ch as u32;
+        let rules = self.speech_rules;
+        // A nested lookup mutably borrows unicode_full only, so a short-table hit can
+        // keep this borrow. Letters and operators are in that table and are not copied.
+        {
+            let unicode_short = rules.unicode_short.borrow();
+            if let Some(replacements) = unicode_short.get(&ch_as_u32) {
+                return self.finish_replacements(replacements, mathml);
+            }
+        }
+        // debug!("replace_single_char: looking for unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
+
+        // see if it in the full unicode table (if it isn't loaded already)
+        let (unicode_full_path, should_ignore_file_time) = {
+            let pref_manager = rules.pref_manager.borrow();
+            let unicode_pref_files = if rules.name == RulesFor::Braille {pref_manager.get_braille_unicode_file()} else {pref_manager.get_speech_unicode_file()};
+            let should_ignore_file_time = pref_manager.pref_to_string("CheckRuleFiles") != "All";
+            (unicode_pref_files.1.to_path_buf(), should_ignore_file_time)
+        };
+        // A nested lookup mutably borrows this map only when it also decides the file must be
+        // read (a capital spelling its lowercase, while the table is still empty or stale).
+        // Copy the rule on that path so the two lookups are not borrowing it at once. Once the
+        // file is loaded, the nested lookup only borrows it immutably and the rule is not copied.
+        let needs_full_read = rules.unicode_full.borrow().is_empty() || !rules.unicode_full_files.borrow().is_file_up_to_date(&unicode_full_path, should_ignore_file_time);
+        if needs_full_read {
+            info!("*** Loading full unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
+            rules.unicode_full.borrow_mut().clear();
+            let files_read = rules.read_unicode(None, false)?;
+            rules.unicode_full_files.borrow_mut().set_files_and_times(files_read);
+            // when debugging, run a check across the short and full tables to ensure no characters are repeated
+            if cfg!(debug_assertions) {
+                let unicode_short = rules.unicode_short.borrow();
+                let unicode_full = rules.unicode_full.borrow();
+                for ch in unicode_short.keys() {
+                    if unicode_full.get(ch).is_some() {
+                        error!("*** Character '{}' (0x{:X}) is repeated in both short and full unicode tables", *ch, *ch);
+                    }
+                }
+            }
+            info!("# Unicode defs = {}/{}", rules.unicode_short.borrow().len(), rules.unicode_full.borrow().len());
+            if let Some(replacements) = rules.unicode_full.borrow().get(&ch_as_u32).cloned() {
+                return self.finish_replacements(&replacements, mathml);
+            }
+        } else {
+            let unicode_full = rules.unicode_full.borrow();
+            if let Some(replacements) = unicode_full.get(&ch_as_u32) {
+                return self.finish_replacements(replacements, mathml);
+            }
+        }
+        self.translate_count = 0;     // not in loop
+        // debug!("*** Did not find unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
+        if rules.translate_single_chars_only || ch.is_ascii() {  // speech or if braille, avoid loop (ASCII remains ASCII if not found)
+            return Ok(self.escape_string_for_safety(String::from(ch)));
+        } else if ('\u{2800}'..='\u{28ff}').contains(&ch) {   // braille -- leave as braille
+            return Ok(self.escape_string_for_safety(String::from(ch)));
+        } else {                                    // Emulate what NVDA does: generate (including single quotes) '\xhhhh' or '\yhhhhhh'
+            let prefix_indicator = if ch_as_u32 < 1<<16 {'x'} else {'y'};
+            return self.replace_chars( &format!("'\\{prefix_indicator}{:06x}'", ch_as_u32), mathml);
+        }
     }
 }
 
