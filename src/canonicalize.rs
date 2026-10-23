@@ -3532,6 +3532,7 @@ impl CanonicalizeContext {
 				"\u{02C9}"| "\u{0304}"| "\u{0305}" => "\u{00AF}",
 				"\u{02DC}" | "~"  => "\u{223C}",		// for base, use version with prefix and infix
 				"\u{01C1}" => "\u{2016}", // U+2016 is "‖"
+				"!!" => "\u{203C}", // U+203C is "‼" (double factorial)
 
 				_ => mo_text,
 			};

@@ -375,3 +375,14 @@ fn vertical_line_evaluated_at_both_given() -> Result<()> {
         return Ok(());
 
 }
+
+#[test]
+fn double_factorial_test() -> Result<()> {
+    let expr1 = "<math><mn>5</mn><mo>!!</mo></math>";
+    let expr2 = "<math><mn>5</mn><mo>‼</mo></math>";
+    test("en", "ClearSpeak", expr2, "5 double factorial")?;
+    test("en", "ClearSpeak", expr1, "5 double factorial")?;
+    test("en", "SimpleSpeak", expr1, "5 double factorial")?;
+    Ok(())
+}
+

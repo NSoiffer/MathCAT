@@ -114,6 +114,7 @@ phf_map! {
 	"‵" => OperatorInfo{ op_type: OperatorTypes::POSTFIX, priority: 880, next: &None },
 	"‶" => OperatorInfo{ op_type: OperatorTypes::POSTFIX, priority: 880, next: &None },
 	"‷" => OperatorInfo{ op_type: OperatorTypes::POSTFIX, priority: 880, next: &None },
+	"‼" => OperatorInfo{ op_type: OperatorTypes::POSTFIX, priority: 810, next: &None },
 	"‾" => OperatorInfo{ op_type: OperatorTypes::POSTFIX, priority: 880, next: &None },
 	"⁃" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 390, next: &None },
 	"⁄" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 680, next: &None },
