@@ -176,6 +176,7 @@
  - "̄": [T: "barra ornamentada"]                            	#  0x304	(en: 'macron embellishment', google: 'embellido de macron')
  - "̅": [T: "barra encima con adorno"]                            	#  0x305	(en: 'overbar embellishment', google: 'embellido de overbar')
  - "̆": [T: "breve"]                            	#  0x306
+ - "˙": [T: "punto"]                             	#  0x2D9
  - "̇": [T: "punto encima con adorno"]            	#  0x307	(en: 'dot above embellishment', google: 'punto por encima del adorno')
 
    # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
