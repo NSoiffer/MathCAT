@@ -1882,7 +1882,7 @@ impl CanonicalizeContext {
 			let close = close_raw.as_deref().unwrap_or(")").replace('>', "⟩");
 			// debug!("open={}, close={}", open, close);
 			let separators_raw = mfenced.attribute_value("separators");
-			let mut separators = separators_raw.as_deref().unwrap_or(",").chars();
+			let separators: Vec<char> = separators_raw.as_deref().unwrap_or(",").chars().filter(|ch| !ch.is_whitespace()).collect();
 			set_mathml_name(mfenced, "mrow");
 			mfenced.remove_attribute("open");
 			mfenced.remove_attribute("close");
@@ -1894,9 +1894,10 @@ impl CanonicalizeContext {
 			}
 			if !children.is_empty() {
 				new_children.push(children[0]);
-				for child in &children[1..] {
-					let sep = separators.next().unwrap_or(',').to_string();
-					new_children.push( ChildOfElement::Element( create_mo(mfenced.document(), &sep, MFENCED_ATTR_VALUE)) );
+				for (i, child) in children[1..].iter().enumerate() {
+					if let Some(&sep) = separators.get(i).or_else(|| separators.last()) {
+            		    new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), &sep.to_string(), MFENCED_ATTR_VALUE)) );
+					}
 					new_children.push(*child);
 				}
 			}
@@ -4993,14 +4994,120 @@ mod canonicalize_tests {
 					<mi>y</mi>
 				</mrow>
 				<mo data-changed='from_mfenced'>;</mo>
-				<mrow data-changed='added'>
-					<mi>z</mi>
-					<mo data-changed='from_mfenced'>,</mo>
-					<mi>a</mi>
-				</mrow>
+				<mi>z</mi>
+				<mo data-changed='from_mfenced'>;</mo>
+				<mi>a</mi>
 				</mrow>
 				<mo data-changed='from_mfenced'>)</mo>
 			</mrow>
+			</mrow>
+		</math>";
+        are_strs_canonically_equal_result(test_str, target_str, &[])
+    }
+
+    #[test]
+    fn mfenced_empty_separators() -> Result<()> {
+        let test_str = "<math><mfenced separators=''><mn>5</mn><mo>+</mo><mn>3</mn></mfenced></math>";
+        let target_str = "<math>
+			<mrow>
+				<mo data-changed='from_mfenced'>(</mo>
+				<mrow data-changed='added'>
+					<mn>5</mn>
+					<mo>+</mo>
+					<mn>3</mn>
+				</mrow>
+				<mo data-changed='from_mfenced'>)</mo>
+			</mrow>
+		</math>";
+        are_strs_canonically_equal_result(test_str, target_str, &[])
+    }
+
+    #[test]
+    fn mfenced_repeat_last_separator() -> Result<()> {
+        let test_str = "<math><mfenced separators=';'><mi>x</mi><mi>y</mi><mi>z</mi></mfenced></math>";
+        let target_str = "<math>
+			<mrow>
+				<mo data-changed='from_mfenced'>(</mo>
+				<mrow data-changed='added'>
+					<mi>x</mi>
+					<mo data-changed='from_mfenced'>;</mo>
+					<mi>y</mi>
+					<mo data-changed='from_mfenced'>;</mo>
+					<mi>z</mi>
+				</mrow>
+				<mo data-changed='from_mfenced'>)</mo>
+			</mrow>
+		</math>";
+        are_strs_canonically_equal_result(test_str, target_str, &[])
+    }
+
+    #[test]
+    fn mfenced_separators_with_whitespace() -> Result<()> {
+        let test_str = "<math><mfenced separators='; ,'><mi>x</mi><mi>y</mi><mi>z</mi></mfenced></math>";
+        let target_str = "<math>
+			<mrow>
+				<mo data-changed='from_mfenced'>(</mo>
+				<mrow data-changed='added'>
+					<mi>x</mi>
+					<mo data-changed='from_mfenced'>;</mo>
+					<mrow data-changed='added'>
+						<mi>y</mi>
+						<mo data-changed='from_mfenced'>,</mo>
+						<mi>z</mi>
+					</mrow>
+				</mrow>
+				<mo data-changed='from_mfenced'>)</mo>
+			</mrow>
+		</math>";
+        are_strs_canonically_equal_result(test_str, target_str, &[])
+    }
+
+    #[test]
+    fn mfenced_too_many_separators() -> Result<()> {
+        let test_str = "<math><mfenced separators=';,'><mi>x</mi><mi>y</mi></mfenced></math>";
+        let target_str = "<math>
+			<mrow>
+				<mo data-changed='from_mfenced'>(</mo>
+				<mrow data-changed='added'>
+					<mi>x</mi>
+					<mo data-changed='from_mfenced'>;</mo>
+					<mi>y</mi>
+				</mrow>
+				<mo data-changed='from_mfenced'>)</mo>
+			</mrow>
+		</math>";
+        are_strs_canonically_equal_result(test_str, target_str, &[])
+    }
+
+    #[test]
+    fn mfenced_default_separator() -> Result<()> {
+        let test_str = "<math><mfenced><mi>x</mi><mi>y</mi></mfenced></math>";
+        let target_str = "<math>
+			<mrow>
+				<mo data-changed='from_mfenced'>(</mo>
+				<mrow data-changed='added'>
+					<mi>x</mi>
+					<mo data-changed='from_mfenced'>,</mo>
+					<mi>y</mi>
+				</mrow>
+				<mo data-changed='from_mfenced'>)</mo>
+			</mrow>
+		</math>";
+        are_strs_canonically_equal_result(test_str, target_str, &[])
+    }
+
+    #[test]
+    fn mfenced_whitespace_only_separators() -> Result<()> {
+        let test_str = "<math><mfenced separators=' '><mn>5</mn><mo>+</mo><mn>3</mn></mfenced></math>";
+        let target_str = "<math>
+			<mrow>
+				<mo data-changed='from_mfenced'>(</mo>
+				<mrow data-changed='added'>
+					<mn>5</mn>
+					<mo>+</mo>
+					<mn>3</mn>
+				</mrow>
+				<mo data-changed='from_mfenced'>)</mo>
 			</mrow>
 		</math>";
         are_strs_canonically_equal_result(test_str, target_str, &[])
