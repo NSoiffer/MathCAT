@@ -3,6 +3,36 @@ use crate::common::*;
 use anyhow::Result;
 
 #[test]
+fn strict_subset_terminology() -> Result<()> {
+    // The agreed convention makes the plain subset sign strict at every verbosity.
+    let expr = "<math><mi>A</mi><mo>⊂</mo><mi>B</mi></math>";
+    for verbosity in ["Terse", "Medium", "Verbose"] {
+        test_prefs("ru", "ClearSpeak", vec![("Verbosity", verbosity)], expr,
+            "заглавная а строгое подмножество заглавная бэ")?;
+    }
+    return Ok(());
+}
+
+#[test]
+fn subset_or_equal_terminology() -> Result<()> {
+    // The non-strict sign must retain the equality alternative.
+    let expr = "<math><mi>A</mi><mo>⊆</mo><mi>B</mi></math>";
+    test("ru", "ClearSpeak", expr, "заглавная а подмножество или равно заглавная бэ")?;
+    test("ru", "SimpleSpeak", expr, "заглавная а подмножество или равно заглавная бэ")?;
+    return Ok(());
+}
+
+#[test]
+fn negated_subset_terminology() -> Result<()> {
+    // Negation is expressed as a complete predicate, including for the full Unicode table.
+    let expr = "<math><mi>A</mi><mo>⊄</mo><mi>B</mi></math>";
+    test("ru", "ClearSpeak", expr, "заглавная а не является строгим подмножеством заглавная бэ")?;
+    let expr = "<math><mi>A</mi><mo>⊈</mo><mi>B</mi></math>";
+    test("ru", "ClearSpeak", expr, "заглавная а не является подмножеством заглавная бэ")?;
+    return Ok(());
+}
+
+#[test]
 fn complex() -> Result<()> {
     let expr = "<math>
                     <mi>ℂ</mi>
@@ -205,7 +235,7 @@ fn element_alone() -> Result<()> {
     let expr = "<math>
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
-    test("ru", "ClearSpeak", expr, "3 плюс 2 и, не принадлежит действительным числам")?;
+    test("ru", "ClearSpeak", expr, "3 плюс 2 и, не принадлежит множеству действительных чисел")?;
     return Ok(());
 }
 
@@ -222,7 +252,7 @@ fn element_under_sum() -> Result<()> {
             </mfrac>
         </math>";
     test("ru", "ClearSpeak", expr,
-                    "сумма по и, принадлежащему целым числам, от; дробь, числитель: 1; знаменатель: и в квадрате")?;
+                    "сумма по и, принадлежащему множеству целых чисел, от; дробь, числитель: 1; знаменатель: и в квадрате")?;
                     return Ok(());
 }
 
@@ -273,7 +303,7 @@ fn set_with_bar_member() -> Result<()> {
             <mo>}</mo>
             </math>";
     test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "множество всех икс, принадлежащих целым числам, таких что икс больше 5")?;
+                expr, "множество всех икс, принадлежащих множеству целых чисел, таких что икс больше 5")?;
                 return Ok(());
 }
 
@@ -283,7 +313,7 @@ fn element_alone_member() -> Result<()> {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "3 плюс 2 и, не принадлежит действительным числам")?;
+                expr, "3 плюс 2 и, не принадлежит множеству действительных чисел")?;
                 return Ok(());
 }
 
@@ -300,7 +330,7 @@ fn element_under_sum_member() -> Result<()> {
             </mfrac>
         </math>";
     test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "сумма по и, принадлежащему целым числам, от; дробь, числитель: 1; знаменатель: и в квадрате")?;
+                expr, "сумма по и, принадлежащему множеству целых чисел, от; дробь, числитель: 1; знаменатель: и в квадрате")?;
                 return Ok(());
 }
 
@@ -318,7 +348,7 @@ fn set_with_bar_element() -> Result<()> {
             <mo>}</mo>
             </math>";
     test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "множество всех икс, являющихся элементами целых чисел, таких что икс больше 5")?;
+                expr, "множество всех икс, являющихся элементами множества целых чисел, таких что икс больше 5")?;
                 return Ok(());
 }
 
@@ -328,7 +358,7 @@ fn element_alone_element() -> Result<()> {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "3 плюс 2 и, не является элементом действительных чисел")?;
+                expr, "3 плюс 2 и, не является элементом множества действительных чисел")?;
                 return Ok(());
 }
 
@@ -345,7 +375,7 @@ fn element_under_sum_element() -> Result<()> {
             </mfrac>
         </math>";
     test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "сумма по и, являющемуся элементом целых чисел, от; дробь, числитель: 1; знаменатель: и в квадрате")?;
+                expr, "сумма по и, являющемуся элементом множества целых чисел, от; дробь, числитель: 1; знаменатель: и в квадрате")?;
                 return Ok(());
 }
 
@@ -373,7 +403,7 @@ fn element_alone_in() -> Result<()> {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "In",
-                expr, "3 плюс 2 и, не принадлежит действительным числам")?;
+                expr, "3 плюс 2 и, не принадлежит множеству действительных чисел")?;
                 return Ok(());
 }
 
@@ -408,7 +438,7 @@ fn set_with_bar_belongs() -> Result<()> {
             <mo>}</mo>
             </math>";
     test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "множество всех икс, входящих в целые числа, таких что икс больше 5")?;
+                expr, "множество всех икс, входящих в множество целых чисел, таких что икс больше 5")?;
                 return Ok(());
 }
 
@@ -418,7 +448,7 @@ fn element_alone_belongs() -> Result<()> {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "3 плюс 2 и, не входит в действительные числа")?;
+                expr, "3 плюс 2 и, не входит в множество действительных чисел")?;
                 return Ok(());
 }
 
@@ -435,7 +465,7 @@ fn element_under_sum_belongs() -> Result<()> {
             </mfrac>
         </math>";
     test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "сумма по и, входящему в целые числа, от; дробь, числитель: 1; знаменатель: и в квадрате")?;
+                expr, "сумма по и, входящему в множество целых чисел, от; дробь, числитель: 1; знаменатель: и в квадрате")?;
                 return Ok(());
 }
 
@@ -453,8 +483,51 @@ fn set_member_woall() -> Result<()> {
             <mo>}</mo>
             </math>";
     test_ClearSpeak_prefs("ru", vec![("ClearSpeak_SetMemberSymbol", "Member"), ("ClearSpeak_Sets", "woAll")],
-                expr, "множество икс, принадлежащих целым числам, таких что икс больше 5")?;
+                expr, "множество икс, принадлежащих множеству целых чисел, таких что икс больше 5")?;
                 return Ok(());
+}
+
+#[test]
+fn standard_number_sets_use_explicit_set_terminology() -> Result<()> {
+    // A number belongs to a set of numbers; the preference must not make it an
+    // element "of numbers" or say that it enters the numbers themselves.
+    let natural = "<math><mo>{</mo><mi>x</mi><mo>∈</mo><mi>ℕ</mi><mo>:</mo><mi>x</mi><mo>&gt;</mo><mn>0</mn><mo>}</mo></math>";
+    test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Member", natural,
+        "множество всех икс, принадлежащих множеству натуральных чисел, таких что икс больше 0")?;
+
+    let rational = "<math><mo>{</mo><mi>x</mi><mo>∈</mo><mi>ℚ</mi><mo>:</mo><mi>x</mi><mo>&gt;</mo><mn>0</mn><mo>}</mo></math>";
+    test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Element", rational,
+        "множество всех икс, являющихся элементами множества рациональных чисел, таких что икс больше 0")?;
+
+    let real = "<math><mo>{</mo><mi>x</mi><mo>∈</mo><mi>ℝ</mi><mo>:</mo><mi>x</mi><mo>&gt;</mo><mn>0</mn><mo>}</mo></math>";
+    test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Belongs", real,
+        "множество всех икс, входящих в множество действительных чисел, таких что икс больше 0")?;
+    return Ok(());
+}
+
+#[test]
+fn standalone_membership_uses_explicit_set_terminology() -> Result<()> {
+    // The spoken predicate must govern "множество", with the number-set name in the genitive.
+    let expr = "<math><mi>x</mi><mo>∈</mo><mi>ℝ</mi></math>";
+    test("ru", "SimpleSpeak", expr,
+        "икс принадлежит множеству действительных чисел")?;
+    test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Member", expr,
+        "икс принадлежит множеству действительных чисел")?;
+    test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "Element", expr,
+        "икс является элементом множества действительных чисел")?;
+    test_ClearSpeak("ru", "ClearSpeak_SetMemberSymbol", "In", expr,
+        "икс находится в множестве действительных чисел")?;
+    return Ok(());
+}
+
+#[test]
+fn reverse_membership_uses_element_terminology() -> Result<()> {
+    // The reverse membership signs describe an element, not the nonstandard calque "член".
+    test("ru", "ClearSpeak", "<math><mi>A</mi><mo>∋</mo><mi>x</mi></math>",
+        "заглавная а содержит элемент икс")?;
+    test("ru", "SimpleSpeak", "<math><mi>A</mi><mo>∌</mo><mi>x</mi></math>",
+        "заглавная а не содержит элемента икс")?;
+    return Ok(());
 }
 
 #[test]

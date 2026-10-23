@@ -77,7 +77,7 @@ fn msqrt() -> Result<()> {
                         <mrow> <mi>x</mi> <mo>+</mo> <mi>y</mi> </mrow>
                     </msqrt>
                 </math>";
-    test("ru", "ClearSpeak", expr, "квадратный корень из икс плюс игрек")?;
+    test("ru", "ClearSpeak", expr, "квадратный корень из выражения икс плюс игрек")?;
     return Ok(());
 }
 
@@ -132,7 +132,7 @@ fn mroot_simple_end_root() -> Result<()> {
                     <mroot> <mrow> <mi>x</mi> <mo>+</mo> <mi>y</mi> </mrow> 
                     <mn>21</mn></mroot>
                 </math>";
-    test_ClearSpeak("ru", "ClearSpeak_Roots", "RootEnd", expr, "корень двадцать первой степени из икс плюс игрек, конец корня")?;
+    test_ClearSpeak("ru", "ClearSpeak_Roots", "RootEnd", expr, "корень двадцать первой степени из выражения икс плюс игрек, конец корня")?;
     return Ok(());
 }
 

@@ -25,21 +25,21 @@
   tag: mn
   match: "starts-with(text(), '-')"
   replace:
-  - t: "минус"        # (en: 'minus')
+  - T: "минус"        # (en: 'minus')
   - x: "translate(text(), '-_', '')"
 
 - name: default
   tag: square-root
   match: "."
   replace:
+  - T: "квадратный корень"      # (en: 'square root')
   - test:
       if: "$Verbosity!='Terse'"
-      then: [t: ""]  
-  - t: "квадратный корень"      # (en: 'square root')
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [t: "из"]   # (en: 'of')
+      then: [T: "из"]   # (en: 'of')
       else: [pause: short]
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [T: "выражения"]
   - x: "*[1]"
   - test:
     - if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
@@ -48,7 +48,7 @@
         then: [pause: medium]
         else: [pause: short]
       else:
-      - t: "конец корня"
+      - T: "конец корня"
       - test:
           if: "following-sibling::*"
           then: [pause: medium]
@@ -59,22 +59,22 @@
   match: "."
   replace:
   - test:
-      if: "$Verbosity!='Terse'"
-      then: [t: ""]
-  - test:
       if: "*[2][self::m:mn and not(contains(., '.'))]"
       then_test:
       - if: "*[2][.='2']"
-        then: [t: "квадратный корень"]        # (en: 'square root')
+        then: [T: "квадратный корень"]        # (en: 'square root')
       - else_if: "*[2][.='3']"
-        then: [t: "кубический корень"]        # (en: 'cube root')
-      - else: [t: "корень", x: "ToOrdinal(*[2])", t: "степени"]      # (en: 'root')
+        then: [T: "кубический корень"]        # (en: 'cube root')
+      - else: [T: "корень", x: "ToOrdinal(*[2])", T: "степени"]      # (en: 'root')
       else:
-      - t: "корень степени"        # (en: 'root')
+      - T: "корень степени"        # (en: 'root')
       - x: "*[2]"
   - test:
       if: "$Verbosity!='Terse'"
-      then: [t: "из"]        # (en: 'of')
+      then: [T: "из"]        # (en: 'of')
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [T: "выражения"]
   - x: "*[1]"
   - test:
     - if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
@@ -83,7 +83,7 @@
         then: [pause: medium]
         else: [pause: short]
       else:
-      - t: "конец корня"
+      - T: "конец корня"
       - test:
           if: "following-sibling::*"
           then: [pause: medium]
@@ -118,7 +118,7 @@
     - else: [x: "*[1]"]
   - test:
       if: "*[2][.='83']"
-      then: [t: "восемьдесят третьих"]
+      then: [T: "восемьдесят третьих"]
       else: [x: "ToOrdinal(*[2], true(), $IsPlural)"]   # extra args specify fractional ordinal and whether it is plural
 
 
@@ -133,11 +133,11 @@
   - x: "*[1]"
   - test:
       if: "BaseNode(*[2])[.='h' or .='hr' or .='Hr']"
-      then: [t: "в"]
-      else: [t: "на"]
+      then: [T: "в"]
+      else: [T: "на"]
   - test:
       if: "BaseNode(*[2])[.='mi']"
-      then: [t: "милю"]
+      then: [T: "милю"]
       else: [x: "*[2]"]
 
 - name: simple-text-fraction
@@ -145,7 +145,7 @@
   match: "*[1][.='rise'] and *[2][.='run']"
   replace:
   - x: "*[1]"
-  - t: "на"
+  - T: "на"
   - x: "*[2]"
   - pause: short
 
@@ -159,7 +159,7 @@
   - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
   replace:
   - x: "*[1]"
-  - t: "разделить на"      # (en: 'over')
+  - T: "разделить на"      # (en: 'over')
   - x: "*[2]"
   - pause: short
 
@@ -169,35 +169,35 @@
   replace:
   - x: "*[1]"
   - pause: short
-  - t: "делить на"
+  - T: "делить на"
   - x: "*[2]"
 
 - name: limit-fraction
   tag: fraction
   match: "ancestor::*[self::m:limit] or ancestor::*[preceding-sibling::*[1][self::m:limit]] or preceding::*[self::m:limit]"
   replace:
-  - t: "дроби"
+  - T: "дроби"
   - pause: short
   - x: "*[1]"
   - pause: short
-  - t: "делить на"
+  - T: "делить на"
   - pause: short
   - x: "*[2]"
   - pause: short
-  - t: "конец дроби"
+  - T: "конец дроби"
   - pause: medium
 
 - name: default
   tag: fraction
   match: "."
   replace:
-  - t: "дробь, числитель:"      # (en: 'fraction')
+  - T: "дробь, числитель:"      # (en: 'fraction')
   - x: "*[1]"
   - pause: short
-  - t: "знаменатель:"      # (en: 'over')
+  - T: "знаменатель:"      # (en: 'over')
   - x: "*[2]"
   - pause: short
-  - t: "конец дроби"      # (en: 'end of fraction')
+  - T: "конец дроби"      # (en: 'end of fraction')
   - pause: medium
 
 # rules for functions raised to a power
@@ -209,12 +209,12 @@
   replace:
   - test:
     - if: "*[1][.='sin']"
-      then: [t: "арксинус"]
+      then: [T: "арксинус"]
     - else_if: "*[1][.='cos' or .='cosh']"
-      then: [t: "арккосинус"]
+      then: [T: "арккосинус"]
     - else_if: "*[1][.='tan' or .='tg']"
-      then: [t: "арктангенс"]
-      else: [t: "обратная", x: "*[1]"]      # (en: 'inverse')
+      then: [T: "арктангенс"]
+      else: [T: "обратная", x: "*[1]"]      # (en: 'inverse')
 
 - name: function-squared-or-cubed
   tag: power
@@ -226,8 +226,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][.=2]"
-      then: [t: "в квадрате"]      # (en: 'squared')
-      else: [t: "в кубе"]      # (en: 'cubed')
+      then: [T: "в квадрате"]      # (en: 'squared')
+      else: [T: "в кубе"]      # (en: 'cubed')
 - name: function-power
   tag: power
   match:
@@ -235,18 +235,18 @@
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
-  - t: "в"
+  - T: "в"
   - test:
     - if: "*[2][self::m:mn][.='4']"
-      then: [t: "четвёртой"]
+      then: [T: "четвёртой"]
     - else_if: "*[2][self::m:mn][not(contains(., '.'))]"
       then: [x: "ToOrdinal(*[2])"]
       else:
-      - t: "степени"
+      - T: "степени"
       - x: "*[2]"
   - test:
       if: "*[2][self::m:mn][not(contains(., '.'))]"
-      then: [t: "степени"]      # (en: 'power')
+      then: [T: "степени"]      # (en: 'power')
 
 # non-function rules for power
 - name: squared-or-cubed
@@ -257,8 +257,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][.=2]"
-      then: [t: "в квадрате"]      # (en: 'squared')
-      else: [t: "в кубе"]      # (en: 'cubed')
+      then: [T: "в квадрате"]      # (en: 'squared')
+      else: [T: "в кубе"]      # (en: 'cubed')
 
 - name: simple-integer
   tag: power
@@ -267,15 +267,15 @@
   - x: "*[1]"
   - test:
       if: "*[2][.='2']"
-      then: [t: "во"]
-      else: [t: "в"]      # (en: 'to the')
+      then: [T: "во"]
+      else: [T: "в"]      # (en: 'to the')
   - test:
       if: "*[2][.>=0]"
       then: {x: "ToOrdinal(*[2])"}
       else: {x: "*[2]"}
   - test:
       if: "*[2][.>=0]"
-      then: [t: "степени"]
+      then: [T: "степени"]
 - name: simple-negative-integer
   tag: power
   match:
@@ -283,15 +283,15 @@
   - "     *[1][self::m:mn][not(contains(., '.'))]]"
   replace:
   - x: "*[1]"
-  - t: "в степени"      # (en: 'to the')
-  - t: "минус"
+  - T: "в степени"      # (en: 'to the')
+  - T: "минус"
   - x: "*[2]/*[1]"
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - t: "в степени"      # (en: 'to the')
+  - T: "в степени"      # (en: 'to the')
   - x: "*[2]"
 
 - name: simple
@@ -299,7 +299,7 @@
   match: "IsNode(*[2], 'leaf')"
   replace:
   - x: "*[1]"
-  - t: "в степени"      # (en: 'to the')
+  - T: "в степени"      # (en: 'to the')
   - test:
       if: "*[2][self::m:mn][contains(., '.')]"
       then: [x: "concat(substring-before(*[2], '.'), '\uF8FE.\uF8FE', substring-after(*[2], '.'))"]
@@ -317,12 +317,12 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - t: "в степени"      # (en: 'raised to the')
+  - T: "в степени"      # (en: 'raised to the')
   - x: "*[2]"
   - test:
       if: "$Impairment = 'Blindness'"
       then:
-      - t: ", конец показателя"      # (en: 'end of exponent')
+      - T: ", конец показателя"      # (en: 'end of exponent')
       - pause: short
       else:
       - pause: medium
@@ -332,7 +332,7 @@
   match: "."
   replace:
   - x: "*[1]"
-  - t: "в степени"      # (en: 'raised to the')
+  - T: "в степени"      # (en: 'raised to the')
   - test:
       if: "*[2][self::m:mn][contains(., '.')]"
       then: [x: "concat(substring-before(*[2], '.'), '\uF8FE.\uF8FE', substring-after(*[2], '.'))"]
@@ -346,7 +346,7 @@
   match: "count(*)=3 and *[1][self::m:mn] and *[2][self::m:mo][.='⁤'] and *[3][self::m:fraction]"
   replace:
   - x: "*[1]"
-  - t: "целых"
+  - T: "целых"
   - test:
       if: "*[3]/*[2][.='83']"
       then: [x: "*[2]"]
@@ -374,6 +374,30 @@
   - pause: short
   - x: "*[3]"
 
+- name: skip-equality-before-continued-gathered-line
+  tag: mo
+  match: ".='=' and not(following-sibling::*) and ancestor::m:lines and ancestor::m:mtr/following-sibling::*[1]//*[.='=']"
+  replace: [T: ""]
+
+- name: skip-final-period-in-multiline
+  tag: mo
+  match: ".='.' and not(following-sibling::*) and ancestor::m:mtr[not(following-sibling::*)] and ancestor::m:lines"
+  replace: [T: ""]
+
+- name: SimpleSpeak-double-absolute-value-as-norm
+  tag: absolute-value
+  match: "count(*)=1 and *[1][self::m:absolute-value]"
+  replace:
+  - T: "норма"
+  - x: "*[1]/*[1]"
+
+- name: SimpleSpeak-absolute-value
+  tag: absolute-value
+  match: "."
+  replace:
+  - T: "модуль"
+  - x: "*[1]"
+
 - name: SimpleSpeak-log
   tag: mrow
   match:
@@ -383,13 +407,13 @@
   replace:
   - test:
     - if: "*[1][.='log']"
-      then: [t: "логарифм"]
+      then: [T: "логарифм"]
     - else_if: "$Verbosity='Terse'"
-      then: [t: "эл эн"]
-      else: [t: "натуральный логарифм"]
+      then: [T: "эл эн"]
+      else: [T: "натуральный логарифм"]
   - test:
       if: "$Verbosity!='Terse'"
-      then: [t: "от"]
+      then: [T: "от"]
   - pause: short
   - test:
       if: "count(*)=2"
@@ -400,9 +424,9 @@
   tag: mrow
   match: "count(*)=3 and *[1][self::m:logarithm-with-base] and *[2][.='⁡']"
   replace:
-  - t: "логарифм по основанию"
+  - T: "логарифм по основанию"
   - x: "*[1]/*[1]"
-  - t: "от"
+  - T: "от"
   - test:
       if: "not(IsNode(*[3], 'simple'))"
       then: [pause: short]
@@ -428,14 +452,14 @@
       else:
       - test:
           if: "$Verbosity='Terse'"
-          then: [t: "открывается"]
+          then: [T: "открывается"]
           else_test:
             if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
-            then: [t: "открывающая круглая скобка"]
+            then: [T: "открывающая круглая скобка"]
             else_test:
               if: ".//m:mo[.='|' or .='∣' or .='∩'] or .//m:mtext[contains(., 'and')] or .//*[contains(name(.), 'given')]"
-              then: [t: "открывающая круглая скобка"]
-              else: [t: "скобка открывается"]
+              then: [T: "открывающая круглая скобка"]
+              else: [T: "скобка открывается"]
       - test:
           if: ".//m:mo[.='|' or .='∣' or .='∩'] or .//m:mtext[contains(., 'and')] or .//*[contains(name(.), 'given')]"
           then: [pause: short]
@@ -445,14 +469,14 @@
           then: [pause: short]
       - test:
           if: "$Verbosity='Terse'"
-          then: [t: "закрывается"]
+          then: [T: "закрывается"]
           else_test:
             if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
-            then: [t: "закрывающая круглая скобка"]
+            then: [T: "закрывающая круглая скобка"]
             else_test:
               if: ".//m:mo[.='|' or .='∣' or .='∩'] or .//m:mtext[contains(., 'and')] or .//*[contains(name(.), 'given')]"
-              then: [t: "закрывающая круглая скобка"]
-              else: [t: "скобка закрывается"]
+              then: [T: "закрывающая круглая скобка"]
+              else: [T: "скобка закрывается"]
   - test:
       if: "following-sibling::*[1][.='+' or .='=']"
       then: [pause: medium]
@@ -465,7 +489,7 @@
   replace:
   - x: "*[1]/*[1]"
   - x: "*[3]"
-  - t: "в степени"
+  - T: "в степени"
   - x: "*[1]/*[2]"
 
 - name: exponent-argument-parens
@@ -477,7 +501,7 @@
   - test:
       if: "*[2][self::m:fraction]"
       then: [pause: medium]
-  - t: "скобка открывается"
+  - T: "скобка открывается"
   - test:
       if: "*[2][self::m:fraction]"
       then: [pause: short]
@@ -485,7 +509,7 @@
   - test:
       if: "*[2][self::m:fraction or .//m:mo[.='+' or .='-' or .='−']]"
       then: [pause: short]
-  - t: "скобка закрывается"
+  - T: "скобка закрывается"
 
 - name: set
   tag: set
@@ -496,32 +520,32 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [t: ""]      
-      - t: "пустое множество"      # (en: 'empty set')
+          then: [T: ""]      
+      - T: "пустое множество"      # (en: 'empty set')
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [t: ""]
-      - t: "множество всех"      # (en: 'set of all')
+          then: [T: ""]
+      - T: "множество всех"      # (en: 'set of all')
       - x: "*[1]/*[1]"
       - test:
           if: "*[1]//*[.='∈']"
-          then: [t: "таких что"]
-          else: [t: "таких, что"]      # (en: 'such that')
+          then: [T: "таких что"]
+          else: [T: "таких, что"]      # (en: 'such that')
       - x: "*[1]/*[3]"
       else:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [t: ""]
-      - t: "множество"      # (en: 'set')
+          then: [T: ""]
+      - T: "множество"      # (en: 'set')
       - x: "*[1]"
 
 - name: no-times-before-exponential
   tag: mo
   match: ".='\u2062' and following-sibling::*[1][(self::m:power or self::m:msup) and *[1][self::m:mi[.='e']]]"
   replace:
-  - t: ""
+  - T: ""
 
 - name: no-times-before-exponent-brackets
   tag: mo
@@ -555,7 +579,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - t: "умножить на"      # (en: 'times')
+  - T: "умножить на"      # (en: 'times')
   - test:
       if: "following-sibling::*[1][self::m:binomial and (not(IsNode(*[1], 'simple')) or not(IsNode(*[2], 'simple')))]"
       then: [pause: short]
@@ -580,22 +604,22 @@
   replace:
   - test:
       if: "IsBracketed(., '[', ']')"
-      then: [t: "квадратная скобка открывается"]
+      then: [T: "квадратная скобка открывается"]
       else_test:
         if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')] or .//m:mo[.='|' or .='∩'] or .//*[contains(., 'and')]"
-        then: [t: "открывающая круглая скобка"]
-        else: [t: "скобка открывается"]
+        then: [T: "открывающая круглая скобка"]
+        else: [T: "скобка открывается"]
   - x: "*[2]"
   - test:
       if: "IsBracketed(., '(', ')') and .//m:mo[.='+' or .='-' or .='−']"
       then: [pause: short]
   - test:
       if: "IsBracketed(., '[', ']')"
-      then: [t: "квадратная скобка закрывается"]
+      then: [T: "квадратная скобка закрывается"]
       else_test:
         if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')] or .//m:mo[.='|' or .='∩'] or .//*[contains(., 'and')]"
-        then: [t: "закрывающая круглая скобка"]
-        else: [t: "скобка закрывается"]
+        then: [T: "закрывающая круглая скобка"]
+        else: [T: "скобка закрывается"]
   - test:
       if: "following-sibling::*[1][.='+' or .='=']"
       then: [pause: medium]

@@ -74,14 +74,14 @@
                 then: [set_variables: [Prefix: "'teljes nagyítás'", CommandOffset: "5"]]      # phrase('zoom in all of the way')
               - else: [set_variables: [Prefix: "'nagyítás'", CommandOffset: "5"]]             # phrase('zoom' in to see more details)
           - else_if: "starts-with($NavCommand, 'Move')"
-            then: [set_variables: [Prefix: "'ugrás'", CommandOffset: "5"]]          # phrase('move' to next entry in table)     
+            then: [set_variables: [Prefix: "'ugrás'", CommandOffset: "5"]]          # phrase('move' to next entry in table)
           - else_if: "starts-with($NavCommand, 'Read')"
             then:
             # "olvasás jelenlegi" is not Hungarian; the whole phrase is chosen here (no suffix word needed for 'Current')
             - test:
               - if: "$NavCommand = 'ReadCurrent'"
                 then: [set_variables: [Prefix: "'az aktuális elem felolvasása'", CommandOffset: "5"]]   # phrase('read current')
-              - else: [set_variables: [Prefix: "'olvasás'", CommandOffset: "5"]]          # phrase('read' to next entry in table)     
+              - else: [set_variables: [Prefix: "'olvasás'", CommandOffset: "5"]]          # phrase('read' to next entry in table)
           - else_if: "starts-with($NavCommand, 'Describe')"
             then:
             - test:
@@ -1236,7 +1236,7 @@
       - T: "nem tud jobbra"                                   # phrase('cannot' move 'right' in expression)
       - test:
         - if: "$NavCommand = 'MoveNext'"
-          then: [T: "mozogni"]                                  # phrase('move' to next entry in table)     
+          then: [T: "mozogni"]                                  # phrase('move' to next entry in table)
         - else_if: "$NavCommand = 'ReadNext'"
           then: [T: "olvasni"]                                  # phrase('read' next entry in table)     
           else: [T: "leírni"]                              # phrase('describe' next entry in table)     

@@ -5,6 +5,15 @@ use crate::common::*;
 use anyhow::Result;
 
 #[test]
+fn imaginary_part_name() -> Result<()> {
+    // The imaginary part is a real component of a complex number, not a "complex part".
+    let expr = r#"<math><mi intent="imaginary-part">Im</mi></math>"#;
+    test("ru", "SimpleSpeak", expr, "мнимая часть")?;
+    test("ru", "ClearSpeak", expr, "мнимая часть")?;
+    return Ok(());
+}
+
+#[test]
 fn silent_intent() -> Result<()> {
     let expr = "<math> <mrow intent='testing:silent($arg1, $arg2)'><mn arg='arg1'>2</mn> <mi arg='arg2'>x</mi></mrow> </math>";
     test("ru", "SimpleSpeak", expr, "2 икс")?;

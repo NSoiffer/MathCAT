@@ -37,6 +37,9 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: "из"]
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [T: "выражения"]
   - x: "*[1]"
 
 - name: overview-default
@@ -44,25 +47,19 @@
   match: "."
   replace:
   - test:
-      if: "*[2][self::m:mn]"
-      then_test:
-      - if: "*[2][.='2']"
-        then: [T: "квадратный корень"]
-      - else_if: "*[2][.='3']"
-        then: [T: "кубический корень"]  # (en: 'cube root')
-      - else_if: "*[2][not(contains(., '.'))]"
-        then: [x: "ToOrdinal(*[2])", T: "корень"]
+    - if: "*[2][self::m:mn and .='2']"
+      then: [T: "квадратный корень"]
+    - else_if: "*[2][self::m:mn and .='3']"
+      then: [T: "кубический корень"]
       else:
-      - test:
-          if: "*[2][self::m:mi][string-length(.)=1]"
-          then:
-          - x: "*[2]"
-          - pronounce: [{text: "-й"}, {ipa: "j"}, {sapi5: "th"}, {eloquence: "T"}]
-          else: {x: "*[2]"}
-      - T: "корень"
+      - T: "корень степени"
+      - x: "*[2]"
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: "из"]
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [T: "выражения"]
   - x: "*[1]"
 
 - name: matrix-override
@@ -71,10 +68,9 @@
   - "*[2][self::m:mtable] and"
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
   replace:
-  - T: "на"  # (en: 'a')
   - x: count(*[2]/*)
   - T: "на"  # (en: 'by')
-  - x: count(*[2]/*[self::m:mtr][1]/*)
+  - x: "count(*[2]/*[1]/*) - count(*[2]/*[1][self::m:mlabeledtr])"
   - test:
       if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
       then: [T: "определитель"]  # (en: 'determinant')
@@ -84,10 +80,9 @@
   tag: mtable
   match: "."
   replace:
-  - T: "на"  # (en: 'a')
   - x: count(*)
   - T: "на"  # (en: 'by')
-  - x: count(*[self::m:mtr][1]/*)
+  - x: "count(*[1]/*) - count(*[1][self::m:mlabeledtr])"
   - T: "таблица"  # (en: 'table')
 
 - name: short-mrow

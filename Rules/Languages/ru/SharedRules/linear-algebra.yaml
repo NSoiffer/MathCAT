@@ -1,18 +1,57 @@
 ---
 
+# Intent inference creates childless operator nodes. The generic leaf fallback
+# speaks their English XML names instead of using translated infix mappings.
+- name: russian-vector-product-leaf
+  tag: [dot-product, cross-product]
+  match: "($SpeechStyle='ClearSpeak' or $SpeechStyle='SimpleSpeak') and count(*)=0"
+  replace:
+  - bookmark: "@id"
+  - x: "SpeakIntentName(name(.), $Verbosity, 'infix')"
+
+# Pr is also a probability notation: expand only with a vector direction index.
+- name: russian-vector-projection-name
+  tag: mi
+  match: "($SpeechStyle='ClearSpeak' or $SpeechStyle='SimpleSpeak') and normalize-space(.)='Pr' and ancestor::*[self::m:indexed-by or self::m:sub or self::m:msub][*[2][self::m:vector or .//m:vector or .//m:mover[*[2]='→']]]"
+  replace:
+  - bookmark: "@id"
+  - T: "проекция"
+
+# TeX4ht can attach the index to the closing bar, rather than the whole norm.
+- name: russian-closing-bar-norm
+  tag: mrow
+  match: "($SpeechStyle='ClearSpeak' or $SpeechStyle='SimpleSpeak') and count(*)=3 and *[1][self::m:mo and .='∥'] and *[3][self::m:indexed-by and *[1][self::m:mo and .='∥']]"
+  replace:
+  - T: "норма"
+  - test:
+      if: "*[2][self::m:mi and string-length(.)=1 and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '')='']"
+      then:
+      - T: "заглавной"
+      - x: "translate(*[2], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"
+      else: [x: "*[2]"]
+  - T: "с индексом"
+  - test:
+      if: "*[3]/*[2]='∞'"
+      then: [T: "бесконечность"]
+      else: [x: "*[3]/*[2]"]
+
+- name: russian-doubled-closing-bar-norm
+  tag: "!*"
+  match: "($SpeechStyle='ClearSpeak' or $SpeechStyle='SimpleSpeak') and self::m:indexed-by and count(*)=2 and *[1][self::m:absolute-value and *[1][self::m:absolute-value]]"
+  replace:
+  - T: "норма"
+  - x: "*[1]/*[1]/*[1]"
+  - T: "с индексом"
+  - test:
+      if: "*[2]='∞'"
+      then: [T: "бесконечность"]
+      else: [x: "*[2]"]
+
 - name: scalar-determinant
   tag: determinant
   match: "count(*)=1 and not(*[1][self::m:mtr])"
   replace:
-  - test:
-      if: "$Verbosity='Verbose'"
-      then:
-      - T: "а"      # phrase('the' square root of 25 equals 5)
-  - T: "определяющий"      # phrase(the 'determinant' of a matrix)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then:
-      - T: "из"      # phrase(systems 'of' linear equations)
+  - T: "определитель"      # phrase(the 'determinant' of a matrix)
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple')) and $Impairment = 'Blindness'"
@@ -23,14 +62,24 @@
   tag: subscripted-norm
   match: "count(*)=2"
   replace:
-  - test:
-      if: "$Verbosity='Verbose'"
-      then:
-      - T: "а"      # phrase('the' square root of 25 equals 5)
-  - x: "*[2]"
   - T: "норма"      # phrase(the 'norm' can be a measure of distance)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then:
-      - T: "из"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
+  - T: "с индексом"
+  - x: "*[2]"
+
+- name: magnitude-as-norm
+  tag: magnitude
+  match: "count(*)=1"
+  replace:
+  - T: "норма"
+  - x: "*[1]"
+
+- name: transpose
+  tag: transpose
+  match: "count(*)=1"
+  replace:
+  - T: "транспонированная матрица"
+  - test:
+      if: "*[1][self::m:mi and string-length(.)=1 and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', .)]"
+      then: [x: "translate(*[1], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]
+      else: [x: "*[1]"]

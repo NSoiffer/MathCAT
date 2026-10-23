@@ -11,7 +11,7 @@
 layout: default
 lang: ru
 ref: users
-title: Руководство пользователя MathCat
+title: Руководство пользователя MathCAT
 ---
 ```
 

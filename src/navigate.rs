@@ -2612,6 +2612,7 @@ mod tests {
 
     #[test]
     fn describe_nested_fraction_ru() -> Result<()> {
+        // Navigation should retain the Russian expression cue for a fraction inside a square root.
         let mathml_str = "<math id='math'>
             <mfrac id='frac'>
                 <mrow id='num'>
@@ -2636,9 +2637,9 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&package_instance);
             let speech = test_command("ZoomIn", mathml, "")?;
-            assert_eq!("переход внутрь; в числитель; икс  плюс, квадратный корень из 1 разделить на игрек, конец корня", speech);
+            assert_eq!("переход внутрь; в числитель; икс  плюс, квадратный корень из выражения 1 разделить на игрек, конец корня", speech);
             let speech = test_command("DescribeCurrent", mathml, "")?;
-            assert_eq!("описать текущее; икс  плюс, квадратный корень из 1 разделить на игрек", speech);
+            assert_eq!("описать текущее; икс  плюс; квадратный корень из выражения 1 разделить на игрек", speech);
             return Ok( () );
         });
     }

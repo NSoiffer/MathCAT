@@ -3,6 +3,18 @@ use crate::common::*;
 use anyhow::Result;
 
 #[test]
+fn unicode_divisibility() -> Result<()> {
+    // The left operand is the divisor; the negated symbol preserves this direction.
+    let expr = "<math><mn>3</mn><mo>∣</mo><mn>6</mn></math>";
+    test("ru", "ClearSpeak", expr, "3 является делителем 6")?;
+    test("ru", "SimpleSpeak", expr, "3 является делителем 6")?;
+    let expr = "<math><mn>3</mn><mo>∤</mo><mn>7</mn></math>";
+    test("ru", "ClearSpeak", expr, "3 не является делителем 7")?;
+    test("ru", "SimpleSpeak", expr, "3 не является делителем 7")?;
+    return Ok(());
+}
+
+#[test]
 fn multiplication() -> Result<()> {
     let expr = "<math>
                     <mn>2</mn><mo>×</mo><mn>3</mn>
@@ -149,7 +161,7 @@ fn vertical_line_auto() -> Result<()> {
         <mn>3</mn><mo>|</mo><mn>6</mn>
     </math>";
     test_ClearSpeak("ru", "ClearSpeak_VerticalLine", "Auto", expr,
-            "3 делит 6")?;
+            "3 является делителем 6")?;
             return Ok(());
 }
 
@@ -159,7 +171,7 @@ fn vertical_line_divides() -> Result<()> {
         <mn>3</mn><mo>|</mo><mn>6</mn>
     </math>";
     test_ClearSpeak("ru", "ClearSpeak_VerticalLine", "Divides", expr,
-            "3 делит 6")?;
+            "3 является делителем 6")?;
             return Ok(());
 }
 

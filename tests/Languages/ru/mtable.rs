@@ -558,11 +558,11 @@ fn simple_absolute_value() -> Result<()> {
   let expr = "<math>
     <mrow><mrow><mo>|</mo> <mi>x</mi> <mo>|</mo></mrow></mrow>
   </math>";
-  test("ru", "SimpleSpeak", expr, "модуль от икс")?;
-  test("ru", "ClearSpeak",  expr, "модуль из икс")?;
-  test_prefs("ru", "ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "Auto")], expr, "модуль из икс")?;
+  test("ru", "SimpleSpeak", expr, "модуль икс")?;
+  test("ru", "ClearSpeak",  expr, "модуль икс")?;
+  test_prefs("ru", "ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "Auto")], expr, "модуль икс")?;
   test_prefs("ru", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_AbsoluteValue", "AbsEnd")],
-             expr, "модуль из икс, конец модуля")?;
+             expr, "модуль икс, конец модуля")?;
              return Ok(());
 }
   
@@ -573,9 +573,9 @@ let expr = "<math>
       <mrow><mi>x</mi><mo>+</mo><mn>1</mn> </mrow>
     <mo>|</mo></mrow></mrow>
   </math>";
-  test("ru", "ClearSpeak", expr, "модуль из икс плюс 1")?;
+  test("ru", "ClearSpeak", expr, "модуль икс плюс 1")?;
   test_prefs("ru", "ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "AbsEnd")],
-             expr, "модуль из икс плюс 1, конец модуля")?;
+             expr, "модуль икс плюс 1, конец модуля")?;
              return Ok(());
 }
 
@@ -585,7 +585,7 @@ fn simple_cardinality_value() -> Result<()> {
     <mrow><mrow><mo>|</mo> <mi>S</mi> <mo>|</mo></mrow></mrow>
   </math>";
   test_prefs("ru", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_AbsoluteValue", "Cardinality")], expr,
-             "мощность множества из заглавная эс")?;
+             "мощность множества заглавной эс")?;
              return Ok(());
 }
   
@@ -1079,6 +1079,21 @@ fn unknown_mtable_property() -> Result<()> {
     test("ru", "ClearSpeak",  expr,
          "2 строки; строка 1; а равно бэ плюс цэ минус дэ; строка 2; плюс е минус эф")?;
          return Ok(());
+}
+
+#[test]
+fn gathered_continued_equation() -> Result<()> {
+  // A gathered display is one derivation split across lines; do not duplicate
+  // the equality at the wrap or announce its final sentence punctuation.
+  let expr = "<math><mtable class='gathered'>
+    <mtr><mtd><mrow><mi>a</mi><mo>=</mo></mrow></mtd></mtr>
+    <mtr><mtd><mrow><mo>=</mo><mi>b</mi><mo>.</mo></mrow></mtd></mtr>
+  </mtable></math>";
+  test("ru", "ClearSpeak", expr, "2 строки, строка 1; а; строка 2; равно бэ")?;
+  test("ru", "SimpleSpeak", expr, "2 строки; строка 1; а; строка 2; равно бэ")?;
+  test("ru", "LiteralSpeak", expr,
+       "таблица с 2 строками и 1 столбцом; строка 1; столбец 1; а равно; строка 2; столбец 1; равно бэ точка")?;
+  Ok(())
 }
 
 

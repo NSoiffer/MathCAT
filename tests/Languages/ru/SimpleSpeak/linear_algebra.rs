@@ -5,35 +5,46 @@ use anyhow::Result;
 #[test]
 fn transpose() -> Result<()> {
   let expr = "<math> <msup><mi>M</mi><mi>T</mi></msup> </math>";
-  test("ru", "SimpleSpeak", expr, "заглавная эм транспонирование")?;
+  // Name the transposed matrix before its letter, as requested for Russian speech.
+  test("ru", "SimpleSpeak", expr, "транспонированная матрица эм")?;
+  test("ru", "ClearSpeak", expr, "транспонированная матрица эм")?;
+  return Ok(());
+}
+
+#[test]
+fn determinant_verbose() -> Result<()> {
+  // Explicit determinant intent must use the mathematical noun without an English article.
+  let expr = r#"<math><mrow intent="determinant($a)"><mi arg="a">a</mi></mrow></math>"#;
+  test_prefs("ru", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "определитель а")?;
+  test_prefs("ru", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "определитель а")?;
   return Ok(());
 }
 
 #[test]
 fn trace() -> Result<()> {
   let expr = "<math> <mi>Tr</mi><mi>M</mi> </math>";
-  test("ru", "SimpleSpeak", expr, "след от заглавная эм")?;
+  test("ru", "SimpleSpeak", expr, "след от заглавной эм")?;
   return Ok(());
 }
 
 #[test]
 fn dimension() -> Result<()> {
   let expr = "<math> <mi>Dim</mi><mi>M</mi> </math>";
-  test("ru", "SimpleSpeak", expr, "размерность от заглавная эм")?;
+  test("ru", "SimpleSpeak", expr, "размерность от заглавной эм")?;
   return Ok(());
 }
 
 #[test]
 fn homomorphism() -> Result<()> {
   let expr = "<math> <mi>Hom</mi><mo>(</mo><mi>M</mi><mo>)</mo> </math>";
-  test("ru", "SimpleSpeak", expr, "гомоморфизм от заглавная эм")?;
+  test("ru", "SimpleSpeak", expr, "гомоморфизм от заглавной эм")?;
   return Ok(());
 }
 
 #[test]
 fn kernel() -> Result<()> {
   let expr = "<math> <mi>ker</mi><mrow><mo>(</mo><mi>L</mi><mo>)</mo></mrow> </math>";
-  test("ru", "SimpleSpeak", expr, "ядро от заглавная эль")?;
+  test("ru", "SimpleSpeak", expr, "ядро от заглавной эль")?;
   return Ok(());
 }
 
@@ -63,7 +74,7 @@ fn norm_non_simple() -> Result<()> {
     </mrow>
 </math>
 ";
-  test("ru", "SimpleSpeak", expr, "норма от икс плюс игрек конец нормы")?;
+  test("ru", "SimpleSpeak", expr, "норма от выражения икс плюс игрек конец нормы")?;
   return Ok(());
 }
 
@@ -80,7 +91,31 @@ fn norm_subscripted() -> Result<()> {
     </msub>
 </math>
 ";
-  test("ru", "SimpleSpeak", expr, "пэ норма из эф")?;
+  // Speak the norm's operand first, then identify its subscript explicitly.
+  test("ru", "SimpleSpeak", expr, "норма эф с индексом пэ")?;
+  test("ru", "ClearSpeak", expr, "норма эф с индексом пэ")?;
+  return Ok(());
+}
+
+#[test]
+fn norm_with_subscript_on_closing_bar() -> Result<()> {
+  // Recognize the TeX4ht form in which only the closing norm bar carries the index.
+  let expr = "<math><mrow><mo>∥</mo><mi>A</mi><msub><mrow><mo>∥</mo></mrow><mi>p</mi></msub></mrow></math>";
+  test("ru", "SimpleSpeak", expr, "норма заглавной а с индексом пэ")?;
+  test("ru", "ClearSpeak", expr, "норма заглавной а с индексом пэ")?;
+
+  let doubled_bars = "<math><mrow><mo>|</mo><mo>|</mo><mi>x</mi><mo>|</mo><msub><mrow><mo>|</mo></mrow><mi>∞</mi></msub></mrow></math>";
+  test("ru", "SimpleSpeak", doubled_bars, "норма икс с индексом бесконечность")?;
+  test("ru", "ClearSpeak", doubled_bars, "норма икс с индексом бесконечность")?;
+  return Ok(());
+}
+
+#[test]
+fn norm_with_doubled_ordinary_bars() -> Result<()> {
+  // TeX4ht sometimes emits a norm as two adjacent ordinary bars on each side.
+  let expr = "<math><mrow><mo>|</mo><mo>|</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>|</mo><mo>|</mo></mrow></math>";
+  test("ru", "SimpleSpeak", expr, "норма икс плюс игрек")?;
+  test("ru", "ClearSpeak", expr, "норма икс плюс игрек")?;
   return Ok(());
 }
 

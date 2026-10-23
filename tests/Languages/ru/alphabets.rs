@@ -5,6 +5,15 @@ use crate::common::*;
 use anyhow::Result;
 
 #[test]
+fn traditional_latin_names() -> Result<()> {
+    // Use the agreed Russian names for g, j and w, including uppercase letters.
+    let expr = "<math><mi>g</mi><mo>,</mo><mi>j</mi><mo>,</mo><mi>w</mi><mo>,</mo><mi>G</mi><mo>,</mo><mi>J</mi><mo>,</mo><mi>W</mi></math>";
+    test("ru", "SimpleSpeak", expr, "гэ, йот, дубль-вэ, заглавная гэ, заглавная йот, заглавная дубль-вэ")?;
+    test("ru", "ClearSpeak", expr, "гэ, йот, дубль-вэ, заглавная гэ, заглавная йот, заглавная дубль-вэ")?;
+    return Ok(());
+}
+
+#[test]
 fn special_alphabet_chars() -> Result<()> {
     let expr = "<math> <mi>ℌ</mi><mo>,</mo><mi>ℭ</mi></math>";
     test("ru", "SimpleSpeak", expr, "фрактурная заглавная аш, фрактурная заглавная цэ")?;

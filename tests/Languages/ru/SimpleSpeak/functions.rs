@@ -305,7 +305,7 @@ fn parens_interval_open_open() -> Result<()> {
         <mrow> <mo arg='open'>(</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>)</mo>
         <mo>)</mo></mrow>
     </math>";
-    test("ru", "SimpleSpeak", expr, "открытый интервал от цэ до дэ")?;
+    test("ru", "SimpleSpeak", expr, "интервал от цэ до дэ")?;
     return Ok(());
 }
 
@@ -316,7 +316,7 @@ fn parens_interval_closed_open() -> Result<()> {
             <mrow> <mo arg='open'>[(]</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>)</mo>
             <mo>)</mo></mrow>
         </math>";
-    test("ru", "SimpleSpeak", expr, "закрыто-открытый интервал от цэ до дэ")?;
+    test("ru", "SimpleSpeak", expr, "полуинтервал от цэ до дэ")?;
     return Ok(());
 }
 
@@ -327,7 +327,7 @@ fn parens_interval_open_closed() -> Result<()> {
         <mrow> <mo arg='open'>(</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>]</mo>
         <mo>]</mo></mrow>
     </math>";
-    test("ru", "SimpleSpeak", expr, "открыто-закрытый интервал от цэ до дэ")?;
+    test("ru", "SimpleSpeak", expr, "полуинтервал от цэ до дэ")?;
     return Ok(());
 }
 
@@ -338,7 +338,7 @@ fn parens_interval_closed_closed() -> Result<()> {
             <mrow> <mo arg='open'>[(]</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>]</mo>
             <mo>]</mo></mrow>
     </math>";
-    test("ru", "SimpleSpeak", expr, "закрытый интервал от цэ до дэ")?;
+    test("ru", "SimpleSpeak", expr, "отрезок от цэ до дэ")?;
     return Ok(());
 }
 
@@ -350,7 +350,7 @@ fn parens_interval_neg_infinity_open_open() -> Result<()> {
         <mo>)</mo></mrow>
     </math>";
     test("ru", "SimpleSpeak", expr,
-        "открытый интервал от минус бесконечности до дэ")?;
+        "интервал от минус бесконечности до дэ")?;
         return Ok(());
 }
 
@@ -362,7 +362,7 @@ fn parens_interval_neg_infinity_open_closed() -> Result<()> {
         <mo>]</mo></mrow>
     </math>";
     test("ru", "SimpleSpeak", expr,
-        "открыто-закрытый интервал от минус бесконечности до дэ")?;
+        "полуинтервал от минус бесконечности до дэ")?;
         return Ok(());
 }
 

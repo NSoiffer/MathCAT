@@ -25,15 +25,12 @@
       then: [T: "див"]             # phrase('div' is short for divergence)
       else: [T: "дивергенция"]      # phrase('divergence of' this function from the mean)
   - test:
-      if: "$Verbosity!='Terse' and *[1][self::m:mi[contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]]"
-      then: [T: "заглавной"]
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [T: "выражения"]
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]
-  - test:
-      if: "$Verbosity!='Terse' and *[1][self::m:mi[contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]]"
-      then: [x: "translate(*[1], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]
-      else: [x: "*[1]"]
+  - x: "*[1]"
 
 - name: curl
   tag: curl
@@ -41,15 +38,12 @@
   replace:
   - T: "ротор"      # phrase(the 'curl of' a field)
   - test:
-      if: "$Verbosity!='Terse' and *[1][self::m:mi[contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]]"
-      then: [T: "заглавной"]
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [T: "выражения"]
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]
-  - test:
-      if: "$Verbosity!='Terse' and *[1][self::m:mi[contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]]"
-      then: [x: "translate(*[1], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]
-      else: [x: "*[1]"]
+  - x: "*[1]"
 
 - name: gradient
   tag: gradient
@@ -60,12 +54,9 @@
       then: [T: "градиент"]      # phrase(the hill has a 'gradient of' five percent)
       else: [T: "набла"]      # phrase(the delete key is labeled 'del')
   - test:
-      if: "$Verbosity!='Terse' and *[1][self::m:mi[contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]]"
-      then: [T: "заглавной"]
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [T: "выражения"]
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]
-  - test:
-      if: "$Verbosity!='Terse' and *[1][self::m:mi[contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]]"
-      then: [x: "translate(*[1], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]
-      else: [x: "*[1]"]
+  - x: "*[1]"

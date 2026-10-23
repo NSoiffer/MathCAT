@@ -2874,7 +2874,9 @@ fn russian_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -
             continue;
         }
         raw_braille_without_repeated_number_indicators.push(ch);
-        previous_char_was_digit = matches!(ch, '⠚' | '⠁' | '⠃' | '⠉' | '⠙' | '⠑' | '⠋' | '⠛' | '⠓' | '⠊');
+        if ch != '𝒢' {
+            previous_char_was_digit = matches!(ch, '⠚' | '⠁' | '⠃' | '⠉' | '⠙' | '⠑' | '⠋' | '⠛' | '⠓' | '⠊');
+        }
     }
 
     let raw_braille_without_periodic_number_indicator = PERIODIC_DECIMAL_NUM_INDICATOR
@@ -2891,7 +2893,8 @@ fn russian_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -
             _ => "",
         }
     });
-    let result = result.replace("⠠⠙⠊⠧", "⠫⠙⠊⠧");
+    let result = result.replace("⠠⠙⠊⠧", "⠫⠙⠊⠧")
+                       .replace('𝒢', "⠄");
     return COLLAPSE_SPACES.replace_all(&result, "⠀")
                           .trim_matches('⠀')
                           .to_string();
@@ -2977,8 +2980,8 @@ fn russian_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -
 
     fn russian_typeform_indicator(typeform: char) -> &'static str {
         match typeform {
-            'B' => "⠻",                         // ГОСТ Р 58511: жирный шрифт, точки 12456.
-            'I' | 'T' | 'D' | 'S' | '𝔹' => "⠸", // ГОСТ Р 58511: курсив/шрифтовое выделение, точки 456.
+            'B' => "⠻",                         // Russian bold indicator, dots 12456.
+            'I' | 'T' | 'D' | 'S' | '𝔹' => "⠸", // Russian typeform indicator, dots 456.
             _ => "",
         }
     }
@@ -3349,6 +3352,7 @@ impl BrailleChars {
     fn get_braille_russian_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {
         // Russian italic typeform for letters is left unchanged pending external advice.
         let text = BrailleChars::substring(as_str!(as_text(node)), &text_range);
+        let text = add_russian_digit_group_separators(text, node);
         let braille_chars = braille_replace_chars(&text, node)?;
         let Some(raw_math_variant) = node.attribute_value("mathvariant") else {
             return Ok(braille_chars);
@@ -3381,6 +3385,40 @@ impl BrailleChars {
         }
 
         return Ok(prefix + &braille_chars + &suffix);
+
+        fn add_russian_digit_group_separators(text: String, node: Element) -> String {
+            const GROUP_SEPARATOR: char = '\u{e02a}';
+
+            // Column arithmetic keeps the digit columns contiguous. The Russian
+            // examples for this layout omit the point-3 separator even for results
+            // longer than four digits.
+            let mut ancestor = Some(node);
+            while let Some(element) = ancestor {
+                if element.attribute_value("intent").is_some_and(|intent| intent.contains(":column-arithmetic")) {
+                    return text;
+                }
+                ancestor = element.parent().and_then(|parent| parent.element());
+            }
+
+            let is_groupable_digit = |ch: char| ch.is_ascii_digit() || ('\u{e020}'..='\u{e029}').contains(&ch);
+            let digit_count = text.chars().count();
+            if digit_count <= 4 || !text.chars().all(is_groupable_digit) {
+                return text;
+            }
+
+            let first_group_len = match digit_count % 3 {
+                0 => 3,
+                remainder => remainder,
+            };
+            let mut result = String::with_capacity(text.len() + digit_count / 3);
+            for (index, ch) in text.chars().enumerate() {
+                if index > 0 && index >= first_group_len && (index - first_group_len) % 3 == 0 {
+                    result.push(GROUP_SEPARATOR);
+                }
+                result.push(ch);
+            }
+            return result;
+        }
     }
 
     fn get_braille_cmu_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {
