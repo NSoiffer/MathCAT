@@ -66,7 +66,9 @@ def get_yaml_files(lang_dir: Path, region_dir: Path | None = None) -> list[Path]
     if region_dir:
         collect_from(region_dir, region_dir)
 
-    return sorted(files)
+    # sort by path parts (case-sensitive) so the order is the same on every platform;
+    # Windows paths compare case-insensitively
+    return sorted(files, key=lambda p: p.parts)
 
 
 def compare_files(
