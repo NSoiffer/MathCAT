@@ -1895,8 +1895,8 @@ impl CanonicalizeContext {
 			if !children.is_empty() {
 				new_children.push(children[0]);
 				for (i, child) in children[1..].iter().enumerate() {
-					if let Some(sep) = separators.get(i).or(separators.last()) {
-						new_children.push( ChildOfElement::Element( create_mo(mfenced.document(), &sep.to_string(), MFENCED_ATTR_VALUE)) );
+					if let Some(&sep) = separators.get(i).or_else(|| separators.last()) {
+            		    new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), &sep.to_string(), MFENCED_ATTR_VALUE)) );
 					}
 					new_children.push(*child);
 				}
