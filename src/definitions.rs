@@ -61,42 +61,33 @@ impl Default for Definitions {
 }
 
 impl Definitions {
-    fn new() -> Self {
-        Definitions {
-            name_to_var_mapping: HashMap::with_capacity(30),
-        }
-    }
-
     pub fn get_hashset(&self, name: &str) -> Option<Ref<'_, HashSet<String>>> {
-        let names = self.name_to_var_mapping.get(name);
-        if let Some(DefinitionCollection::Set(set)) = names {
-            return Some(set.borrow());
+        match self.name_to_var_mapping.get(name)? {
+            DefinitionCollection::Set(set) => Some(set.borrow()),
+            _ => None,
         }
-        return None;
     }
 
     pub fn get_hashmap(&self, name: &str) ->  Option<Ref<'_, HashMap<String, String>>> {
-        let names = self.name_to_var_mapping.get(name);
-        if let Some(DefinitionCollection::Map(map)) = names {
-            return Some(map.borrow());
+        match self.name_to_var_mapping.get(name)? {
+            DefinitionCollection::Map(map) => Some(map.borrow()),
+            _ => None,
         }
-        return None;
     }
 
     pub fn get_vec(&self, name: &str) -> Option<Ref<'_, Vec<String>>> {
-        let names = self.name_to_var_mapping.get(name);
-        if let Some(DefinitionCollection::Vec(vec)) = names {
-            return Some(vec.borrow());
+        match self.name_to_var_mapping.get(name)? {
+            DefinitionCollection::Vec(vec) => Some(vec.borrow()),
+            _ => None,
         }
-        return None;
     }
 }
 
 thread_local!{
     /// Global variable containing all of the definitions.
     /// See [`Definitions`] for more details.
-    pub static SPEECH_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
-    pub static BRAILLE_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
+    pub static SPEECH_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::default() );
+    pub static BRAILLE_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::default() );
     pub static DEFINITIONS: &'static std::thread::LocalKey<RefCell<Definitions>> = const { &SPEECH_DEFINITIONS };
 }
 
@@ -110,15 +101,12 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
     let file_path = pref_manager.get_definitions_file(use_speech_defs);
     let definitions = if use_speech_defs {&SPEECH_DEFINITIONS} else {&BRAILLE_DEFINITIONS};
     definitions.with( |defs| defs.borrow_mut().name_to_var_mapping.clear() );
-    let mut files_read = read_one_definitions_file(use_speech_defs, file_path)
+    let files_read = read_one_definitions_file(use_speech_defs, file_path)
         .with_context(|| format!("in file '{}'", file_path.to_string_lossy()))?;
     let mut seen: HashSet<String> = HashSet::with_capacity(files_read.len());
     let mut new_files: Vec<PathBuf> = Vec::with_capacity(files_read.len());
-    for p in files_read.drain(..) {
-        let canon = match crate::shim_filesystem::canonicalize_shim(&p) {
-            Ok(c) => c,
-            Err(_) => p,
-        };
+    for p in files_read {
+        let canon = crate::shim_filesystem::canonicalize_shim(&p).unwrap_or(p);
         let key = canon.to_string_lossy().to_string();
         if seen.insert(key) {
             new_files.push(canon);
@@ -152,11 +140,8 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
 
     /// merge "TrigFunctions" and "AdditionalFunctionNames" into a new set named "FunctionNames"
     fn build_all_functions_set(defs: &mut RefMut<Definitions>) -> HashSet<String> {
-        let trig_functions = defs.get_hashset("TrigFunctionNames").unwrap();
         let mut all_functions = defs.get_hashset("AdditionalFunctionNames").unwrap().clone();
-        for trig_name in trig_functions.iter() {
-            all_functions.insert(trig_name.clone());
-        }
+        all_functions.extend(defs.get_hashset("TrigFunctionNames").unwrap().iter().cloned());
         return all_functions;
     }
 }
