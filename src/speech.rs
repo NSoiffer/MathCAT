@@ -2804,7 +2804,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
             // see if it in the full unicode table (if it isn't loaded already)
             let pref_manager = rules.pref_manager.borrow();
             let unicode_pref_files = if rules.name == RulesFor::Braille {pref_manager.get_braille_unicode_file()} else {pref_manager.get_speech_unicode_file()};
-            let should_ignore_file_time = pref_manager.pref_to_string("CheckRuleFiles") == "All";
+            let should_ignore_file_time = pref_manager.pref_to_string("CheckRuleFiles") != "All";
             if rules.unicode_full.borrow().is_empty() || !rules.unicode_full_files.borrow().is_file_up_to_date(unicode_pref_files.1, should_ignore_file_time) {
                 info!("*** Loading full unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
                 rules.unicode_full.borrow_mut().clear();
