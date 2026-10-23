@@ -4556,7 +4556,9 @@ impl CanonicalizeContext {
 		// We essentially have 'terminator( mrow terminator)'
 		//   in other words, we have an extra mrow with one child due to the initial start -- remove it
 		let mut top_of_stack = parse_stack.pop().unwrap();
-		assert_eq!(parse_stack.len(), 0);
+		if !parse_stack.is_empty() {
+			bail!("Unbalanced fences:\n{}", mml_to_string(mrow));
+		}
 	
 		let mut parsed_mrow = top_of_stack.mrow;
 		assert_eq!( name(top_of_stack.mrow), "mrow");
