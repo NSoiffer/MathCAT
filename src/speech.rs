@@ -2083,7 +2083,7 @@ impl FilesAndTimes {
         self.ft.clear();
     }
 
-    pub fn is_valid(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.ft.is_empty()
     }
 
@@ -2234,11 +2234,11 @@ pub fn invalidate_braille_caches() {
 // Used for testing the cache is invalidated when the language changes in prefs.rs
 impl SpeechRules {
     pub(crate) fn rule_files_cache_is_empty(&self) -> bool {
-        self.rule_files.is_valid()
+        self.rule_files.is_empty()
     }
 
     pub(crate) fn definitions_files_cache_is_empty(&self) -> bool {
-        self.definitions_files.borrow().is_valid()
+        self.definitions_files.borrow().is_empty()
     }
 
     pub(crate) fn definitions_files_cache_path(&self) -> PathBuf {
