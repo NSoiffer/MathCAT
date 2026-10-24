@@ -14,7 +14,7 @@ use crate::speech::{NAVIGATION_RULES, CONCAT_INDICATOR, CONCAT_STRING, SpeechRul
 use crate::infer_intent::add_fixity_children;
 use crate::interface::copy_mathml;
 use crate::tts::TTS;
-#[cfg(not(target_family = "wasm"))]
+#[cfg(not(target_family = "wasm"))]634
 use std::time::Instant;
 use crate::errors::*;
 use phf::phf_set;
@@ -631,7 +631,8 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             return;
         }
         let top_entry = nav_state.pop().unwrap();
-        for _ in 0..count {
+        for _i in 0..count {
+			// debug!("  ... loop count={}", count - 1 - _i);
             nav_state.pop();
         }
         if push_command_on_stack {
