@@ -649,45 +649,6 @@ impl Function for ToCommonFraction {
     }
 }
 
-struct Min;
-/**
- * Returns true the smallest of the two args
- * @param(num1) 
- * @param(num2)
- */
- impl Function for Min {
-
-    fn evaluate<'d>(&self,
-                        _context: &context::Evaluation<'_, 'd>,
-                        args: Vec<Value<'d>>)
-                        -> Result<Value<'d>, Error>
-    {
-        let mut args = Args(args);
-        args.exactly(2)?;
-        let num1 = args.pop_number()?;
-        let num2 = args.pop_number()?;
-        return Ok( Value::Number( num1.min(num2) ) );
-    }
-}
-
-struct Max;
-
-impl Function for Max {
-
-    fn evaluate<'d>(&self,
-                        _context: &context::Evaluation<'_, 'd>,
-                        args: Vec<Value<'d>>)
-                        -> Result<Value<'d>, Error>
-    {
-        let mut args = Args(args);
-        args.exactly(2)?;
-        let num1 = args.pop_number()?;
-        let num2 = args.pop_number()?;
-        return Ok( Value::Number( num1.max(num2) ) );
-    }
-}
-
-
 struct BaseNode;
 /**
  * Returns true if the node is a large op
@@ -1352,83 +1313,43 @@ impl Function for GetNavigationPartName {
     }
 }
 
-pub struct FontSizeGuess;
-/// FontSizeGuess(size_string)
-///   returns a guess of the size in "ems"
-/// Examples:
-///    "0.278em" -> 0.278
-///    ""
-// 		   returns original node match isn't found
-impl FontSizeGuess {
-    /// Returns an estimated width in em units, using an assumed 12-point font for conversions.
-    pub fn em_from_value(value_with_unit: &str) -> f64 {
-        // match one or more digits followed by a unit -- there are many more units, but they tend to be large and rarer(?)
-        static FONT_VALUE: LazyLock<Regex> = LazyLock::new(|| { Regex::new(r"(-?[0-9]*\.?[0-9]*)(px|cm|mm|Q|in|pc|pt|ex|em|rem)").unwrap() });
-        let cap = FONT_VALUE.captures(value_with_unit);
-        if let Some(cap) = cap {
-            if cap.len() == 3 {
-                let multiplier = match &cap[2] {    // guess based on 12pt font to convert to ems
-                    "px" => 1.0/12.0,
-                    "cm" => 2.37,
-                    "mm" => 0.237,
-                    "Q" => 0.059,  // 1/4 mm
-                    "in" => 6.02,
-                    "pc" => 1.0,
-                    "pt" => 1.0/12.0,
-                    "ex" => 0.5,
-                    "em" => 1.0,
-                    "rem" => 16.0/12.0,
-                    default => {debug!("unit='{default}'"); 10.0}
-                };
-                // debug!("FontSizeGuess: {}->{}, val={}, multiplier={}", value_with_unit, value*multiplier, value, multiplier);
-                return cap[1].parse::<f64>().unwrap_or(0.0) * multiplier;
-            }  else {
-                return 0.0;             // something bad happened
-            }
-        }else {
-            let multiplier = match value_with_unit {    // guess based on 12pt font to convert to ems
-                "veryverythinspace" => 1.0/18.0,
-                "verythinspace" => 2.0/18.0,
-                "thinspace" => 3.0/18.0,
-                "mediumspace" => 4.0/18.0,
-                "thickspace" => 5.0/18.0,
-                "verythickspace" => 6.0/18.0,
-                "veryverythickspace" => 7.0/18.0,
-                _ => 0.0,
+/// Converts a MathML length (e.g. "0.278em", "12pt", "thinspace") to an estimated size in ems, assuming a 12-point font.
+pub(crate) fn em_from_value(value_with_unit: &str) -> f64 {
+    // match one or more digits followed by a unit -- there are many more units, but they tend to be large and rarer(?)
+    static FONT_VALUE: LazyLock<Regex> = LazyLock::new(|| { Regex::new(r"(-?[0-9]*\.?[0-9]*)(px|cm|mm|Q|in|pc|pt|ex|em|rem)").unwrap() });
+    let cap = FONT_VALUE.captures(value_with_unit);
+    if let Some(cap) = cap {
+        if cap.len() == 3 {
+            let multiplier = match &cap[2] {    // guess based on 12pt font to convert to ems
+                "px" => 1.0/12.0,
+                "cm" => 2.37,
+                "mm" => 0.237,
+                "Q" => 0.059,  // 1/4 mm
+                "in" => 6.02,
+                "pc" => 1.0,
+                "pt" => 1.0/12.0,
+                "ex" => 0.5,
+                "em" => 1.0,
+                "rem" => 16.0/12.0,
+                default => {debug!("unit='{default}'"); 10.0}
             };
-            return multiplier;
+            // debug!("em_from_value: {}->{}, val={}, multiplier={}", value_with_unit, value*multiplier, value, multiplier);
+            return cap[1].parse::<f64>().unwrap_or(0.0) * multiplier;
+        }  else {
+            return 0.0;             // something bad happened
         }
-    }
-}
-impl Function for FontSizeGuess {
-    fn evaluate<'d>(&self,
-                        _context: &context::Evaluation<'_, 'd>,
-                        args: Vec<Value<'d>>)
-                        -> Result<Value<'d>, Error>
-    {
-        let mut args = Args(args);
-        args.exactly(1)?;
-        let value_with_unit = args.pop_string()?;
-        let em_value = FontSizeGuess::em_from_value(&value_with_unit);
-        return Ok( Value::Number(em_value) );
-    }
-}
-
-pub struct ReplaceAll;
-/// ReplaceAll(haystack, needle, replacement)
-///   Returns a string with all occurrences of 'needle' replaced with 'replacement'
-impl Function for ReplaceAll {
-    fn evaluate<'d>(&self,
-                        _context: &context::Evaluation<'_, 'd>,
-                        args: Vec<Value<'d>>)
-                        -> Result<Value<'d>, Error>
-    {
-        let mut args = Args(args);
-        args.exactly(3)?;
-        let replacement = args.pop_string()?;
-        let needle = args.pop_string()?;
-        let haystack = args.pop_string()?;
-        return Ok( Value::String(haystack.replace(&needle, &replacement)) );
+    }else {
+        let multiplier = match value_with_unit {    // guess based on 12pt font to convert to ems
+            "veryverythinspace" => 1.0/18.0,
+            "verythinspace" => 2.0/18.0,
+            "thinspace" => 3.0/18.0,
+            "mediumspace" => 4.0/18.0,
+            "thickspace" => 5.0/18.0,
+            "verythickspace" => 6.0/18.0,
+            "veryverythickspace" => 7.0/18.0,
+            _ => 0.0,
+        };
+        return multiplier;
     }
 }
 
@@ -1704,12 +1625,6 @@ pub fn register_mathcat_xpath_functions(context: &mut Context) {
     context.set_function("HasVisibleColumnLine", HasVisibleColumnLine);
     context.set_function("HasVisibleRowLine", HasVisibleRowLine);
     context.set_function("DEBUG", Debug);
-
-    // Not used: remove??
-    context.set_function("min", Min);       // missing in xpath 1.0
-    context.set_function("max", Max);       // missing in xpath 1.0
-    context.set_function("FontSizeGuess", FontSizeGuess);
-    context.set_function("ReplaceAll", ReplaceAll);
 }
 
 
@@ -1740,11 +1655,11 @@ mod tests {
     // Pica widths must use the existing 12pt font estimate: 1pc, 12pt, and 1em are equivalent.
     #[test]
     fn font_size_guess_pica_widths() {
-        assert_eq!(FontSizeGuess::em_from_value("1pc"), 1.0);
-        assert_eq!(FontSizeGuess::em_from_value("0.5pc"), 0.5);
-        assert_eq!(FontSizeGuess::em_from_value("-1pc"), -1.0);
-        assert_eq!(FontSizeGuess::em_from_value("12pt"), 1.0);
-        assert_eq!(FontSizeGuess::em_from_value("1em"), 1.0);
+        assert_eq!(em_from_value("1pc"), 1.0);
+        assert_eq!(em_from_value("0.5pc"), 0.5);
+        assert_eq!(em_from_value("-1pc"), -1.0);
+        assert_eq!(em_from_value("12pt"), 1.0);
+        assert_eq!(em_from_value("1em"), 1.0);
     }
 
     #[test]

@@ -1135,7 +1135,7 @@ impl CanonicalizeContext {
 				// normalize width ems
 				let width_raw = mathml.attribute_value("width");
 				let width = width_raw.as_deref().unwrap_or("0em");
-				let normalized_width = crate::xpath_functions::FontSizeGuess::em_from_value(width);
+				let normalized_width = crate::xpath_functions::em_from_value(width);
 				mathml.set_attribute_value("data-width", &normalized_width.to_string());
 				return Some(mathml);
 			},
