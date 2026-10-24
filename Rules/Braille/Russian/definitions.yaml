@@ -1,6 +1,7 @@
 ---
 - include: "../definitions.yaml"
 
+# Private-use markers expanded by unicode.yaml; aliases share the same braille spelling.
 - RussianFunctionBraille: {
     "arcsin": "\uE100", "arccos": "\uE101", "arctg": "\uE102", "arctan": "\uE102",
     "arcctg": "\uE103", "arccotan": "\uE103", "arccot": "\uE103",
@@ -17,6 +18,7 @@
     "gcd": "\uE11E", "lcm": "\uE11F"
   }
 
+# Private-use label markers shared by over-, under-, and script-label rules.
 - RussianLabelMarks: {
     "′": "\uE130", "″": "\uE130\uE130", "‴": "\uE130\uE130\uE130", "'": "\uE130",
     "*": "\uE131", "∗": "\uE131", "⋆": "\uE131",
@@ -31,12 +33,14 @@
     "←": "\uE13B", "⟵": "\uE13B", "⃖": "\uE13B"
   }
 
+# These over-label marks do not need a separate position indicator.
 - RussianExactOverLabelMarksWithoutIndicator: {
     "~": "\uE135", "∼": "\uE135", "˜": "\uE135", "̃": "\uE135",
     "^": "\uE136", "∧": "\uE136", "ˆ": "\uE136", "̂": "\uE136",
     "∨": "\uE137", "˅": "\uE137", "ˇ": "\uE137", "̌": "\uE137"
   }
 
+# These upper-right labels use their mark without a separate position indicator.
 - RussianUpperRightLabelMarksWithoutIndicator: {
     "′": "\uE130", "″": "\uE130\uE130", "‴": "\uE130\uE130\uE130", "'": "\uE130",
     "*": "\uE131", "∗": "\uE131", "⋆": "\uE131",

@@ -123,6 +123,7 @@
 
 
 # Units (e.g., meters per second)
+# For a ratio of units, adapt the connector to the denominator.
 - name: per-fraction
   tag: fraction
   match:
@@ -228,6 +229,7 @@
       if: "*[2][.=2]"
       then: [T: "в квадрате"]      # (en: 'squared')
       else: [T: "в кубе"]      # (en: 'cubed')
+# Speak the function power before its argument.
 - name: function-power
   tag: power
   match:
@@ -511,6 +513,7 @@
       then: [pause: short]
   - T: "скобка закрывается"
 
+# Handle empty sets and set-builder notation before enumerating set members.
 - name: set
   tag: set
   match: "."

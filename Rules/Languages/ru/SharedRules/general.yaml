@@ -210,8 +210,9 @@
       if: "not(IsNode(*[2], 'simple'))"
       then: [T: "конец числа сочетаний"]
 
+# Read an infix pochhammer intent as a number of arrangements.
 - name: permutation
-  # Not a default because the order of the args is reversed
+  # Use Russian arrangements wording rather than the generic infix intent mapping
   tag: pochhammer
   match: "count(*)=2 and contains(@data-intent-property, ':infix:')"
   replace:
@@ -230,6 +231,7 @@
   - T: "до"
   - x: "*[2]"
 
+# Choose the Russian interval name from the open or closed endpoints.
 - name: intervals
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
   match: "count(*)=2"
@@ -253,11 +255,12 @@
       then: [T: "бесконечности"]
       else: [x: "*[2]"]
 
+# Read a two-coordinate point with a spoken comma between coordinates.
 - name: default-point
   tag: point
   match: "count(*)=2"
   replace:
-  - T: "точка"      # phrase(a decimal 'point' indicates the fraction component of a number)
+  - T: "точка"      # phrase(the 'point' with coordinates x and y)
   - x: "*[1]"
   - T: "запятая"
   - x: "*[2]"
@@ -378,6 +381,7 @@
 # 2. does it match an English unit (if in an English language)
 # 3. does it match an SI prefix followed by an SI that accepts SI prefixes
 # Due to this order, some things like "ft" and "cd" mean "feet" vs "femto-tonnes" and "pints" vs "pico-tonnes"
+# Resolve prefixed and unprefixed unit names using the language definitions.
 - name: unit
   tag: unit
   match: "$Verbosity != 'Terse' and contains(@data-intent-property, ':unit')"
@@ -486,18 +490,21 @@
       if: "$Verbosity='Terse'"
       then: [T: "кос"]      # phrase('cos' is the abbreviation for cosine)
       else: [T: "косинус"]      # phrase(find the 'cosine' in a right-angle triangle)
+# Expand the tangent abbreviation as a function name.
 - name: tan
   tag: mi
   match: ".='tan' or .='tg'"
   replace:
   - bookmark: "@id"
   - T: "тангенс"
+# Expand the secant abbreviation as a function name.
 - name: sec
   tag: mi
   match: ".='sec'"
   replace:
   - bookmark: "@id"
   - T: "секанс"
+# Expand the cosecant abbreviation as a function name.
 - name: csc
   tag: mi
   match: ".='csc'"
@@ -1245,6 +1252,7 @@
   replace:
     x: "text()"
 
+# Choose reaction-arrow wording from the arrow direction and its annotations.
 - name: chemical-arrow-operator
   tag: chemical-arrow-operator
   match: "."

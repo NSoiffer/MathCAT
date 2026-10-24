@@ -18,6 +18,7 @@
       - x: "translate(*[2], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"
       - T: "большое"
 
+# In verbose speech, distinguish the origin of the ray from the point it passes through.
 - name: geometry-ray
   tag: ray
   match: "count(*)=2"
@@ -36,6 +37,7 @@
       - x: "translate(*[2], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"
       - T: "большое"
 
+# Read the two endpoint labels as capital letters.
 - name: geometry-arc
   tag: arc
   match: "count(*)=2"
@@ -61,6 +63,7 @@
   - x: "*[3]"
 
 
+# Separate coordinates with spoken commas; announce the end when the context requires it.
 - name: coordinate
   tag: coordinate
   match: "."

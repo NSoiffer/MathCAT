@@ -1,7 +1,7 @@
 ---
  - "⋇": [tc: "1⠌⠯⠦"]             # 0x22C7 (Division times)
  - "⊩": [tc: "⠸⠳⠿⠸⠒"]           # 0x22A9 (Forces)
- - "ℏ": [tc: "⠈⠒⠓"]              # t: "B"F  (reduced Plank's constant)
+ - "ℏ": [tc: "⠈⠒⠓"]              # U+210F (reduced Planck constant)
  - "ⅆ": [tc: "⠙"]                # 0x2146
  - "ⅇ": [tc: "⠑"]                # 0x2147
  - "ⅈ": [tc: "⠊"]                # 0x2148

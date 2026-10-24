@@ -218,12 +218,12 @@
     "g": "грамм",
     "m": "метр",
     "mol": "моль",
-    "s": "секунда", "sec": "секунда",  # "sec" не является официальным, но поддерживается
+    "s": "секунда", "sec": "секунда",  # "sec" is a supported alias; the SI symbol is "s"
 
     # derived units
     "Bq": "беккерель",
     "C": "кулон",
-    "°C": "градус Цельсия", "℃": "градус Цельсия", # должны использоваться только с отрицательными степенями
+    "°C": "градус Цельсия", "℃": "градус Цельсия", # SI prefixes also apply to degrees Celsius (SI Brochure, section 3)
     "F": "фарад",
     "Gy": "грей",
     "H": "генри",
@@ -233,7 +233,7 @@
     "lm": "люмен",
     "lx": "люкс",
     "N": "ньютон",
-    "Ω": "ом", "Ω": "ом",       # греческая заглавная буква Омега, U+2126 OHM SIGN
+    "Ω": "ом", "Ω": "ом",       # Greek capital omega and U+2126 OHM SIGN
     "Pa": "паскаль",
     "S": "сименс",
     "Sv": "зиверт",
@@ -243,23 +243,23 @@
     "Wb": "вебер",
 
     # accepted (plus a few variants) that take SI prefixes
-    "l": "литр", "L": "литр", "ℓ": "литр",  # должны использоваться только с отрицательными степенями
-    "t": "тонна",           # должна использоваться только с положительными степенями
+    "l": "литр", "L": "литр", "ℓ": "литр",  # Both "l" and "L" are accepted symbols; the script form is also supported
+    "t": "тонна",           # SI prefixes are accepted with the tonne
     "Da": "дальтон",
-    "Np": "непер",               # должен использоваться только с отрицательными степенями
-    "u": "атомная единица массы",     # 'u' правильно: https://en.wikipedia.org/wiki/Dalton_(unit)
+    "Np": "непер",               # Logarithmic ratio unit
+    "u": "атомная единица массы",     # 'u' is an accepted symbol for the unified atomic mass unit
     "eV": "электронвольт",
-    "rad": "радиан",             # должен использоваться только с отрицательными степенями
-    "sr": "стерадиан",          # должен использоваться только с отрицательными степенями      
+    "rad": "радиан",             # SI unit of plane angle
+    "sr": "стерадиан",          # SI unit of solid angle
   
     # others that take a prefix
-    "a": "год",               # должен использоваться только с положительными степенями
-    "as": "угловая секунда",          # см. ru.wikipedia.org/wiki/Minute_and_second_of_arc
+    "a": "год",               # Supported symbol for year
+    "as": "угловая секунда",          # Supported alias for arcsecond
 
     # technically wrong, but used in practice with SI Units
-    "b": "бит",               # должен использоваться только с положительными степенями
-    "B": "байт",              # должен использоваться только с положительными степенями
-    "Bd": "бод",              # должен использоваться только с положительными степенями
+    "b": "бит",               # Supported information unit
+    "B": "байт",              # Supported information unit
+    "Bd": "бод",              # Supported symbol for baud
   }
 
 
@@ -273,7 +273,7 @@
     "y": "год", "yr": "год",    
 
     # angles
-    "°": "градус", "deg": "градус", # должны использоваться только с отрицательными степенями
+    "°": "градус", "deg": "градус", # Plane angle; listed here without SI prefixes
     "arcmin": "угловая минута",
     "amin": "угловая минута",
     "am": "угловая минута",
@@ -285,13 +285,13 @@
     "au": "астрономическая единица", "AU": "астрономическая единица",
     "ltyr": "световой год", "ly": "световой год",
     "pc": "парсек",
-    "Å": "ангстрем", "Å": "ангстрем",           # U+00C5 и U+212B
+    "Å": "ангстрем", "Å": "ангстрем",           # U+00C5 and U+212B
     "fm": "ферми",
 
     # others
     "ha": "гектар",
-    # "B": "bel",    # "B" чаще означает байты
-    "dB": "децибел", # уже логарифмическая, поэтому не используется с приставками СИ
+    # "B": "bel",    # "B" more commonly denotes bytes
+    "dB": "децибел", # Already logarithmic; kept in UnitsWithoutPrefixes
 
     "amu": "атомная единица массы",
     "atm": "атмосфера",
@@ -377,7 +377,7 @@
     "19": "девятнадцать", "89": "восемьдесят девять"
   }
 
-# Connector used by functional intent mappings, for example "синус от икс".
+# Connector used by functional intent mappings, for example "sine of x".
 - FunctionApplicationWord: ["от"]
 
 - CurrencySymbols: {

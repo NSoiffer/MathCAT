@@ -887,6 +887,7 @@
           then: [T: "снизу"]
     - else: [x: "*[2]"]
 
+# Describe an otherwise unrecognized annotation below the base expression.
 - name: default
   tag: munder
   match: "."
@@ -913,6 +914,7 @@
   - x: "*[1]"
   - x: "*[2]"
 
+# Describe an otherwise unrecognized annotation above the base expression.
 - name: default
   tag: mover
   match: "."
@@ -925,6 +927,7 @@
   - x: "*[2]"
   - T: "сверху"
 
+# Read the base followed by its lower and upper annotations.
 - name: default
   tag: munderover
   match: "."
