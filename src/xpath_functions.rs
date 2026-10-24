@@ -690,19 +690,17 @@ impl Function for Max {
 
 struct BaseNode;
 /**
- * Returns true if the node is a large op
- * @param(node)     -- node(s) to test -- should be an <mo>
+ * Returns the base of a scripted element (msub, msup, munder, ...), looking through nested scripts
+ * @param(node)     -- the node whose base is wanted
  */
  impl BaseNode {
-    /// Recursively find the base node
+    /// Find the base node by following the first child of scripted elements
     /// The base node of a non scripted element is the element itself
-    fn base_node(node: Element) -> Element {
-        let name = as_str!(node.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(node)));
-        if ["msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts"].contains(&name) {
-            return BaseNode::base_node(as_element(node.children()[0]));
-        } else {
-            return node;
+    fn base_node(mut node: Element) -> Element {
+        while IsNode::is_modified(node) {
+            node = as_element(node.children()[0]);
         }
+        return node;
     }
  }
  impl Function for BaseNode {
