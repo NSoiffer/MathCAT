@@ -201,7 +201,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [ot: ""]
+          then: [OT: ""]
       - T: "дробь"
   - x: "*[1]"
   - test:
@@ -247,7 +247,7 @@
   tag: fraction
   match: "."
   replace:
-  - ot: ""
+  - OT: ""
   - T: "дробь, числитель:"
   - x: "*[1]"
   - pause: medium
