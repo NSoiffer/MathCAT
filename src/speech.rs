@@ -2305,7 +2305,7 @@ impl SpeechRules {
             self.unicode_short_files.borrow_mut().set_files_and_times(self.read_unicode(None, true)?);
         }
 
-        if self.definitions_files.borrow().ft.is_empty() || !self.definitions_files.borrow().is_file_up_to_date(
+        if !self.definitions_files.borrow().is_file_up_to_date(
                             pref_manager.get_definitions_file(self.name != RulesFor::Braille),
                             should_ignore_file_time
         ) {
