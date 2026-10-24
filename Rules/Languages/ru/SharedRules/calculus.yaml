@@ -4,13 +4,13 @@
   tag: laplacian
   match: "count(*) <= 1"   # can be on ∇^2 or on enclosing mrow
   replace:
-  - T: "лапласиан"      # phrase('laplacian' of x)  -- "LahPlahsian" sounds better with speech engines tested
+  - T: "лапласиан"      # phrase(the 'laplacian' of a scalar field)
   - test:
       if: "count(*) = 1"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [T: "от"]             # phrase(function 'of' one variable) -- note OneCore voices spell out "div"
+          then: [T: "от"]             # phrase(the laplacian 'of' a scalar field)
       - test:
           if: "not(IsNode(*[1], 'leaf'))"
           then: [pause: short]
@@ -23,10 +23,10 @@
   - test:
       if: "$Verbosity='Terse'"
       then: [T: "див"]             # phrase('div' is short for divergence)
-      else: [T: "дивергенция"]      # phrase('divergence of' this function from the mean)
+      else: [T: "дивергенция"]      # phrase(the 'divergence' of a vector field)
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [T: "выражения"]
+      then: [T: "выражения"]      # Introduce a compound operand with the genitive form
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]
@@ -39,7 +39,7 @@
   - T: "ротор"      # phrase(the 'curl of' a field)
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [T: "выражения"]
+      then: [T: "выражения"]      # Introduce a compound operand with the genitive form
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]
@@ -51,11 +51,11 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [T: "градиент"]      # phrase(the hill has a 'gradient of' five percent)
-      else: [T: "набла"]      # phrase(the delete key is labeled 'del')
+      then: [T: "градиент"]      # phrase(the 'gradient' of a scalar field)
+      else: [T: "набла"]      # Nabla is the Russian name of the gradient symbol
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [T: "выражения"]
+      then: [T: "выражения"]      # Introduce a compound operand with the genitive form
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]

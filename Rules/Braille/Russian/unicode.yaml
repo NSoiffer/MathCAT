@@ -1,91 +1,91 @@
 ---
 # Russian mathematical braille characters
-- ".": [t: "⠠⠲"]
-- ",": [t: "⠠⠂"]
-- "!": [t: "⠠⠖"]
-- "?": [t: "⠠⠢"]
-- ":": [t: "⠀⠲"]
-- ";": [t: "⠠⠆"]
-- "№": [t: "⠝"]
-- "§": [t: "⠬"]
-- "…": [t: "⠠⠄"]
-- "↵": [t: "⠐"]
-- "⏎": [t: "⠠"]
-- "⍰": [t: "⠐"]
-- "[": [t: "⠷"]
-- "]": [t: "⠾"]
-- "{": [t: "⠪"]
-- "}": [t: "⠕"]
-- "/": [t: "⠠⠌"]
-- "\\": [t: "⠀⠰⠤"]
-- "|": [t: "⠸"]
-- "+": [t: "⠀⠖"]
-- "-": [t: "⠀⠤"]
-- "=": [t: "⠀⠶"]
-- "(": [t: "⠣"]
-- ")": [t: "⠜"]
-- ">": [t: "⠀⠕⠀"]
-- "<": [t: "⠀⠪⠀"]
-- "%": [t: "⠼⠴"]
-- "‰": [t: "⠼⠴⠴"]
-- "÷": [T: "⠀⠲"]
-- "±": [T: "⠖⠤"]
-- ";": [t: "⠠⠢"]
-- "Ϳ": [t: "⠰⠊"]
-- "·": [t: "⠰"]
-- "α": [t: "g⠁"]
-- "β": [t: "g⠃"]
-- "γ": [t: "g⠛"]
-- "δ": [t: "g⠙"]
-- "ε": [t: "g⠑"]
-- "ζ": [t: "g⠵"]
-- "η": [t: "g⠚"]
-- "θ": [t: "g⠓"]
-- "ι": [t: "g⠊"]
-- "κ": [t: "g⠅"]
-- "λ": [t: "g⠇"]
-- "μ": [t: "g⠍"]
-- "ν": [t: "g⠝"]
-- "ξ": [t: "g⠭"]
-- "ο": [t: "g⠕"]
-- "π": [t: "g⠏"]
-- "ρ": [t: "g⠗"]
-- "σ": [t: "g⠎"]
-- "τ": [t: "g⠞"]
-- "υ": [t: "g⠥"]
-- "φ": [t: "g⠋"]
-- "χ": [t: "g⠉"]
-- "ψ": [t: "g⠽"]
-- "ω": [t: "g⠺"]
-- "Α": [t: "v⠁"]
-- "Β": [t: "v⠃"]
-- "Γ": [t: "v⠛"]
-- "Δ": [t: "v⠙"]
-- "Ε": [t: "v⠑"]
-- "Ζ": [t: "v⠵"]
-- "Η": [t: "v⠚"]
-- "Θ": [t: "v⠓"]
-- "Ι": [t: "v⠊"]
-- "Κ": [t: "v⠅"]
-- "Λ": [t: "v⠇"]
-- "Μ": [t: "v⠍"]
-- "Ν": [t: "v⠝"]
-- "Ξ": [t: "v⠭"]
-- "Ο": [t: "v⠕"]
-- "Π": [t: "v⠏"]
-- "Ρ": [t: "v⠗"]
-- "Σ": [t: "v⠎"]
-- "Τ": [t: "v⠞"]
-- "Υ": [t: "v⠥"]
-- "Φ": [t: "v⠋"]
-- "Χ": [t: "v⠉"]
-- "Ψ": [t: "v⠽"]
-- "Ω": [t: "v⠺"]
-- "ϐ": [t: "g⠃"]
-- "ϑ": [t: "g⠓"]
-- "ϕ": [t: "g⠋"]
-- "ϖ": [t: "g⠏"]
-- "ϱ": [t: "g⠗"]
+- ".": [t: "⠠⠲"]  # 0x002E (full stop)
+- ",": [t: "⠠⠂"]  # 0x002C (comma)
+- "!": [t: "⠠⠖"]  # 0x0021 (exclamation mark)
+- "?": [t: "⠠⠢"]  # 0x003F (question mark)
+- ":": [t: "⠀⠲"]  # 0x003A (colon)
+- ";": [t: "⠠⠆"]  # 0x003B (semicolon)
+- "№": [t: "⠝"]  # 0x2116 (numero sign)
+- "§": [t: "⠬"]  # 0x00A7 (section sign)
+- "…": [t: "⠠⠄"]  # 0x2026 (horizontal ellipsis)
+- "↵": [t: "⠐"]  # 0x21B5 (downwards arrow with corner leftwards)
+- "⏎": [t: "⠠"]  # 0x23CE (return symbol)
+- "⍰": [t: "⠐"]  # 0x2370 (apl functional symbol quad question)
+- "[": [t: "⠷"]  # 0x005B (left square bracket)
+- "]": [t: "⠾"]  # 0x005D (right square bracket)
+- "{": [t: "⠪"]  # 0x007B (left curly bracket)
+- "}": [t: "⠕"]  # 0x007D (right curly bracket)
+- "/": [t: "⠠⠌"]  # 0x002F (solidus)
+- "\\": [t: "⠀⠰⠤"]  # 0x005C (reverse solidus)
+- "|": [t: "⠸"]  # 0x007C (vertical line)
+- "+": [t: "⠀⠖"]  # 0x002B (plus sign)
+- "-": [t: "⠀⠤"]  # 0x002D (hyphen-minus)
+- "=": [t: "⠀⠶"]  # 0x003D (equals sign)
+- "(": [t: "⠣"]  # 0x0028 (left parenthesis)
+- ")": [t: "⠜"]  # 0x0029 (right parenthesis)
+- ">": [t: "⠀⠕⠀"]  # 0x003E (greater-than sign)
+- "<": [t: "⠀⠪⠀"]  # 0x003C (less-than sign)
+- "%": [t: "⠼⠴"]  # 0x0025 (percent sign)
+- "‰": [t: "⠼⠴⠴"]  # 0x2030 (per mille sign)
+- "÷": [T: "⠀⠲"]  # 0x00F7 (division sign)
+- "±": [T: "⠖⠤"]  # 0x00B1 (plus-minus sign)
+- ";": [t: "⠠⠢"]  # 0x037E (greek question mark)
+- "Ϳ": [t: "⠰⠊"]  # 0x037F (greek capital letter yot)
+- "·": [t: "⠰"]  # 0x0387 (greek ano teleia)
+- "α": [t: "g⠁"]  # 0x03B1 (greek small letter alpha)
+- "β": [t: "g⠃"]  # 0x03B2 (greek small letter beta)
+- "γ": [t: "g⠛"]  # 0x03B3 (greek small letter gamma)
+- "δ": [t: "g⠙"]  # 0x03B4 (greek small letter delta)
+- "ε": [t: "g⠑"]  # 0x03B5 (greek small letter epsilon)
+- "ζ": [t: "g⠵"]  # 0x03B6 (greek small letter zeta)
+- "η": [t: "g⠚"]  # 0x03B7 (greek small letter eta)
+- "θ": [t: "g⠓"]  # 0x03B8 (greek small letter theta)
+- "ι": [t: "g⠊"]  # 0x03B9 (greek small letter iota)
+- "κ": [t: "g⠅"]  # 0x03BA (greek small letter kappa)
+- "λ": [t: "g⠇"]  # 0x03BB (greek small letter lamda)
+- "μ": [t: "g⠍"]  # 0x03BC (greek small letter mu)
+- "ν": [t: "g⠝"]  # 0x03BD (greek small letter nu)
+- "ξ": [t: "g⠭"]  # 0x03BE (greek small letter xi)
+- "ο": [t: "g⠕"]  # 0x03BF (greek small letter omicron)
+- "π": [t: "g⠏"]  # 0x03C0 (greek small letter pi)
+- "ρ": [t: "g⠗"]  # 0x03C1 (greek small letter rho)
+- "σ": [t: "g⠎"]  # 0x03C3 (greek small letter sigma)
+- "τ": [t: "g⠞"]  # 0x03C4 (greek small letter tau)
+- "υ": [t: "g⠥"]  # 0x03C5 (greek small letter upsilon)
+- "φ": [t: "g⠋"]  # 0x03C6 (greek small letter phi)
+- "χ": [t: "g⠉"]  # 0x03C7 (greek small letter chi)
+- "ψ": [t: "g⠽"]  # 0x03C8 (greek small letter psi)
+- "ω": [t: "g⠺"]  # 0x03C9 (greek small letter omega)
+- "Α": [t: "v⠁"]  # 0x0391 (greek capital letter alpha)
+- "Β": [t: "v⠃"]  # 0x0392 (greek capital letter beta)
+- "Γ": [t: "v⠛"]  # 0x0393 (greek capital letter gamma)
+- "Δ": [t: "v⠙"]  # 0x0394 (greek capital letter delta)
+- "Ε": [t: "v⠑"]  # 0x0395 (greek capital letter epsilon)
+- "Ζ": [t: "v⠵"]  # 0x0396 (greek capital letter zeta)
+- "Η": [t: "v⠚"]  # 0x0397 (greek capital letter eta)
+- "Θ": [t: "v⠓"]  # 0x0398 (greek capital letter theta)
+- "Ι": [t: "v⠊"]  # 0x0399 (greek capital letter iota)
+- "Κ": [t: "v⠅"]  # 0x039A (greek capital letter kappa)
+- "Λ": [t: "v⠇"]  # 0x039B (greek capital letter lamda)
+- "Μ": [t: "v⠍"]  # 0x039C (greek capital letter mu)
+- "Ν": [t: "v⠝"]  # 0x039D (greek capital letter nu)
+- "Ξ": [t: "v⠭"]  # 0x039E (greek capital letter xi)
+- "Ο": [t: "v⠕"]  # 0x039F (greek capital letter omicron)
+- "Π": [t: "v⠏"]  # 0x03A0 (greek capital letter pi)
+- "Ρ": [t: "v⠗"]  # 0x03A1 (greek capital letter rho)
+- "Σ": [t: "v⠎"]  # 0x03A3 (greek capital letter sigma)
+- "Τ": [t: "v⠞"]  # 0x03A4 (greek capital letter tau)
+- "Υ": [t: "v⠥"]  # 0x03A5 (greek capital letter upsilon)
+- "Φ": [t: "v⠋"]  # 0x03A6 (greek capital letter phi)
+- "Χ": [t: "v⠉"]  # 0x03A7 (greek capital letter chi)
+- "Ψ": [t: "v⠽"]  # 0x03A8 (greek capital letter psi)
+- "Ω": [t: "v⠺"]  # 0x03A9 (greek capital letter omega)
+- "ϐ": [t: "g⠃"]  # 0x03D0 (greek beta symbol)
+- "ϑ": [t: "g⠓"]  # 0x03D1 (greek theta symbol)
+- "ϕ": [t: "g⠋"]  # 0x03D5 (greek phi symbol)
+- "ϖ": [t: "g⠏"]  # 0x03D6 (greek pi symbol)
+- "ϱ": [t: "g⠗"]  # 0x03F1 (greek rho symbol)
 - "′":
   - test:
       if: "preceding-sibling::*[1][self::m:mn or .='°' or .='′']"
@@ -96,36 +96,37 @@
       if: "preceding-sibling::*[1][self::m:mn or .='°' or .='′']"
       then: [t: "⠨⠔⠔"]
       else: [t: "⠔⠔"]
-- "‴": [t: "⠔⠔⠔"]
-- "°": [t: "⠨⠴"]
-- "℃": [t: "⠨⠴⠨⠉"]
-- "℉": [T: "⠨⠴⠨⠋"]
-- "∀": [t: "⠫⠄"]
-- "∂": [t: "⠹"]
-- "∃": [t: "⠫⠢"]
-- "∅": [t: "⠈⠴"]
-- "∇": [t: "⠫⠴"]
-- "∈": [t: "⠀⠐⠪⠀"]
-- "∉": [t: "⠘⠪"]
-- "∋": [t: "⠀⠕⠂⠀"]
-- "∌": [t: "⠈⠕⠂⠄"]
-- "∎": [t: "⠀⠸⠇⠀"]
-- "∏": [t: "⠸⠏"]
-- "∑": [t: "⠸⠎"]
-- "−": [t: "⠀⠤"]
-- "∓": [T: "⠤⠖"]
-- "∔": [t: "⠈⠖"]
-- "∕": [T: "⠴"]
-- "⁄": [T: "⠳"]
-- "∖": [t: "⠀⠰⠤"]
-- "∗": [t: "⠔"]
-- "·": [t: "⠄"]
-- "×": [t: "⠀⠦"]
-- "⋅": [t: "⠄"]
-- "⁡": [t: ""]
-- "⁢": [t: ""]
-- "⁣": [t: ""]
-- "⁤": [t: ""]
+- "‴": [t: "⠔⠔⠔"]  # 0x2034 (triple prime)
+- "°": [t: "⠨⠴"]  # 0x00B0 (degree sign)
+- "℃": [t: "⠨⠴⠨⠉"]  # 0x2103 (degree celsius)
+- "℉": [T: "⠨⠴⠨⠋"]  # 0x2109 (degree fahrenheit)
+- "∀": [t: "⠫⠄"]  # 0x2200 (for all)
+- "∂": [t: "⠹"]  # 0x2202 (partial differential)
+- "∃": [t: "⠫⠢"]  # 0x2203 (there exists)
+- "∅": [t: "⠈⠴"]  # 0x2205 (empty set)
+- "∇": [t: "⠫⠴"]  # 0x2207 (nabla)
+- "∈": [t: "⠀⠐⠪⠀"]  # 0x2208 (element of)
+- "∉": [t: "⠘⠪"]  # 0x2209 (not an element of)
+- "∋": [t: "⠀⠕⠂⠀"]  # 0x220B (contains as member)
+- "∌": [t: "⠈⠕⠂⠄"]  # 0x220C (does not contain as member)
+- "∎": [t: "⠀⠸⠇⠀"]  # 0x220E (end of proof)
+- "∏": [t: "⠸⠏"]  # 0x220F (n-ary product)
+- "∑": [t: "⠸⠎"]  # 0x2211 (n-ary summation)
+- "−": [t: "⠀⠤"]  # 0x2212 (minus sign)
+- "∓": [T: "⠤⠖"]  # 0x2213 (minus-or-plus sign)
+- "∔": [t: "⠈⠖"]  # 0x2214 (dot plus)
+- "∕": [T: "⠴"]  # 0x2215 (division slash)
+- "⁄": [T: "⠳"]  # 0x2044 (fraction slash)
+- "∖": [t: "⠀⠰⠤"]  # 0x2216 (set minus)
+- "∗": [t: "⠔"]  # 0x2217 (asterisk operator)
+- "·": [t: "⠄"]  # 0x00B7 (middle dot)
+- "×": [t: "⠀⠦"]  # 0x00D7 (multiplication sign)
+- "⋅": [t: "⠄"]  # 0x22C5 (dot operator)
+- "⁡": [t: ""]  # 0x2061 (function application)
+- "⁢": [t: ""]  # 0x2062 (invisible times)
+- "⁣": [t: ""]  # 0x2063 (invisible separator)
+- "⁤": [t: ""]  # 0x2064 (invisible plus)
+# Function markers from RussianFunctionBraille; # is removed during braille cleanup.
 - "\uE100": [t: "⠫⠁⠎#"]
 - "\uE101": [t: "⠫⠁⠉#"]
 - "\uE102": [t: "⠫⠁⠞#"]
@@ -158,6 +159,7 @@
 - "\uE11D": [t: "⠫⠙⠊⠧#"]
 - "\uE11E": [t: "⠫⠛⠉⠙#"]
 - "\uE11F": [t: "⠫⠇⠉⠍#"]
+# Label markers from RussianLabelMarks.
 - "\uE130": [t: "⠔"]
 - "\uE131": [t: "⠆"]
 - "\uE132": [t: "⠦"]
@@ -171,6 +173,7 @@
 - "\uE13A": [t: "⠠⠢"]
 - "\uE13B": [T: "⠐⠒"]
 - "\uE02A": [T: "𝒢"]              # internal Russian digit-group separator
+# Continuation digits used after omissions, in long division, and in split repeating decimals.
 - "\ue020": [t: "⠚"]
 - "\ue021": [t: "⠁"]
 - "\ue022": [t: "⠃"]
@@ -181,6 +184,7 @@
 - "\ue027": [t: "⠛"]
 - "\ue028": [t: "⠓"]
 - "\ue029": [t: "⠊"]
+# Decimal-continuation digits used after a decimal comma and in repeating parts.
 - "\ue030": [t: "⠚"]
 - "\ue031": [t: "⠁"]
 - "\ue032": [t: "⠃"]
@@ -191,6 +195,7 @@
 - "\ue037": [t: "⠛"]
 - "\ue038": [t: "⠓"]
 - "\ue039": [t: "⠊"]
+# Column-arithmetic continuation digits; kept separate for spacing during cleanup.
 - "\ue040": [t: "⠚"]
 - "\ue041": [t: "⠁"]
 - "\ue042": [t: "⠃"]
@@ -201,162 +206,163 @@
 - "\ue047": [t: "⠛"]
 - "\ue048": [t: "⠓"]
 - "\ue049": [t: "⠊"]
-- "∘": [t: "⠴"]
-- "√": [t: "⠩⠱"]
-- "∛": [t: "⠩⠒⠱"]
-- "∜": [t: "⠩⠲⠱"]
-- "∞": [t: "⠻"]
-- "∠": [t: "⠸⠪"]
-- "⌒": [T: "⠸⠜"]
-- "∣": [t: "⠸"]
-- "∤": [t: "⠀⠼⠀"]
-- "∥": [t: "⠸⠸#"]
-- "∧": [t: "⠀⠰⠢"]
-- "∨": [t: "⠀⠰⠔"]
-- "∩": [t: "⠀⠰⠲"]
-- "∪": [t: "⠀⠰⠴"]
-- "∫": [t: "⠮"]
-- "∬": [t: "⠮⠮"]
-- "∭": [t: "⠮⠮⠮"]
-- "∮": [t: "⠮⠴"]
-- "∯": [t: "⠮⠮⠴"]
-- "∴": [t: "⠀⠠⠡⠀"]
-- "∵": [t: "⠀⠈⠌⠀"]
-- "∶": [t: "⠀⠳"]
-- "∸": [t: "⠈⠤"]
-- "∼": [t: "⠀⠢"]
-- "≅": [t: "⠀⠢"]
-- "≈": [t: "⠀⠢⠢"]
-- "≐": [t: "⠀⠒⠕"]
-- "≔": [t: "⠀⠶⠒"]
-- "≕": [t: "⠀⠶⠒"]
-- "≖": [t: "⠀⠶⠴"]
-- "≗": [t: "⠀⠶⠴"]
-- "≛": [t: "⠀⠶⠆"]
-- "≟": [t: "⠶⠢"]
-- "≠": [t: "⠀⠾"]
-- "≡": [t: "⠀⠰⠶"]
-- "≢": [t: "⠀⠰⠾"]
-- "≤": [t: "⠀⠪⠶"]
-- "≥": [t: "⠀⠕⠶"]
-- "≶": [T: "⠀⠪⠕⠀"]
-- "≷": [T: "⠀⠕⠪⠀"]
-- "≪": [t: "⠀⠪⠪⠀"]
-- "≫": [t: "⠀⠕⠕⠀"]
-- "≺": [t: "⠀⠒⠪⠀"]
-- "≻": [t: "⠀⠕⠒⠀"]
-- "≼": [t: "⠀⠒⠪⠶"]
-- "≽": [t: "⠀⠕⠒⠶"]
-- "⊂": [t: "⠀⠯⠀"]
-- "⊃": [t: "⠀⠹⠀"]
-- "⊄": [t: "⠈⠯"]
-- "⊅": [t: "⠈⠹"]
-- "⊆": [t: "⠀⠯⠶"]
-- "⊇": [t: "⠀⠹⠶"]
-- "⊕": [t: "⠀⠰⠖"]
-- "⊥": [t: "⠼⠄"]
-- "⟂": [T: "⠼⠄"]
-- "⊨": [t: "⠼⠎"]
-- "⊼": [t: "⠰⠌"]
-- "⊽": [t: "⠘⠡"]
-- "⋅": [t: "⠄"]
-- "⋆": [t: "⠔"]
-- "⋮": [t: "⠠⠲⠲⠲"]
-- "⋯": [t: "⠠⠲⠲⠲"]
-- "⋰": [t: "⠠⠲⠲⠲"]
-- "⋱": [t: "⠠⠲⠲⠲"]
-- "△": [t: "⠸⠙"]
-- "〈": [T: "⠪"]
-- "〉": [T: "⠕"]
-- "⟨": [T: "⠪"]
-- "⟩": [T: "⠕"]
-- "¬": [T: "⠩"]
-- "~": [T: "⠢"]
-- "↑": [T: "⠰⠌"]
-- "↓": [T: "⠘⠡"]
-- "↔": [T: "⠪⠒⠕"]
-- "↕": [T: "⠹⠄"]
-- "↖": [T: "⠐⠢"]
-- "↗": [T: "⠔⠂"]
-- "↘": [T: "⠢⠄"]
-- "↙": [T: "⠠⠔"]
-- "→": [T: "⠀⠒⠕⠀"]
-- "⟶": [T: "⠀⠒⠕⠀"]
-- "←": [T: "⠀⠪⠒⠀"]
-- "⟵": [T: "⠀⠪⠒⠀"]
-- "⇒": [t: "⠀⠶⠜"]
-- "⇐": [t: "⠀⠦⠶"]
-- "⇔": [t: "⠀⠦⠶⠜"]
-- "⇑": [T: "⠌⠌"]
-- "⇓": [T: "⠡⠡"]
-- "◻": [t: "⠶"]
-- "♮": [t: "⠻⠨⠝⠻"]
+- "∘": [t: "⠴"]  # 0x2218 (ring operator)
+- "√": [t: "⠩⠱"]  # 0x221A (square root)
+- "∛": [t: "⠩⠒⠱"]  # 0x221B (cube root)
+- "∜": [t: "⠩⠲⠱"]  # 0x221C (fourth root)
+- "∞": [t: "⠻"]  # 0x221E (infinity)
+- "∠": [t: "⠸⠪"]  # 0x2220 (angle)
+- "⌒": [T: "⠸⠜"]  # 0x2312 (arc)
+- "∣": [t: "⠸"]  # 0x2223 (divides)
+- "∤": [t: "⠀⠼⠀"]  # 0x2224 (does not divide)
+- "∥": [t: "⠸⠸#"]  # 0x2225 (parallel to)
+- "∧": [t: "⠀⠰⠢"]  # 0x2227 (logical and)
+- "∨": [t: "⠀⠰⠔"]  # 0x2228 (logical or)
+- "∩": [t: "⠀⠰⠲"]  # 0x2229 (intersection)
+- "∪": [t: "⠀⠰⠴"]  # 0x222A (union)
+- "∫": [t: "⠮"]  # 0x222B (integral)
+- "∬": [t: "⠮⠮"]  # 0x222C (double integral)
+- "∭": [t: "⠮⠮⠮"]  # 0x222D (triple integral)
+- "∮": [t: "⠮⠴"]  # 0x222E (contour integral)
+- "∯": [t: "⠮⠮⠴"]  # 0x222F (surface integral)
+- "∴": [t: "⠀⠠⠡⠀"]  # 0x2234 (therefore)
+- "∵": [t: "⠀⠈⠌⠀"]  # 0x2235 (because)
+- "∶": [t: "⠀⠳"]  # 0x2236 (ratio)
+- "∸": [t: "⠈⠤"]  # 0x2238 (dot minus)
+- "∼": [t: "⠀⠢"]  # 0x223C (tilde operator)
+- "≅": [t: "⠀⠢"]  # 0x2245 (approximately equal to)
+- "≈": [t: "⠀⠢⠢"]  # 0x2248 (almost equal to)
+- "≐": [t: "⠀⠒⠕"]  # 0x2250 (approaches the limit)
+- "≔": [t: "⠀⠶⠒"]  # 0x2254 (colon equals)
+- "≕": [t: "⠀⠶⠒"]  # 0x2255 (equals colon)
+- "≖": [t: "⠀⠶⠴"]  # 0x2256 (ring in equal to)
+- "≗": [t: "⠀⠶⠴"]  # 0x2257 (ring equal to)
+- "≛": [t: "⠀⠶⠆"]  # 0x225B (star equals)
+- "≟": [t: "⠶⠢"]  # 0x225F (questioned equal to)
+- "≠": [t: "⠀⠾"]  # 0x2260 (not equal to)
+- "≡": [t: "⠀⠰⠶"]  # 0x2261 (identical to)
+- "≢": [t: "⠀⠰⠾"]  # 0x2262 (not identical to)
+- "≤": [t: "⠀⠪⠶"]  # 0x2264 (less-than or equal to)
+- "≥": [t: "⠀⠕⠶"]  # 0x2265 (greater-than or equal to)
+- "≶": [T: "⠀⠪⠕⠀"]  # 0x2276 (less-than or greater-than)
+- "≷": [T: "⠀⠕⠪⠀"]  # 0x2277 (greater-than or less-than)
+- "≪": [t: "⠀⠪⠪⠀"]  # 0x226A (much less-than)
+- "≫": [t: "⠀⠕⠕⠀"]  # 0x226B (much greater-than)
+- "≺": [t: "⠀⠒⠪⠀"]  # 0x227A (precedes)
+- "≻": [t: "⠀⠕⠒⠀"]  # 0x227B (succeeds)
+- "≼": [t: "⠀⠒⠪⠶"]  # 0x227C (precedes or equal to)
+- "≽": [t: "⠀⠕⠒⠶"]  # 0x227D (succeeds or equal to)
+- "⊂": [t: "⠀⠯⠀"]  # 0x2282 (subset of)
+- "⊃": [t: "⠀⠹⠀"]  # 0x2283 (superset of)
+- "⊄": [t: "⠈⠯"]  # 0x2284 (not a subset of)
+- "⊅": [t: "⠈⠹"]  # 0x2285 (not a superset of)
+- "⊆": [t: "⠀⠯⠶"]  # 0x2286 (subset of or equal to)
+- "⊇": [t: "⠀⠹⠶"]  # 0x2287 (superset of or equal to)
+- "⊕": [t: "⠀⠰⠖"]  # 0x2295 (circled plus)
+- "⊥": [t: "⠼⠄"]  # 0x22A5 (up tack)
+- "⟂": [T: "⠼⠄"]  # 0x27C2 (perpendicular)
+- "⊨": [t: "⠼⠎"]  # 0x22A8 (true)
+- "⊼": [t: "⠰⠌"]  # 0x22BC (nand)
+- "⊽": [t: "⠘⠡"]  # 0x22BD (nor)
+- "⋅": [t: "⠄"]  # 0x22C5 (dot operator)
+- "⋆": [t: "⠔"]  # 0x22C6 (star operator)
+- "⋮": [t: "⠠⠲⠲⠲"]  # 0x22EE (vertical ellipsis)
+- "⋯": [t: "⠠⠲⠲⠲"]  # 0x22EF (midline horizontal ellipsis)
+- "⋰": [t: "⠠⠲⠲⠲"]  # 0x22F0 (up right diagonal ellipsis)
+- "⋱": [t: "⠠⠲⠲⠲"]  # 0x22F1 (down right diagonal ellipsis)
+- "△": [t: "⠸⠙"]  # 0x25B3 (white up-pointing triangle)
+- "〈": [T: "⠪"]  # 0x2329 (left-pointing angle bracket)
+- "〉": [T: "⠕"]  # 0x232A (right-pointing angle bracket)
+- "⟨": [T: "⠪"]  # 0x27E8 (mathematical left angle bracket)
+- "⟩": [T: "⠕"]  # 0x27E9 (mathematical right angle bracket)
+- "¬": [T: "⠩"]  # 0x00AC (not sign)
+- "~": [T: "⠢"]  # 0x007E (tilde)
+- "↑": [T: "⠰⠌"]  # 0x2191 (upwards arrow)
+- "↓": [T: "⠘⠡"]  # 0x2193 (downwards arrow)
+- "↔": [T: "⠪⠒⠕"]  # 0x2194 (left right arrow)
+- "↕": [T: "⠹⠄"]  # 0x2195 (up down arrow)
+- "↖": [T: "⠐⠢"]  # 0x2196 (north west arrow)
+- "↗": [T: "⠔⠂"]  # 0x2197 (north east arrow)
+- "↘": [T: "⠢⠄"]  # 0x2198 (south east arrow)
+- "↙": [T: "⠠⠔"]  # 0x2199 (south west arrow)
+- "→": [T: "⠀⠒⠕⠀"]  # 0x2192 (rightwards arrow)
+- "⟶": [T: "⠀⠒⠕⠀"]  # 0x27F6 (long rightwards arrow)
+- "←": [T: "⠀⠪⠒⠀"]  # 0x2190 (leftwards arrow)
+- "⟵": [T: "⠀⠪⠒⠀"]  # 0x27F5 (long leftwards arrow)
+- "⇒": [t: "⠀⠶⠜"]  # 0x21D2 (rightwards double arrow)
+- "⇐": [t: "⠀⠦⠶"]  # 0x21D0 (leftwards double arrow)
+- "⇔": [t: "⠀⠦⠶⠜"]  # 0x21D4 (left right double arrow)
+- "⇑": [T: "⠌⠌"]  # 0x21D1 (upwards double arrow)
+- "⇓": [T: "⠡⠡"]  # 0x21D3 (downwards double arrow)
+- "◻": [t: "⠶"]  # 0x25FB (white medium square)
+- "♮": [t: "⠻⠨⠝⠻"]  # 0x266E (music natural sign)
 
 # Latin letters and digits used for mathematical identifiers.
-- "a": [t: "l⠁"]
-- "A": [t: "u⠁"]
-- "b": [t: "l⠃"]
-- "B": [t: "u⠃"]
-- "c": [t: "l⠉"]
-- "C": [t: "u⠉"]
-- "d": [t: "l⠙"]
-- "D": [t: "u⠙"]
-- "e": [t: "l⠑"]
-- "E": [t: "u⠑"]
-- "f": [t: "l⠋"]
-- "F": [t: "u⠋"]
-- "g": [t: "l⠛"]
-- "G": [t: "u⠛"]
-- "h": [t: "l⠓"]
-- "H": [t: "u⠓"]
-- "i": [t: "l⠊"]
-- "I": [t: "u⠊"]
-- "j": [t: "l⠚"]
-- "J": [t: "u⠚"]
-- "k": [t: "l⠅"]
-- "K": [t: "u⠅"]
-- "l": [t: "l⠇"]
-- "L": [t: "u⠇"]
-- "m": [t: "l⠍"]
-- "M": [t: "u⠍"]
-- "n": [t: "l⠝"]
-- "N": [t: "u⠝"]
-- "o": [t: "l⠕"]
-- "O": [t: "u⠕"]
-- "p": [t: "l⠏"]
-- "P": [t: "u⠏"]
-- "q": [t: "l⠟"]
-- "Q": [t: "u⠟"]
-- "r": [t: "l⠗"]
-- "R": [t: "u⠗"]
-- "s": [t: "l⠎"]
-- "S": [t: "u⠎"]
-- "t": [t: "l⠞"]
-- "T": [t: "u⠞"]
-- "u": [t: "l⠥"]
-- "U": [t: "u⠥"]
-- "v": [t: "l⠧"]
-- "V": [t: "u⠧"]
-- "w": [t: "l⠺"]
-- "W": [t: "u⠺"]
-- "x": [t: "l⠭"]
-- "X": [t: "u⠭"]
-- "y": [t: "l⠽"]
-- "Y": [t: "u⠽"]
-- "z": [t: "l⠵"]
-- "Z": [t: "u⠵"]
-- "0": [t: "N⠚"]
-- "1": [t: "N⠁"]
-- "2": [t: "N⠃"]
-- "3": [t: "N⠉"]
-- "4": [t: "N⠙"]
-- "5": [t: "N⠑"]
-- "6": [t: "N⠋"]
-- "7": [t: "N⠛"]
-- "8": [t: "N⠓"]
-- "9": [t: "N⠊"]
+- "a": [t: "l⠁"]  # 0x0061 (latin small letter a)
+- "A": [t: "u⠁"]  # 0x0041 (latin capital letter a)
+- "b": [t: "l⠃"]  # 0x0062 (latin small letter b)
+- "B": [t: "u⠃"]  # 0x0042 (latin capital letter b)
+- "c": [t: "l⠉"]  # 0x0063 (latin small letter c)
+- "C": [t: "u⠉"]  # 0x0043 (latin capital letter c)
+- "d": [t: "l⠙"]  # 0x0064 (latin small letter d)
+- "D": [t: "u⠙"]  # 0x0044 (latin capital letter d)
+- "e": [t: "l⠑"]  # 0x0065 (latin small letter e)
+- "E": [t: "u⠑"]  # 0x0045 (latin capital letter e)
+- "f": [t: "l⠋"]  # 0x0066 (latin small letter f)
+- "F": [t: "u⠋"]  # 0x0046 (latin capital letter f)
+- "g": [t: "l⠛"]  # 0x0067 (latin small letter g)
+- "G": [t: "u⠛"]  # 0x0047 (latin capital letter g)
+- "h": [t: "l⠓"]  # 0x0068 (latin small letter h)
+- "H": [t: "u⠓"]  # 0x0048 (latin capital letter h)
+- "i": [t: "l⠊"]  # 0x0069 (latin small letter i)
+- "I": [t: "u⠊"]  # 0x0049 (latin capital letter i)
+- "j": [t: "l⠚"]  # 0x006A (latin small letter j)
+- "J": [t: "u⠚"]  # 0x004A (latin capital letter j)
+- "k": [t: "l⠅"]  # 0x006B (latin small letter k)
+- "K": [t: "u⠅"]  # 0x004B (latin capital letter k)
+- "l": [t: "l⠇"]  # 0x006C (latin small letter l)
+- "L": [t: "u⠇"]  # 0x004C (latin capital letter l)
+- "m": [t: "l⠍"]  # 0x006D (latin small letter m)
+- "M": [t: "u⠍"]  # 0x004D (latin capital letter m)
+- "n": [t: "l⠝"]  # 0x006E (latin small letter n)
+- "N": [t: "u⠝"]  # 0x004E (latin capital letter n)
+- "o": [t: "l⠕"]  # 0x006F (latin small letter o)
+- "O": [t: "u⠕"]  # 0x004F (latin capital letter o)
+- "p": [t: "l⠏"]  # 0x0070 (latin small letter p)
+- "P": [t: "u⠏"]  # 0x0050 (latin capital letter p)
+- "q": [t: "l⠟"]  # 0x0071 (latin small letter q)
+- "Q": [t: "u⠟"]  # 0x0051 (latin capital letter q)
+- "r": [t: "l⠗"]  # 0x0072 (latin small letter r)
+- "R": [t: "u⠗"]  # 0x0052 (latin capital letter r)
+- "s": [t: "l⠎"]  # 0x0073 (latin small letter s)
+- "S": [t: "u⠎"]  # 0x0053 (latin capital letter s)
+- "t": [t: "l⠞"]  # 0x0074 (latin small letter t)
+- "T": [t: "u⠞"]  # 0x0054 (latin capital letter t)
+- "u": [t: "l⠥"]  # 0x0075 (latin small letter u)
+- "U": [t: "u⠥"]  # 0x0055 (latin capital letter u)
+- "v": [t: "l⠧"]  # 0x0076 (latin small letter v)
+- "V": [t: "u⠧"]  # 0x0056 (latin capital letter v)
+- "w": [t: "l⠺"]  # 0x0077 (latin small letter w)
+- "W": [t: "u⠺"]  # 0x0057 (latin capital letter w)
+- "x": [t: "l⠭"]  # 0x0078 (latin small letter x)
+- "X": [t: "u⠭"]  # 0x0058 (latin capital letter x)
+- "y": [t: "l⠽"]  # 0x0079 (latin small letter y)
+- "Y": [t: "u⠽"]  # 0x0059 (latin capital letter y)
+- "z": [t: "l⠵"]  # 0x007A (latin small letter z)
+- "Z": [t: "u⠵"]  # 0x005A (latin capital letter z)
+- "0": [t: "N⠚"]  # 0x0030 (digit zero)
+- "1": [t: "N⠁"]  # 0x0031 (digit one)
+- "2": [t: "N⠃"]  # 0x0032 (digit two)
+- "3": [t: "N⠉"]  # 0x0033 (digit three)
+- "4": [t: "N⠙"]  # 0x0034 (digit four)
+- "5": [t: "N⠑"]  # 0x0035 (digit five)
+- "6": [t: "N⠋"]  # 0x0036 (digit six)
+- "7": [t: "N⠛"]  # 0x0037 (digit seven)
+- "8": [t: "N⠓"]  # 0x0038 (digit eight)
+- "9": [t: "N⠊"]  # 0x0039 (digit nine)
 
 # Lowered digits used in denominators and integer scripts.
+# Lower-cell digits for fraction denominators and integer root indices.
 - "\ue000": [t: "⠴"]
 - "\ue001": [t: "⠂"]
 - "\ue002": [t: "⠆"]
@@ -369,110 +375,110 @@
 - "\ue009": [t: "⠔"]
 
 # Precomposed Unicode fractions and script digits, verified against liblouis.
-- "¼": [T: "⠼⠁⠲"]
-- "½": [T: "⠼⠁⠆"]
-- "¾": [T: "⠼⠉⠲"]
-- "⅐": [T: "⠼⠁⠶"]
-- "⅑": [T: "⠼⠁⠔"]
-- "⅒": [T: "⠼⠁⠂⠴"]
-- "⅓": [T: "⠼⠁⠒"]
-- "⅔": [T: "⠼⠃⠒"]
-- "⅕": [T: "⠼⠁⠢"]
-- "⅖": [T: "⠼⠃⠢"]
-- "⅗": [T: "⠼⠉⠢"]
-- "⅘": [T: "⠼⠙⠢"]
-- "⅙": [T: "⠼⠁⠖"]
-- "⅚": [T: "⠼⠑⠖"]
-- "⅛": [T: "⠼⠁⠦"]
-- "⅜": [T: "⠼⠉⠦"]
-- "⅝": [T: "⠼⠑⠦"]
-- "⅞": [T: "⠼⠛⠦"]
-- "↉": [T: "⠼⠚⠒"]
-- "⁰": [T: "⠴"]
-- "¹": [T: "⠂"]
-- "²": [T: "⠆"]
-- "³": [T: "⠒"]
-- "⁴": [T: "⠲"]
-- "⁵": [T: "⠢"]
-- "⁶": [T: "⠖"]
-- "⁷": [T: "⠶"]
-- "⁸": [T: "⠦"]
-- "⁹": [T: "⠔"]
-- "₀": [T: "⠴"]
-- "₁": [T: "⠂"]
-- "₂": [T: "⠆"]
-- "₃": [T: "⠒"]
-- "₄": [T: "⠲"]
-- "₅": [T: "⠢"]
-- "₆": [T: "⠖"]
-- "₇": [T: "⠶"]
-- "₈": [T: "⠦"]
-- "₉": [T: "⠔"]
+- "¼": [T: "⠼⠁⠲"]  # 0x00BC (vulgar fraction one quarter)
+- "½": [T: "⠼⠁⠆"]  # 0x00BD (vulgar fraction one half)
+- "¾": [T: "⠼⠉⠲"]  # 0x00BE (vulgar fraction three quarters)
+- "⅐": [T: "⠼⠁⠶"]  # 0x2150 (vulgar fraction one seventh)
+- "⅑": [T: "⠼⠁⠔"]  # 0x2151 (vulgar fraction one ninth)
+- "⅒": [T: "⠼⠁⠂⠴"]  # 0x2152 (vulgar fraction one tenth)
+- "⅓": [T: "⠼⠁⠒"]  # 0x2153 (vulgar fraction one third)
+- "⅔": [T: "⠼⠃⠒"]  # 0x2154 (vulgar fraction two thirds)
+- "⅕": [T: "⠼⠁⠢"]  # 0x2155 (vulgar fraction one fifth)
+- "⅖": [T: "⠼⠃⠢"]  # 0x2156 (vulgar fraction two fifths)
+- "⅗": [T: "⠼⠉⠢"]  # 0x2157 (vulgar fraction three fifths)
+- "⅘": [T: "⠼⠙⠢"]  # 0x2158 (vulgar fraction four fifths)
+- "⅙": [T: "⠼⠁⠖"]  # 0x2159 (vulgar fraction one sixth)
+- "⅚": [T: "⠼⠑⠖"]  # 0x215A (vulgar fraction five sixths)
+- "⅛": [T: "⠼⠁⠦"]  # 0x215B (vulgar fraction one eighth)
+- "⅜": [T: "⠼⠉⠦"]  # 0x215C (vulgar fraction three eighths)
+- "⅝": [T: "⠼⠑⠦"]  # 0x215D (vulgar fraction five eighths)
+- "⅞": [T: "⠼⠛⠦"]  # 0x215E (vulgar fraction seven eighths)
+- "↉": [T: "⠼⠚⠒"]  # 0x2189 (vulgar fraction zero thirds)
+- "⁰": [T: "⠴"]  # 0x2070 (superscript zero)
+- "¹": [T: "⠂"]  # 0x00B9 (superscript one)
+- "²": [T: "⠆"]  # 0x00B2 (superscript two)
+- "³": [T: "⠒"]  # 0x00B3 (superscript three)
+- "⁴": [T: "⠲"]  # 0x2074 (superscript four)
+- "⁵": [T: "⠢"]  # 0x2075 (superscript five)
+- "⁶": [T: "⠖"]  # 0x2076 (superscript six)
+- "⁷": [T: "⠶"]  # 0x2077 (superscript seven)
+- "⁸": [T: "⠦"]  # 0x2078 (superscript eight)
+- "⁹": [T: "⠔"]  # 0x2079 (superscript nine)
+- "₀": [T: "⠴"]  # 0x2080 (subscript zero)
+- "₁": [T: "⠂"]  # 0x2081 (subscript one)
+- "₂": [T: "⠆"]  # 0x2082 (subscript two)
+- "₃": [T: "⠒"]  # 0x2083 (subscript three)
+- "₄": [T: "⠲"]  # 0x2084 (subscript four)
+- "₅": [T: "⠢"]  # 0x2085 (subscript five)
+- "₆": [T: "⠖"]  # 0x2086 (subscript six)
+- "₇": [T: "⠶"]  # 0x2087 (subscript seven)
+- "₈": [T: "⠦"]  # 0x2088 (subscript eight)
+- "₉": [T: "⠔"]  # 0x2089 (subscript nine)
 
 # Russian literary braille letters for mtext and Cyrillic identifiers.
-- "а": [t: "⠁"]
-- "А": [t: "C⠁"]
-- "б": [t: "⠃"]
-- "Б": [t: "C⠃"]
-- "в": [t: "⠺"]
-- "В": [t: "C⠺"]
-- "г": [t: "⠛"]
-- "Г": [t: "C⠛"]
-- "д": [t: "⠙"]
-- "Д": [t: "C⠙"]
-- "е": [t: "⠑"]
-- "Е": [t: "C⠑"]
-- "ё": [t: "⠡"]
-- "Ё": [t: "C⠡"]
-- "ж": [t: "⠚"]
-- "Ж": [t: "C⠚"]
-- "з": [t: "⠵"]
-- "З": [t: "C⠵"]
-- "и": [t: "⠊"]
-- "И": [t: "C⠊"]
-- "й": [t: "⠯"]
-- "Й": [t: "C⠯"]
-- "к": [t: "⠅"]
-- "К": [t: "C⠅"]
-- "л": [t: "⠇"]
-- "Л": [t: "C⠇"]
-- "м": [t: "⠍"]
-- "М": [t: "C⠍"]
-- "н": [t: "⠝"]
-- "Н": [t: "C⠝"]
-- "о": [t: "⠕"]
-- "О": [t: "C⠕"]
-- "п": [t: "⠏"]
-- "П": [t: "C⠏"]
-- "р": [t: "⠗"]
-- "Р": [t: "C⠗"]
-- "с": [t: "⠎"]
-- "С": [t: "C⠎"]
-- "т": [t: "⠞"]
-- "Т": [t: "C⠞"]
-- "у": [t: "⠥"]
-- "У": [t: "C⠥"]
-- "ф": [t: "⠋"]
-- "Ф": [t: "C⠋"]
-- "х": [t: "⠓"]
-- "Х": [t: "C⠓"]
-- "ц": [t: "⠉"]
-- "Ц": [t: "C⠉"]
-- "ч": [t: "⠟"]
-- "Ч": [t: "C⠟"]
-- "ш": [t: "⠱"]
-- "Ш": [t: "C⠱"]
-- "щ": [t: "⠭"]
-- "Щ": [t: "C⠭"]
-- "ъ": [t: "⠷"]
-- "Ъ": [t: "C⠷"]
-- "ы": [t: "⠮"]
-- "Ы": [t: "C⠮"]
-- "ь": [t: "⠾"]
-- "Ь": [t: "C⠾"]
-- "э": [t: "⠪"]
-- "Э": [t: "C⠪"]
-- "ю": [t: "⠳"]
-- "Ю": [t: "C⠳"]
-- "я": [t: "⠫"]
-- "Я": [t: "C⠫"]
+- "а": [t: "⠁"]  # 0x0430 (cyrillic small letter a)
+- "А": [t: "C⠁"]  # 0x0410 (cyrillic capital letter a)
+- "б": [t: "⠃"]  # 0x0431 (cyrillic small letter be)
+- "Б": [t: "C⠃"]  # 0x0411 (cyrillic capital letter be)
+- "в": [t: "⠺"]  # 0x0432 (cyrillic small letter ve)
+- "В": [t: "C⠺"]  # 0x0412 (cyrillic capital letter ve)
+- "г": [t: "⠛"]  # 0x0433 (cyrillic small letter ghe)
+- "Г": [t: "C⠛"]  # 0x0413 (cyrillic capital letter ghe)
+- "д": [t: "⠙"]  # 0x0434 (cyrillic small letter de)
+- "Д": [t: "C⠙"]  # 0x0414 (cyrillic capital letter de)
+- "е": [t: "⠑"]  # 0x0435 (cyrillic small letter ie)
+- "Е": [t: "C⠑"]  # 0x0415 (cyrillic capital letter ie)
+- "ё": [t: "⠡"]  # 0x0451 (cyrillic small letter io)
+- "Ё": [t: "C⠡"]  # 0x0401 (cyrillic capital letter io)
+- "ж": [t: "⠚"]  # 0x0436 (cyrillic small letter zhe)
+- "Ж": [t: "C⠚"]  # 0x0416 (cyrillic capital letter zhe)
+- "з": [t: "⠵"]  # 0x0437 (cyrillic small letter ze)
+- "З": [t: "C⠵"]  # 0x0417 (cyrillic capital letter ze)
+- "и": [t: "⠊"]  # 0x0438 (cyrillic small letter i)
+- "И": [t: "C⠊"]  # 0x0418 (cyrillic capital letter i)
+- "й": [t: "⠯"]  # 0x0439 (cyrillic small letter short i)
+- "Й": [t: "C⠯"]  # 0x0419 (cyrillic capital letter short i)
+- "к": [t: "⠅"]  # 0x043A (cyrillic small letter ka)
+- "К": [t: "C⠅"]  # 0x041A (cyrillic capital letter ka)
+- "л": [t: "⠇"]  # 0x043B (cyrillic small letter el)
+- "Л": [t: "C⠇"]  # 0x041B (cyrillic capital letter el)
+- "м": [t: "⠍"]  # 0x043C (cyrillic small letter em)
+- "М": [t: "C⠍"]  # 0x041C (cyrillic capital letter em)
+- "н": [t: "⠝"]  # 0x043D (cyrillic small letter en)
+- "Н": [t: "C⠝"]  # 0x041D (cyrillic capital letter en)
+- "о": [t: "⠕"]  # 0x043E (cyrillic small letter o)
+- "О": [t: "C⠕"]  # 0x041E (cyrillic capital letter o)
+- "п": [t: "⠏"]  # 0x043F (cyrillic small letter pe)
+- "П": [t: "C⠏"]  # 0x041F (cyrillic capital letter pe)
+- "р": [t: "⠗"]  # 0x0440 (cyrillic small letter er)
+- "Р": [t: "C⠗"]  # 0x0420 (cyrillic capital letter er)
+- "с": [t: "⠎"]  # 0x0441 (cyrillic small letter es)
+- "С": [t: "C⠎"]  # 0x0421 (cyrillic capital letter es)
+- "т": [t: "⠞"]  # 0x0442 (cyrillic small letter te)
+- "Т": [t: "C⠞"]  # 0x0422 (cyrillic capital letter te)
+- "у": [t: "⠥"]  # 0x0443 (cyrillic small letter u)
+- "У": [t: "C⠥"]  # 0x0423 (cyrillic capital letter u)
+- "ф": [t: "⠋"]  # 0x0444 (cyrillic small letter ef)
+- "Ф": [t: "C⠋"]  # 0x0424 (cyrillic capital letter ef)
+- "х": [t: "⠓"]  # 0x0445 (cyrillic small letter ha)
+- "Х": [t: "C⠓"]  # 0x0425 (cyrillic capital letter ha)
+- "ц": [t: "⠉"]  # 0x0446 (cyrillic small letter tse)
+- "Ц": [t: "C⠉"]  # 0x0426 (cyrillic capital letter tse)
+- "ч": [t: "⠟"]  # 0x0447 (cyrillic small letter che)
+- "Ч": [t: "C⠟"]  # 0x0427 (cyrillic capital letter che)
+- "ш": [t: "⠱"]  # 0x0448 (cyrillic small letter sha)
+- "Ш": [t: "C⠱"]  # 0x0428 (cyrillic capital letter sha)
+- "щ": [t: "⠭"]  # 0x0449 (cyrillic small letter shcha)
+- "Щ": [t: "C⠭"]  # 0x0429 (cyrillic capital letter shcha)
+- "ъ": [t: "⠷"]  # 0x044A (cyrillic small letter hard sign)
+- "Ъ": [t: "C⠷"]  # 0x042A (cyrillic capital letter hard sign)
+- "ы": [t: "⠮"]  # 0x044B (cyrillic small letter yeru)
+- "Ы": [t: "C⠮"]  # 0x042B (cyrillic capital letter yeru)
+- "ь": [t: "⠾"]  # 0x044C (cyrillic small letter soft sign)
+- "Ь": [t: "C⠾"]  # 0x042C (cyrillic capital letter soft sign)
+- "э": [t: "⠪"]  # 0x044D (cyrillic small letter e)
+- "Э": [t: "C⠪"]  # 0x042D (cyrillic capital letter e)
+- "ю": [t: "⠳"]  # 0x044E (cyrillic small letter yu)
+- "Ю": [t: "C⠳"]  # 0x042E (cyrillic capital letter yu)
+- "я": [t: "⠫"]  # 0x044F (cyrillic small letter ya)
+- "Я": [t: "C⠫"]  # 0x042F (cyrillic capital letter ya)

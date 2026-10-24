@@ -47,6 +47,7 @@
       then: [T: "бесконечность"]
       else: [x: "*[2]"]
 
+# Handle a determinant whose child is an expression rather than table rows.
 - name: scalar-determinant
   tag: determinant
   match: "count(*)=1 and not(*[1][self::m:mtr])"
@@ -58,6 +59,7 @@
       then: [T: "конец определителя"]      # phrase('end determinant' of a matrix)
 
 
+# Read the norm before its index.
 - name: subscripted-norm
   tag: subscripted-norm
   match: "count(*)=2"
