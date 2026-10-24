@@ -631,15 +631,9 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             return;
         }
         let top_entry = nav_state.pop().unwrap();
-        let mut count = count - 1;
-        loop {
-            // debug!("  ... loop count={}", count);
+        for _ in 0..count {
             nav_state.pop();
-            if count == 0 {
-                break;
-            };
-            count -= 1;
-        };
+        }
         if push_command_on_stack {
             nav_state.push(top_entry.position, top_entry.command);
         }
