@@ -429,11 +429,7 @@ impl TTS {
         }
 
         let mut result = String::with_capacity(255);
-        result += &match self {
-            TTS::None  => self.get_string_none(&command, prefs, true)?,
-            TTS::SSML  => self.get_string_ssml(&command, prefs, true)?,
-            TTS::SAPI5 => self.get_string_sapi5(&command, prefs, true)?,
-        };
+        result += &self.get_string(&command, prefs, true)?;
 
 
         if !command.replacements.is_empty()  {
@@ -444,11 +440,7 @@ impl TTS {
             result += &speech;
         }
 
-        let end_tag = match self {
-            TTS::None  => self.get_string_none(&command, prefs, false)?,
-            TTS::SSML  => self.get_string_ssml(&command, prefs, false)?,
-            TTS::SAPI5 => self.get_string_sapi5(&command, prefs, false)?,
-        };   
+        let end_tag = self.get_string(&command, prefs, false)?;
 
         if end_tag.is_empty() {
             return Ok( result ); // avoids adding in " "
@@ -467,6 +459,15 @@ impl TTS {
             }
         }
     
+    }
+
+    /// Dispatch to the engine-specific code that generates the start or end tag for `command`
+    fn get_string(&self, command: &TTSCommandRule, prefs: &PreferenceManager, is_start_tag: bool) -> Result<String> {
+        return match self {
+            TTS::None  => self.get_string_none(command, prefs, is_start_tag),
+            TTS::SSML  => self.get_string_ssml(command, prefs, is_start_tag),
+            TTS::SAPI5 => self.get_string_sapi5(command, prefs, is_start_tag),
+        };
     }
 
     // auto pausing can't be known until neighboring strings are computed
@@ -663,12 +664,7 @@ impl TTS {
             value: TTSCommandValue::Number(pause as f64),
             replacements: ReplacementArray::build_empty(),
         };
-        return match self {
-            TTS::None  => self.get_string_none(&command, prefs, true),
-            TTS::SSML  => self.get_string_ssml(&command, prefs, true),
-            TTS::SAPI5 => self.get_string_sapi5(&command, prefs, true),
-        };
-
+        return self.get_string(&command, prefs, true);
     }
 
     /// Take the longest of the pauses
