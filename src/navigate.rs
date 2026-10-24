@@ -14,7 +14,7 @@ use crate::speech::{NAVIGATION_RULES, CONCAT_INDICATOR, CONCAT_STRING, SpeechRul
 use crate::infer_intent::add_fixity_children;
 use crate::interface::copy_mathml;
 use crate::tts::TTS;
-#[cfg(not(target_family = "wasm"))]634
+#[cfg(not(target_family = "wasm"))]
 use std::time::Instant;
 use crate::errors::*;
 use phf::phf_set;
