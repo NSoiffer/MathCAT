@@ -741,42 +741,14 @@ enum NavigationParam {
 }
 
 
-fn choose_command(
-	shift_key: bool,
-	control_key: bool,
-	none: NavigationCommand,
-	shift: NavigationCommand,
-	control: NavigationCommand,
-	shift_control: NavigationCommand
-) -> NavigationCommand {
-	   if shift_key && control_key {
-		return shift_control;
-    } else if control_key {
-        return control;
-    } else if shift_key {
-		return shift;
-	} else {
-		return none;
-    }
-}
-
-fn choose_param(
-	shift_key: bool,
-	control_key: bool,
-	none: NavigationParam,
-	shift: NavigationParam,
-	control: NavigationParam,
-	shift_control: NavigationParam
-) -> NavigationParam {
-    if shift_key && control_key {
-		return shift_control;
-    } else if control_key {
-        return control;
-    } else if shift_key {
-		return shift;
-	} else {
-		return none;
-    }
+/// Returns one of four values (a `NavigationCommand` or `NavigationParam`) depending on which of Shift/Ctrl are held.
+fn choose<T>(shift_key: bool, control_key: bool, none: T, shift: T, control: T, shift_control: T) -> T {
+    return match (shift_key, control_key) {
+        (true, true) => shift_control,
+        (false, true) => control,
+        (true, false) => shift,
+        (false, false) => none,
+    };
 }
 
 fn key_press_to_command_and_param(
@@ -790,7 +762,7 @@ fn key_press_to_command_and_param(
 	// for now, we build in the defaults
 
     // this is a hack to map alt+ctl+arrow to ctl+arrow to change table mappings (github.com/daisy/MathCAT/issues/105)
-    // if this change sticks, choose_command() needs to be changed and this hack should go away
+    // if this change sticks, choose() needs to be changed and this hack should go away
     let mut alt_key = alt_key;
     if alt_key && control_key && [VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN].contains(&key) {
         alt_key = false;
@@ -803,37 +775,37 @@ fn key_press_to_command_and_param(
     let param;
 	match key {
         VK_LEFT => {
-            command = choose_command(shift_key, control_key, NavigationCommand::Move,   NavigationCommand::Read,	NavigationCommand::Move,	   NavigationCommand::Describe);
-            param =   choose_param(  shift_key, control_key, NavigationParam::Previous, NavigationParam::Previous, NavigationParam::CellPrevious, NavigationParam::Previous);
+            command = choose(shift_key, control_key, NavigationCommand::Move,   NavigationCommand::Read,	NavigationCommand::Move,	   NavigationCommand::Describe);
+            param =   choose(shift_key, control_key, NavigationParam::Previous, NavigationParam::Previous, NavigationParam::CellPrevious, NavigationParam::Previous);
             },
         VK_RIGHT => {
-            command = choose_command(shift_key, control_key, NavigationCommand::Move,	NavigationCommand::Read, NavigationCommand::Move,	  NavigationCommand::Describe);
-            param =   choose_param(  shift_key, control_key, NavigationParam::Next, NavigationParam::Next, NavigationParam::CellNext, NavigationParam::Next);
+            command = choose(shift_key, control_key, NavigationCommand::Move,	NavigationCommand::Read, NavigationCommand::Move,	  NavigationCommand::Describe);
+            param =   choose(shift_key, control_key, NavigationParam::Next, NavigationParam::Next, NavigationParam::CellNext, NavigationParam::Next);
             },
         VK_UP => {
-            command = choose_command(shift_key, control_key, NavigationCommand::Zoom,      NavigationCommand::ChangeNavMode, NavigationCommand::Move,   NavigationCommand::Zoom);
-            param =   choose_param(  shift_key, control_key, NavigationParam::Previous,  NavigationParam::Previous,      NavigationParam::CellUp, NavigationParam::Start);
+            command = choose(shift_key, control_key, NavigationCommand::Zoom,      NavigationCommand::ChangeNavMode, NavigationCommand::Move,   NavigationCommand::Zoom);
+            param =   choose(shift_key, control_key, NavigationParam::Previous,  NavigationParam::Previous,      NavigationParam::CellUp, NavigationParam::Start);
             },
         VK_DOWN => {
-            command = choose_command(shift_key, control_key, NavigationCommand::Zoom, NavigationCommand::ChangeNavMode, NavigationCommand::Move,     NavigationCommand::Zoom);
-            param =   choose_param(  shift_key, control_key, NavigationParam::Next, NavigationParam::Next,          NavigationParam::CellDown, NavigationParam::End);
+            command = choose(shift_key, control_key, NavigationCommand::Zoom, NavigationCommand::ChangeNavMode, NavigationCommand::Move,     NavigationCommand::Zoom);
+            param =   choose(shift_key, control_key, NavigationParam::Next, NavigationParam::Next,          NavigationParam::CellDown, NavigationParam::End);
             },
         VK_RETURN => {
-            command = choose_command(shift_key, control_key, NavigationCommand::Locate,  NavigationCommand::Last, NavigationCommand::Locate, NavigationCommand::Last);
-            param =   choose_param(  shift_key, control_key, NavigationParam::Previous,NavigationParam::Last, NavigationParam::Last,    NavigationParam::Last);
+            command = choose(shift_key, control_key, NavigationCommand::Locate,  NavigationCommand::Last, NavigationCommand::Locate, NavigationCommand::Last);
+            param =   choose(shift_key, control_key, NavigationParam::Previous,NavigationParam::Last, NavigationParam::Last,    NavigationParam::Last);
             },
         VK_SPACE => {
-            command = choose_command(shift_key, control_key, NavigationCommand::Read,		NavigationCommand::ToggleSpeakMode,    NavigationCommand::Read,        NavigationCommand::Describe);
-            param =   choose_param(  shift_key, control_key, NavigationParam::Current, NavigationParam::Last,                NavigationParam::CellCurrent, NavigationParam::Current);
+            command = choose(shift_key, control_key, NavigationCommand::Read,		NavigationCommand::ToggleSpeakMode,    NavigationCommand::Read,        NavigationCommand::Describe);
+            param =   choose(shift_key, control_key, NavigationParam::Current, NavigationParam::Last,                NavigationParam::CellCurrent, NavigationParam::Current);
             },
     
         VK_HOME => {
-            command = choose_command(shift_key, control_key, NavigationCommand::Move, NavigationCommand::Move,	   NavigationCommand::Move,      NavigationCommand::ReadTo);
-            param =   choose_param(  shift_key, control_key, NavigationParam::Start,NavigationParam::ColStart, NavigationParam::LineStart, NavigationParam::Start);
+            command = choose(shift_key, control_key, NavigationCommand::Move, NavigationCommand::Move,	   NavigationCommand::Move,      NavigationCommand::ReadTo);
+            param =   choose(shift_key, control_key, NavigationParam::Start,NavigationParam::ColStart, NavigationParam::LineStart, NavigationParam::Start);
             },
         VK_END => {
-            command = choose_command(shift_key, control_key, NavigationCommand::Move, NavigationCommand::Move,   NavigationCommand::Move,    NavigationCommand::ReadTo);
-            param =   choose_param(  shift_key, control_key, NavigationParam::End,  NavigationParam::ColEnd, NavigationParam::LineEnd, NavigationParam::End);
+            command = choose(shift_key, control_key, NavigationCommand::Move, NavigationCommand::Move,   NavigationCommand::Move,    NavigationCommand::ReadTo);
+            param =   choose(shift_key, control_key, NavigationParam::End,  NavigationParam::ColEnd, NavigationParam::LineEnd, NavigationParam::End);
             },
         VK_BACK => {
             command = NavigationCommand::MoveLastLocation;
@@ -844,7 +816,7 @@ fn key_press_to_command_and_param(
             param = NavigationParam::Last;
             },
         0x30..=0x39 => {  // '0' ... '9'
-            command = choose_command(shift_key, control_key, NavigationCommand::Move, NavigationCommand::Read, NavigationCommand::SetPlacemarker, NavigationCommand::Describe);
+            command = choose(shift_key, control_key, NavigationCommand::Move, NavigationCommand::Read, NavigationCommand::SetPlacemarker, NavigationCommand::Describe);
             static PLACE_MARKER: &[NavigationParam] = &[
                 NavigationParam::Placemarker0,
                 NavigationParam::Placemarker1,
