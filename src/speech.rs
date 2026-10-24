@@ -2855,9 +2855,8 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         }
         self.translate_count = 0;     // not in loop
         // debug!("*** Did not find unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
-        if rules.translate_single_chars_only || ch.is_ascii() {  // speech or if braille, avoid loop (ASCII remains ASCII if not found)
-            return Ok(self.escape_string_for_safety(String::from(ch)));
-        } else if ('\u{2800}'..='\u{28ff}').contains(&ch) {   // braille -- leave as braille
+        if rules.translate_single_chars_only || ch.is_ascii() ||  // speech or if braille, avoid loop (ASCII remains ASCII if not found)
+           ('\u{2800}'..='\u{28ff}').contains(&ch) {             // braille -- leave as braille
             return Ok(self.escape_string_for_safety(String::from(ch)));
         } else {                                    // Emulate what NVDA does: generate (including single quotes) '\xhhhh' or '\yhhhhhh'
             let prefix_indicator = if ch_as_u32 < 1<<16 {'x'} else {'y'};
