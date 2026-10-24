@@ -189,7 +189,9 @@ def test_cli_main_rich_output_matches_grouped_golden(capsys, monkeypatch) -> Non
     golden_path = Path(__file__).resolve().parent / "golden" / "rich" / "cli_calculus_verbose.golden"
 
     old_width = console.width
+    old_legacy_windows = console.legacy_windows
     console.width = 80
+    console.legacy_windows = False  # on Windows rich would otherwise replace the rounded box corners
 
     try:
         monkeypatch.setattr(sys, "argv", ["audit_translations", *args])
@@ -197,6 +199,7 @@ def test_cli_main_rich_output_matches_grouped_golden(capsys, monkeypatch) -> Non
         output = strip_ansi(capsys.readouterr().out)
     finally:
         console.width = old_width
+        console.legacy_windows = old_legacy_windows
 
     assert output == golden_path.read_text(encoding="utf-8")
 
@@ -264,11 +267,13 @@ def test_cli_module_rich_output_groups_by_rule_and_type() -> None:
     env = os.environ.copy()
     env["PYTHONPATH"] = os.pathsep.join([str(python_scripts_dir), env.get("PYTHONPATH", "")]).strip(os.pathsep)
     env["COLUMNS"] = "80"
+    env["PYTHONIOENCODING"] = "utf-8"  # output contains characters like "≠" that e.g. Windows code pages lack
 
     result = subprocess.run(
         [sys.executable, "-m", "audit_translations", *args],
         capture_output=True,
         text=True,
+        encoding="utf-8",
         cwd=str(python_scripts_dir),
         env=env,
         check=True,
