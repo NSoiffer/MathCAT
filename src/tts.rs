@@ -234,18 +234,13 @@ pub enum TTS {
 /// Applies only when generating speech (not braille) with SSML or SAPI5 output.
 /// Returns `s` unchanged when no escaping is needed (no allocation).
 pub fn escape_string_for_safety(s: String, rules_for: RulesFor, tts: &TTS) -> String {
-    if rules_for == RulesFor::Braille || (*tts != TTS::SSML && *tts != TTS::SAPI5) {
-        return s;
-    }
-    if !needs_xml_text_escape(&s) {
+    if rules_for == RulesFor::Braille ||
+       (*tts != TTS::SSML && *tts != TTS::SAPI5) ||
+       !s.contains(['&', '<', '>', '"']) {   // no XML text escape needed
         return s;
     }
     log::debug!("Escaping string for safety: {}", s);
     return encode_safe(&s).into_owned();
-}
-
-fn needs_xml_text_escape(s: &str) -> bool {
-    return s.as_bytes().iter().any(|&b| b == b'&' || b == b'<' || b == b'>' || b == b'"');
 }
 
 impl TTS {
