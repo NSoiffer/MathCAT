@@ -391,42 +391,36 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             const LOOP_LIMIT: usize = 3;
             let mut cumulative_speech = String::with_capacity(120);
             for loop_count in 0..LOOP_LIMIT {
-                match apply_navigation_rules(mathml, nav_command, &rules, &mut rules_with_context, &mut nav_state, loop_count) {
-                    Ok( (speech, done)) => {
-                        cumulative_speech = cumulative_speech + if loop_count==0 {""} else {" "} + speech.trim();
-                        if done {
-                            let (tts, rate) = {
-                                let prefs = rules.pref_manager.borrow();
-                                (prefs.get_tts(), prefs.pref_to_string("MathRate"))
-                            };
-                            if rate != "100" {
-                                match tts {
-                                    TTS::SSML
-                                        if !cumulative_speech.starts_with("<prosody rate") => {
-                                            cumulative_speech = format!("<prosody rate='{}%'>{}</prosody>", rate, cumulative_speech);
-                                        }
-                                    TTS::SAPI5
-                                        if !cumulative_speech.starts_with("<rate speed") => {
-                                            cumulative_speech = format!(
-                                                "<rate speed='{:.1}'>{}</rate>",
-                                                10.0 * (0.01 * rate.parse::<f32>().unwrap_or(100.0)).log(3.0),
-                                                cumulative_speech
-                                            );
-                                        }
-                                    _ => (),  // do nothing
+                let (speech, done) = apply_navigation_rules(mathml, nav_command, &rules, &mut rules_with_context, &mut nav_state, loop_count)?;
+                cumulative_speech = cumulative_speech + if loop_count==0 {""} else {" "} + speech.trim();
+                if done {
+                    let (tts, rate) = {
+                        let prefs = rules.pref_manager.borrow();
+                        (prefs.get_tts(), prefs.pref_to_string("MathRate"))
+                    };
+                    if rate != "100" {
+                        match tts {
+                            TTS::SSML
+                                if !cumulative_speech.starts_with("<prosody rate") => {
+                                    cumulative_speech = format!("<prosody rate='{}%'>{}</prosody>", rate, cumulative_speech);
                                 }
-                            }
-                                                return Ok( rules.pref_manager.borrow().get_tts()
-                                            .merge_pauses(crate::speech::remove_optional_indicators(
-                                                &cumulative_speech.replace(CONCAT_STRING, "")
-                                                                    .replace(CONCAT_INDICATOR, "")                            
-                                                            )
-                                            .trim_start().trim_end_matches([' ', ',', ';'])) );
+                            TTS::SAPI5
+                                if !cumulative_speech.starts_with("<rate speed") => {
+                                    cumulative_speech = format!(
+                                        "<rate speed='{:.1}'>{}</rate>",
+                                        10.0 * (0.01 * rate.parse::<f32>().unwrap_or(100.0)).log(3.0),
+                                        cumulative_speech
+                                    );
+                                }
+                            _ => (),  // do nothing
                         }
-                    },
-                    Err(e) => {
-                        return Err(e);
                     }
+                    return Ok( rules.pref_manager.borrow().get_tts()
+                                .merge_pauses(crate::speech::remove_optional_indicators(
+                                    &cumulative_speech.replace(CONCAT_STRING, "")
+                                                        .replace(CONCAT_INDICATOR, "")
+                                                )
+                                .trim_start().trim_end_matches([' ', ',', ';'])) );
                 }
             }
             bail!("Internal error: Navigation exceeded limit of number of times no speech generated
